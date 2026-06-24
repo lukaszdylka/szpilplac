@@ -67,6 +67,10 @@ main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:9px}
 footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin-top:22px;line-height:1.8}
 footer a{color:var(--green);font-weight:600}
 footer a:hover{text-decoration:underline}
+.footer-sources{margin-top:10px;font-size:11px;color:var(--ink2);opacity:.7;line-height:1.6}
+.footer-sources a{color:var(--ink2);font-weight:400}
+.footer-sources a:hover{color:var(--green);text-decoration:underline}
+.buycoffee{margin-top:10px}
 </style>
 </head>
 <body>
@@ -82,7 +86,6 @@ footer a:hover{text-decoration:underline}
         <button id="lSzl">ŚL</button>
       </div>
       <button class="icon-btn" id="themeBtn" title="Zmień motyw">
-        <!-- ikona motywu podmieniana przez JS -->
         <svg id="themeIco" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
       </button>
     </div>
@@ -91,10 +94,20 @@ footer a:hover{text-decoration:underline}
 <main id="games"></main>
 <footer>
   <a href="https://www.familock.pl" target="_blank" rel="noopener">Escape Room Familock</a> ·
-  <a href="https://gra.familock.pl" target="_blank" rel="noopener">Gra point&click "Starzik. TheSzpil</a> ·
+  <a href="https://gra.familock.pl" target="_blank" rel="noopener">Gra point&amp;click „Starzik. TheSzpil"</a> ·
   <a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a>
-  <br>
-  <p><a href="https://buycoffee.to/wspolnotafamilocka" target="_blank"><img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width: 97px; height: 25px" alt="Postaw kawę dla Łukasz Dyłka [Familock ER] na buycoffee.to"></a></p>
+
+  <div class="footer-sources">
+    Słownik śląski: <a href="https://bonclok.pl/slowniczek-wyrazow-slaskich/" target="_blank" rel="noopener">bonclok.pl</a>
+    · <a href="https://slunski-chachor.com" target="_blank" rel="noopener">slunski-chachor.com</a>
+  </div>
+
+  <div class="buycoffee">
+    <a href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener">
+      <img src="https://buycoffee.to/static/img/share/share-button-dark.png"
+           style="width:97px;height:25px" alt="Postaw kawę na buycoffee.to">
+    </a>
+  </div>
 </footer>
 <script>
 "use strict";
@@ -104,15 +117,12 @@ var store=(function(){var m={},ok=false;
   return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
          set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
 
-/* SVG ikony — monochromatyczne, stroke=currentColor */
 var ICO={
   sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
   moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>',
   auto:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
-  /* ikony gier */
   word:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="6" y1="10" x2="9" y2="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="9" y1="8" x2="9" y2="12"/></svg>',
   lock:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
-  photo:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><path d="M7 4l1.5-2h3L13 4"/></svg>',
   conn:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>'
 };
 var THEME_ICONS={system:ICO.auto,light:ICO.sun,dark:ICO.moon};
@@ -128,26 +138,26 @@ document.getElementById("themeBtn").addEventListener("click",function(){
 });
 applyTheme();
 
+// ── Aby aktywować grę zmień false na true: ──
+var ACTIVE_KLODKA  = false;
+var ACTIVE_CUZAMEN = false;
+
 var lang=store.get(LK)||"pl";
 var S={
   pl:{sub:"Codzienne familockowe gry i zagadki",live:"Dzisiaj",done:"Zagrane",soon:"Wkrótce",
-    games:[{ico:ICO.word,name:"Słōwko",      desc:"Zgadnij śląskie słowo dnia — 6 prób.",       href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",      desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.",    href:ACTIVE_KLODKA?"klodka.html":null},
-           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znajdź cztery grupy po cztery słowa.",      href:ACTIVE_CUZAMEN?"cuzamen.html":null}]},
+    games:[{ico:ICO.word,name:"Słōwko",       desc:"Zgadnij śląskie słowo dnia — 6 prób.",    href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",       desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.", href:ACTIVE_KLODKA?"klodka.html":null},
+           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znajdź cztery grupy po cztery słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}]},
   szl:{sub:"Codzienne familockowe szpile i zagadki",live:"Dzisiej",done:"Zagrane",soon:"Niydługo",
-    games:[{ico:ICO.word,name:"Słōwko",      desc:"Zgodnij ślonske słowo dnia — 6 prób.",       href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",      desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",      href:ACTIVE_KLODKA?"klodka.html":null},
-           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa.",      href:ACTIVE_CUZAMEN?"cuzamen.html":null}]}
+    games:[{ico:ICO.word,name:"Słōwko",       desc:"Zgodnij ślonske słowo dnia — 6 prób.",    href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",       desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",   href:ACTIVE_KLODKA?"klodka.html":null},
+           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}]}
 };
 function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();
   function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}
   return Math.floor((md(n)-md(s))/86400000);}
 var DAY=daysSince(2026,6,23);
 var KEYS={"slowko.html":"slowko_v2","cuzamen.html":"cuzamen_v1"};
-
-// ── Aby aktywować grę zmień false na true: ──
-var ACTIVE_KLODKA  = false;
-var ACTIVE_CUZAMEN = false;
 function playedToday(href){try{var g=JSON.parse(store.get(KEYS[href])||"{}").game;
   return g&&g.day===DAY&&g.status&&g.status!=="playing";}catch(e){return false;}}
 
