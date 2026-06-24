@@ -88,14 +88,16 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 
 /* KLAWIATURA */
 .kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
-  margin-top:auto;padding-top:6px}
+  margin-top:6px;padding-top:2px}
 .kbd-row{display:flex;gap:4px;justify-content:center}
-.key{flex:1;min-width:0;height:48px;border-radius:7px;background:var(--surface2);
+.kbd-row:nth-child(2){padding:0 14px}
+.kbd-row:nth-child(3) .key{height:38px;font-size:clamp(10px,3vw,13px)}
+.key{flex:1;min-width:0;height:46px;border-radius:7px;background:var(--surface2);
   border:1px solid var(--line);font-weight:700;font-size:clamp(11px,3.5vw,15px);
   color:var(--ink);display:flex;align-items:center;justify-content:center;
   text-transform:uppercase;transition:transform .05s,background .12s}
 .key:active{transform:translateY(1px)}
-.key.wide{flex:1.7;font-size:10.5px;letter-spacing:.02em}
+.key.wide{flex:1.75;font-size:10.5px;letter-spacing:.02em}
 .key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .key.present{background:var(--present);border-color:var(--present);color:#fff}
 .key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
@@ -520,10 +522,10 @@ hydrateStatsFromDayGames();
 
 /* ── KLAWIATURA ─────────────────────────────────────────────────────── */
 var KEY_ROWS=[
-  ["A","B","C","Ć","D","E","F","G","H"],
-  ["I","J","K","L","Ł","M","N","Ń","O"],
-  ["Ó","P","R","S","Ś","T","U","W","Y"],
-  ["ENTER","Z","Ź","Ż","⌫"]
+  ["Ą","Ć","Ę","Ł","Ń","Ó","Ś","Ź","Ż","Ō","Ô","Ŏ"],
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","⌫"]
 ];
 var ALPHABET={};
 KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
