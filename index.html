@@ -109,7 +109,8 @@ var ICO={
   /* ikony gier */
   word:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="6" y1="10" x2="9" y2="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="9" y1="8" x2="9" y2="12"/></svg>',
   lock:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
-  photo:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><path d="M7 4l1.5-2h3L13 4"/></svg>'
+  photo:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><path d="M7 4l1.5-2h3L13 4"/></svg>',
+  conn:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>'
 };
 var THEME_ICONS={system:ICO.auto,light:ICO.sun,dark:ICO.moon};
 var THEMES=["system","light","dark"];
@@ -127,19 +128,23 @@ applyTheme();
 var lang=store.get(LK)||"pl";
 var S={
   pl:{sub:"Codzienne familockowe gry i zagadki",live:"Dzisiaj",done:"Zagrane",soon:"Wkrótce",
-    games:[{ico:ICO.word,name:"Słōwko",desc:"Zgadnij śląskie słowo dnia — 6 prób.",href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.",href:null},
-           {ico:ICO.photo,name:"Fotka",  desc:"Co to za przedmiot ze Starzika?",href:null}]},
+    games:[{ico:ICO.word,name:"Słōwko",      desc:"Zgadnij śląskie słowo dnia — 6 prób.",       href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",      desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.",    href:ACTIVE_KLODKA?"klodka.html":null},
+           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znajdź cztery grupy po cztery słowa.",      href:ACTIVE_CUZAMEN?"cuzamen.html":null}]},
   szl:{sub:"Codzienne familockowe szpile i zagadki",live:"Dzisiej",done:"Zagrane",soon:"Niydługo",
-    games:[{ico:ICO.word,name:"Słōwko",desc:"Zgodnij ślonske słowo dnia — 6 prób.",href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",href:null},
-           {ico:ICO.photo,name:"Fotka",  desc:"Co to za przedmiot ze Starzika?",href:null}]}
+    games:[{ico:ICO.word,name:"Słōwko",      desc:"Zgodnij ślonske słowo dnia — 6 prób.",       href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",      desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",      href:ACTIVE_KLODKA?"klodka.html":null},
+           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa.",      href:ACTIVE_CUZAMEN?"cuzamen.html":null}]}
 };
 function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();
   function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}
   return Math.floor((md(n)-md(s))/86400000);}
 var DAY=daysSince(2026,6,23);
-var KEYS={"slowko.html":"slowko_v2"};
+var KEYS={"slowko.html":"slowko_v2","cuzamen.html":"cuzamen_v1"};
+
+// ── Aby aktywować grę zmień false na true: ──
+var ACTIVE_KLODKA  = false;
+var ACTIVE_CUZAMEN = false;
 function playedToday(href){try{var g=JSON.parse(store.get(KEYS[href])||"{}").game;
   return g&&g.day===DAY&&g.status&&g.status!=="playing";}catch(e){return false;}}
 
