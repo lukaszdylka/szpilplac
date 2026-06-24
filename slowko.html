@@ -908,11 +908,13 @@ function startCd(){clearInterval(cdTimer);
 function showEnd(){
   var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
   var isToday=currentDay===TODAY_IDX;
+  var isArchive=currentDay<TODAY_IDX;
   openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
     '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
-    (isToday?statsHtml()+distHtml()+cdHtml(t):'')+ // statystyki tylko dla dzisiaj
-    (isToday?'<button class="btn" id="shareBtn">'+t.share+'</button>':'')+
+    statsHtml()+distHtml()+  // statystyki zawsze
+    (isToday?cdHtml(t):'')+  // odliczanie tylko dla dzisiaj
+    '<button class="btn" id="shareBtn">'+t.share+'</button>'+
     '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(isToday)startCd();}
