@@ -972,33 +972,9 @@ function loadDay(dayIdx){
   buildBoard();buildKbd();relabelKbd();
 
   var saved=loadDayGame(dayIdx);
-  // Archiwum: jeśli mamy zapisany stan — pokaż tylko, bez fetch
-  if(dayIdx<TODAY_IDX){
-    PNO=dayIdx+1;
-    document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
-    if(saved&&saved.guesses&&saved.guesses.length>0){
-      LEN=Array.from(saved.guesses[0]).length;
-      buildBoard();buildKbd();
-      game={guesses:[],status:saved.status||"playing",reveal:saved.reveal||null};
-      saved.guesses.forEach(function(g,i){
-        var states=saved.states&&saved.states[i]?saved.states[i]:Array.from(g).map(function(){return"absent";});
-        stateCache[g]=states;game.guesses.push(g);paintRow(i,Array.from(g),states,false);
-      });
-      paintKbd();
-      if(game.status!=="playing")setTimeout(function(){showEnd();},300);
-    } else {
-      // Nie grał tego dnia — pobierz meta żeby pokazać planszę z właściwą długością
-      rpc("wihajster_day",{p_day:dayIdx}).then(function(meta){
-        LEN=meta.length;buildBoard();buildKbd();
-        game={guesses:[],status:"not_played",reveal:null};
-      }).catch(function(){});
-    }
-    return;
-  }
-
-  // Dziś lub przyszłość (tester) — zawsze przez Supabase
   var fn=dayIdx===TODAY_IDX?"wihajster_today":"wihajster_day";
   var args=dayIdx===TODAY_IDX?{}:{p_day:dayIdx};
+
   rpc(fn,args).then(function(meta){
     LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
     currentHint=meta.hint||null;
@@ -1008,24 +984,29 @@ function loadDay(dayIdx){
     buildBoard();buildKbd();relabelKbd();
 
     var s=saved||{guesses:[],status:"playing",reveal:null};
-    game={guesses:[],status:s.status||"playing",reveal:s.reveal||null};
+    var savedStatus=(s.status==="won"||s.status==="lost")?s.status:"playing";
+    game={guesses:[],status:savedStatus,reveal:s.reveal||null};
 
-    // Odtwórz próby przez Supabase (re-ocena żeby mieć stany)
     var replay=s.guesses||[];
     (function step(i){
       if(i>=replay.length){
         paintKbd();
+        updateCatBar();
         updateHintBar();
+        updateNavBar();
         if(game.status!=="playing")setTimeout(function(){showEnd();},300);
-        return;}
+        return;
+      }
       var g=replay[i],arr=Array.from(g);
       var fn2=dayIdx===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
       var a2=dayIdx===TODAY_IDX?{p_guess:g}:{p_day:dayIdx,p_guess:g};
       rpc(fn2,a2).then(function(res){
-        stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);
+        var st=res&&res.states?res.states:((s.states&&s.states[i])||arr.map(function(){return"absent";}));
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
       }).catch(function(){
-        var st=arr.map(function(){return"absent";});
-        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);});
+        var st=(s.states&&s.states[i])||arr.map(function(){return"absent";});
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
+      });
     })(0);
   }).catch(function(){toast(T().errConn);});
 }
