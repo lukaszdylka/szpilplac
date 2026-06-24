@@ -203,14 +203,15 @@ footer a{color:var(--green);font-weight:600}
   letter-spacing:.06em;padding:3px 10px;border-radius:999px;
   border:1px solid var(--line);background:var(--surface2)}
 
-/* DALTONIZM — wzory na kafelkach */
-.cb .tile.correct::after{content:"✓";position:absolute;font-size:.7em;bottom:2px;right:3px;opacity:.7}
-.cb .tile.present::after{content:"◆";position:absolute;font-size:.55em;bottom:2px;right:3px;opacity:.7}
-.cb .tile.absent::after{content:"✕";position:absolute;font-size:.6em;bottom:2px;right:3px;opacity:.5}
-.cb .tile{position:relative}
-.cb .key.correct::after{content:"✓";font-size:.6em;margin-left:2px;opacity:.8}
-.cb .key.present::after{content:"◆";font-size:.5em;margin-left:2px;opacity:.8}
-.cb .key.absent::after{content:"✕";font-size:.55em;margin-left:2px;opacity:.6}
+/* DALTONIZM — inne kolory rozróżnialne bez rozróżniania czerwień/zieleń */
+.cb .tile.correct,.cb .key.correct{background:#1a6fc4!important;border-color:#1a6fc4!important}
+.cb .tile.present,.cb .key.present{background:#e07b1a!important;border-color:#e07b1a!important}
+.cb .tile.absent,.cb .key.absent{background:#555!important;border-color:#555!important}
+[data-theme=dark] .cb .tile.correct,[data-theme=dark] .cb .key.correct{background:#3a8fe4!important;border-color:#3a8fe4!important}
+[data-theme=dark] .cb .tile.present,[data-theme=dark] .cb .key.present{background:#f09030!important;border-color:#f09030!important}
+/* Nadpisanie zmiennych CSS — obejmuje swatch w helpie i wszystkie inne elementy */
+.cb{--correct:#1a6fc4;--present:#e07b1a}
+[data-theme=dark] .cb{--correct:#3a8fe4;--present:#f09030}
 
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
 .no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake{animation:none!important}
@@ -705,11 +706,12 @@ function updateNavBar(){
     var dg=loadDayGame(currentDay);
     if(dg&&dg.status!=="playing"){
       archiveMsgEl.textContent=t.archReadonly;
+      kbdEl.style.display="none";
     } else {
       archiveMsgEl.textContent=t.archNotPlayed;
+      kbdEl.style.display="";
     }
     archiveMsgEl.style.display="block";
-    kbdEl.style.display="none"; // archiwum = tylko podgląd
   } else {
     // przyszłość (tester)
     archiveMsgEl.style.display="none";
@@ -736,7 +738,9 @@ function maxGuesses(){return IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;}
 function onKey(k){
   var isToday=currentDay===TODAY_IDX;
   var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
-  if(!isToday&&!isFutureTester){return;} // archiwum = readonly
+  var isArchiveUnplayed=currentDay<TODAY_IDX&&(!game||game.status==="playing");
+  var canPlay=isToday||isFutureTester||isArchiveUnplayed;
+  if(!canPlay){return;}
   if(!game||game.status!=="playing"){
     toast(isToday?T().done:T().doneArchive);return;
   }
