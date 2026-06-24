@@ -53,9 +53,38 @@ document.getElementById("refreshBtn").addEventListener("click", loadData);
 document.getElementById("clearStatsBtn").addEventListener("click", clearStats);
 function esc(v){ return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function qEvents(){
-  var cols = "id,created_at,game,puzzle_no,puzzle_word,won,tries,max_tries,guesses,lang,mode,errors";
-  var url = SUPABASE_URL + "/rest/v1/szpilplac_events?select=" + encodeURIComponent(cols) + "&order=created_at.desc&limit=2000";
-  return fetch(url,{headers:{"apikey":serviceKey,"Authorization":"Bearer "+serviceKey,"Accept":"application/json"}}).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); });
+  // Używamy select=* zamiast listy kolumn, żeby panel działał także wtedy,
+  // gdy tabela ma starszy schemat i nie ma jeszcze np. guesses, mode albo errors.
+  var url = SUPABASE_URL + "/rest/v1/szpilplac_events?select=*&order=created_at.desc&limit=2000";
+  return fetch(url,{headers:{"apikey":serviceKey,"Authorization":"Bearer "+serviceKey,"Accept":"application/json"}})
+    .then(function(r){
+      if(!r.ok){
+        return r.text().then(function(txt){
+          throw new Error("HTTP "+r.status+(txt?" — "+txt.slice(0,300):""));
+        });
+      }
+      return r.json();
+    })
+    .then(function(rows){
+      return Array.isArray(rows) ? rows.map(normalizeEventRow) : [];
+    });
+}
+function normalizeEventRow(r){
+  r = r || {};
+  return {
+    id: r.id || null,
+    created_at: r.created_at || new Date().toISOString(),
+    game: r.game || "slowko",
+    puzzle_no: r.puzzle_no == null ? null : r.puzzle_no,
+    puzzle_word: r.puzzle_word || null,
+    won: !!r.won,
+    tries: r.tries == null ? null : Number(r.tries),
+    max_tries: r.max_tries == null ? null : Number(r.max_tries),
+    guesses: Array.isArray(r.guesses) ? r.guesses : [],
+    lang: r.lang || null,
+    mode: r.mode || null,
+    errors: r.errors == null ? null : Number(r.errors)
+  };
 }
 function loadData(){ document.getElementById("content").innerHTML='<div class="spinner">Ładuję dane…</div>'; qEvents().then(function(rows){ allRows=Array.isArray(rows)?rows:[]; render(); }).catch(function(e){ document.getElementById("content").innerHTML='<p style="color:var(--red);padding:20px">Nie udało się pobrać danych. Sprawdź, czy uruchomiłeś SQL tworzący tabelę oraz czy wpisałeś service role key. Szczegół: '+esc(e.message)+'</p>'; }); }
 function clearStats(){
