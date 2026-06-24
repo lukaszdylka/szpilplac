@@ -184,6 +184,25 @@ footer a{color:var(--green);font-weight:600}
 .archive-view{opacity:.85;pointer-events:none}
 .archive-msg{text-align:center;padding:10px 0 4px;font-size:12px;color:var(--ink2);font-style:italic}
 
+/* PANEL USTAWIEŃ */
+.sett-row{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid var(--line)}
+.sett-row:last-child{border-bottom:none;padding-bottom:0}
+.sett-label{font-size:14px;color:var(--ink)}
+.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;
+  overflow:hidden;background:var(--surface2)}
+.seg button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2);white-space:nowrap}
+.seg button.on{background:var(--green);color:#fff}
+
+/* WSKAZÓWKA */
+.hint-bar{display:flex;align-items:center;gap:8px;margin:2px 0 4px;min-height:28px}
+.hint-btn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+  border:1px solid var(--gold);color:var(--gold);background:transparent;white-space:nowrap}
+.hint-btn:hover{background:var(--surface2)}
+.hint-text{font-size:12.5px;color:var(--ink2);font-style:italic}
+.hint-text b{color:var(--ink);font-style:normal}
+
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
 </style>
 </head>
@@ -201,6 +220,9 @@ footer a{color:var(--green);font-weight:600}
       </button>
       <button class="icon-btn" id="helpBtn" title="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="icon-btn" id="settBtn" title="Ustawienia">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M12.95 3.05l-1.06 1.06M4.11 11.89l-1.06 1.06"/></svg>
       </button>
       <button class="icon-btn" id="statBtn" title="Statystyki">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
@@ -228,6 +250,7 @@ footer a{color:var(--green);font-weight:600}
 
 <main>
   <div class="board" id="board"></div>
+  <div class="hint-bar" id="hintBar" style="display:none"></div>
   <div class="archive-msg" id="archiveMsg" style="display:none"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="kbd" id="kbd"></div>
@@ -273,7 +296,13 @@ var MAX_GUESSES_TEST = 20;             // tester może zgadywać więcej
 var STORAGE_KEY  = "slowko_v2";
 var LANG_KEY     = "familock_lang";
 var THEME_KEY    = "szpilplac_theme";
-var EPOCH        = new Date(2026, 5, 23); // 2026-06-23
+var HINT_KEY     = "slowko_hint";   // ustawienie wskazówki
+var EPOCH        = new Date(2026, 5, 23);
+
+// Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
+var hintMode = store.get(HINT_KEY) || "off";
+var currentHint = null;   // tłumaczenie bieżącego dnia (z meta)
+var hintShown = false;    // czy wskazówka już widoczna // 2026-06-23
 
 /* ── TRYB TESTOWY ───────────────────────────────────────────────────── */
 var IS_TESTER = (function(){
@@ -290,10 +319,24 @@ function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); retu
 function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short"}); }
 
 /* ── STORE ──────────────────────────────────────────────────────────── */
-var store=(function(){var m={},ok=false;
-  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
-  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
-         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+var store=(function(){
+  var m={},ok=false;
+  try{
+    localStorage.setItem("__t","1");
+    localStorage.removeItem("__t");
+    ok=true;
+  }catch(e){ok=false;}
+  return{
+    get:function(k){
+      if(!ok)return m[k]||null;
+      try{return localStorage.getItem(k);}catch(e){return m[k]||null;}
+    },
+    set:function(k,v){
+      if(!ok){m[k]=v;return;}
+      try{localStorage.setItem(k,v);}catch(e){m[k]=v;}
+    }
+  };
+})();
 
 // Klucz per-dzień: "slowko_d42" itd.
 function dayKey(idx){ return "slowko_d"+idx; }
@@ -336,6 +379,12 @@ var S={
     lgA:"Tej litery nie ma w słowie.",
     spH:"Jak wpisywać?",
     spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>• śląskie <b>wongel</b> → WONGEL<br><br>Klawisz <b>Ł</b> jest na klawiaturze.",
+    settH:"Ustawienia",
+    settHintL:"Wskazówka",
+    settHintS:"Tłumaczenie słowa po polsku",
+    settOff:"Wył.",settManual:"Na żądanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    hintBtn:"Pokaż wskazówkę",
+    hintPre:"Wskazówka: to po polsku ",
     archReadonly:"Archiwum — podgląd Twojego wyniku",
     archNotPlayed:"Ten dzień minął — nie grałeś wtedy.",
     calTitle:"Archiwum",
@@ -357,6 +406,12 @@ var S={
     lgA:"Tyj litery w słowie niy ma.",
     spH:"Jak wpisywać?",
     spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>• ślonske <b>rechtor</b> → RECHTOR<br><br>Klawisz <b>Ł</b> je na tastaturze.",
+    settH:"Ustawiynia",
+    settHintL:"Podpowiydź",
+    settHintS:"Tłumaczynie słowa po polsku",
+    settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    hintBtn:"Pokoz podpowiydź",
+    hintPre:"Podpowiydź: to po polsku ",
     archReadonly:"Archiwum — podglond twojego wyniku",
     archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
     calTitle:"Archiwum",
@@ -456,6 +511,80 @@ function paintKbd(){
     el.classList.remove("correct","present","absent");if(best[c])el.classList.add(best[c]);});
 }
 
+/* ── WSKAZÓWKA ──────────────────────────────────────────────────────── */
+var hintBarEl = document.getElementById("hintBar");
+
+function updateHintBar(){
+  if(!currentHint||hintMode==="off"){hintBarEl.style.display="none";return;}
+  var isToday=currentDay===TODAY_IDX;
+  var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
+  if(!isToday&&!isFutureTester){hintBarEl.style.display="none";return;}
+  if(!game||game.status!=="playing"){hintBarEl.style.display="none";return;}
+  var t=T();
+  var tryCount=game?game.guesses.length:0;
+  var autoAt=parseInt(hintMode,10); // NaN gdy "off" lub "manual"
+
+  if(hintShown){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text">'+t.hintPre+'<b>'+currentHint+'</b></span>';
+    return;
+  }
+  if(hintMode==="manual"){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<button class="hint-btn" id="hintShowBtn">'+t.hintBtn+'</button>';
+    document.getElementById("hintShowBtn").addEventListener("click",function(){
+      hintShown=true;updateHintBar();});
+    return;
+  }
+  if(!isNaN(autoAt)&&tryCount>=autoAt){
+    hintShown=true;
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text">'+t.hintPre+'<b>'+currentHint+'</b></span>';
+    return;
+  }
+  if(!isNaN(autoAt)&&tryCount<autoAt){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text" style="opacity:.5">'+
+      t.hintPre+'<b>???</b> (po '+(autoAt-tryCount)+' próbac'+(autoAt-tryCount===1?"ie":"h")+')</span>';
+    return;
+  }
+  hintBarEl.style.display="none";
+}
+
+/* ── USTAWIENIA ─────────────────────────────────────────────────────── */
+function showSettings(){
+  var t=T();
+  function seg(opts,cur,key){
+    return'<div class="seg">'+opts.map(function(o){
+      return'<button data-v="'+o.v+'" data-k="'+key+'" class="seg-opt'+(cur===o.v?" on":"")+'">'+o.l+'</button>';
+    }).join("")+'</div>';
+  }
+  var hintOpts=[
+    {v:"off",l:t.settOff},{v:"manual",l:t.settManual},
+    {v:"3",l:t.sett3},{v:"4",l:t.sett4},{v:"5",l:t.sett5}
+  ];
+  openModal(
+    '<h2>'+t.settH+'</h2>'+
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settHintL+'</div>'+
+      '<div class="sett-sub">'+t.settHintS+'</div></div>'+
+      seg(hintOpts,hintMode,"hint")+
+    '</div>'
+  );
+  modal.querySelectorAll(".seg-opt").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var v=btn.dataset.v,k=btn.dataset.k;
+      if(k==="hint"){
+        hintMode=v;store.set(HINT_KEY,v);
+        modal.querySelectorAll(".seg-opt").forEach(function(b){
+          b.classList.toggle("on",b.dataset.v===v&&b.dataset.k===k);});
+        hintShown=false;updateHintBar();
+      }
+    });
+  });
+}
+document.getElementById("settBtn").addEventListener("click",showSettings);
+
 /* ── NAWIGACJA DNI ──────────────────────────────────────────────────── */
 function updateNavBar(){
   var t=T();
@@ -534,6 +663,7 @@ function submit(){
     current="";
     setTimeout(function(){
       paintKbd();
+      updateHintBar();
       if(won)finish(true);
       else if(game.guesses.length>=maxGuesses())finish(false);
       else saveDayGame(currentDay,game);
@@ -681,7 +811,10 @@ document.getElementById("calNext").addEventListener("click",function(){
 
 function renderCalendar(){
   var t=T();
-  document.getElementById("calTitle").textContent=t.calTitle;
+  var MONTHS_PL=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
+    "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+  document.getElementById("calTitle").textContent=
+    t.calTitle+" — "+MONTHS_PL[calViewMonth]+" "+calViewYear;
   var grid=document.getElementById("calGrid");grid.innerHTML="";
   var DOWS=["Pn","Wt","Śr","Cz","Pt","Sb","Nd"];
   DOWS.forEach(function(d){var el=document.createElement("div");el.className="cal-dow";el.textContent=d;grid.appendChild(el);});
@@ -760,6 +893,8 @@ function loadDay(dayIdx){
   var args=dayIdx===TODAY_IDX?{}:{p_day:dayIdx};
   rpc(fn,args).then(function(meta){
     LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
+    currentHint=meta.hint||null;
+    hintShown=false;
     document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
     buildBoard();buildKbd();relabelKbd();
 
@@ -771,6 +906,7 @@ function loadDay(dayIdx){
     (function step(i){
       if(i>=replay.length){
         paintKbd();
+        updateHintBar();
         if(game.status!=="playing")setTimeout(function(){showEnd();},300);
         return;}
       var g=replay[i],arr=Array.from(g);
