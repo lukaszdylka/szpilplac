@@ -221,8 +221,8 @@ footer a{color:var(--green);font-weight:600}
       <button class="icon-btn" id="helpBtn" title="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="icon-btn" id="settBtn" title="Ustawienia">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M12.95 3.05l-1.06 1.06M4.11 11.89l-1.06 1.06"/></svg>
+      <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.4"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.97 2.97l-.04-.04A1.8 1.8 0 0 0 14.8 19.6a1.8 1.8 0 0 0-1.08 1.65V21.3a2.1 2.1 0 0 1-4.2 0v-.05A1.8 1.8 0 0 0 8.45 19.6a1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 1 1-2.97-2.97l.04-.04A1.8 1.8 0 0 0 3.85 15a1.8 1.8 0 0 0-1.65-1.08H2.1a2.1 2.1 0 0 1 0-4.2h.1a1.8 1.8 0 0 0 1.65-1.08A1.8 1.8 0 0 0 3.5 6.66l-.04-.04a2.1 2.1 0 1 1 2.97-2.97l.04.04a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 9.53 2.4V2.1a2.1 2.1 0 0 1 4.2 0v.3a1.8 1.8 0 0 0 1.08 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 1 1 2.97 2.97l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.08h.85a2.1 2.1 0 0 1 0 4.2h-.85A1.8 1.8 0 0 0 19.4 15z"/></svg>
       </button>
       <button class="icon-btn" id="statBtn" title="Statystyki">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
@@ -327,7 +327,13 @@ function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"s
 // Klucz per-dzień: "slowko_d42" itd.
 function dayKey(idx){ return "slowko_d"+idx; }
 function loadDayGame(idx){ return JSON.parse(store.get(dayKey(idx))||"null"); }
-function saveDayGame(idx, g){ store.set(dayKey(idx), JSON.stringify(g)); }
+function saveDayGame(idx, g){
+  var copy=Object.assign({},g||{});
+  if(g&&Array.isArray(g.guesses)&&typeof stateCache!=="undefined"){
+    copy.states=g.guesses.map(function(gs){return stateCache&&stateCache[gs]?stateCache[gs]:null;});
+  }
+  store.set(dayKey(idx), JSON.stringify(copy));
+}
 
 /* ── SUPABASE RPC ───────────────────────────────────────────────────── */
 function rpc(fn,args){
@@ -359,7 +365,7 @@ var S={
     share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
     cta:"Chcesz więcej? Przyjdź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli tam grałeś — zobaczysz swój wynik (tryb tylko do odczytu).",
+    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli nie masz tam jeszcze wyniku, możesz rozegrać zaległe słowo. Jeśli dzień jest już rozegrany — zobaczysz swój wynik.",
     lgC:"Litera jest na właściwym miejscu.",
     lgP:"Litera jest w słowie, ale na innym miejscu.",
     lgA:"Tej litery nie ma w słowie.",
@@ -372,7 +378,7 @@ var S={
     hintBtn:"Pokaż wskazówkę",
     hintPre:"Wskazówka: to po polsku ",
     archReadonly:"Archiwum — podgląd Twojego wyniku",
-    archNotPlayed:"Ten dzień minął — nie grałeś wtedy.",
+    archNotPlayed:"Ten dzień minął — możesz go jeszcze rozegrać.",
     calTitle:"Archiwum",
     errConn:"Błąd połączenia. Odśwież stronę."
   },
@@ -386,7 +392,7 @@ var S={
     share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
     cta:"Chcesz wiyncyj? Przidź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwalo wrócić do wcześniyjszych dni.",
+    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwolo wrócić do wcześniyjszych dni. Jak niy mosz tam jeszcze wyniku, możesz rozegrać zaległe słōwko.",
     lgC:"Litera je na dobrym placu.",
     lgP:"Litera je w słowie, ale na inkszym placu.",
     lgA:"Tyj litery w słowie niy ma.",
@@ -399,7 +405,7 @@ var S={
     hintBtn:"Pokoz podpowiydź",
     hintPre:"Podpowiydź: to po polsku ",
     archReadonly:"Archiwum — podglond twojego wyniku",
-    archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
+    archNotPlayed:"Tyn dziyń minął — możesz go jeszcze rozegrać.",
     calTitle:"Archiwum",
     errConn:"Błond połonczenia. Łodświyż strona."
   }
@@ -434,10 +440,62 @@ var stateCache = {};
 var current = "";
 var busy = false;
 
-// Statystyki globalne (tylko dla "dziś")
-var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false};
+// Statystyki globalne (lokalne, dla rozegranych dni)
+var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false,results:{}};
 var stats=Object.assign({},DEF_STATS,JSON.parse(store.get(STORAGE_KEY)||"{}").stats||{});
+if(!stats.results)stats.results={};
 function saveStats(){ store.set(STORAGE_KEY, JSON.stringify({stats:stats})); }
+function recalcStats(){
+  var results=stats.results||{};
+  var days=Object.keys(results).map(function(k){return parseInt(k,10);})
+    .filter(function(d){return !isNaN(d)&&d<=TODAY_IDX;})
+    .sort(function(a,b){return a-b;});
+  stats.played=days.length;
+  stats.wins=0;
+  stats.dist=DEF_STATS.dist.slice();
+  var cur=0,max=0,last=null;
+  days.forEach(function(d){
+    var r=results[d]||{};
+    if(r.won){
+      stats.wins++;
+      var tries=Math.max(1,parseInt(r.tries||1,10));
+      stats.dist[Math.min(tries-1,stats.dist.length-1)]++;
+      cur=(last!==null&&d===last+1&&results[last]&&results[last].won)?cur+1:1;
+      if(cur>max)max=cur;
+    }else cur=0;
+    last=d;
+  });
+  var latest=days.length?days[days.length-1]:null;
+  stats.lastDay=latest;
+  stats.lastWin=latest!==null?!!results[latest].won:false;
+  stats.streak=stats.lastWin?cur:0;
+  stats.maxStreak=max;
+}
+function hydrateStatsFromDayGames(){
+  if(!stats.results)stats.results={};
+  for(var i=0;i<=TODAY_IDX;i++){
+    var dg=loadDayGame(i);
+    if(dg&&(dg.status==="won"||dg.status==="lost")&&!stats.results[i]){
+      stats.results[i]={won:dg.status==="won",tries:(dg.guesses||[]).length||MAX_GUESSES};
+    }
+  }
+  recalcStats();
+  saveStats();
+}
+function recordStats(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return;
+  if(!stats.results)stats.results={};
+  if(stats.results[currentDay])return;
+  stats.results[currentDay]={won:!!won,tries:game.guesses.length};
+  recalcStats();
+  saveStats();
+  trackEvent({game:"slowko",puzzle_no:currentDay+1,
+    puzzle_word:game.reveal?game.reveal.word:null,
+    won:won,tries:game.guesses.length,max_tries:maxGuesses(),
+    guesses:game.guesses.slice(),lang:lang,
+    mode:IS_TESTER?"tester":"supabase"});
+}
+hydrateStatsFromDayGames();
 
 /* ── KLAWIATURA ─────────────────────────────────────────────────────── */
 var KEY_ROWS=[
@@ -502,9 +560,9 @@ var hintBarEl = document.getElementById("hintBar");
 
 function updateHintBar(){
   if(!currentHint||hintMode==="off"){hintBarEl.style.display="none";return;}
-  var isToday=currentDay===TODAY_IDX;
   var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
-  if(!isToday&&!isFutureTester){hintBarEl.style.display="none";return;}
+  var canUseHint=currentDay<=TODAY_IDX||isFutureTester;
+  if(!canUseHint){hintBarEl.style.display="none";return;}
   if(!game||game.status!=="playing"){hintBarEl.style.display="none";return;}
   var t=T();
   var tryCount=game?game.guesses.length:0;
@@ -590,13 +648,14 @@ function updateNavBar(){
     kbdEl.style.display="";
   } else if(isArchive){
     var dg=loadDayGame(currentDay);
-    if(dg&&dg.status!=="playing"){
+    if(dg&&(dg.status==="won"||dg.status==="lost")){
       archiveMsgEl.textContent=t.archReadonly;
+      kbdEl.style.display="none";
     } else {
       archiveMsgEl.textContent=t.archNotPlayed;
+      kbdEl.style.display="";
     }
     archiveMsgEl.style.display="block";
-    kbdEl.style.display="none"; // archiwum = tylko podgląd
   } else {
     // przyszłość (tester)
     archiveMsgEl.style.display="none";
@@ -623,7 +682,8 @@ function maxGuesses(){return IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;}
 function onKey(k){
   var isToday=currentDay===TODAY_IDX;
   var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
-  if(!isToday&&!isFutureTester){return;} // archiwum = readonly
+  var canPlay=currentDay<=TODAY_IDX||isFutureTester;
+  if(!canPlay){return;}
   if(!game||game.status!=="playing"){
     toast(isToday?T().done:T().doneArchive);return;
   }
@@ -658,22 +718,8 @@ function submit(){
 }
 function finish(won){
   game.status=won?"won":"lost";
-  // Statystyki tylko dla gry dzisiaj (nie archiwum, nie przyszłość testera)
-  if(currentDay===TODAY_IDX&&stats.lastDay!==TODAY_IDX){
-    stats.played++;
-    if(won){stats.wins++;stats.dist[Math.min(game.guesses.length-1,stats.dist.length-1)]++;
-      stats.streak=(stats.lastDay===TODAY_IDX-1&&stats.lastWin)?stats.streak+1:1;}
-    else stats.streak=0;
-    if(stats.streak>stats.maxStreak)stats.maxStreak=stats.streak;
-    stats.lastDay=TODAY_IDX;stats.lastWin=won;
-    saveStats();
-    trackEvent({game:"slowko",puzzle_no:currentDay+1,
-      puzzle_word:game.reveal?game.reveal.word:null,
-      won:won,tries:game.guesses.length,max_tries:maxGuesses(),
-      guesses:game.guesses.slice(),lang:lang,
-      mode:IS_TESTER?"tester":"supabase"});
-  }
   saveDayGame(currentDay,game);
+  recordStats(won);
   var go=function(){
     toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
     setTimeout(showEnd,900);
@@ -731,19 +777,22 @@ function startCd(){clearInterval(cdTimer);
 function showEnd(){
   var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
   var isToday=currentDay===TODAY_IDX;
+  var showLocalStats=currentDay<=TODAY_IDX;
   openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
     '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
-    (isToday?statsHtml()+distHtml()+cdHtml(t):'')+ // statystyki tylko dla dzisiaj
-    (isToday?'<button class="btn" id="shareBtn">'+t.share+'</button>':'')+
+    (showLocalStats?statsHtml()+distHtml():'')+
+    (isToday?cdHtml(t):'')+
+    (showLocalStats?'<button class="btn" id="shareBtn">'+t.share+'</button>':'')+
     '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(isToday)startCd();}
 
 function showStats(){
+  hydrateStatsFromDayGames();
   var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
   var html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
-  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  if(dg.status==="won"||dg.status==="lost")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
   openModal(html);
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(document.getElementById("cd"))startCd();}
@@ -762,11 +811,13 @@ document.getElementById("helpBtn").addEventListener("click",showHelp);
 /* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
 function share(){
   var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var g=loadDayGame(TODAY_IDX)||game;
-  var lines=(g.guesses||[]).map(function(gs){
-    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
+  var shareDay=currentDay;
+  var g=loadDayGame(shareDay)||game;
+  var statesArr=g.states||[];
+  var lines=(g.guesses||[]).map(function(gs,i){
+    return ((stateCache[gs]||statesArr[i]||[]).map(function(s){return em[s]||"⬛";})).join("");});
   var score=g.status==="won"?g.guesses.length:"X";
-  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+  var txt="Słōwko #"+(shareDay+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
     "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
   if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
 function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
@@ -850,33 +901,9 @@ function loadDay(dayIdx){
   buildBoard();buildKbd();relabelKbd();
 
   var saved=loadDayGame(dayIdx);
-  // Archiwum: jeśli mamy zapisany stan — pokaż tylko, bez fetch
-  if(dayIdx<TODAY_IDX){
-    PNO=dayIdx+1;
-    document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
-    if(saved&&saved.guesses&&saved.guesses.length>0){
-      LEN=Array.from(saved.guesses[0]).length;
-      buildBoard();buildKbd();
-      game={guesses:[],status:saved.status||"playing",reveal:saved.reveal||null};
-      saved.guesses.forEach(function(g,i){
-        var states=saved.states&&saved.states[i]?saved.states[i]:Array.from(g).map(function(){return"absent";});
-        stateCache[g]=states;game.guesses.push(g);paintRow(i,Array.from(g),states,false);
-      });
-      paintKbd();
-      if(game.status!=="playing")setTimeout(function(){showEnd();},300);
-    } else {
-      // Nie grał tego dnia — pobierz meta żeby pokazać planszę z właściwą długością
-      rpc("wihajster_day",{p_day:dayIdx}).then(function(meta){
-        LEN=meta.length;buildBoard();buildKbd();
-        game={guesses:[],status:"not_played",reveal:null};
-      }).catch(function(){});
-    }
-    return;
-  }
-
-  // Dziś lub przyszłość (tester) — zawsze przez Supabase
   var fn=dayIdx===TODAY_IDX?"wihajster_today":"wihajster_day";
   var args=dayIdx===TODAY_IDX?{}:{p_day:dayIdx};
+
   rpc(fn,args).then(function(meta){
     LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
     currentHint=meta.hint||null;
@@ -885,24 +912,28 @@ function loadDay(dayIdx){
     buildBoard();buildKbd();relabelKbd();
 
     var s=saved||{guesses:[],status:"playing",reveal:null};
-    game={guesses:[],status:s.status||"playing",reveal:s.reveal||null};
+    var savedStatus=(s.status==="won"||s.status==="lost")?s.status:"playing";
+    game={guesses:[],status:savedStatus,reveal:s.reveal||null};
 
-    // Odtwórz próby przez Supabase (re-ocena żeby mieć stany)
     var replay=s.guesses||[];
     (function step(i){
       if(i>=replay.length){
         paintKbd();
         updateHintBar();
+        updateNavBar();
         if(game.status!=="playing")setTimeout(function(){showEnd();},300);
-        return;}
+        return;
+      }
       var g=replay[i],arr=Array.from(g);
       var fn2=dayIdx===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
       var a2=dayIdx===TODAY_IDX?{p_guess:g}:{p_day:dayIdx,p_guess:g};
       rpc(fn2,a2).then(function(res){
-        stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);
+        var st=res&&res.states?res.states:((s.states&&s.states[i])||arr.map(function(){return"absent";}));
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
       }).catch(function(){
-        var st=arr.map(function(){return"absent";});
-        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);});
+        var st=(s.states&&s.states[i])||arr.map(function(){return"absent";});
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
+      });
     })(0);
   }).catch(function(){toast(T().errConn);});
 }
