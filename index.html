@@ -15,11 +15,6 @@
   --green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;
   --sh:0 6px 18px -10px rgba(35,32,26,.4);
 }
-@media(prefers-color-scheme:dark){:root{
-  --bg:#161310;--surface:#262018;--surface2:#2e2820;
-  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
-  --green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;
-}}
 [data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;}
 [data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
@@ -186,16 +181,15 @@ var ICO={
   conn:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>'
 };
 
-var THEME_ICONS={system:ICO.auto,light:ICO.sun,dark:ICO.moon};
-var THEMES=["system","light","dark"];
-var theme=store.get(TK)||"system";
+var THEME_ICONS={light:ICO.sun,dark:ICO.moon};
+var THEMES=["light","dark"];
+var theme=store.get(TK)||"light";
 function applyTheme(){
-  if(theme==="system")document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme",theme);
+  document.documentElement.setAttribute("data-theme",theme);
   document.getElementById("themeBtn").innerHTML=THEME_ICONS[theme];
 }
 document.getElementById("themeBtn").addEventListener("click",function(){
-  theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(TK,theme);applyTheme();
+  theme=theme==="light"?"dark":"light";store.set(TK,theme);applyTheme();
 });
 applyTheme();
 
