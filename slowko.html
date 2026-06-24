@@ -181,113 +181,22 @@ footer a{color:var(--green);font-weight:600}
 <script>
 "use strict";
 /* ===== KONFIGURACJA ===== */
-var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co", SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo"; // wypełnij dla trybu serwer
+var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
+var SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+
+// Statystyki — ten sam projekt Supabase
+var STATS_URL=SUPABASE_URL, STATS_KEY=SUPABASE_ANON_KEY;
+
+function trackEvent(payload){
+  fetch(STATS_URL+"/rest/v1/szpilplac_events",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":STATS_KEY,
+             "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify(payload)
+  }).catch(function(){});
+}
 var STORAGE_KEY="slowko_v2", LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme";
 var MAX_GUESSES=6;
-
-/* ===== SŁOWA — zweryfikowane ze słownika bonclok.pl i slunski-chachor.com =====
-   Pisownia uproszczona (centralna): OKNO, LOKNO, RECHTOR — bez znaków specjalnych.
-   Użytkownik wpisuje słowa tak samo jak widzi je na klawiaturze.
-   Pełna lista do edycji tutaj: */
-var LOCAL_WORDS=[
-  // 4 liter
-  {w:"BABA",pl:"kobieta, żona"},
-  {w:"BAJA",pl:"wagary"},
-  {w:"BANA",pl:"tramwaj, pociąg"},
-  {w:"CHOP",pl:"mąż, mężczyzna"},
-  {w:"FEST",pl:"mocno, bardzo"},
-  {w:"GANC",pl:"całkiem, bardzo"},
-  {w:"GIRA",pl:"noga"},
-  {w:"GORA",pl:"góra, strych"},
-  {w:"GOWA",pl:"głowa"},
-  {w:"GUPI",pl:"głupi"},
-  {w:"HEFT",pl:"zeszyt"},
-  {w:"KARA",pl:"taczka"},
-  {w:"KETA",pl:"łańcuch"},
-  {w:"KNIF",pl:"sposób, trik"},
-  {w:"LUFT",pl:"powietrze"},
-  {w:"RYMA",pl:"katar"},
-  {w:"UJEK",pl:"wujek"},
-  {w:"ZOLA",pl:"podeszwa buta"},
-  // 5 liter
-  {w:"ANCUG",pl:"garnitur"},
-  {w:"BANIA",pl:"dynia"},
-  {w:"BEBOK",pl:"straszydło, demon"},
-  {w:"BIGEL",pl:"wieszak na ubranie"},
-  {w:"BLANK",pl:"całkiem, zupełnie"},
-  {w:"BLAZA",pl:"odcisk, pęcherz"},
-  {w:"BRYLE",pl:"okulary"},
-  {w:"BYFYJ",pl:"kredens"},
-  {w:"DYCKI",pl:"zawsze"},
-  {w:"FRELA",pl:"panna, dziewczyna"},
-  {w:"GANBA",pl:"wstyd"},
-  {w:"GEBIS",pl:"sztuczna szczęka"},
-  {w:"GIBKO",pl:"szybko"},
-  {w:"GODKA",pl:"śląska mowa"},
-  {w:"GRUBA",pl:"kopalnia"},
-  {w:"GYMBA",pl:"buzia, twarz"},
-  {w:"HAJER",pl:"górnik"},
-  {w:"HANYS",pl:"Ślązak"},
-  {w:"KABOT",pl:"kurtka, marynarka"},
-  {w:"KAFYJ",pl:"kawa"},
-  {w:"KALNY",pl:"mętny, brudny"},
-  {w:"KAPSA",pl:"kieszeń"},
-  {w:"KECKA",pl:"spódnica"},
-  {w:"KIBEL",pl:"wiadro"},
-  {w:"KISTA",pl:"skrzynka"},
-  {w:"KOFER",pl:"walizka"},
-  {w:"KRUPY",pl:"kasza"},
-  {w:"KRYKA",pl:"laska"},
-  {w:"ŁOKNO",pl:"okno"},
-  {w:"MODRY",pl:"niebieski"},
-  {w:"MYCKA",pl:"czapka"},
-  {w:"OBIOD",pl:"obiad"},
-  {w:"RAJZA",pl:"podróż"},
-  {w:"SYNEK",pl:"syn, chłopak"},
-  {w:"SZPIL",pl:"gra, mecz"},
-  {w:"SZYNK",pl:"knajpa, bar"},
-  {w:"TASZA",pl:"torba"},
-  {w:"WUSZT",pl:"kiełbasa"},
-  {w:"ZYMFT",pl:"musztarda"},
-  // 6 liter
-  {w:"ANTRYJ",pl:"przedpokój"},
-  {w:"BACHOR",pl:"żołądek"},
-  {w:"BAJTEL",pl:"dziecko, chłopak"},
-  {w:"BAMBER",pl:"rolnik"},
-  {w:"BANHOF",pl:"dworzec kolejowy"},
-  {w:"BEBECH",pl:"duży brzuch"},
-  {w:"BINDER",pl:"krawat"},
-  {w:"GALERT",pl:"galaretka z nóżek"},
-  {w:"GALOTY",pl:"spodnie"},
-  {w:"GELTAG",pl:"dzień wypłaty"},
-  {w:"GLASKA",pl:"szklanka"},
-  {w:"HASIOK",pl:"śmietnik"},
-  {w:"KAMRAT",pl:"kolega, przyjaciel"},
-  {w:"KAPOTA",pl:"kurtka"},
-  {w:"KAPUCA",pl:"kaptur"},
-  {w:"KARLUS",pl:"kawaler"},
-  {w:"KICHOL",pl:"nos"},
-  {w:"KNEFEL",pl:"guzik"},
-  {w:"KOLOCZ",pl:"ciasto drożdżowe"},
-  {w:"PIERON",pl:"piorun"},
-  {w:"STARKA",pl:"babcia"},
-  {w:"SZNITA",pl:"kromka chleba"},
-  {w:"SZNUPA",pl:"nos, pysk"},
-  {w:"SZOLKA",pl:"filiżanka"},
-  {w:"WANDER",pl:"wędrówka"},
-  {w:"WONGEL",pl:"węgiel"},
-  {w:"ŁOBIOD",pl:"obiad"},
-  // 7 liter
-  {w:"BERGMON",pl:"górnik"},
-  {w:"FAJRANT",pl:"koniec pracy"},
-  {w:"FAMILOK",pl:"kamienica, familok"},
-  {w:"GARDINA",pl:"firanka"},
-  {w:"GESZEFT",pl:"sklep"},
-  {w:"GESZYNK",pl:"prezent"},
-  {w:"GISKANA",pl:"konewka, podlewaczka"},
-  {w:"RECHTOR",pl:"nauczyciel"},
-  {w:"STARZIK",pl:"dziadek"},
-];
 
 /* ===== KLAWIATURA ===== */
 var KEY_ROWS=[
@@ -357,34 +266,16 @@ document.getElementById("themeBtn").addEventListener("click",function(){
 });
 applyTheme();
 
-/* ===== BACKEND ===== */
-var MODE=(SUPABASE_URL&&SUPABASE_ANON_KEY)?"supabase":"local";
+/* ===== BACKEND — tylko Supabase ===== */
 function rpc(fn,args){
   return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
     headers:{"Content-Type":"application/json","Accept":"application/json",
              "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
-    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});}
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);
-  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-function localOrder(n){var arr=[],i,rnd=mulberry32(20260623);
-  for(i=0;i<n;i++)arr.push(i);
-  for(var j=n-1;j>0;j--){var k=Math.floor(rnd()*(j+1));var t=arr[j];arr[j]=arr[k];arr[k]=t;}return arr;}
-function localDay(){var s=new Date(2026,5,23),now=new Date();
-  function md(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
-  return Math.floor((md(now)-md(s))/86400000);}
-var LOCAL_ANS=null;
-function localToday(){var d=localDay(),ord=localOrder(LOCAL_WORDS.length);
-  LOCAL_ANS=LOCAL_WORDS[ord[((d%LOCAL_WORDS.length)+LOCAL_WORDS.length)%LOCAL_WORDS.length]];
-  return{day_index:d,puzzle_no:d+1,length:Array.from(LOCAL_ANS.w).length};}
-function evalLocal(ga){var aa=Array.from(LOCAL_ANS.w),res=new Array(aa.length).fill("absent"),c={},i;
-  for(i=0;i<aa.length;i++)c[aa[i]]=(c[aa[i]]||0)+1;
-  for(i=0;i<aa.length;i++)if(ga[i]===aa[i]){res[i]="correct";c[ga[i]]--;}
-  for(i=0;i<aa.length;i++)if(res[i]!=="correct"){var ch=ga[i];if(c[ch]>0){res[i]="present";c[ch]--;}}
-  var solved=ga.join("")===aa.join("");
-  return{states:res,solved:solved,word:solved?LOCAL_ANS.w:null,meaning:solved?LOCAL_ANS.pl:null};}
+    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
+}
 
 /* ===== STAN ===== */
-var DAY=null,LEN=5,PNO=1,offline=false;
+var DAY=null,LEN=5,PNO=1;
 var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0],lastDay:null,lastWin:false};
 var saved=JSON.parse(store.get(STORAGE_KEY)||"{}");
 var stats=Object.assign({},DEF_STATS,saved.stats||{});
@@ -453,9 +344,7 @@ function submit(){
       if(won){if(res.word)game.reveal={word:res.word,meaning:res.meaning};finish(true);}
       else if(game.guesses.length>=MAX_GUESSES)finish(false);
       else saveAll();},LEN*150+220);};
-  if(MODE==="supabase"&&!offline)
-    rpc("wihajster_guess",{p_guess:current}).then(done).catch(function(){busy=false;toast(T().short);});
-  else done(evalLocal(arr));
+  rpc("wihajster_guess",{p_guess:current}).then(done).catch(function(){busy=false;toast(T().short);});
 }
 function finish(won){
   game.status=won?"won":"lost";
@@ -464,11 +353,17 @@ function finish(won){
       stats.streak=(stats.lastDay===DAY-1&&stats.lastWin)?stats.streak+1:1;}
     else stats.streak=0;
     if(stats.streak>stats.maxStreak)stats.maxStreak=stats.streak;
-    stats.lastDay=DAY;stats.lastWin=won;}
+    stats.lastDay=DAY;stats.lastWin=won;
+    trackEvent({
+      game:"slowko", puzzle_no:PNO,
+      puzzle_word:game.reveal?game.reveal.word:null,
+      won:won, tries:game.guesses.length, max_tries:MAX_GUESSES,
+      guesses:game.guesses.slice(), lang:lang, mode:"supabase"
+    });
+  }
   var go=function(){saveAll();toast(won?T().win[game.guesses.length-1]:T().lose);setTimeout(showEnd,900);};
   if(!won&&!game.reveal){
-    if(MODE==="supabase"&&!offline)rpc("wihajster_reveal").then(function(r){game.reveal=r;go();}).catch(go);
-    else{game.reveal={word:LOCAL_ANS.w,meaning:LOCAL_ANS.pl};go();}
+    rpc("wihajster_reveal").then(function(r){game.reveal=r;go();}).catch(go);
   } else go();
 }
 document.addEventListener("keydown",function(e){
@@ -571,14 +466,17 @@ function boot(meta){
     if(i>=replay.length){paintKbd();if(game.status!=="playing")setTimeout(showEnd,300);return;}
     var g=replay[i],arr=Array.from(g);
     var apply=function(res){stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);};
-    if(MODE==="supabase"&&!offline)rpc("wihajster_guess",{p_guess:g}).then(apply)
+    rpc("wihajster_guess",{p_guess:g}).then(apply)
       .catch(function(){apply({states:arr.map(function(){return"absent";})});});
-    else apply(evalLocal(arr));})(0);}
+  })(0);
+}
 function start(){
-  if(MODE==="supabase"){
-    rpc("wihajster_today").then(function(meta){offline=false;boot(meta);})
-      .catch(function(){offline=true;boot(localToday());});}
-  else{offline=true;boot(localToday());}}
+  rpc("wihajster_today")
+    .then(function(meta){boot(meta);})
+    .catch(function(){
+      toast("Błąd połączenia z bazą. Odśwież stronę.");
+    });
+}
 applyLang();start();
 </script>
 </body>
