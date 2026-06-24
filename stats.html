@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statystyki · Szpilplac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;--red:#b84040;
+  --c0:#3f8a5a;--c1:#bf8a3a;--c2:#5a7ab8;--c3:#9a5a3a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
+h1,h2,h3{font-family:"Oswald";text-transform:uppercase;letter-spacing:.02em;margin:0}
+a{color:var(--green);font-weight:600;text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer;border:none}
+
+/* login */
+#login{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;gap:14px;width:100%;max-width:320px}
+#login h1{font-size:28px;color:var(--ink)}
+#login input{width:100%;padding:12px 14px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface);font-size:15px;font-family:inherit;color:var(--ink)}
+#login input:focus{outline:3px solid var(--gold);outline-offset:2px}
+#login button{width:100%;padding:12px;border-radius:9px;background:var(--green);
+  color:#fff;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+#login button:hover{filter:brightness(1.08)}
+.err{color:var(--red);font-size:13px;display:none}
+
+/* dashboard */
+#dash{display:none;width:100%;max-width:860px;padding-top:20px}
+header{width:100%;max-width:860px;padding-top:20px;display:flex;
+  align-items:center;justify-content:space-between;margin-bottom:24px}
+header h1{font-size:30px}
+.hdr-right{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2)}
+.logout{padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
+.logout:hover{background:var(--surface);color:var(--ink)}
+
+.refresh{padding:7px 14px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--green)}
+.refresh:hover{background:var(--surface)}
+
+/* sekcje */
+.section{margin-bottom:28px}
+.section h2{font-size:18px;color:var(--ink2);margin-bottom:12px;
+  border-bottom:1px solid var(--line);padding-bottom:6px}
+
+/* karty KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .n{font-family:"Oswald";font-size:32px;color:var(--green);line-height:1}
+.kpi .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-top:3px}
+
+/* tabele */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;padding:9px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink2);border-bottom:1px solid var(--line);font-weight:700;background:var(--surface2)}
+td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.tag-won{background:#d4eddf;color:#1e6b3f}
+.tag-lost{background:#f4d9d9;color:#8a2020}
+
+/* rozkład prób */
+.dist-row{display:flex;align-items:center;gap:10px;margin:4px 0;font-size:13px}
+.dist-i{width:16px;font-weight:700;color:var(--ink2);text-align:right}
+.dist-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:20px;overflow:hidden}
+.dist-bar{height:100%;background:var(--green);display:flex;align-items:center;
+  padding:0 8px;font-size:11px;font-weight:700;color:#fff;min-width:28px;border-radius:4px}
+.dist-cnt{font-size:12px;color:var(--ink2);width:28px}
+
+/* spinner */
+.spinner{text-align:center;padding:40px;color:var(--ink2);font-size:14px}
+
+/* gra tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{padding:7px 16px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
+.tab.on{background:var(--green);color:#fff;border-color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <h1>Szpilplac Stats</h1>
+  <input type="password" id="pwInput" placeholder="Service role key" autocomplete="current-password">
+  <p class="err" id="loginErr">Nieprawidłowy klucz.</p>
+  <button id="loginBtn">Zaloguj</button>
+  <small style="color:var(--ink2);text-align:center">Klucz przechowywany lokalnie w przeglądarce.</small>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <header>
+    <div>
+      <a href="index.html" style="font-size:12px;font-weight:600;color:var(--green)">← Szpilplac</a>
+      <h1 style="margin-top:4px">Statystyki</h1>
+    </div>
+    <div class="hdr-right">
+      <button class="refresh" id="refreshBtn">↻ Odśwież</button>
+      <button class="logout" id="logoutBtn">Wyloguj</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-game="slowko">Słōwko</button>
+    <button class="tab" data-game="cuzamen">Cuzamen Szpil</button>
+    <button class="tab" data-game="all">Wszystkie</button>
+  </div>
+
+  <div id="content"><div class="spinner">Ładuję dane…</div></div>
+</div>
+
+<script>
+"use strict";
+/* ── Konfiguracja ── */
+var SUPABASE_URL = "https://xyivrakegwybwhmmcawq.supabase.co";
+// Ten sam projekt co Słōwko — wpisujesz service_role key przy logowaniu poniżej
+var KEY_LS = "szpilplac_stats_key";
+
+/* ── Hasło (service_role key) ── */
+var serviceKey = "";
+try { serviceKey = localStorage.getItem(KEY_LS) || ""; } catch(e) {}
+
+var loginDiv = document.getElementById("login");
+var dashDiv  = document.getElementById("dash");
+
+function showDash() { loginDiv.style.display="none"; dashDiv.style.display="block"; loadData(currentGame); }
+function showLogin(){ loginDiv.style.display=""; dashDiv.style.display="none"; }
+
+if(serviceKey) showDash(); else showLogin();
+
+document.getElementById("loginBtn").addEventListener("click", function(){
+  var v = document.getElementById("pwInput").value.trim();
+  if(!v){ document.getElementById("loginErr").style.display="block"; return; }
+  serviceKey = v;
+  try { localStorage.setItem(KEY_LS, v); } catch(e) {}
+  document.getElementById("loginErr").style.display="none";
+  showDash();
+});
+document.getElementById("logoutBtn").addEventListener("click", function(){
+  serviceKey = "";
+  try { localStorage.removeItem(KEY_LS); } catch(e) {}
+  showLogin();
+});
+document.getElementById("pwInput").addEventListener("keydown", function(e){
+  if(e.key==="Enter") document.getElementById("loginBtn").click();
+});
+
+/* ── Fetch helper ── */
+function q(viewOrTable, params){
+  var url = SUPABASE_URL + "/rest/v1/" + viewOrTable + (params ? "?" + params : "");
+  return fetch(url, {
+    headers: { "apikey": serviceKey, "Authorization": "Bearer " + serviceKey }
+  }).then(function(r){
+    if(r.status===401) throw new Error("auth");
+    return r.json();
+  });
+}
+
+/* ── Tabs ── */
+var currentGame = "slowko";
+document.querySelectorAll(".tab").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("on");});
+    btn.classList.add("on");
+    currentGame = btn.dataset.game;
+    loadData(currentGame);
+  });
+});
+document.getElementById("refreshBtn").addEventListener("click", function(){
+  loadData(currentGame);
+});
+
+/* ── Helpers render ── */
+function kpi(n, label){ return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+label+'</div></div>'; }
+function pct(a, b){ return b ? Math.round(a/b*100)+"%" : "–"; }
+
+function distChart(rows, maxKey, valKey, labelFn){
+  var max = Math.max.apply(null, rows.map(function(r){return +r[valKey]||0;}));
+  return rows.map(function(r){
+    var v = +r[valKey]||0;
+    var w = max ? Math.max(8, Math.round(v/max*100)) : 8;
+    return '<div class="dist-row">'+
+      '<div class="dist-i">'+(labelFn?labelFn(r[maxKey]):r[maxKey])+'</div>'+
+      '<div class="dist-bar-wrap"><div class="dist-bar" style="width:'+w+'%">'+v+'</div></div>'+
+      '<div class="dist-cnt">'+v+'</div></div>';
+  }).join("");
+}
+
+function table(cols, rows, renderRow){
+  if(!rows||!rows.length) return '<p style="color:var(--ink2);padding:14px;font-size:13px">Brak danych.</p>';
+  var head = cols.map(function(c){return'<th>'+c+'</th>';}).join("");
+  var body = rows.map(renderRow).join("");
+  return '<div class="tbl-wrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>';
+}
+
+/* ── Render overview ── */
+function renderOverview(rows, game){
+  if(!rows||!rows.length) return '<p style="color:var(--ink2);font-size:13px">Brak danych.</p>';
+  var r = game==="all" ? null : rows.find(function(x){return x.game===game;});
+  var filtered = game==="all" ? rows : (r ? [r] : []);
+  if(!filtered.length) return '<p style="color:var(--ink2);font-size:13px">Brak rozegranych partii.</p>';
+  var total=0,wins=0;
+  filtered.forEach(function(x){total+=+x.total_plays||0;wins+=+x.wins||0;});
+  var avgStr = r && r.avg_tries_on_win ? (+r.avg_tries_on_win).toFixed(1) : "–";
+  return '<div class="kpi-row">'+
+    kpi(total,"Rozegranych")+
+    kpi(wins,"Wygranych")+
+    kpi(pct(wins,total),"% wygranych")+
+    (game!=="all"?kpi(avgStr,"Śr. prób (wygrane)"):"");
+}
+
+/* ── Render dzienny ── */
+function renderDaily(rows, game){
+  var filtered = game==="all" ? rows : rows.filter(function(r){return r.game===game;});
+  return table(
+    ["Dzień","Gra","Partie","Wygrane","%"],
+    filtered.slice(0,30),
+    function(r){
+      return '<tr><td>'+r.day+'</td><td>'+r.game+'</td>'+
+        '<td>'+r.plays+'</td><td>'+r.wins+'</td>'+
+        '<td>'+pct(+r.wins,+r.plays)+'</td></tr>';
+    }
+  );
+}
+
+/* ── Render Słōwko ── */
+function renderSlowko(dist, guesses, words){
+  var distHtml = dist&&dist.length
+    ? distChart(dist,"tries","cnt")
+    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';
+
+  var guessHtml = table(
+    ["Słowo","Liczba wpisań"],
+    (guesses||[]).slice(0,20),
+    function(r){return '<tr><td><b>'+r.word+'</b></td><td>'+r.cnt+'</td></tr>';}
+  );
+
+  var wordsHtml = table(
+    ["Słowo dnia","Partie","Wygrane","% wygranych","Śr. prób"],
+    (words||[]).slice(0,20),
+    function(r){
+      return '<tr><td><b>'+r.word+'</b></td><td>'+r.plays+'</td>'+
+        '<td>'+r.wins+'</td><td>'+r.win_pct+'%</td>'+
+        '<td>'+(r.avg_tries||"–")+'</td></tr>';
+    }
+  );
+
+  return '<div class="section"><h2>Rozkład prób (wygrane)</h2>'+distHtml+'</div>'+
+    '<div class="section"><h2>Najczęściej wpisywane słowa (top 20)</h2>'+guessHtml+'</div>'+
+    '<div class="section"><h2>Najtrudniejsze słowa dnia</h2>'+wordsHtml+'</div>';
+}
+
+/* ── Render Cuzamen ── */
+function renderCuzamen(dist){
+  var distHtml = dist&&dist.length
+    ? distChart(dist,"errors","cnt",function(v){return v+" błędów";})
+    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';
+  return '<div class="section"><h2>Rozkład błędów</h2>'+distHtml+'</div>';
+}
+
+/* ── Ostatnie partie (log) ── */
+function renderLog(rows, game){
+  var filtered = game==="all" ? rows : rows.filter(function(r){return r.game===game;});
+  return table(
+    ["Kiedy","Gra","#","Słowo","Wynik","Prób","Język"],
+    filtered.slice(0,50),
+    function(r){
+      var dt = new Date(r.created_at).toLocaleString("pl-PL",{timeZone:"Europe/Warsaw",
+        day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+      var tag = r.won
+        ? '<span class="tag tag-won">wygrana</span>'
+        : '<span class="tag tag-lost">przegrana</span>';
+      return '<tr><td style="white-space:nowrap">'+dt+'</td>'+
+        '<td>'+r.game+'</td><td>'+r.puzzle_no+'</td>'+
+        '<td>'+(r.puzzle_word||"–")+'</td>'+
+        '<td>'+tag+'</td><td>'+r.tries+'</td>'+
+        '<td>'+(r.lang||"–")+'</td></tr>';
+    }
+  );
+}
+
+/* ── Główne ładowanie ── */
+function loadData(game){
+  document.getElementById("content").innerHTML='<div class="spinner">Ładuję dane…</div>';
+
+  var overviewP  = q("stats_overview");
+  var dailyP     = q("stats_daily","limit=60&order=day.desc");
+  var logP       = q("szpilplac_events","select=id,created_at,game,puzzle_no,puzzle_word,won,tries,lang&order=created_at.desc&limit=200");
+  var distP      = game!=="cuzamen" ? q("stats_slowko_dist") : Promise.resolve([]);
+  var guessesP   = game==="slowko"  ? q("stats_slowko_guesses") : Promise.resolve([]);
+  var wordsP     = game==="slowko"  ? q("stats_slowko_words")   : Promise.resolve([]);
+  var cuzDistP   = game!=="slowko"  ? q("stats_cuzamen_dist")   : Promise.resolve([]);
+
+  Promise.all([overviewP, dailyP, logP, distP, guessesP, wordsP, cuzDistP])
+    .then(function(results){
+      var overview=results[0], daily=results[1], log=results[2];
+      var dist=results[3], guesses=results[4], words=results[5], cuzDist=results[6];
+
+      var html =
+        '<div class="section"><h2>Przegląd</h2>'+renderOverview(overview,game)+'</div>'+
+        '<div class="section"><h2>Aktywność dzienna</h2>'+renderDaily(daily,game)+'</div>';
+
+      if(game==="slowko" || game==="all")
+        html += renderSlowko(dist,guesses,words);
+      if(game==="cuzamen" || game==="all")
+        html += '<div class="section"><h2>Cuzamen Szpil</h2>'+renderCuzamen(cuzDist)+'</div>';
+
+      html += '<div class="section"><h2>Ostatnie partie</h2>'+renderLog(log,game)+'</div>';
+
+      document.getElementById("content").innerHTML = html;
+    })
+    .catch(function(e){
+      if(e.message==="auth"){
+        document.getElementById("content").innerHTML=
+          '<p style="color:var(--red);padding:20px">Nieprawidłowy klucz. <button class="logout" onclick="document.getElementById(\'logoutBtn\').click()">Wyloguj i spróbuj ponownie</button></p>';
+      } else {
+        document.getElementById("content").innerHTML=
+          '<p style="color:var(--red);padding:20px">Błąd połączenia z Supabase. Sprawdź SUPABASE_URL w pliku stats.html.</p>';
+      }
+    });
+}
+</script>
+</body>
+</html>
