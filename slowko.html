@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Słōwko · Szpilplac · Familock</title>
+<meta name="description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach. Gra od Familocka Starzik.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0e8d4;--bg2:#e9e0cc;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--green2:#24382c;--gold:#bf8a3a;
+  --correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
+  --sh:0 8px 22px -12px rgba(35,32,26,.4);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#161310;--bg2:#1e1a14;--surface:#262018;--surface2:#2e2820;
+  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
+  --green:#4a7a56;--green2:#3a6044;--gold:#d4a04a;
+  --correct:#4a9a6a;--present:#c49050;--absent:#5a5448;
+}}
+[data-theme=light]{
+  --bg:#f0e8d4;--bg2:#e9e0cc;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--green2:#24382c;
+  --gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
+}
+[data-theme=dark]{
+  --bg:#161310;--bg2:#1e1a14;--surface:#262018;--surface2:#2e2820;
+  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--green2:#3a6044;
+  --gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;
+}
+*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
+html,body{margin:0;height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;min-height:100%;padding:0 12px 16px}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+header{width:100%;max-width:500px;padding-top:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
+.back:hover{text-decoration:underline}
+.controls{display:flex;gap:5px;align-items:center}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.theme-btn,.help-btn,.stat-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);font-size:14px;display:flex;align-items:center;justify-content:center}
+.theme-btn:hover,.help-btn:hover,.stat-btn:hover{background:var(--surface)}
+.title-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+h1{font-family:"Oswald";font-weight:700;font-size:clamp(26px,8vw,38px);
+  text-transform:uppercase;letter-spacing:.02em;margin:0;color:var(--ink)}
+.pno{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink2)}
+
+main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1}
+.board{display:grid;gap:6px;margin:12px 0 4px;width:min(90vw,calc(var(--len,5)*58px))}
+.row{display:grid;grid-template-columns:repeat(var(--len,5),1fr);gap:6px}
+.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:calc(min(90vw,calc(var(--len,5)*58px))/var(--len,5)*.46);
+  text-transform:uppercase;background:var(--surface2);border:2px solid var(--line);border-radius:7px;user-select:none}
+.tile.filled{border-color:#a99f84;animation:pop .12s ease}
+@keyframes pop{50%{transform:scale(1.07)}}
+.tile.reveal{animation:flip .45s ease forwards}
+@keyframes flip{0%{transform:rotateX(0)}45%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+.tile.correct{background:var(--correct);border-color:var(--correct);color:#fff}
+.tile.present{background:var(--present);border-color:var(--present);color:#fff}
+.tile.absent{background:var(--absent);border-color:var(--absent);color:#ddd}
+.row.shake{animation:shake .38s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+  30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);text-align:center;
+  margin:2px 0 3px;transition:opacity .2s}
+
+.kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
+  margin-top:auto;padding-top:6px}
+.kbd-row{display:flex;gap:4px;justify-content:center}
+.key{flex:1;min-width:0;height:48px;border-radius:7px;background:var(--surface2);
+  border:1px solid var(--line);font-weight:700;font-size:clamp(11px,3.5vw,15px);
+  color:var(--ink);display:flex;align-items:center;justify-content:center;
+  text-transform:uppercase;transition:transform .05s,background .12s}
+.key:active{transform:translateY(1px)}
+.key.wide{flex:1.7;font-size:10.5px;letter-spacing:.02em}
+.key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
+.key.present{background:var(--present);border-color:var(--present);color:#fff}
+.key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
+
+footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:10px}
+footer a{color:var(--green);font-weight:600}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;
+  justify-content:center;padding:16px;z-index:50}
+.scrim.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;max-width:360px;width:100%;
+  padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);border:1px solid var(--line);
+  position:relative;max-height:88vh;overflow-y:auto}
+.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2);line-height:1}
+.modal h2{font-family:"Oswald";text-transform:uppercase;margin:0 0 14px;font-size:22px;color:var(--ink)}
+.reveal-card{text-align:center;margin:0 0 16px;padding:14px;border-radius:10px;
+  background:var(--surface2);border:1px dashed var(--line)}
+.reveal-word{font-family:"Oswald";font-size:30px;letter-spacing:.1em;color:var(--ink)}
+.reveal-pl{margin-top:5px;font-size:14px;color:var(--ink2)}
+.reveal-pl b{color:var(--green)}
+.stats{display:flex;justify-content:space-between;text-align:center;margin:0 0 14px}
+.stat .n{font-family:"Oswald";font-size:24px;color:var(--green)}
+.stat .l{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-top:1px}
+.dist h3{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 7px}
+.bar-row{display:flex;align-items:center;gap:7px;font-size:12px;margin:2px 0}
+.bar-i{width:12px;font-weight:700;color:var(--ink2)}
+.bar-wrap{flex:1;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar{background:var(--absent);color:#fff;text-align:right;padding:2px 6px;
+  font-weight:700;font-size:11px;min-width:24px;border-radius:3px}
+.bar.win{background:var(--correct)}
+.cd{text-align:center;margin:14px 0}
+.cd-l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.cd-t{font-family:"Oswald";font-size:26px;color:var(--ink);letter-spacing:.04em}
+.btn{display:block;width:100%;text-align:center;padding:13px;border-radius:9px;
+  font-weight:800;font-size:14px;background:var(--correct);color:#fff;
+  text-transform:uppercase;letter-spacing:.04em;margin-top:14px}
+.btn:hover{filter:brightness(1.07)}
+.cta{display:block;text-align:center;margin-top:10px;padding:11px;border-radius:9px;
+  color:var(--green);font-weight:700;font-size:13px;border:1px solid var(--line);
+  background:var(--surface2)}
+.cta:hover{background:var(--surface)}
+.help-body{font-size:13.5px;line-height:1.55;color:var(--ink2)}
+.help-body b{color:var(--ink)}
+.legend{margin-top:12px}
+.legend-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px;color:var(--ink2)}
+.swatch{width:32px;height:32px;border-radius:6px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-weight:800;color:#fff;font-size:16px}
+.spelling-note{margin-top:14px;padding:11px;border-radius:8px;background:var(--surface2);
+  font-size:12.5px;color:var(--ink2);line-height:1.5}
+.spelling-note b{color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <a class="back" href="index.html">← Szpilplac</a>
+    <div class="controls">
+      <div class="lang-tog" role="group">
+        <button id="lPl" class="on">PL</button>
+        <button id="lSzl">ŚL</button>
+      </div>
+      <button class="theme-btn" id="themeBtn">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
+      </button>
+      <button class="help-btn" id="helpBtn" title="Jak grać">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="stat-btn" id="statBtn" title="Statystyki">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="title-row">
+    <h1>Słōwko</h1>
+    <span class="pno" id="pno">#–</span>
+  </div>
+</header>
+
+<main>
+  <div class="board" id="board"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="kbd" id="kbd"></div>
+</main>
+
+<footer>
+  <a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> ·
+  escape room <b>Starzik</b>, Świyntochłowice
+</footer>
+
+<div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+"use strict";
+/* ===== KONFIGURACJA ===== */
+var SUPABASE_URL="", SUPABASE_ANON_KEY=""; // wypełnij dla trybu serwer
+var STORAGE_KEY="slowko_v2", LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme";
+var MAX_GUESSES=6;
+
+/* ===== SŁOWA — zweryfikowane ze słownika bonclok.pl i slunski-chachor.com =====
+   Pisownia uproszczona (centralna): OKNO, LOKNO, RECHTOR — bez znaków specjalnych.
+   Użytkownik wpisuje słowa tak samo jak widzi je na klawiaturze.
+   Pełna lista do edycji tutaj: */
+var LOCAL_WORDS=[
+  // 4 liter
+  {w:"BABA",pl:"kobieta, żona"},
+  {w:"BAJA",pl:"wagary"},
+  {w:"BANA",pl:"tramwaj, pociąg"},
+  {w:"CHOP",pl:"mąż, mężczyzna"},
+  {w:"FEST",pl:"mocno, bardzo"},
+  {w:"GANC",pl:"całkiem, bardzo"},
+  {w:"GIRA",pl:"noga"},
+  {w:"GORA",pl:"góra, strych"},
+  {w:"GOWA",pl:"głowa"},
+  {w:"GUPI",pl:"głupi"},
+  {w:"HEFT",pl:"zeszyt"},
+  {w:"KARA",pl:"taczka"},
+  {w:"KETA",pl:"łańcuch"},
+  {w:"KNIF",pl:"sposób, trik"},
+  {w:"LUFT",pl:"powietrze"},
+  {w:"RYMA",pl:"katar"},
+  {w:"UJEK",pl:"wujek"},
+  {w:"ZOLA",pl:"podeszwa buta"},
+  // 5 liter
+  {w:"ANCUG",pl:"garnitur"},
+  {w:"BANIA",pl:"dynia"},
+  {w:"BEBOK",pl:"straszydło, demon"},
+  {w:"BIGEL",pl:"wieszak na ubranie"},
+  {w:"BLANK",pl:"całkiem, zupełnie"},
+  {w:"BLAZA",pl:"odcisk, pęcherz"},
+  {w:"BRYLE",pl:"okulary"},
+  {w:"BYFYJ",pl:"kredens"},
+  {w:"DYCKI",pl:"zawsze"},
+  {w:"FRELA",pl:"panna, dziewczyna"},
+  {w:"GANBA",pl:"wstyd"},
+  {w:"GEBIS",pl:"sztuczna szczęka"},
+  {w:"GIBKO",pl:"szybko"},
+  {w:"GODKA",pl:"śląska mowa"},
+  {w:"GRUBA",pl:"kopalnia"},
+  {w:"GYMBA",pl:"buzia, twarz"},
+  {w:"HAJER",pl:"górnik"},
+  {w:"HANYS",pl:"Ślązak"},
+  {w:"KABOT",pl:"kurtka, marynarka"},
+  {w:"KAFYJ",pl:"kawa"},
+  {w:"KALNY",pl:"mętny, brudny"},
+  {w:"KAPSA",pl:"kieszeń"},
+  {w:"KECKA",pl:"spódnica"},
+  {w:"KIBEL",pl:"wiadro"},
+  {w:"KISTA",pl:"skrzynka"},
+  {w:"KOFER",pl:"walizka"},
+  {w:"KRUPY",pl:"kasza"},
+  {w:"KRYKA",pl:"laska"},
+  {w:"ŁOKNO",pl:"okno"},
+  {w:"MODRY",pl:"niebieski"},
+  {w:"MYCKA",pl:"czapka"},
+  {w:"OBIOD",pl:"obiad"},
+  {w:"RAJZA",pl:"podróż"},
+  {w:"SYNEK",pl:"syn, chłopak"},
+  {w:"SZPIL",pl:"gra, mecz"},
+  {w:"SZYNK",pl:"knajpa, bar"},
+  {w:"TASZA",pl:"torba"},
+  {w:"WUSZT",pl:"kiełbasa"},
+  {w:"ZYMFT",pl:"musztarda"},
+  // 6 liter
+  {w:"ANTRYJ",pl:"przedpokój"},
+  {w:"BACHOR",pl:"żołądek"},
+  {w:"BAJTEL",pl:"dziecko, chłopak"},
+  {w:"BAMBER",pl:"rolnik"},
+  {w:"BANHOF",pl:"dworzec kolejowy"},
+  {w:"BEBECH",pl:"duży brzuch"},
+  {w:"BINDER",pl:"krawat"},
+  {w:"GALERT",pl:"galaretka z nóżek"},
+  {w:"GALOTY",pl:"spodnie"},
+  {w:"GELTAG",pl:"dzień wypłaty"},
+  {w:"GLASKA",pl:"szklanka"},
+  {w:"HASIOK",pl:"śmietnik"},
+  {w:"KAMRAT",pl:"kolega, przyjaciel"},
+  {w:"KAPOTA",pl:"kurtka"},
+  {w:"KAPUCA",pl:"kaptur"},
+  {w:"KARLUS",pl:"kawaler"},
+  {w:"KICHOL",pl:"nos"},
+  {w:"KNEFEL",pl:"guzik"},
+  {w:"KOLOCZ",pl:"ciasto drożdżowe"},
+  {w:"PIERON",pl:"piorun"},
+  {w:"STARKA",pl:"babcia"},
+  {w:"SZNITA",pl:"kromka chleba"},
+  {w:"SZNUPA",pl:"nos, pysk"},
+  {w:"SZOLKA",pl:"filiżanka"},
+  {w:"WANDER",pl:"wędrówka"},
+  {w:"WONGEL",pl:"węgiel"},
+  {w:"ŁOBIOD",pl:"obiad"},
+  // 7 liter
+  {w:"BERGMON",pl:"górnik"},
+  {w:"FAJRANT",pl:"koniec pracy"},
+  {w:"FAMILOK",pl:"kamienica, familok"},
+  {w:"GARDINA",pl:"firanka"},
+  {w:"GESZEFT",pl:"sklep"},
+  {w:"GESZYNK",pl:"prezent"},
+  {w:"GISKANA",pl:"konewka, podlewaczka"},
+  {w:"RECHTOR",pl:"nauczyciel"},
+  {w:"STARZIK",pl:"dziadek"},
+];
+
+/* ===== KLAWIATURA ===== */
+var KEY_ROWS=[
+  ["A","B","C","Ć","D","E","F","G","H"],
+  ["I","J","K","L","Ł","M","N","Ń","O"],
+  ["Ó","P","R","S","Ś","T","U","W","Y"],
+  ["ENTER","Z","Ź","Ż","⌫"]
+];
+var ALPHABET={};
+KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
+
+/* ===== NAPISY ===== */
+var S={
+  pl:{enter:"Sprawdź",short:"Za mało liter.",done:"Na dziś już zagrane. Wróć jutro!",
+    win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!"],
+    lose:"Nie tym razem.",endW:"Zgadnięte!",endL:"Nie udało się",
+    meaning:"to po polsku:",played:"Rozegrane",wpct:"% wygranych",
+    streak:"Seria",best:"Rekord",dist:"Rozkład prób",next:"Nowe słowo za",
+    share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
+    cta:"Chcesz więcej? Przyjdź do Starzika →",
+    howH:"Jak grać",
+    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.",
+    lgC:"Litera jest na właściwym miejscu.",
+    lgP:"Litera jest w słowie, ale na innym miejscu.",
+    lgA:"Tej litery nie ma w słowie.",
+    spH:"Jak wpisywać?",
+    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku, bez żadnych ō ani ô.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>• śląskie <b>wongel</b> → WONGEL<br>• śląskie <b>fajrant</b> → FAJRANT<br><br>Klawisz <b>Ł</b> jest na klawiaturze."
+  },
+  szl:{enter:"Wkludź",short:"Za mało liter.",done:"Na dzisiej już zagrane. Wroc jutro!",
+    win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!"],
+    lose:"Niy tym razym.",endW:"Trefiłeś!",endL:"Niy podarziło sie",
+    meaning:"to po polsku:",played:"Granych",wpct:"% wygranych",
+    streak:"Seryja",best:"Rekord",dist:"Rozkłod prób",next:"Nowe słowo za",
+    share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
+    cta:"Chcesz wiyncyj? Przidź do Starzika →",
+    howH:"Jak grać",
+    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.",
+    lgC:"Litera je na dobrym placu.",
+    lgP:"Litera je w słowie, ale na inkszym placu.",
+    lgA:"Tyj litery w słowie niy ma.",
+    spH:"Jak wpisywać?",
+    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku, bez ō ani ô.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>• ślonske <b>rechtor</b> → RECHTOR<br>• ślonske <b>wongel</b> → WONGEL<br>• ślonske <b>fajrant</b> → FAJRANT<br><br>Klawisz <b>Ł</b> je na tastaturze."
+  }
+};
+var lang=(function(){try{return localStorage.getItem(LANG_KEY)||"pl";}catch(e){return"pl";}})();
+function T(){return S[lang];}
+
+/* ===== MOTYW ===== */
+var TSVG={
+  system:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
+  light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+};
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+var THEMES=["system","light","dark"];
+var theme=store.get(THEME_KEY)||"system";
+function applyTheme(){
+  if(theme==="system")document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",theme);
+  document.getElementById("themeBtn").innerHTML=TSVG[theme];
+}
+document.getElementById("themeBtn").addEventListener("click",function(){
+  theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(THEME_KEY,theme);applyTheme();
+});
+applyTheme();
+
+/* ===== BACKEND ===== */
+var MODE=(SUPABASE_URL&&SUPABASE_ANON_KEY)?"supabase":"local";
+function rpc(fn,args){
+  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json",
+             "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
+    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function localOrder(n){var arr=[],i,rnd=mulberry32(20260623);
+  for(i=0;i<n;i++)arr.push(i);
+  for(var j=n-1;j>0;j--){var k=Math.floor(rnd()*(j+1));var t=arr[j];arr[j]=arr[k];arr[k]=t;}return arr;}
+function localDay(){var s=new Date(2026,5,23),now=new Date();
+  function md(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+  return Math.floor((md(now)-md(s))/86400000);}
+var LOCAL_ANS=null;
+function localToday(){var d=localDay(),ord=localOrder(LOCAL_WORDS.length);
+  LOCAL_ANS=LOCAL_WORDS[ord[((d%LOCAL_WORDS.length)+LOCAL_WORDS.length)%LOCAL_WORDS.length]];
+  return{day_index:d,puzzle_no:d+1,length:Array.from(LOCAL_ANS.w).length};}
+function evalLocal(ga){var aa=Array.from(LOCAL_ANS.w),res=new Array(aa.length).fill("absent"),c={},i;
+  for(i=0;i<aa.length;i++)c[aa[i]]=(c[aa[i]]||0)+1;
+  for(i=0;i<aa.length;i++)if(ga[i]===aa[i]){res[i]="correct";c[ga[i]]--;}
+  for(i=0;i<aa.length;i++)if(res[i]!=="correct"){var ch=ga[i];if(c[ch]>0){res[i]="present";c[ch]--;}}
+  var solved=ga.join("")===aa.join("");
+  return{states:res,solved:solved,word:solved?LOCAL_ANS.w:null,meaning:solved?LOCAL_ANS.pl:null};}
+
+/* ===== STAN ===== */
+var DAY=null,LEN=5,PNO=1,offline=false;
+var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0],lastDay:null,lastWin:false};
+var saved=JSON.parse(store.get(STORAGE_KEY)||"{}");
+var stats=Object.assign({},DEF_STATS,saved.stats||{});
+var game={day:null,guesses:[],status:"playing",reveal:null};
+if(saved.game)game=Object.assign(game,saved.game);
+var current="";
+var stateCache={};
+function saveAll(){store.set(STORAGE_KEY,JSON.stringify({stats:stats,game:game}));}
+
+/* ===== RENDER ===== */
+var board=document.getElementById("board"),kbd=document.getElementById("kbd"),
+    toastEl=document.getElementById("toast");
+var keyEls={};
+function buildBoard(){board.style.setProperty("--len",LEN);board.innerHTML="";
+  for(var r=0;r<MAX_GUESSES;r++){var row=document.createElement("div");row.className="row";row.style.setProperty("--len",LEN);
+    for(var c=0;c<LEN;c++){var t=document.createElement("div");t.className="tile";row.appendChild(t);}board.appendChild(row);}}
+function paintRow(r,arr,states,anim){var tiles=board.children[r].children;
+  for(var i=0;i<LEN;i++){(function(i){var t=tiles[i];t.textContent=arr[i];
+    if(anim){t.classList.add("reveal");t.style.animationDelay=(i*.15)+"s";
+      setTimeout(function(){t.classList.add(states[i]);},i*150+180);}
+    else t.classList.add(states[i]);})(i);}}
+function paintCurrent(){var row=board.children[game.guesses.length];if(!row)return;
+  var arr=Array.from(current),tiles=row.children;
+  for(var i=0;i<LEN;i++){var t=tiles[i];
+    if(i<arr.length){t.textContent=arr[i];t.classList.add("filled");}
+    else{t.textContent="";t.classList.remove("filled");}}}
+function buildKbd(){kbd.innerHTML="";keyEls={};
+  KEY_ROWS.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
+    row.forEach(function(k){var b=document.createElement("button");b.className="key";
+      if(k.length>1)b.classList.add("wide");b.dataset.k=k;
+      b.textContent=(k==="ENTER"?T().enter:k);
+      b.addEventListener("click",function(){onKey(k);});
+      if(k.length===1)keyEls[k]=b;rEl.appendChild(b);});kbd.appendChild(rEl);});}
+function relabelKbd(){var e=kbd.querySelector('[data-k="ENTER"]');if(e)e.textContent=T().enter;}
+function paintKbd(){var best={},rank={absent:0,present:1,correct:2};
+  game.guesses.forEach(function(g){var arr=Array.from(g),st=stateCache[g]||[];
+    for(var i=0;i<arr.length;i++){var c=arr[i],s=st[i];if(!s)continue;if(!best[c]||rank[s]>rank[best[c]])best[c]=s;}});
+  Object.keys(keyEls).forEach(function(c){var el=keyEls[c];
+    el.classList.remove("correct","present","absent");if(best[c])el.classList.add(best[c]);});}
+
+/* ===== INPUT ===== */
+var toastT;
+function toast(m){toastEl.textContent=m;toastEl.style.opacity="1";
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.style.opacity="0";},1700);}
+function shake(){var row=board.children[game.guesses.length];if(!row)return;
+  row.classList.add("shake");setTimeout(function(){row.classList.remove("shake");},400);}
+var busy=false;
+function onKey(k){
+  if(game.status!=="playing"){toast(T().done);return;}
+  if(k==="⌫"){current=current.slice(0,-1);paintCurrent();return;}
+  if(k==="ENTER"){submit();return;}
+  if(ALPHABET[k]&&Array.from(current).length<LEN){current+=k;paintCurrent();}
+}
+function submit(){
+  if(busy)return;
+  var arr=Array.from(current);
+  if(arr.length<LEN){shake();toast(T().short);return;}
+  busy=true;
+  var done=function(res){
+    busy=false;if(!res||res.ok===false){shake();toast(T().short);return;}
+    stateCache[current]=res.states;game.guesses.push(current);
+    paintRow(game.guesses.length-1,arr,res.states,true);
+    var won=res.states.every(function(s){return s==="correct";});
+    current="";
+    setTimeout(function(){paintKbd();
+      if(won){if(res.word)game.reveal={word:res.word,meaning:res.meaning};finish(true);}
+      else if(game.guesses.length>=MAX_GUESSES)finish(false);
+      else saveAll();},LEN*150+220);};
+  if(MODE==="supabase"&&!offline)
+    rpc("wihajster_guess",{p_guess:current}).then(done).catch(function(){busy=false;toast(T().short);});
+  else done(evalLocal(arr));
+}
+function finish(won){
+  game.status=won?"won":"lost";
+  if(stats.lastDay!==DAY){stats.played++;
+    if(won){stats.wins++;stats.dist[Math.min(game.guesses.length-1,6)]++;
+      stats.streak=(stats.lastDay===DAY-1&&stats.lastWin)?stats.streak+1:1;}
+    else stats.streak=0;
+    if(stats.streak>stats.maxStreak)stats.maxStreak=stats.streak;
+    stats.lastDay=DAY;stats.lastWin=won;}
+  var go=function(){saveAll();toast(won?T().win[game.guesses.length-1]:T().lose);setTimeout(showEnd,900);};
+  if(!won&&!game.reveal){
+    if(MODE==="supabase"&&!offline)rpc("wihajster_reveal").then(function(r){game.reveal=r;go();}).catch(go);
+    else{game.reveal={word:LOCAL_ANS.w,meaning:LOCAL_ANS.pl};go();}
+  } else go();
+}
+document.addEventListener("keydown",function(e){
+  if(document.getElementById("scrim").classList.contains("open")){if(e.key==="Escape")closeModal();return;}
+  if(e.key==="Enter")onKey("ENTER");else if(e.key==="Backspace")onKey("⌫");
+  else{var ch=e.key.toUpperCase();if(ALPHABET[ch])onKey(ch);}
+});
+
+/* ===== MODALE ===== */
+var scrim=document.getElementById("scrim"),modal=document.getElementById("modal");
+function openModal(html){
+  modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
+  modal.querySelector(".modal-close").addEventListener("click",closeModal);
+  scrim.classList.add("open");}
+function closeModal(){scrim.classList.remove("open");}
+scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
+
+function pct(){return stats.played?Math.round(stats.wins/stats.played*100):0;}
+function statsHtml(){var t=T();
+  return'<div class="stats">'+
+    '<div class="stat"><div class="n">'+stats.played+'</div><div class="l">'+t.played+'</div></div>'+
+    '<div class="stat"><div class="n">'+pct()+'</div><div class="l">'+t.wpct+'</div></div>'+
+    '<div class="stat"><div class="n">'+stats.streak+'</div><div class="l">'+t.streak+'</div></div>'+
+    '<div class="stat"><div class="n">'+stats.maxStreak+'</div><div class="l">'+t.best+'</div></div></div>';}
+function distHtml(){var t=T(),max=Math.max(1,Math.max.apply(null,stats.dist)),rows="";
+  for(var i=0;i<MAX_GUESSES;i++){var v=stats.dist[i],w=Math.max(8,Math.round(v/max*100));
+    var hl=(game.status==="won"&&game.guesses.length===i+1)?" win":"";
+    rows+='<div class="bar-row"><span class="bar-i">'+(i+1)+'</span>'+
+      '<div class="bar-wrap"><div class="bar'+hl+'" style="width:'+w+'%">'+v+'</div></div></div>';}
+  return'<div class="dist"><h3>'+t.dist+'</h3>'+rows+'</div>';}
+var cdTimer;
+function cdHtml(t){return'<div class="cd"><div class="cd-l">'+t.next+'</div>'+
+  '<div class="cd-t" id="cd">--:--:--</div></div>';}
+function startCd(){clearInterval(cdTimer);
+  function tick(){var el=document.getElementById("cd");if(!el){clearInterval(cdTimer);return;}
+    var n=new Date(),nx=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);
+    var s=Math.max(0,Math.floor((nx-n)/1000));
+    el.textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60]
+      .map(function(x){return String(x).padStart(2,"0");}).join(":");}
+  tick();cdTimer=setInterval(tick,1000);}
+
+function showEnd(){
+  var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
+  openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
+    '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
+    '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
+    statsHtml()+distHtml()+cdHtml(t)+
+    '<button class="btn" id="shareBtn">'+t.share+'</button>'+
+    '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
+  document.getElementById("shareBtn").addEventListener("click",share);startCd();}
+function showStats(){
+  var t=T(),html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
+  if(game.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  openModal(html);var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
+  if(document.getElementById("cd"))startCd();}
+function showHelp(){
+  var t=T();
+  openModal('<h2>'+t.howH+'</h2>'+
+    '<div class="help-body">'+t.howB+'</div>'+
+    '<div class="legend">'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--correct)">B</div>'+t.lgC+'</div>'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--absent)">F</div>'+t.lgA+'</div></div>'+
+    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>');}
+
+document.getElementById("statBtn").addEventListener("click",showStats);
+document.getElementById("helpBtn").addEventListener("click",showHelp);
+
+/* ===== UDOSTĘPNIANIE ===== */
+function share(){var em={correct:"🟩",present:"🟨",absent:"⬛"};
+  var lines=game.guesses.map(function(g){return(stateCache[g]||[]).map(function(s){return em[s];}).join("");});
+  var txt="Słōwko #"+PNO+" "+( game.status==="won"?game.guesses.length:"X")+"/"+MAX_GUESSES+"\n\n"+
+    lines.join("\n")+"\n\nszpilplac.familock.pl";
+  if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
+function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
+  function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
+    ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}}
+
+/* ===== JĘZYK ===== */
+function applyLang(){var t=T();
+  document.documentElement.lang=lang==="szl"?"szl":"pl";
+  document.getElementById("lPl").className=lang==="pl"?"on":"";
+  document.getElementById("lSzl").className=lang==="szl"?"on":"";
+  relabelKbd();if(scrim.classList.contains("open"))closeModal();}
+function setLang(l){lang=l;store.set(LANG_KEY,l);applyLang();}
+document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
+document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
+
+/* ===== START ===== */
+function boot(meta){
+  DAY=meta.day_index;LEN=meta.length;PNO=meta.puzzle_no;
+  document.getElementById("pno").textContent="#"+PNO;
+  if(game.day!==DAY){game={day:DAY,guesses:[],status:"playing",reveal:null};}
+  buildBoard();buildKbd();applyLang();
+  var replay=game.guesses.slice();game.guesses=[];
+  (function step(i){
+    if(i>=replay.length){paintKbd();if(game.status!=="playing")setTimeout(showEnd,300);return;}
+    var g=replay[i],arr=Array.from(g);
+    var apply=function(res){stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);};
+    if(MODE==="supabase"&&!offline)rpc("wihajster_guess",{p_guess:g}).then(apply)
+      .catch(function(){apply({states:arr.map(function(){return"absent";})});});
+    else apply(evalLocal(arr));})(0);}
+function start(){
+  if(MODE==="supabase"){
+    rpc("wihajster_today").then(function(meta){offline=false;boot(meta);})
+      .catch(function(){offline=true;boot(localToday());});}
+  else{offline=true;boot(localToday());}}
+applyLang();start();
+</script>
+</body>
+</html>

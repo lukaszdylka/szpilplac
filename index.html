@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Szpilplac · Familock</title>
+<meta name="description" content="Codzienne familockowe gry i zagadki ze Starzika — Familock Świętochłowice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;
+  --sh:0 6px 18px -10px rgba(35,32,26,.4);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;
+  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
+  --green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;
+}}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;}
+*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;padding:0 16px 32px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+header{width:100%;max-width:480px;padding-top:20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.site-name{font-family:"Oswald";font-size:clamp(28px,9vw,42px);font-weight:700;
+  letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
+.site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
+.controls{display:flex;gap:6px;align-items:center}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.icon-btn svg{display:block;flex:none}
+
+main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:9px}
+.game-link{display:flex;align-items:center;gap:14px;padding:13px 15px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--sh);transition:transform .1s,box-shadow .1s}
+.game-link:hover{transform:translateY(-1px);box-shadow:0 10px 24px -10px rgba(35,32,26,.45)}
+.game-link.soon{opacity:.5;cursor:default}
+.game-link.soon:hover{transform:none;box-shadow:var(--sh)}
+.game-icon{flex:none;width:42px;height:42px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.game-icon svg{display:block}
+.lbl{flex:1;min-width:0}
+.lbl .name{font-family:"Oswald";font-size:19px;text-transform:uppercase;letter-spacing:.02em;line-height:1}
+.lbl .desc{font-size:12px;color:var(--ink2);margin-top:2px}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;white-space:nowrap}
+.badge.live{background:var(--correct);color:#fff}
+.badge.done{color:var(--correct);border:1px solid var(--correct)}
+.badge.soon{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+
+footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin-top:22px;line-height:1.8}
+footer a{color:var(--green);font-weight:600}
+footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <div class="site-name">Szpilplac</div>
+      <div class="site-sub" id="sub"></div>
+    </div>
+    <div class="controls">
+      <div class="lang-tog" role="group">
+        <button id="lPl" class="on">PL</button>
+        <button id="lSzl">ŚL</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Zmień motyw">
+        <!-- ikona motywu podmieniana przez JS -->
+        <svg id="themeIco" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="games"></main>
+<footer>
+  <a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> ·
+  <a href="https://gra.familock.pl" target="_blank" rel="noopener">Starzik: TheSzpil</a>
+</footer>
+<script>
+"use strict";
+var LK="familock_lang",TK="szpilplac_theme";
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
+/* SVG ikony — monochromatyczne, stroke=currentColor */
+var ICO={
+  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>',
+  auto:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
+  /* ikony gier */
+  word:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="6" y1="10" x2="9" y2="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="9" y1="8" x2="9" y2="12"/></svg>',
+  lock:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
+  photo:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="10" cy="10" r="3"/><path d="M7 4l1.5-2h3L13 4"/></svg>'
+};
+var THEME_ICONS={system:ICO.auto,light:ICO.sun,dark:ICO.moon};
+var THEMES=["system","light","dark"];
+var theme=store.get(TK)||"system";
+function applyTheme(){
+  if(theme==="system")document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",theme);
+  document.getElementById("themeBtn").innerHTML=THEME_ICONS[theme];
+}
+document.getElementById("themeBtn").addEventListener("click",function(){
+  theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(TK,theme);applyTheme();
+});
+applyTheme();
+
+var lang=store.get(LK)||"pl";
+var S={
+  pl:{sub:"Codzienne familockowe gry i zagadki",live:"Dzisiaj",done:"Zagrane",soon:"Wkrótce",
+    games:[{ico:ICO.word,name:"Słōwko",desc:"Zgadnij śląskie słowo dnia — 6 prób.",href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.",href:null},
+           {ico:ICO.photo,name:"Fotka",  desc:"Co to za przedmiot ze Starzika?",href:null}]},
+  szl:{sub:"Codzienne familockowe szpile i zagadki",live:"Dzisiej",done:"Zagrane",soon:"Niydługo",
+    games:[{ico:ICO.word,name:"Słōwko",desc:"Zgodnij ślonske słowo dnia — 6 prób.",href:"slowko.html"},
+           {ico:ICO.lock,name:"Kłōdka",desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",href:null},
+           {ico:ICO.photo,name:"Fotka",  desc:"Co to za przedmiot ze Starzika?",href:null}]}
+};
+function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();
+  function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}
+  return Math.floor((md(n)-md(s))/86400000);}
+var DAY=daysSince(2026,6,23);
+var KEYS={"slowko.html":"slowko_v2"};
+function playedToday(href){try{var g=JSON.parse(store.get(KEYS[href])||"{}").game;
+  return g&&g.day===DAY&&g.status&&g.status!=="playing";}catch(e){return false;}}
+
+function render(){
+  var s=S[lang];
+  document.getElementById("sub").textContent=s.sub;
+  document.getElementById("lPl").className=lang==="pl"?"on":"";
+  document.getElementById("lSzl").className=lang==="szl"?"on":"";
+  var wrap=document.getElementById("games");wrap.innerHTML="";
+  s.games.forEach(function(g){
+    var done=g.href&&playedToday(g.href);
+    var el=document.createElement(g.href?"a":"div");
+    el.className="game-link"+(g.href?"":" soon");
+    if(g.href)el.href=g.href;
+    var badge=g.href?(done?s.done:s.live):s.soon;
+    var bcls=g.href?(done?"done":"live"):"soon";
+    el.innerHTML='<div class="game-icon">'+g.ico+'</div>'+
+      '<div class="lbl"><div class="name">'+g.name+'</div>'+
+      '<div class="desc">'+g.desc+'</div></div>'+
+      '<div class="badge '+bcls+'">'+badge+'</div>';
+    wrap.appendChild(el);
+  });
+}
+document.getElementById("lPl").addEventListener("click",function(){lang="pl";store.set(LK,lang);render();});
+document.getElementById("lSzl").addEventListener("click",function(){lang="szl";store.set(LK,lang);render();});
+render();
+</script>
+</body>
+</html>
