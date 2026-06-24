@@ -15,12 +15,6 @@
   --green:#2f4a39;--gold:#bf8a3a;
   --correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
 }
-@media(prefers-color-scheme:dark){:root{
-  --bg:#161310;--surface:#262018;--surface2:#2e2820;
-  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
-  --green:#4a7a56;--gold:#d4a04a;
-  --correct:#4a9a6a;--present:#c49050;--absent:#5a5448;
-}}
 [data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;}
 [data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
@@ -149,6 +143,11 @@ footer a{color:var(--green);font-weight:600}
 .spelling-note{margin-top:14px;padding:11px;border-radius:8px;background:var(--surface2);
   font-size:12.5px;color:var(--ink2);line-height:1.5}
 .spelling-note b{color:var(--ink)}
+.contact-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.contact-btn{flex:1;min-width:0;text-align:center;padding:9px 12px;border-radius:9px;
+  font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--line);
+  background:var(--surface2);cursor:pointer;font-family:inherit}
+.contact-btn:hover{background:var(--surface);color:var(--ink)}
 
 /* KALENDARZ POPUP */
 .cal-scrim{position:fixed;inset:0;z-index:60;display:none;
@@ -205,7 +204,24 @@ footer a{color:var(--green);font-weight:600}
 .hint-text{font-size:12.5px;color:var(--ink2);font-style:italic}
 .hint-text b{color:var(--ink);font-style:normal}
 
+/* KATEGORIA (tak samo jak hint-bar ale nad nią) */
+.cat-bar{display:flex;align-items:center;gap:8px;margin:2px 0 2px;min-height:26px}
+.cat-text{font-size:12px;color:var(--ink2);font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;padding:3px 10px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface2)}
+
+/* DALTONIZM — inne kolory rozróżnialne bez rozróżniania czerwień/zieleń */
+.cb .tile.correct,.cb .key.correct{background:#1a6fc4!important;border-color:#1a6fc4!important}
+.cb .tile.present,.cb .key.present{background:#e07b1a!important;border-color:#e07b1a!important}
+.cb .tile.absent,.cb .key.absent{background:#555!important;border-color:#555!important}
+[data-theme=dark] .cb .tile.correct,[data-theme=dark] .cb .key.correct{background:#3a8fe4!important;border-color:#3a8fe4!important}
+[data-theme=dark] .cb .tile.present,[data-theme=dark] .cb .key.present{background:#f09030!important;border-color:#f09030!important}
+/* Nadpisanie zmiennych CSS — obejmuje swatch w helpie i wszystkie inne elementy */
+.cb{--correct:#1a6fc4;--present:#e07b1a}
+[data-theme=dark] .cb{--correct:#3a8fe4;--present:#f09030}
+
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
+.no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake{animation:none!important}
 </style>
 </head>
 <body>
@@ -223,8 +239,8 @@ footer a{color:var(--green);font-weight:600}
       <button class="icon-btn" id="helpBtn" title="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.4"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.97 2.97l-.04-.04A1.8 1.8 0 0 0 14.8 19.6a1.8 1.8 0 0 0-1.08 1.65V21.3a2.1 2.1 0 0 1-4.2 0v-.05A1.8 1.8 0 0 0 8.45 19.6a1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 1 1-2.97-2.97l.04-.04A1.8 1.8 0 0 0 3.85 15a1.8 1.8 0 0 0-1.65-1.08H2.1a2.1 2.1 0 0 1 0-4.2h.1a1.8 1.8 0 0 0 1.65-1.08A1.8 1.8 0 0 0 3.5 6.66l-.04-.04a2.1 2.1 0 1 1 2.97-2.97l.04.04a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 9.53 2.4V2.1a2.1 2.1 0 0 1 4.2 0v.3a1.8 1.8 0 0 0 1.08 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 1 1 2.97 2.97l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.08h.85a2.1 2.1 0 0 1 0 4.2h-.85A1.8 1.8 0 0 0 19.4 15z"/></svg>
+      <button class="icon-btn" id="settBtn" title="Ustawienia">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.40,4.01 L8.51,1.25 L15.49,1.25 L14.60,4.01 L15.81,4.52 L17.13,1.93 L22.07,6.87 L19.48,8.19 L19.99,9.40 L22.75,8.51 L22.75,15.49 L19.99,14.60 L19.48,15.81 L22.07,17.13 L17.13,22.07 L15.81,19.48 L14.60,19.99 L15.49,22.75 L8.51,22.75 L9.40,19.99 L8.19,19.48 L6.87,22.07 L1.93,17.13 L4.52,15.81 L4.01,14.60 L1.25,15.49 L1.25,8.51 L4.01,9.40 L4.52,8.19 L1.93,6.87 L6.87,1.93 L8.19,4.52 Z"/><circle cx="12" cy="12" r="4.4"/></svg>
       </button>
       <button class="icon-btn" id="statBtn" title="Statystyki">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
@@ -252,6 +268,7 @@ footer a{color:var(--green);font-weight:600}
 
 <main>
   <div class="board" id="board"></div>
+  <div class="cat-bar" id="catBar" style="display:none"></div>
   <div class="hint-bar" id="hintBar" style="display:none"></div>
   <div class="archive-msg" id="archiveMsg" style="display:none"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -283,6 +300,11 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
+var store=(function(){
+  var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
 /* ── KONFIGURACJA ───────────────────────────────────────────────────── */
 var SUPABASE_URL     = "https://xyivrakegwybwhmmcawq.supabase.co";
 var SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
@@ -298,19 +320,24 @@ var MAX_GUESSES_TEST = 20;             // tester może zgadywać więcej
 var STORAGE_KEY  = "slowko_v2";
 var LANG_KEY     = "familock_lang";
 var THEME_KEY    = "szpilplac_theme";
-var HINT_KEY     = "slowko_hint";   // ustawienie wskazówki
+var HINT_KEY     = "slowko_hint";
+var ANIM_KEY     = "slowko_anim";    // animacje: "on"|"off"
+var SOUND_KEY    = "slowko_sound";   // dźwięki: "on"|"off"
+var CB_KEY       = "slowko_cb";      // daltonizm: "on"|"off"
+var CAT_KEY      = "slowko_cat";     // kategoria: "on"|"off"
+var SWAP_KEY     = "slowko_swap";    // zamiana Enter/Backspace: "on"|"off"
 var EPOCH        = new Date(2026, 5, 23);
-
-/* ── STORE ──────────────────────────────────────────────────────────── */
-var store=(function(){var m={},ok=false;
-  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
-  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
-         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
 
 // Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
 var hintMode = store.get(HINT_KEY) || "off";
 var currentHint = null;   // tłumaczenie bieżącego dnia (z meta)
-var hintShown = false;    // czy wskazówka już widoczna // 2026-06-23
+var hintShown = false;
+var animMode  = store.get(ANIM_KEY)  || "on";
+var soundMode = store.get(SOUND_KEY) || "off";
+var cbMode    = store.get(CB_KEY)    || "off";
+var catMode   = store.get(CAT_KEY)   || "off";
+var swapMode  = store.get(SWAP_KEY)  || "off";
+var currentCategory = null;  // kategoria bieżącego dnia
 
 /* ── TRYB TESTOWY ───────────────────────────────────────────────────── */
 var IS_TESTER = (function(){
@@ -323,8 +350,8 @@ var IS_TESTER = (function(){
 /* ── HELPERS ────────────────────────────────────────────────────────── */
 function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 
-// Dzień gry liczony zawsze według czasu polskiego, niezależnie od UTC/Supabase
-// i niezależnie od strefy czasowej przeglądarki gracza.
+// Dzień gry liczony według czasu Polski, żeby po północy w Polsce
+// frontend i Supabase nie rozjeżdżały się przez UTC.
 function warsawDateParts(d){
   var parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Warsaw",
@@ -337,7 +364,6 @@ function warsawDateParts(d){
   parts.forEach(function(p){
     if(p.type !== "literal") out[p.type] = Number(p.value);
   });
-
   return out;
 }
 
@@ -350,6 +376,9 @@ function todayIndex(){
 
 function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
 function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"}); }
+
+/* ── STORE ──────────────────────────────────────────────────────────── */
+
 
 // Klucz per-dzień: "slowko_d42" itd.
 function dayKey(idx){ return "slowko_d"+idx; }
@@ -373,24 +402,16 @@ function rpc(fn,args){
 
 /* ── STATYSTYKI ─────────────────────────────────────────────────────── */
 function trackEvent(payload){
-  return fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
+  fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
     headers:{"Content-Type":"application/json","apikey":STATS_KEY,
              "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
     body:JSON.stringify(payload)
-  }).then(function(r){
-    if(!r.ok){
-      return r.text().then(function(txt){throw new Error("stats "+r.status+" "+txt);});
-    }
-    return true;
-  }).catch(function(e){
-    console.warn("Nie udało się zapisać statystyk w Supabase:", e);
-    return false;
-  });
+  }).catch(function(){});
 }
 
 /* ── NAPISY ─────────────────────────────────────────────────────────── */
 var S={
-  pl:{enter:"Sprawdź",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
+  pl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
     doneArchive:"Ten dzień już rozegrałeś.",
     archive:"Archiwum",today:"Dzisiaj",tester:"Tryb testowy",
     win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!","Niezłe!"],
@@ -400,24 +421,34 @@ var S={
     share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
     cta:"Chcesz więcej? Przyjdź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli nie masz tam jeszcze wyniku, możesz rozegrać zaległe słowo. Jeśli dzień jest już rozegrany — zobaczysz swój wynik.",
+    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli tam grałeś — zobaczysz swój wynik (tryb tylko do odczytu).",
     lgC:"Litera jest na właściwym miejscu.",
     lgP:"Litera jest w słowie, ale na innym miejscu.",
     lgA:"Tej litery nie ma w słowie.",
+    contactBug:"Zgłoś błąd / propozycję",
+    contactMe:"Kontakt z autorem",
     spH:"Jak wpisywać?",
-    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>• śląskie <b>wongel</b> → WONGEL<br><br>Klawisz <b>Ł</b> jest na klawiaturze.",
+    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>",
     settH:"Ustawienia",
-    settHintL:"Wskazówka",
+    settCatL:"Kategoria słowa",settCatS:"Temat/kategoria jako podpowiedź",
+    settHintL:"Tłumaczenie",
+
     settHintS:"Tłumaczenie słowa po polsku",
     settOff:"Wył.",settManual:"Na żądanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
+    settSoundL:"Dźwięki",settSoundS:"Klik przy wpisywaniu, dźwięk trafienia",
+    settCbL:"Tryb dla daltonistów",settCbS:"Wzory zamiast samych kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
+    settOn:"Wł.",
     hintBtn:"Pokaż wskazówkę",
+    catPre:"Kategoria: ",
     hintPre:"Wskazówka: to po polsku ",
     archReadonly:"Archiwum — podgląd Twojego wyniku",
-    archNotPlayed:"Ten dzień minął — możesz go jeszcze rozegrać.",
+    archNotPlayed:"Ten dzień minął — nie grałeś wtedy.",
     calTitle:"Archiwum",
     errConn:"Błąd połączenia. Odśwież stronę."
   },
-  szl:{enter:"Wkludź",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
+  szl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
     doneArchive:"Tyn dziyń już rozegrałeś.",
     archive:"Archiwum",today:"Dzisiej",tester:"Tryb testowy",
     win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!","Niy źle!"],
@@ -427,20 +458,29 @@ var S={
     share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
     cta:"Chcesz wiyncyj? Przidź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwolo wrócić do wcześniyjszych dni. Jak niy mosz tam jeszcze wyniku, możesz rozegrać zaległe słōwko.",
+    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwalo wrócić do wcześniyjszych dni.",
     lgC:"Litera je na dobrym placu.",
     lgP:"Litera je w słowie, ale na inkszym placu.",
     lgA:"Tyj litery w słowie niy ma.",
+    contactBug:"Zgłoś błąd / propozycja",
+    contactMe:"Kontakt z autorim",
     spH:"Jak wpisywać?",
-    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>• ślonske <b>rechtor</b> → RECHTOR<br><br>Klawisz <b>Ł</b> je na tastaturze.",
+    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>",
     settH:"Ustawiynia",
-    settHintL:"Podpowiydź",
+    settCatL:"Kategoryjo słowa",settCatS:"Tymat jako podpowiydź",
+    settHintL:"Tłumaczynie",
     settHintS:"Tłumaczynie słowa po polsku",
     settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
+    settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
+    settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
+    settOn:"Wł.",
     hintBtn:"Pokoz podpowiydź",
+    catPre:"Kategoryjo: ",
     hintPre:"Podpowiydź: to po polsku ",
     archReadonly:"Archiwum — podglond twojego wyniku",
-    archNotPlayed:"Tyn dziyń minął — możesz go jeszcze rozegrać.",
+    archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
     calTitle:"Archiwum",
     errConn:"Błond połonczenia. Łodświyż strona."
   }
@@ -448,10 +488,7 @@ var S={
 var lang=store.get(LANG_KEY)||"pl";
 function T(){return S[lang];}
 
-
-/* Zdejmij fokus z klikniętych przycisków.
-   Dzięki temu spacja po kliknięciu strzałki, klawiatury ekranowej albo ikony
-   nie uruchamia ponownie ostatniego przycisku. */
+/* Zdejmij fokus z klikniętych przycisków — spacja nie uruchomi ponownie */
 document.addEventListener("click",function(e){
   var btn=e.target&&e.target.closest?e.target.closest("button"):null;
   if(btn){setTimeout(function(){btn.blur();},0);}
@@ -459,19 +496,17 @@ document.addEventListener("click",function(e){
 
 /* ── MOTYW ──────────────────────────────────────────────────────────── */
 var TSVG={
-  system:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
   light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
   dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
 };
-var THEMES=["system","light","dark"];
-var theme=store.get(THEME_KEY)||"system";
+var THEMES=["light","dark"];
+var theme=store.get(THEME_KEY)||"light";
 function applyTheme(){
-  if(theme==="system")document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme",theme);
+  document.documentElement.setAttribute("data-theme",theme);
   document.getElementById("themeBtn").innerHTML=TSVG[theme];
 }
 document.getElementById("themeBtn").addEventListener("click",function(){
-  theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(THEME_KEY,theme);applyTheme();
+  theme=theme==="light"?"dark":"light";store.set(THEME_KEY,theme);applyTheme();
 });
 applyTheme();
 
@@ -484,10 +519,9 @@ var stateCache = {};
 var current = "";
 var busy = false;
 
-// Statystyki globalne (lokalne, dla rozegranych dni)
-var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false,results:{}};
+// Statystyki globalne (tylko dla "dziś")
+var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false};
 var stats=Object.assign({},DEF_STATS,JSON.parse(store.get(STORAGE_KEY)||"{}").stats||{});
-if(!stats.results)stats.results={};
 function saveStats(){ store.set(STORAGE_KEY, JSON.stringify({stats:stats})); }
 function recalcStats(){
   var results=stats.results||{};
@@ -526,24 +560,6 @@ function hydrateStatsFromDayGames(){
   recalcStats();
   saveStats();
 }
-function recordStats(won){
-  if(IS_TESTER&&currentDay>TODAY_IDX)return false;
-  if(!stats.results)stats.results={};
-  if(stats.results[currentDay])return false;
-  stats.results[currentDay]={won:!!won,tries:game.guesses.length};
-  recalcStats();
-  saveStats();
-  return true;
-}
-function sendFinishEvent(won){
-  if(IS_TESTER&&currentDay>TODAY_IDX)return;
-  trackEvent({game:"slowko",puzzle_no:currentDay+1,
-    puzzle_word:game.reveal?game.reveal.word:null,
-    won:won,tries:game.guesses.length,max_tries:maxGuesses(),
-    guesses:game.guesses.slice(),lang:lang,
-    mode:IS_TESTER?"tester":"supabase"});
-}
-hydrateStatsFromDayGames();
 
 /* ── KLAWIATURA ─────────────────────────────────────────────────────── */
 var KEY_ROWS=[
@@ -588,7 +604,12 @@ function paintCurrent(){
     else{t.textContent="";t.classList.remove("filled");}}
 }
 function buildKbd(){kbdEl.innerHTML="";keyEls={};
-  KEY_ROWS.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
+  var rows=KEY_ROWS.map(function(r,i){
+    if(i===KEY_ROWS.length-1&&swapMode==="on")
+      return r.map(function(k){return k==="ENTER"?"⌫":k==="⌫"?"ENTER":k;});
+    return r;
+  });
+  rows.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
     row.forEach(function(k){var b=document.createElement("button");b.className="key";
       if(k.length>1)b.classList.add("wide");b.dataset.k=k;
       b.textContent=(k==="ENTER"?T().enter:k);
@@ -608,9 +629,9 @@ var hintBarEl = document.getElementById("hintBar");
 
 function updateHintBar(){
   if(!currentHint||hintMode==="off"){hintBarEl.style.display="none";return;}
+  var isToday=currentDay===TODAY_IDX;
   var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
-  var canUseHint=currentDay<=TODAY_IDX||isFutureTester;
-  if(!canUseHint){hintBarEl.style.display="none";return;}
+  if(!isToday&&!isFutureTester){hintBarEl.style.display="none";return;}
   if(!game||game.status!=="playing"){hintBarEl.style.display="none";return;}
   var t=T();
   var tryCount=game?game.guesses.length:0;
@@ -646,36 +667,124 @@ function updateHintBar(){
 /* ── USTAWIENIA ─────────────────────────────────────────────────────── */
 function showSettings(){
   var t=T();
+  function tog(cur,key,onL,offL){
+    return'<div class="seg">'+
+      '<button data-v="on" data-k="'+key+'" class="seg-opt'+(cur==="on"?" on":"")+'">'+(onL||t.settOn)+'</button>'+
+      '<button data-v="off" data-k="'+key+'" class="seg-opt'+(cur==="off"?" on":"")+'">'+(offL||t.settOff)+'</button>'+
+    '</div>';
+  }
   function seg(opts,cur,key){
     return'<div class="seg">'+opts.map(function(o){
-      return'<button data-v="'+o.v+'" data-k="'+key+'" class="seg-opt'+(cur===o.v?" on":"")+'">'+o.l+'</button>';
+      return'<button data-v="'+o.v+'" data-k="'+key+'" class="seg-opt'+(cur===o.v?" on":"")+'" >'+o.l+'</button>';
     }).join("")+'</div>';
   }
   var hintOpts=[
     {v:"off",l:t.settOff},{v:"manual",l:t.settManual},
     {v:"3",l:t.sett3},{v:"4",l:t.sett4},{v:"5",l:t.sett5}
   ];
+
   openModal(
     '<h2>'+t.settH+'</h2>'+
+
+    // Kategoria słowa
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settCatL+'</div>'+
+      '<div class="sett-sub">'+t.settCatS+'</div></div>'+
+      tog(catMode,CAT_KEY)+
+    '</div>'+
+
+    // Tłumaczenie (wskazówka PL)
     '<div class="sett-row">'+
       '<div><div class="sett-label">'+t.settHintL+'</div>'+
       '<div class="sett-sub">'+t.settHintS+'</div></div>'+
-      seg(hintOpts,hintMode,"hint")+
+      seg(hintOpts,hintMode,HINT_KEY)+
+    '</div>'+
+
+    // Animacje
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settAnimL+'</div>'+
+      '<div class="sett-sub">'+t.settAnimS+'</div></div>'+
+      tog(animMode,ANIM_KEY)+
+    '</div>'+
+
+    // Dźwięki
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settSoundL+'</div>'+
+      '<div class="sett-sub">'+t.settSoundS+'</div></div>'+
+      tog(soundMode,SOUND_KEY)+
+    '</div>'+
+
+    // Zamiana Enter/Backspace
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settSwapL+'</div>'+
+      '<div class="sett-sub">'+t.settSwapS+'</div></div>'+
+      tog(swapMode,SWAP_KEY)+
+    '</div>'+
+
+    // Daltonizm
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settCbL+'</div>'+
+      '<div class="sett-sub">'+t.settCbS+'</div></div>'+
+      tog(cbMode,CB_KEY)+
     '</div>'
   );
+
   modal.querySelectorAll(".seg-opt").forEach(function(btn){
     btn.addEventListener("click",function(){
-      var v=btn.dataset.v,k=btn.dataset.k;
-      if(k==="hint"){
-        hintMode=v;store.set(HINT_KEY,v);
-        modal.querySelectorAll(".seg-opt").forEach(function(b){
-          b.classList.toggle("on",b.dataset.v===v&&b.dataset.k===k);});
-        hintShown=false;updateHintBar();
-      }
+      var v=btn.dataset.v, k=btn.dataset.k;
+      // Zaznacz aktywny w tej grupie
+      modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){
+        b.classList.toggle("on",b.dataset.v===v);
+      });
+      if(k===HINT_KEY){ hintMode=v; store.set(HINT_KEY,v); hintShown=false; updateHintBar(); }
+      if(k===CAT_KEY){  catMode=v;  store.set(CAT_KEY,v);  updateCatBar(); }
+      if(k===ANIM_KEY){ animMode=v; store.set(ANIM_KEY,v); applyAnimMode(); }
+      if(k===SOUND_KEY){soundMode=v;store.set(SOUND_KEY,v);}
+      if(k===CB_KEY){   cbMode=v;   store.set(CB_KEY,v);   applyCbMode(); }
+      if(k===SWAP_KEY){swapMode=v;store.set(SWAP_KEY,v);buildKbd();}
     });
   });
 }
 document.getElementById("settBtn").addEventListener("click",showSettings);
+
+/* ── KATEGORIA ──────────────────────────────────────────────────────── */
+var catBarEl = document.getElementById("catBar");
+function updateCatBar(){
+  if(!currentCategory||catMode!=="on"){catBarEl.style.display="none";return;}
+  var isActive=currentDay<=TODAY_IDX||(IS_TESTER&&currentDay>TODAY_IDX);
+  if(!isActive){catBarEl.style.display="none";return;}
+  catBarEl.style.display="flex";
+  catBarEl.innerHTML='<span class="cat-text">'+T().catPre+'<b>'+currentCategory+'</b></span>';
+}
+
+/* ── ANIMACJE ───────────────────────────────────────────────────────── */
+function applyAnimMode(){
+  document.documentElement.classList.toggle("no-anim", animMode==="off");
+}
+
+/* ── DALTONIZM ──────────────────────────────────────────────────────── */
+function applyCbMode(){
+  document.documentElement.classList.toggle("cb", cbMode==="on");
+}
+
+/* ── DŹWIĘKI (Web Audio API) ────────────────────────────────────────── */
+var _ctx=null;
+function getCtx(){
+  if(!_ctx){try{_ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  return _ctx;
+}
+function playSound(type){
+  if(soundMode!=="on")return;
+  var ctx=getCtx();if(!ctx)return;
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  if(type==="key"){o.frequency.value=440;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);}
+  else if(type==="correct"){o.frequency.setValueAtTime(523,ctx.currentTime);o.frequency.setValueAtTime(659,ctx.currentTime+.08);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);}
+  else if(type==="present"){o.frequency.value=392;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.15);}
+  else if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(523,ctx.currentTime);o.frequency.setValueAtTime(659,ctx.currentTime+.1);o.frequency.setValueAtTime(784,ctx.currentTime+.2);g.gain.setValueAtTime(.14,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);}
+  else if(type==="error"){o.frequency.value=220;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.12);}
+  o.start();o.stop(ctx.currentTime+.5);
+}
 
 /* ── NAWIGACJA DNI ──────────────────────────────────────────────────── */
 function updateNavBar(){
@@ -696,7 +805,7 @@ function updateNavBar(){
     kbdEl.style.display="";
   } else if(isArchive){
     var dg=loadDayGame(currentDay);
-    if(dg&&(dg.status==="won"||dg.status==="lost")){
+    if(dg&&dg.status!=="playing"){
       archiveMsgEl.textContent=t.archReadonly;
       kbdEl.style.display="none";
     } else {
@@ -730,14 +839,15 @@ function maxGuesses(){return IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;}
 function onKey(k){
   var isToday=currentDay===TODAY_IDX;
   var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
-  var canPlay=currentDay<=TODAY_IDX||isFutureTester;
+  var isArchiveUnplayed=currentDay<TODAY_IDX&&(!game||game.status==="playing");
+  var canPlay=isToday||isFutureTester||isArchiveUnplayed;
   if(!canPlay){return;}
   if(!game||game.status!=="playing"){
     toast(isToday?T().done:T().doneArchive);return;
   }
   if(k==="⌫"){current=current.slice(0,-1);paintCurrent();return;}
   if(k==="ENTER"){submit();return;}
-  if(ALPHABET[k]&&Array.from(current).length<LEN){current+=k;paintCurrent();}
+  if(ALPHABET[k]&&Array.from(current).length<LEN){current+=k;paintCurrent();playSound('key');}
 }
 function submit(){
   if(busy)return;
@@ -750,15 +860,18 @@ function submit(){
     busy=false;
     if(!res||res.ok===false){shake();toast(T().short);return;}
     stateCache[current]=res.states;
-    if(!game.states)game.states=[];
     game.guesses.push(current);
-    game.states[game.guesses.length-1]=res.states;
     paintRow(game.guesses.length-1,arr,res.states,true);
     var won=res.states.every(function(s){return s==="correct";});
+    if(won)playSound('win');
+    else if(res.states.some(function(s){return s==="correct";}))playSound('correct');
+    else if(res.states.some(function(s){return s==="present";}))playSound('present');
+    else playSound('error');
     if(won&&res.word)game.reveal={word:res.word,meaning:res.meaning};
     current="";
     setTimeout(function(){
       paintKbd();
+      updateCatBar();
       updateHintBar();
       if(won)finish(true);
       else if(game.guesses.length>=maxGuesses())finish(false);
@@ -766,10 +879,27 @@ function submit(){
     },LEN*150+220);
   }).catch(function(){busy=false;toast(T().errConn);});
 }
+function recordStats(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return false;
+  if(!stats.results)stats.results={};
+  if(stats.results[currentDay])return false;
+  stats.results[currentDay]={won:!!won,tries:game.guesses.length};
+  recalcStats();
+  saveStats();
+  return true;
+}
+function sendFinishEvent(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return;
+  trackEvent({game:"slowko",puzzle_no:currentDay+1,
+    puzzle_word:game.reveal?game.reveal.word:null,
+    won:won,tries:game.guesses.length,max_tries:maxGuesses(),
+    guesses:game.guesses.slice(),lang:lang,
+    mode:IS_TESTER?"tester":"supabase"});
+}
 function finish(won){
   game.status=won?"won":"lost";
   saveDayGame(currentDay,game);
-  var shouldTrack = recordStats(won);
+  var shouldTrack=recordStats(won);
   var go=function(){
     if(shouldTrack)sendFinishEvent(won);
     toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
@@ -828,22 +958,21 @@ function startCd(){clearInterval(cdTimer);
 function showEnd(){
   var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
   var isToday=currentDay===TODAY_IDX;
-  var showLocalStats=currentDay<=TODAY_IDX;
+  var isArchive=currentDay<TODAY_IDX;
   openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
     '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
-    (showLocalStats?statsHtml()+distHtml():'')+
-    (isToday?cdHtml(t):'')+
-    (showLocalStats?'<button class="btn" id="shareBtn">'+t.share+'</button>':'')+
+    statsHtml()+distHtml()+  // statystyki zawsze
+    (isToday?cdHtml(t):'')+  // odliczanie tylko dla dzisiaj
+    '<button class="btn" id="shareBtn">'+t.share+'</button>'+
     '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(isToday)startCd();}
 
 function showStats(){
-  hydrateStatsFromDayGames();
   var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
   var html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
-  if(dg.status==="won"||dg.status==="lost")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
   openModal(html);
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(document.getElementById("cd"))startCd();}
@@ -854,7 +983,21 @@ function showHelp(){var t=T();
     '<div class="legend-row"><div class="swatch" style="background:var(--correct)">B</div>'+t.lgC+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--absent)">F</div>'+t.lgA+'</div></div>'+
-    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>');}
+    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>'+
+    '<div class="contact-row">'+
+      '<button class="contact-btn" id="btnBug">✉ '+t.contactBug+'</button>'+
+      '<button class="contact-btn" id="btnContact">✉ '+t.contactMe+'</button>'+
+    '</div>');
+  // Adres składany w JS — ochrona przed spamerami
+  function openMail(sub){
+    var u=["kont","akt","@","fami","lock",".","pl"].join("");
+    var s=encodeURIComponent(sub);
+    window.location.href="mai"+"lto:"+u+"?subject="+s;
+  }
+  var bb=document.getElementById("btnBug");
+  if(bb)bb.addEventListener("click",function(){openMail("Słōwko: błąd / propozycja");});
+  var bc=document.getElementById("btnContact");
+  if(bc)bc.addEventListener("click",function(){openMail("Szpilplac: kontakt");});}
 
 document.getElementById("statBtn").addEventListener("click",showStats);
 document.getElementById("helpBtn").addEventListener("click",showHelp);
@@ -862,13 +1005,11 @@ document.getElementById("helpBtn").addEventListener("click",showHelp);
 /* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
 function share(){
   var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var shareDay=currentDay;
-  var g=loadDayGame(shareDay)||game;
-  var statesArr=g.states||[];
-  var lines=(g.guesses||[]).map(function(gs,i){
-    return ((stateCache[gs]||statesArr[i]||[]).map(function(s){return em[s]||"⬛";})).join("");});
+  var g=loadDayGame(TODAY_IDX)||game;
+  var lines=(g.guesses||[]).map(function(gs){
+    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
   var score=g.status==="won"?g.guesses.length:"X";
-  var txt="Słōwko #"+(shareDay+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
     "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
   if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
 function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
@@ -958,6 +1099,7 @@ function loadDay(dayIdx){
   rpc(fn,args).then(function(meta){
     LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
     currentHint=meta.hint||null;
+    currentCategory=meta.category||null;
     hintShown=false;
     document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
     buildBoard();buildKbd();relabelKbd();
@@ -970,6 +1112,7 @@ function loadDay(dayIdx){
     (function step(i){
       if(i>=replay.length){
         paintKbd();
+        updateCatBar();
         updateHintBar();
         updateNavBar();
         if(game.status!=="playing")setTimeout(function(){showEnd();},300);
@@ -1002,6 +1145,9 @@ document.getElementById("lSzl").addEventListener("click",function(){setLang("szl
 
 /* ── START ──────────────────────────────────────────────────────────── */
 applyLang();
+applyAnimMode();
+applyCbMode();
+hydrateStatsFromDayGames();
 loadDay(TODAY_IDX);
 </script>
 </body>
