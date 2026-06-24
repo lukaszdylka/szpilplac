@@ -82,14 +82,16 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 
 /* KLAWIATURA */
 .kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
-  margin-top:auto;padding-top:6px}
+  margin-top:6px;padding-top:2px}
 .kbd-row{display:flex;gap:4px;justify-content:center}
-.key{flex:1;min-width:0;height:48px;border-radius:7px;background:var(--surface2);
+.kbd-row:nth-child(2){padding:0 14px}
+.kbd-row:nth-child(3) .key{height:38px;font-size:clamp(10px,3vw,13px)}
+.key{flex:1;min-width:0;height:46px;border-radius:7px;background:var(--surface2);
   border:1px solid var(--line);font-weight:700;font-size:clamp(11px,3.5vw,15px);
   color:var(--ink);display:flex;align-items:center;justify-content:center;
   text-transform:uppercase;transition:transform .05s,background .12s}
 .key:active{transform:translateY(1px)}
-.key.wide{flex:1.7;font-size:10.5px;letter-spacing:.02em}
+.key.wide{flex:1.75;font-size:10.5px;letter-spacing:.02em}
 .key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .key.present{background:var(--present);border-color:var(--present);color:#fff}
 .key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
@@ -350,7 +352,13 @@ function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"s
 // Klucz per-dzień: "slowko_d42" itd.
 function dayKey(idx){ return "slowko_d"+idx; }
 function loadDayGame(idx){ return JSON.parse(store.get(dayKey(idx))||"null"); }
-function saveDayGame(idx, g){ store.set(dayKey(idx), JSON.stringify(g)); }
+function saveDayGame(idx, g){
+  var copy=Object.assign({},g||{});
+  if(g&&Array.isArray(g.guesses)&&typeof stateCache!=="undefined"){
+    copy.states=g.guesses.map(function(gs){return stateCache&&stateCache[gs]?stateCache[gs]:null;});
+  }
+  store.set(dayKey(idx), JSON.stringify(copy));
+}
 
 /* ── SUPABASE RPC ───────────────────────────────────────────────────── */
 function rpc(fn,args){
@@ -372,7 +380,7 @@ function trackEvent(payload){
 
 /* ── NAPISY ─────────────────────────────────────────────────────────── */
 var S={
-  pl:{enter:"Sprawdź",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
+  pl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
     doneArchive:"Ten dzień już rozegrałeś.",
     archive:"Archiwum",today:"Dzisiaj",tester:"Tryb testowy",
     win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!","Niezłe!"],
@@ -406,7 +414,7 @@ var S={
     calTitle:"Archiwum",
     errConn:"Błąd połączenia. Odśwież stronę."
   },
-  szl:{enter:"Wkludź",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
+  szl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
     doneArchive:"Tyn dziyń już rozegrałeś.",
     archive:"Archiwum",today:"Dzisiej",tester:"Tryb testowy",
     win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!","Niy źle!"],
@@ -443,6 +451,12 @@ var S={
 var lang=store.get(LANG_KEY)||"pl";
 function T(){return S[lang];}
 
+/* Zdejmij fokus z klikniętych przycisków — spacja nie uruchomi ponownie */
+document.addEventListener("click",function(e){
+  var btn=e.target&&e.target.closest?e.target.closest("button"):null;
+  if(btn){setTimeout(function(){btn.blur();},0);}
+});
+
 /* ── MOTYW ──────────────────────────────────────────────────────────── */
 var TSVG={
   light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
@@ -472,13 +486,50 @@ var busy = false;
 var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false};
 var stats=Object.assign({},DEF_STATS,JSON.parse(store.get(STORAGE_KEY)||"{}").stats||{});
 function saveStats(){ store.set(STORAGE_KEY, JSON.stringify({stats:stats})); }
+function recalcStats(){
+  var results=stats.results||{};
+  var days=Object.keys(results).map(function(k){return parseInt(k,10);})
+    .filter(function(d){return !isNaN(d)&&d<=TODAY_IDX;})
+    .sort(function(a,b){return a-b;});
+  stats.played=days.length;
+  stats.wins=0;
+  stats.dist=DEF_STATS.dist.slice();
+  var cur=0,max=0,last=null;
+  days.forEach(function(d){
+    var r=results[d]||{};
+    if(r.won){
+      stats.wins++;
+      var tries=Math.max(1,parseInt(r.tries||1,10));
+      stats.dist[Math.min(tries-1,stats.dist.length-1)]++;
+      cur=(last!==null&&d===last+1&&results[last]&&results[last].won)?cur+1:1;
+      if(cur>max)max=cur;
+    }else cur=0;
+    last=d;
+  });
+  var latest=days.length?days[days.length-1]:null;
+  stats.lastDay=latest;
+  stats.lastWin=latest!==null?!!results[latest].won:false;
+  stats.streak=stats.lastWin?cur:0;
+  stats.maxStreak=max;
+}
+function hydrateStatsFromDayGames(){
+  if(!stats.results)stats.results={};
+  for(var i=0;i<=TODAY_IDX;i++){
+    var dg=loadDayGame(i);
+    if(dg&&(dg.status==="won"||dg.status==="lost")&&!stats.results[i]){
+      stats.results[i]={won:dg.status==="won",tries:(dg.guesses||[]).length||MAX_GUESSES};
+    }
+  }
+  recalcStats();
+  saveStats();
+}
 
 /* ── KLAWIATURA ─────────────────────────────────────────────────────── */
 var KEY_ROWS=[
-  ["A","B","C","Ć","D","E","F","G","H"],
-  ["I","J","K","L","Ł","M","N","Ń","O"],
-  ["Ó","P","R","S","Ś","T","U","W","Y"],
-  ["ENTER","Z","Ź","Ż","⌫"]
+  ["Ą","Ć","Ę","Ł","Ń","Ó","Ś","Ź","Ż","Ō","Ô","Ŏ"],
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","⌫"]
 ];
 var ALPHABET={};
 KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
@@ -778,25 +829,29 @@ function submit(){
     },LEN*150+220);
   }).catch(function(){busy=false;toast(T().errConn);});
 }
+function recordStats(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return false;
+  if(!stats.results)stats.results={};
+  if(stats.results[currentDay])return false;
+  stats.results[currentDay]={won:!!won,tries:game.guesses.length};
+  recalcStats();
+  saveStats();
+  return true;
+}
+function sendFinishEvent(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return;
+  trackEvent({game:"slowko",puzzle_no:currentDay+1,
+    puzzle_word:game.reveal?game.reveal.word:null,
+    won:won,tries:game.guesses.length,max_tries:maxGuesses(),
+    guesses:game.guesses.slice(),lang:lang,
+    mode:IS_TESTER?"tester":"supabase"});
+}
 function finish(won){
   game.status=won?"won":"lost";
-  // Statystyki tylko dla gry dzisiaj (nie archiwum, nie przyszłość testera)
-  if(currentDay===TODAY_IDX&&stats.lastDay!==TODAY_IDX){
-    stats.played++;
-    if(won){stats.wins++;stats.dist[Math.min(game.guesses.length-1,stats.dist.length-1)]++;
-      stats.streak=(stats.lastDay===TODAY_IDX-1&&stats.lastWin)?stats.streak+1:1;}
-    else stats.streak=0;
-    if(stats.streak>stats.maxStreak)stats.maxStreak=stats.streak;
-    stats.lastDay=TODAY_IDX;stats.lastWin=won;
-    saveStats();
-    trackEvent({game:"slowko",puzzle_no:currentDay+1,
-      puzzle_word:game.reveal?game.reveal.word:null,
-      won:won,tries:game.guesses.length,max_tries:maxGuesses(),
-      guesses:game.guesses.slice(),lang:lang,
-      mode:IS_TESTER?"tester":"supabase"});
-  }
   saveDayGame(currentDay,game);
+  var shouldTrack=recordStats(won);
   var go=function(){
+    if(shouldTrack)sendFinishEvent(won);
     toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
     setTimeout(showEnd,900);
   };
@@ -1026,6 +1081,7 @@ document.getElementById("lSzl").addEventListener("click",function(){setLang("szl
 applyLang();
 applyAnimMode();
 applyCbMode();
+hydrateStatsFromDayGames();
 loadDay(TODAY_IDX);
 </script>
 </body>
