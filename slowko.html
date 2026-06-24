@@ -143,6 +143,11 @@ footer a{color:var(--green);font-weight:600}
 .spelling-note{margin-top:14px;padding:11px;border-radius:8px;background:var(--surface2);
   font-size:12.5px;color:var(--ink2);line-height:1.5}
 .spelling-note b{color:var(--ink)}
+.contact-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.contact-btn{flex:1;min-width:0;text-align:center;padding:9px 12px;border-radius:9px;
+  font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--line);
+  background:var(--surface2);cursor:pointer;font-family:inherit}
+.contact-btn:hover{background:var(--surface);color:var(--ink)}
 
 /* KALENDARZ POPUP */
 .cal-scrim{position:fixed;inset:0;z-index:60;display:none;
@@ -396,6 +401,8 @@ var S={
     lgC:"Litera jest na właściwym miejscu.",
     lgP:"Litera jest w słowie, ale na innym miejscu.",
     lgA:"Tej litery nie ma w słowie.",
+    contactBug:"Zgłoś błąd / propozycję",
+    contactMe:"Kontakt z autorem",
     spH:"Jak wpisywać?",
     spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>",
     settH:"Ustawienia",
@@ -431,6 +438,8 @@ var S={
     lgC:"Litera je na dobrym placu.",
     lgP:"Litera je w słowie, ale na inkszym placu.",
     lgA:"Tyj litery w słowie niy ma.",
+    contactBug:"Zgłoś błąd / propozycja",
+    contactMe:"Kontakt z autorim",
     spH:"Jak wpisywać?",
     spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>",
     settH:"Ustawiynia",
@@ -447,7 +456,7 @@ var S={
     catPre:"Kategoryjo: ",
     hintPre:"Podpowiydź: to po polsku ",
     archReadonly:"Archiwum — podglond twojego wyniku",
-    archNotPlayed:"Tyn dziyń minął — niy grołś wtynczos.",
+    archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
     calTitle:"Archiwum",
     errConn:"Błond połonczenia. Łodświyż strona."
   }
@@ -950,7 +959,21 @@ function showHelp(){var t=T();
     '<div class="legend-row"><div class="swatch" style="background:var(--correct)">B</div>'+t.lgC+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--absent)">F</div>'+t.lgA+'</div></div>'+
-    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>');}
+    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>'+
+    '<div class="contact-row">'+
+      '<button class="contact-btn" id="btnBug">✉ '+t.contactBug+'</button>'+
+      '<button class="contact-btn" id="btnContact">✉ '+t.contactMe+'</button>'+
+    '</div>');
+  // Adres składany w JS — ochrona przed spamerami
+  function openMail(sub){
+    var u=["kont","akt","@","fami","lock",".","pl"].join("");
+    var s=encodeURIComponent(sub);
+    window.location.href="mai"+"lto:"+u+"?subject="+s;
+  }
+  var bb=document.getElementById("btnBug");
+  if(bb)bb.addEventListener("click",function(){openMail("Słōwko: błąd / propozycja");});
+  var bc=document.getElementById("btnContact");
+  if(bc)bc.addEventListener("click",function(){openMail("Szpilplac: kontakt");});}
 
 document.getElementById("statBtn").addEventListener("click",showStats);
 document.getElementById("helpBtn").addEventListener("click",showHelp);
