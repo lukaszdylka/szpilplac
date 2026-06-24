@@ -299,6 +299,12 @@ var THEME_KEY    = "szpilplac_theme";
 var HINT_KEY     = "slowko_hint";   // ustawienie wskazówki
 var EPOCH        = new Date(2026, 5, 23);
 
+/* ── STORE ──────────────────────────────────────────────────────────── */
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
 // Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
 var hintMode = store.get(HINT_KEY) || "off";
 var currentHint = null;   // tłumaczenie bieżącego dnia (z meta)
@@ -317,26 +323,6 @@ function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate
 function todayIndex(){ return Math.floor((midnightOf(new Date()) - midnightOf(EPOCH)) / 86400000); }
 function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
 function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short"}); }
-
-/* ── STORE ──────────────────────────────────────────────────────────── */
-var store=(function(){
-  var m={},ok=false;
-  try{
-    localStorage.setItem("__t","1");
-    localStorage.removeItem("__t");
-    ok=true;
-  }catch(e){ok=false;}
-  return{
-    get:function(k){
-      if(!ok)return m[k]||null;
-      try{return localStorage.getItem(k);}catch(e){return m[k]||null;}
-    },
-    set:function(k,v){
-      if(!ok){m[k]=v;return;}
-      try{localStorage.setItem(k,v);}catch(e){m[k]=v;}
-    }
-  };
-})();
 
 // Klucz per-dzień: "slowko_d42" itd.
 function dayKey(idx){ return "slowko_d"+idx; }
