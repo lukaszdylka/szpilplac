@@ -10,37 +10,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <style>
 :root{
-  --bg:#f0e8d4;--bg2:#e9e0cc;--surface:#fbf7ee;--surface2:#f3ecda;
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
   --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
-  --green:#2f4a39;--green2:#24382c;--gold:#bf8a3a;
+  --green:#2f4a39;--gold:#bf8a3a;
   --correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
-  --sh:0 8px 22px -12px rgba(35,32,26,.4);
 }
 @media(prefers-color-scheme:dark){:root{
-  --bg:#161310;--bg2:#1e1a14;--surface:#262018;--surface2:#2e2820;
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;
   --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
-  --green:#4a7a56;--green2:#3a6044;--gold:#d4a04a;
+  --green:#4a7a56;--gold:#d4a04a;
   --correct:#4a9a6a;--present:#c49050;--absent:#5a5448;
 }}
-[data-theme=light]{
-  --bg:#f0e8d4;--bg2:#e9e0cc;--surface:#fbf7ee;--surface2:#f3ecda;
-  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--green2:#24382c;
-  --gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
-}
-[data-theme=dark]{
-  --bg:#161310;--bg2:#1e1a14;--surface:#262018;--surface2:#2e2820;
-  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--green2:#3a6044;
-  --gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;
-}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
-html,body{margin:0;height:100%}
+html,body{margin:0;min-height:100%}
 body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
   -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
-  align-items:center;min-height:100%;padding:0 12px 16px}
+  align-items:center;min-height:100vh;padding:0 12px 16px}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
 
+/* HEADER */
 header{width:100%;max-width:500px;padding-top:14px}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
@@ -49,20 +41,38 @@ header{width:100%;max-width:500px;padding-top:14px}
 .lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
 .lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
 .lang-tog button.on{background:var(--green);color:#fff}
-.theme-btn,.help-btn,.stat-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);font-size:14px;display:flex;align-items:center;justify-content:center}
-.theme-btn:hover,.help-btn:hover,.stat-btn:hover{background:var(--surface)}
-.title-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
-h1{font-family:"Oswald";font-weight:700;font-size:clamp(26px,8vw,38px);
-  text-transform:uppercase;letter-spacing:.02em;margin:0;color:var(--ink)}
-.pno{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink2)}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
 
+/* NAWIGACJA DNI */
+.nav-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.nav-btn{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);font-size:14px;flex:none}
+.nav-btn:hover{background:var(--surface);color:var(--ink)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.nav-day{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}
+.nav-day .dayno{font-family:"Oswald";font-size:18px;color:var(--ink);letter-spacing:.02em}
+.nav-cal{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);flex:none}
+.nav-cal:hover{background:var(--surface);color:var(--ink)}
+.archive-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--gold);color:#fff;margin-left:6px}
+.tester-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:#8a4ab8;color:#fff;margin-left:6px}
+
+/* PLANSZA */
 main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1}
 .board{display:grid;gap:6px;margin:12px 0 4px;width:min(90vw,calc(var(--len,5)*58px))}
 .row{display:grid;grid-template-columns:repeat(var(--len,5),1fr);gap:6px}
 .tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
   font-weight:800;font-size:calc(min(90vw,calc(var(--len,5)*58px))/var(--len,5)*.46);
-  text-transform:uppercase;background:var(--surface2);border:2px solid var(--line);border-radius:7px;user-select:none}
+  text-transform:uppercase;background:var(--surface2);border:2px solid var(--line);
+  border-radius:7px;user-select:none}
 .tile.filled{border-color:#a99f84;animation:pop .12s ease}
 @keyframes pop{50%{transform:scale(1.07)}}
 .tile.reveal{animation:flip .45s ease forwards}
@@ -73,9 +83,10 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 .row.shake{animation:shake .38s}
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
   30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
-.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);text-align:center;
-  margin:2px 0 3px;transition:opacity .2s}
+.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);
+  text-align:center;margin:2px 0 3px;transition:opacity .2s}
 
+/* KLAWIATURA */
 .kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
   margin-top:auto;padding-top:6px}
 .kbd-row{display:flex;gap:4px;justify-content:center}
@@ -92,14 +103,14 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:10px}
 footer a{color:var(--green);font-weight:600}
 
-/* modal */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;
-  justify-content:center;padding:16px;z-index:50}
+/* MODAL */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
+  align-items:center;justify-content:center;padding:16px;z-index:50}
 .scrim.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;max-width:360px;width:100%;
-  padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);border:1px solid var(--line);
-  position:relative;max-height:88vh;overflow-y:auto}
-.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2);line-height:1}
+.modal{background:var(--surface);border-radius:14px;max-width:380px;width:100%;
+  padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);
+  border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}
+.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2);line-height:1;cursor:pointer}
 .modal h2{font-family:"Oswald";text-transform:uppercase;margin:0 0 14px;font-size:22px;color:var(--ink)}
 .reveal-card{text-align:center;margin:0 0 16px;padding:14px;border-radius:10px;
   background:var(--surface2);border:1px dashed var(--line)}
@@ -136,6 +147,43 @@ footer a{color:var(--green);font-weight:600}
 .spelling-note{margin-top:14px;padding:11px;border-radius:8px;background:var(--surface2);
   font-size:12.5px;color:var(--ink2);line-height:1.5}
 .spelling-note b{color:var(--ink)}
+
+/* KALENDARZ POPUP */
+.cal-scrim{position:fixed;inset:0;z-index:60;display:none;
+  align-items:flex-start;justify-content:center;padding-top:80px}
+.cal-scrim.open{display:flex}
+.cal-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:0 16px 40px -12px rgba(0,0,0,.45);
+  max-width:340px;width:calc(100vw - 32px)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-head h3{font-family:"Oswald";text-transform:uppercase;font-size:17px;margin:0;color:var(--ink)}
+.cal-head button{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);color:var(--ink2);font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+.cal-head button:hover{background:var(--surface);color:var(--ink)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-dow{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
+  padding:2px 0;font-weight:700}
+.cal-day{aspect-ratio:1;border-radius:8px;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border:1px solid transparent;color:var(--ink2)}
+.cal-day.empty{cursor:default}
+.cal-day.today{border-color:var(--green);color:var(--ink);background:var(--surface2)}
+.cal-day.played{background:var(--gold);color:#fff;border-color:var(--gold)}
+.cal-day.played.won{background:var(--correct);border-color:var(--correct)}
+.cal-day.past:not(.played){border-color:var(--line);color:var(--ink2)}
+.cal-day.past:not(.played):hover{background:var(--surface2);border-color:var(--ink2)}
+.cal-day.future{opacity:.25;cursor:default}
+.cal-nav{display:flex;justify-content:space-between;margin-top:10px}
+.cal-nav button{font-size:12px;font-weight:600;color:var(--green);padding:4px 8px;
+  border-radius:6px;border:1px solid var(--line);background:var(--surface2)}
+.cal-nav button:hover{background:var(--surface)}
+.cal-nav button:disabled{opacity:.3;cursor:default}
+
+/* ARCHIWUM — widok readonly */
+.archive-view{opacity:.85;pointer-events:none}
+.archive-msg{text-align:center;padding:10px 0 4px;font-size:12px;color:var(--ink2);font-style:italic}
+
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
 </style>
 </head>
@@ -148,25 +196,39 @@ footer a{color:var(--green);font-weight:600}
         <button id="lPl" class="on">PL</button>
         <button id="lSzl">ŚL</button>
       </div>
-      <button class="theme-btn" id="themeBtn">
+      <button class="icon-btn" id="themeBtn">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
       </button>
-      <button class="help-btn" id="helpBtn" title="Jak grać">
+      <button class="icon-btn" id="helpBtn" title="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="stat-btn" id="statBtn" title="Statystyki">
+      <button class="icon-btn" id="statBtn" title="Statystyki">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
       </button>
     </div>
   </div>
-  <div class="title-row">
-    <h1>Słōwko</h1>
-    <span class="pno" id="pno">#–</span>
+
+  <!-- Pasek nawigacji dni -->
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" title="Poprzedni dzień" disabled>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="10,3 5,8 10,13"/></svg>
+    </button>
+    <div class="nav-day">
+      <div class="dayno" id="navDayNo"></div>
+      <div id="navDayLabel"></div>
+    </div>
+    <button class="nav-btn" id="nextBtn" title="Następny dzień" disabled>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,3 11,8 6,13"/></svg>
+    </button>
+    <button class="nav-cal icon-btn" id="calBtn" title="Kalendarz">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="13" height="12" rx="2"/><line x1="1.5" y1="6" x2="14.5" y2="6"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/></svg>
+    </button>
   </div>
 </header>
 
 <main>
   <div class="board" id="board"></div>
+  <div class="archive-msg" id="archiveMsg" style="display:none"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="kbd" id="kbd"></div>
 </main>
@@ -176,84 +238,140 @@ footer a{color:var(--green);font-weight:600}
   escape room <b>Starzik</b>, Świyntochłowice
 </footer>
 
+<!-- Modal główny -->
 <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<!-- Kalendarz popup -->
+<div class="cal-scrim" id="calScrim">
+  <div class="cal-box" id="calBox">
+    <div class="cal-head">
+      <h3 id="calTitle">Archiwum</h3>
+      <button id="calClose">×</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-nav">
+      <button id="calPrev">← Poprzedni miesiąc</button>
+      <button id="calNext">Następny miesiąc →</button>
+    </div>
+  </div>
+</div>
 
 <script>
 "use strict";
-/* ===== KONFIGURACJA ===== */
-var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
-var SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+/* ── KONFIGURACJA ───────────────────────────────────────────────────── */
+var SUPABASE_URL     = "https://xyivrakegwybwhmmcawq.supabase.co";
+var SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+var STATS_URL        = SUPABASE_URL;
+var STATS_KEY        = SUPABASE_ANON_KEY;
 
-// Statystyki — ten sam projekt Supabase
-var STATS_URL=SUPABASE_URL, STATS_KEY=SUPABASE_ANON_KEY;
+// Tryb testowy: wejdź przez slowko.html?test=TWOJE_HASLO
+// Tester: nieograniczona liczba słów dziennie + dostęp do archiwum
+var TEST_PASSWORD    = "starzik";      // ← zmień na swoje hasło
+var MAX_GUESSES      = 6;
+var MAX_GUESSES_TEST = 20;             // tester może zgadywać więcej
 
+var STORAGE_KEY  = "slowko_v2";
+var LANG_KEY     = "familock_lang";
+var THEME_KEY    = "szpilplac_theme";
+var EPOCH        = new Date(2026, 5, 23); // 2026-06-23
+
+/* ── TRYB TESTOWY ───────────────────────────────────────────────────── */
+var IS_TESTER = (function(){
+  try {
+    var p = new URLSearchParams(window.location.search).get("test");
+    return p === TEST_PASSWORD;
+  } catch(e){ return false; }
+})();
+
+/* ── HELPERS ────────────────────────────────────────────────────────── */
+function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function todayIndex(){ return Math.floor((midnightOf(new Date()) - midnightOf(EPOCH)) / 86400000); }
+function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
+function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short"}); }
+
+/* ── STORE ──────────────────────────────────────────────────────────── */
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
+// Klucz per-dzień: "slowko_d42" itd.
+function dayKey(idx){ return "slowko_d"+idx; }
+function loadDayGame(idx){ return JSON.parse(store.get(dayKey(idx))||"null"); }
+function saveDayGame(idx, g){ store.set(dayKey(idx), JSON.stringify(g)); }
+
+/* ── SUPABASE RPC ───────────────────────────────────────────────────── */
+function rpc(fn,args){
+  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json",
+             "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
+    body:JSON.stringify(args||{})
+  }).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
+}
+
+/* ── STATYSTYKI ─────────────────────────────────────────────────────── */
 function trackEvent(payload){
-  fetch(STATS_URL+"/rest/v1/szpilplac_events",{
-    method:"POST",
+  fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
     headers:{"Content-Type":"application/json","apikey":STATS_KEY,
              "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
     body:JSON.stringify(payload)
   }).catch(function(){});
 }
-var STORAGE_KEY="slowko_v2", LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme";
-var MAX_GUESSES=6;
 
-/* ===== KLAWIATURA ===== */
-var KEY_ROWS=[
-  ["A","B","C","Ć","D","E","F","G","H"],
-  ["I","J","K","L","Ł","M","N","Ń","O"],
-  ["Ó","P","R","S","Ś","T","U","W","Y"],
-  ["ENTER","Z","Ź","Ż","⌫"]
-];
-var ALPHABET={};
-KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
-
-/* ===== NAPISY ===== */
+/* ── NAPISY ─────────────────────────────────────────────────────────── */
 var S={
-  pl:{enter:"Sprawdź",short:"Za mało liter.",done:"Na dziś już zagrane. Wróć jutro!",
-    win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!"],
+  pl:{enter:"Sprawdź",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
+    doneArchive:"Ten dzień już rozegrałeś.",
+    archive:"Archiwum",today:"Dzisiaj",tester:"Tryb testowy",
+    win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!","Niezłe!"],
     lose:"Nie tym razem.",endW:"Zgadnięte!",endL:"Nie udało się",
     meaning:"to po polsku:",played:"Rozegrane",wpct:"% wygranych",
     streak:"Seria",best:"Rekord",dist:"Rozkład prób",next:"Nowe słowo za",
     share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
     cta:"Chcesz więcej? Przyjdź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.",
+    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli tam grałeś — zobaczysz swój wynik (tryb tylko do odczytu).",
     lgC:"Litera jest na właściwym miejscu.",
     lgP:"Litera jest w słowie, ale na innym miejscu.",
     lgA:"Tej litery nie ma w słowie.",
     spH:"Jak wpisywać?",
-    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku, bez żadnych ō ani ô.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>• śląskie <b>wongel</b> → WONGEL<br>• śląskie <b>fajrant</b> → FAJRANT<br><br>Klawisz <b>Ł</b> jest na klawiaturze."
+    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>• śląskie <b>wongel</b> → WONGEL<br><br>Klawisz <b>Ł</b> jest na klawiaturze.",
+    archReadonly:"Archiwum — podgląd Twojego wyniku",
+    archNotPlayed:"Ten dzień minął — nie grałeś wtedy.",
+    calTitle:"Archiwum",
+    errConn:"Błąd połączenia. Odśwież stronę."
   },
-  szl:{enter:"Wkludź",short:"Za mało liter.",done:"Na dzisiej już zagrane. Wroc jutro!",
-    win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!"],
+  szl:{enter:"Wkludź",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
+    doneArchive:"Tyn dziyń już rozegrałeś.",
+    archive:"Archiwum",today:"Dzisiej",tester:"Tryb testowy",
+    win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!","Niy źle!"],
     lose:"Niy tym razym.",endW:"Trefiłeś!",endL:"Niy podarziło sie",
     meaning:"to po polsku:",played:"Granych",wpct:"% wygranych",
     streak:"Seryja",best:"Rekord",dist:"Rozkłod prób",next:"Nowe słowo za",
     share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
     cta:"Chcesz wiyncyj? Przidź do Starzika →",
     howH:"Jak grać",
-    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.",
+    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwalo wrócić do wcześniyjszych dni.",
     lgC:"Litera je na dobrym placu.",
     lgP:"Litera je w słowie, ale na inkszym placu.",
     lgA:"Tyj litery w słowie niy ma.",
     spH:"Jak wpisywać?",
-    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku, bez ō ani ô.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>• ślonske <b>rechtor</b> → RECHTOR<br>• ślonske <b>wongel</b> → WONGEL<br>• ślonske <b>fajrant</b> → FAJRANT<br><br>Klawisz <b>Ł</b> je na tastaturze."
+    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>• ślonske <b>rechtor</b> → RECHTOR<br><br>Klawisz <b>Ł</b> je na tastaturze.",
+    archReadonly:"Archiwum — podglond twojego wyniku",
+    archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
+    calTitle:"Archiwum",
+    errConn:"Błond połonczenia. Łodświyż strona."
   }
 };
-var lang=(function(){try{return localStorage.getItem(LANG_KEY)||"pl";}catch(e){return"pl";}})();
+var lang=store.get(LANG_KEY)||"pl";
 function T(){return S[lang];}
 
-/* ===== MOTYW ===== */
+/* ── MOTYW ──────────────────────────────────────────────────────────── */
 var TSVG={
   system:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
   light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
   dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
 };
-var store=(function(){var m={},ok=false;
-  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
-  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
-         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
 var THEMES=["system","light","dark"];
 var theme=store.get(THEME_KEY)||"system";
 function applyTheme(){
@@ -266,65 +384,134 @@ document.getElementById("themeBtn").addEventListener("click",function(){
 });
 applyTheme();
 
-/* ===== BACKEND — tylko Supabase ===== */
-function rpc(fn,args){
-  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
-    headers:{"Content-Type":"application/json","Accept":"application/json",
-             "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
-    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
-}
+/* ── STAN GLOBALNY ──────────────────────────────────────────────────── */
+var TODAY_IDX = todayIndex();
+var currentDay = TODAY_IDX;  // który dzień aktualnie wyświetlamy
+var LEN=5, PNO=1;
+var game = null;    // {guesses:[], status:"playing"|"won"|"lost", reveal:null}
+var stateCache = {};
+var current = "";
+var busy = false;
 
-/* ===== STAN ===== */
-var DAY=null,LEN=5,PNO=1;
-var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0],lastDay:null,lastWin:false};
-var saved=JSON.parse(store.get(STORAGE_KEY)||"{}");
-var stats=Object.assign({},DEF_STATS,saved.stats||{});
-var game={day:null,guesses:[],status:"playing",reveal:null};
-if(saved.game)game=Object.assign(game,saved.game);
-var current="";
-var stateCache={};
-function saveAll(){store.set(STORAGE_KEY,JSON.stringify({stats:stats,game:game}));}
+// Statystyki globalne (tylko dla "dziś")
+var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false};
+var stats=Object.assign({},DEF_STATS,JSON.parse(store.get(STORAGE_KEY)||"{}").stats||{});
+function saveStats(){ store.set(STORAGE_KEY, JSON.stringify({stats:stats})); }
 
-/* ===== RENDER ===== */
-var board=document.getElementById("board"),kbd=document.getElementById("kbd"),
-    toastEl=document.getElementById("toast");
+/* ── KLAWIATURA ─────────────────────────────────────────────────────── */
+var KEY_ROWS=[
+  ["A","B","C","Ć","D","E","F","G","H"],
+  ["I","J","K","L","Ł","M","N","Ń","O"],
+  ["Ó","P","R","S","Ś","T","U","W","Y"],
+  ["ENTER","Z","Ź","Ż","⌫"]
+];
+var ALPHABET={};
+KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
+
+/* ── RENDER PLANSZY ─────────────────────────────────────────────────── */
+var boardEl=document.getElementById("board"),
+    kbdEl=document.getElementById("kbd"),
+    toastEl=document.getElementById("toast"),
+    archiveMsgEl=document.getElementById("archiveMsg");
 var keyEls={};
-function buildBoard(){board.style.setProperty("--len",LEN);board.innerHTML="";
-  for(var r=0;r<MAX_GUESSES;r++){var row=document.createElement("div");row.className="row";row.style.setProperty("--len",LEN);
-    for(var c=0;c<LEN;c++){var t=document.createElement("div");t.className="tile";row.appendChild(t);}board.appendChild(row);}}
-function paintRow(r,arr,states,anim){var tiles=board.children[r].children;
+
+function buildBoard(){
+  boardEl.style.setProperty("--len",LEN);boardEl.innerHTML="";
+  var max=IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;
+  for(var r=0;r<max;r++){
+    var row=document.createElement("div");row.className="row";row.style.setProperty("--len",LEN);
+    for(var c=0;c<LEN;c++){var t=document.createElement("div");t.className="tile";row.appendChild(t);}
+    boardEl.appendChild(row);
+  }
+}
+function paintRow(r,arr,states,anim){
+  var rows=boardEl.children; if(r>=rows.length)return;
+  var tiles=rows[r].children;
   for(var i=0;i<LEN;i++){(function(i){var t=tiles[i];t.textContent=arr[i];
     if(anim){t.classList.add("reveal");t.style.animationDelay=(i*.15)+"s";
       setTimeout(function(){t.classList.add(states[i]);},i*150+180);}
-    else t.classList.add(states[i]);})(i);}}
-function paintCurrent(){var row=board.children[game.guesses.length];if(!row)return;
-  var arr=Array.from(current),tiles=row.children;
+    else t.classList.add(states[i]);})(i);
+  }
+}
+function paintCurrent(){
+  var rows=boardEl.children; if(!game||game.guesses.length>=rows.length)return;
+  var row=rows[game.guesses.length];var arr=Array.from(current),tiles=row.children;
   for(var i=0;i<LEN;i++){var t=tiles[i];
     if(i<arr.length){t.textContent=arr[i];t.classList.add("filled");}
-    else{t.textContent="";t.classList.remove("filled");}}}
-function buildKbd(){kbd.innerHTML="";keyEls={};
+    else{t.textContent="";t.classList.remove("filled");}}
+}
+function buildKbd(){kbdEl.innerHTML="";keyEls={};
   KEY_ROWS.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
     row.forEach(function(k){var b=document.createElement("button");b.className="key";
       if(k.length>1)b.classList.add("wide");b.dataset.k=k;
       b.textContent=(k==="ENTER"?T().enter:k);
       b.addEventListener("click",function(){onKey(k);});
-      if(k.length===1)keyEls[k]=b;rEl.appendChild(b);});kbd.appendChild(rEl);});}
-function relabelKbd(){var e=kbd.querySelector('[data-k="ENTER"]');if(e)e.textContent=T().enter;}
-function paintKbd(){var best={},rank={absent:0,present:1,correct:2};
-  game.guesses.forEach(function(g){var arr=Array.from(g),st=stateCache[g]||[];
+      if(k.length===1)keyEls[k]=b;rEl.appendChild(b);});kbdEl.appendChild(rEl);});}
+function relabelKbd(){var e=kbdEl.querySelector('[data-k="ENTER"]');if(e)e.textContent=T().enter;}
+function paintKbd(){
+  var best={},rank={absent:0,present:1,correct:2};
+  if(game)game.guesses.forEach(function(g){var arr=Array.from(g),st=stateCache[g]||[];
     for(var i=0;i<arr.length;i++){var c=arr[i],s=st[i];if(!s)continue;if(!best[c]||rank[s]>rank[best[c]])best[c]=s;}});
   Object.keys(keyEls).forEach(function(c){var el=keyEls[c];
-    el.classList.remove("correct","present","absent");if(best[c])el.classList.add(best[c]);});}
+    el.classList.remove("correct","present","absent");if(best[c])el.classList.add(best[c]);});
+}
 
-/* ===== INPUT ===== */
+/* ── NAWIGACJA DNI ──────────────────────────────────────────────────── */
+function updateNavBar(){
+  var t=T();
+  var isToday=currentDay===TODAY_IDX;
+  var isArchive=currentDay<TODAY_IDX;
+  document.getElementById("navDayNo").textContent="Słōwko #"+(currentDay+1);
+  var label=isToday?t.today:fmtDate(dateOfDay(currentDay));
+  if(IS_TESTER&&currentDay>TODAY_IDX)label="▶ "+t.tester;
+  document.getElementById("navDayLabel").innerHTML=label+
+    (IS_TESTER?"<span class='tester-badge'>TEST</span>":"")+
+    (isArchive&&!IS_TESTER?"<span class='archive-badge'>"+t.archive+"</span>":"");
+  document.getElementById("prevBtn").disabled=(currentDay<=0);
+  document.getElementById("nextBtn").disabled=(!IS_TESTER&&currentDay>=TODAY_IDX);
+  // archiveMsg
+  if(isToday){
+    archiveMsgEl.style.display="none";
+    kbdEl.style.display="";
+  } else if(isArchive){
+    var dg=loadDayGame(currentDay);
+    if(dg&&dg.status!=="playing"){
+      archiveMsgEl.textContent=t.archReadonly;
+    } else {
+      archiveMsgEl.textContent=t.archNotPlayed;
+    }
+    archiveMsgEl.style.display="block";
+    kbdEl.style.display="none"; // archiwum = tylko podgląd
+  } else {
+    // przyszłość (tester)
+    archiveMsgEl.style.display="none";
+    kbdEl.style.display="";
+  }
+}
+document.getElementById("prevBtn").addEventListener("click",function(){
+  if(currentDay>0){currentDay--;loadDay(currentDay);}
+});
+document.getElementById("nextBtn").addEventListener("click",function(){
+  if(IS_TESTER||currentDay<TODAY_IDX){currentDay++;loadDay(currentDay);}
+});
+
+/* ── TOAST / SHAKE ──────────────────────────────────────────────────── */
 var toastT;
 function toast(m){toastEl.textContent=m;toastEl.style.opacity="1";
-  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.style.opacity="0";},1700);}
-function shake(){var row=board.children[game.guesses.length];if(!row)return;
-  row.classList.add("shake");setTimeout(function(){row.classList.remove("shake");},400);}
-var busy=false;
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.style.opacity="0";},1800);}
+function shake(){var rows=boardEl.children;if(!game||game.guesses.length>=rows.length)return;
+  var row=rows[game.guesses.length];row.classList.add("shake");
+  setTimeout(function(){row.classList.remove("shake");},400);}
+
+/* ── INPUT ──────────────────────────────────────────────────────────── */
+function maxGuesses(){return IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;}
 function onKey(k){
-  if(game.status!=="playing"){toast(T().done);return;}
+  var isToday=currentDay===TODAY_IDX;
+  var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
+  if(!isToday&&!isFutureTester){return;} // archiwum = readonly
+  if(!game||game.status!=="playing"){
+    toast(isToday?T().done:T().doneArchive);return;
+  }
   if(k==="⌫"){current=current.slice(0,-1);paintCurrent();return;}
   if(k==="ENTER"){submit();return;}
   if(ALPHABET[k]&&Array.from(current).length<LEN){current+=k;paintCurrent();}
@@ -334,45 +521,64 @@ function submit(){
   var arr=Array.from(current);
   if(arr.length<LEN){shake();toast(T().short);return;}
   busy=true;
-  var done=function(res){
-    busy=false;if(!res||res.ok===false){shake();toast(T().short);return;}
-    stateCache[current]=res.states;game.guesses.push(current);
+  var fn=currentDay===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
+  var args=currentDay===TODAY_IDX?{p_guess:current}:{p_day:currentDay,p_guess:current};
+  rpc(fn,args).then(function(res){
+    busy=false;
+    if(!res||res.ok===false){shake();toast(T().short);return;}
+    stateCache[current]=res.states;
+    game.guesses.push(current);
     paintRow(game.guesses.length-1,arr,res.states,true);
     var won=res.states.every(function(s){return s==="correct";});
+    if(won&&res.word)game.reveal={word:res.word,meaning:res.meaning};
     current="";
-    setTimeout(function(){paintKbd();
-      if(won){if(res.word)game.reveal={word:res.word,meaning:res.meaning};finish(true);}
-      else if(game.guesses.length>=MAX_GUESSES)finish(false);
-      else saveAll();},LEN*150+220);};
-  rpc("wihajster_guess",{p_guess:current}).then(done).catch(function(){busy=false;toast(T().short);});
+    setTimeout(function(){
+      paintKbd();
+      if(won)finish(true);
+      else if(game.guesses.length>=maxGuesses())finish(false);
+      else saveDayGame(currentDay,game);
+    },LEN*150+220);
+  }).catch(function(){busy=false;toast(T().errConn);});
 }
 function finish(won){
   game.status=won?"won":"lost";
-  if(stats.lastDay!==DAY){stats.played++;
-    if(won){stats.wins++;stats.dist[Math.min(game.guesses.length-1,6)]++;
-      stats.streak=(stats.lastDay===DAY-1&&stats.lastWin)?stats.streak+1:1;}
+  // Statystyki tylko dla gry dzisiaj (nie archiwum, nie przyszłość testera)
+  if(currentDay===TODAY_IDX&&stats.lastDay!==TODAY_IDX){
+    stats.played++;
+    if(won){stats.wins++;stats.dist[Math.min(game.guesses.length-1,stats.dist.length-1)]++;
+      stats.streak=(stats.lastDay===TODAY_IDX-1&&stats.lastWin)?stats.streak+1:1;}
     else stats.streak=0;
     if(stats.streak>stats.maxStreak)stats.maxStreak=stats.streak;
-    stats.lastDay=DAY;stats.lastWin=won;
-    trackEvent({
-      game:"slowko", puzzle_no:PNO,
+    stats.lastDay=TODAY_IDX;stats.lastWin=won;
+    saveStats();
+    trackEvent({game:"slowko",puzzle_no:currentDay+1,
       puzzle_word:game.reveal?game.reveal.word:null,
-      won:won, tries:game.guesses.length, max_tries:MAX_GUESSES,
-      guesses:game.guesses.slice(), lang:lang, mode:"supabase"
-    });
+      won:won,tries:game.guesses.length,max_tries:maxGuesses(),
+      guesses:game.guesses.slice(),lang:lang,
+      mode:IS_TESTER?"tester":"supabase"});
   }
-  var go=function(){saveAll();toast(won?T().win[game.guesses.length-1]:T().lose);setTimeout(showEnd,900);};
+  saveDayGame(currentDay,game);
+  var go=function(){
+    toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
+    setTimeout(showEnd,900);
+  };
   if(!won&&!game.reveal){
-    rpc("wihajster_reveal").then(function(r){game.reveal=r;go();}).catch(go);
+    var fn=currentDay===TODAY_IDX?"wihajster_reveal":"wihajster_reveal_day";
+    var args=currentDay===TODAY_IDX?{}:{p_day:currentDay};
+    rpc(fn,args).then(function(r){game.reveal=r;saveDayGame(currentDay,game);go();}).catch(go);
   } else go();
 }
+
 document.addEventListener("keydown",function(e){
-  if(document.getElementById("scrim").classList.contains("open")){if(e.key==="Escape")closeModal();return;}
-  if(e.key==="Enter")onKey("ENTER");else if(e.key==="Backspace")onKey("⌫");
+  if(document.getElementById("scrim").classList.contains("open")||
+     document.getElementById("calScrim").classList.contains("open")){
+    if(e.key==="Escape"){closeModal();closeCalendar();}return;}
+  if(e.key==="Enter")onKey("ENTER");
+  else if(e.key==="Backspace")onKey("⌫");
   else{var ch=e.key.toUpperCase();if(ALPHABET[ch])onKey(ch);}
 });
 
-/* ===== MODALE ===== */
+/* ── MODAL ──────────────────────────────────────────────────────────── */
 var scrim=document.getElementById("scrim"),modal=document.getElementById("modal");
 function openModal(html){
   modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
@@ -389,8 +595,9 @@ function statsHtml(){var t=T();
     '<div class="stat"><div class="n">'+stats.streak+'</div><div class="l">'+t.streak+'</div></div>'+
     '<div class="stat"><div class="n">'+stats.maxStreak+'</div><div class="l">'+t.best+'</div></div></div>';}
 function distHtml(){var t=T(),max=Math.max(1,Math.max.apply(null,stats.dist)),rows="";
-  for(var i=0;i<MAX_GUESSES;i++){var v=stats.dist[i],w=Math.max(8,Math.round(v/max*100));
-    var hl=(game.status==="won"&&game.guesses.length===i+1)?" win":"";
+  var mg=IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;
+  for(var i=0;i<mg;i++){var v=stats.dist[i]||0,w=Math.max(8,Math.round(v/max*100));
+    var hl=(game&&currentDay===TODAY_IDX&&game.status==="won"&&game.guesses.length===i+1)?" win":"";
     rows+='<div class="bar-row"><span class="bar-i">'+(i+1)+'</span>'+
       '<div class="bar-wrap"><div class="bar'+hl+'" style="width:'+w+'%">'+v+'</div></div></div>';}
   return'<div class="dist"><h3>'+t.dist+'</h3>'+rows+'</div>';}
@@ -407,22 +614,26 @@ function startCd(){clearInterval(cdTimer);
 
 function showEnd(){
   var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
+  var isToday=currentDay===TODAY_IDX;
   openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
     '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
-    statsHtml()+distHtml()+cdHtml(t)+
-    '<button class="btn" id="shareBtn">'+t.share+'</button>'+
+    (isToday?statsHtml()+distHtml()+cdHtml(t):'')+ // statystyki tylko dla dzisiaj
+    (isToday?'<button class="btn" id="shareBtn">'+t.share+'</button>':'')+
     '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
-  document.getElementById("shareBtn").addEventListener("click",share);startCd();}
+  var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
+  if(isToday)startCd();}
+
 function showStats(){
-  var t=T(),html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
-  if(game.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
-  openModal(html);var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
+  var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
+  var html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
+  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  openModal(html);
+  var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(document.getElementById("cd"))startCd();}
-function showHelp(){
-  var t=T();
-  openModal('<h2>'+t.howH+'</h2>'+
-    '<div class="help-body">'+t.howB+'</div>'+
+
+function showHelp(){var t=T();
+  openModal('<h2>'+t.howH+'</h2><div class="help-body">'+t.howB+'</div>'+
     '<div class="legend">'+
     '<div class="legend-row"><div class="swatch" style="background:var(--correct)">B</div>'+t.lgC+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
@@ -432,11 +643,15 @@ function showHelp(){
 document.getElementById("statBtn").addEventListener("click",showStats);
 document.getElementById("helpBtn").addEventListener("click",showHelp);
 
-/* ===== UDOSTĘPNIANIE ===== */
-function share(){var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var lines=game.guesses.map(function(g){return(stateCache[g]||[]).map(function(s){return em[s];}).join("");});
-  var txt="Słōwko #"+PNO+" "+( game.status==="won"?game.guesses.length:"X")+"/"+MAX_GUESSES+"\n\n"+
-    lines.join("\n")+"\n\nszpilplac.familock.pl";
+/* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
+function share(){
+  var em={correct:"🟩",present:"🟨",absent:"⬛"};
+  var g=loadDayGame(TODAY_IDX)||game;
+  var lines=(g.guesses||[]).map(function(gs){
+    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
+  var score=g.status==="won"?g.guesses.length:"X";
+  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+    "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
   if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
 function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
   if(navigator.clipboard&&navigator.clipboard.writeText)
@@ -445,39 +660,145 @@ function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
     ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
     document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}}
 
-/* ===== JĘZYK ===== */
-function applyLang(){var t=T();
+/* ── KALENDARZ ──────────────────────────────────────────────────────── */
+var calScrim=document.getElementById("calScrim");
+var calViewYear, calViewMonth;
+
+function openCalendar(){
+  var d=dateOfDay(currentDay);
+  calViewYear=d.getFullYear(); calViewMonth=d.getMonth();
+  renderCalendar();
+  calScrim.classList.add("open");}
+function closeCalendar(){calScrim.classList.remove("open");}
+document.getElementById("calBtn").addEventListener("click",openCalendar);
+document.getElementById("calClose").addEventListener("click",closeCalendar);
+calScrim.addEventListener("click",function(e){if(e.target===calScrim)closeCalendar();});
+
+document.getElementById("calPrev").addEventListener("click",function(){
+  calViewMonth--;if(calViewMonth<0){calViewMonth=11;calViewYear--;}renderCalendar();});
+document.getElementById("calNext").addEventListener("click",function(){
+  calViewMonth++;if(calViewMonth>11){calViewMonth=0;calViewYear++;}renderCalendar();});
+
+function renderCalendar(){
+  var t=T();
+  document.getElementById("calTitle").textContent=t.calTitle;
+  var grid=document.getElementById("calGrid");grid.innerHTML="";
+  var DOWS=["Pn","Wt","Śr","Cz","Pt","Sb","Nd"];
+  DOWS.forEach(function(d){var el=document.createElement("div");el.className="cal-dow";el.textContent=d;grid.appendChild(el);});
+
+  var first=new Date(calViewYear,calViewMonth,1);
+  var dow=(first.getDay()+6)%7; // 0=pn
+  for(var e=0;e<dow;e++){var emp=document.createElement("div");emp.className="cal-day empty";grid.appendChild(emp);}
+
+  var daysInMonth=new Date(calViewYear,calViewMonth+1,0).getDate();
+  var epochDate=midnightOf(EPOCH);
+  var todayDate=midnightOf(new Date());
+
+  for(var d=1;d<=daysInMonth;d++){
+    var date=new Date(calViewYear,calViewMonth,d);
+    var dayIdx=Math.floor((midnightOf(date)-epochDate)/86400000);
+    var el=document.createElement("div");
+    el.textContent=d;
+    if(dayIdx<0){el.className="cal-day future";grid.appendChild(el);continue;}
+    if(date>todayDate&&!IS_TESTER){el.className="cal-day future";grid.appendChild(el);continue;}
+    var dg=dayIdx>=0?loadDayGame(dayIdx):null;
+    var cls="cal-day";
+    if(midnightOf(date).getTime()===todayDate.getTime())cls+=" today";
+    else if(date<todayDate||IS_TESTER)cls+=" past";
+    if(dg&&dg.status==="won")cls+=" played won";
+    else if(dg&&dg.status==="lost")cls+=" played";
+    el.className=cls;
+    (function(idx){el.addEventListener("click",function(){
+      if(idx<0)return;
+      if(idx>TODAY_IDX&&!IS_TESTER)return;
+      closeCalendar();currentDay=idx;loadDay(idx);});
+    })(dayIdx);
+    grid.appendChild(el);
+  }
+
+  // Nawigacja miesiąca — ogranicz do zakresu gry
+  var epochMonth=new Date(EPOCH.getFullYear(),EPOCH.getMonth(),1);
+  var curView=new Date(calViewYear,calViewMonth,1);
+  document.getElementById("calPrev").disabled=(curView<=epochMonth);
+  var maxMonth=IS_TESTER?new Date(calViewYear+1,0,1):new Date(todayDate.getFullYear(),todayDate.getMonth(),1);
+  document.getElementById("calNext").disabled=(curView>=maxMonth);
+}
+
+/* ── ŁADOWANIE DNIA ─────────────────────────────────────────────────── */
+function loadDay(dayIdx){
+  current="";busy=false;stateCache={};
+  updateNavBar();
+  buildBoard();buildKbd();relabelKbd();
+
+  var saved=loadDayGame(dayIdx);
+  // Archiwum: jeśli mamy zapisany stan — pokaż tylko, bez fetch
+  if(dayIdx<TODAY_IDX){
+    PNO=dayIdx+1;
+    document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
+    if(saved&&saved.guesses&&saved.guesses.length>0){
+      LEN=Array.from(saved.guesses[0]).length;
+      buildBoard();buildKbd();
+      game={guesses:[],status:saved.status||"playing",reveal:saved.reveal||null};
+      saved.guesses.forEach(function(g,i){
+        var states=saved.states&&saved.states[i]?saved.states[i]:Array.from(g).map(function(){return"absent";});
+        stateCache[g]=states;game.guesses.push(g);paintRow(i,Array.from(g),states,false);
+      });
+      paintKbd();
+      if(game.status!=="playing")setTimeout(function(){showEnd();},300);
+    } else {
+      // Nie grał tego dnia — pobierz meta żeby pokazać planszę z właściwą długością
+      rpc("wihajster_day",{p_day:dayIdx}).then(function(meta){
+        LEN=meta.length;buildBoard();buildKbd();
+        game={guesses:[],status:"not_played",reveal:null};
+      }).catch(function(){});
+    }
+    return;
+  }
+
+  // Dziś lub przyszłość (tester) — zawsze przez Supabase
+  var fn=dayIdx===TODAY_IDX?"wihajster_today":"wihajster_day";
+  var args=dayIdx===TODAY_IDX?{}:{p_day:dayIdx};
+  rpc(fn,args).then(function(meta){
+    LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
+    document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
+    buildBoard();buildKbd();relabelKbd();
+
+    var s=saved||{guesses:[],status:"playing",reveal:null};
+    game={guesses:[],status:s.status||"playing",reveal:s.reveal||null};
+
+    // Odtwórz próby przez Supabase (re-ocena żeby mieć stany)
+    var replay=s.guesses||[];
+    (function step(i){
+      if(i>=replay.length){
+        paintKbd();
+        if(game.status!=="playing")setTimeout(function(){showEnd();},300);
+        return;}
+      var g=replay[i],arr=Array.from(g);
+      var fn2=dayIdx===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
+      var a2=dayIdx===TODAY_IDX?{p_guess:g}:{p_day:dayIdx,p_guess:g};
+      rpc(fn2,a2).then(function(res){
+        stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);
+      }).catch(function(){
+        var st=arr.map(function(){return"absent";});
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);});
+    })(0);
+  }).catch(function(){toast(T().errConn);});
+}
+
+/* ── JĘZYK ──────────────────────────────────────────────────────────── */
+function applyLang(){
   document.documentElement.lang=lang==="szl"?"szl":"pl";
   document.getElementById("lPl").className=lang==="pl"?"on":"";
   document.getElementById("lSzl").className=lang==="szl"?"on":"";
-  relabelKbd();if(scrim.classList.contains("open"))closeModal();}
+  relabelKbd();updateNavBar();
+  if(scrim.classList.contains("open"))closeModal();}
 function setLang(l){lang=l;store.set(LANG_KEY,l);applyLang();}
 document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
 document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
 
-/* ===== START ===== */
-function boot(meta){
-  DAY=meta.day_index;LEN=meta.length;PNO=meta.puzzle_no;
-  document.getElementById("pno").textContent="#"+PNO;
-  if(game.day!==DAY){game={day:DAY,guesses:[],status:"playing",reveal:null};}
-  buildBoard();buildKbd();applyLang();
-  var replay=game.guesses.slice();game.guesses=[];
-  (function step(i){
-    if(i>=replay.length){paintKbd();if(game.status!=="playing")setTimeout(showEnd,300);return;}
-    var g=replay[i],arr=Array.from(g);
-    var apply=function(res){stateCache[g]=res.states;game.guesses.push(g);paintRow(i,arr,res.states,false);step(i+1);};
-    rpc("wihajster_guess",{p_guess:g}).then(apply)
-      .catch(function(){apply({states:arr.map(function(){return"absent";})});});
-  })(0);
-}
-function start(){
-  rpc("wihajster_today")
-    .then(function(meta){boot(meta);})
-    .catch(function(){
-      toast("Błąd połączenia z bazą. Odśwież stronę.");
-    });
-}
-applyLang();start();
+/* ── START ──────────────────────────────────────────────────────────── */
+applyLang();
+loadDay(TODAY_IDX);
 </script>
 </body>
 </html>
