@@ -287,10 +287,11 @@ var SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 var STATS_URL        = SUPABASE_URL;
 var STATS_KEY        = SUPABASE_ANON_KEY;
 
+// Tryb testowy: wejdź przez slowko.html?test=TWOJE_HASLO
 // Tester: nieograniczona liczba słów dziennie + dostęp do archiwum
 var TEST_PASSWORD    = "starzik";      // ← zmień na swoje hasło
 var MAX_GUESSES      = 6;
-var MAX_GUESSES_TEST = 10;             // tester może zgadywać więcej
+var MAX_GUESSES_TEST = 20;             // tester może zgadywać więcej
 
 var STORAGE_KEY  = "slowko_v2";
 var LANG_KEY     = "familock_lang";
@@ -345,11 +346,19 @@ function rpc(fn,args){
 
 /* ── STATYSTYKI ─────────────────────────────────────────────────────── */
 function trackEvent(payload){
-  fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
+  return fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
     headers:{"Content-Type":"application/json","apikey":STATS_KEY,
              "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
     body:JSON.stringify(payload)
-  }).catch(function(){});
+  }).then(function(r){
+    if(!r.ok){
+      return r.text().then(function(txt){throw new Error("stats "+r.status+" "+txt);});
+    }
+    return true;
+  }).catch(function(e){
+    console.warn("Nie udało się zapisać statystyk w Supabase:", e);
+    return false;
+  });
 }
 
 /* ── NAPISY ─────────────────────────────────────────────────────────── */
@@ -411,6 +420,15 @@ var S={
 };
 var lang=store.get(LANG_KEY)||"pl";
 function T(){return S[lang];}
+
+
+/* Zdejmij fokus z klikniętych przycisków.
+   Dzięki temu spacja po kliknięciu strzałki, klawiatury ekranowej albo ikony
+   nie uruchamia ponownie ostatniego przycisku. */
+document.addEventListener("click",function(e){
+  var btn=e.target&&e.target.closest?e.target.closest("button"):null;
+  if(btn){setTimeout(function(){btn.blur();},0);}
+});
 
 /* ── MOTYW ──────────────────────────────────────────────────────────── */
 var TSVG={
@@ -482,12 +500,16 @@ function hydrateStatsFromDayGames(){
   saveStats();
 }
 function recordStats(won){
-  if(IS_TESTER&&currentDay>TODAY_IDX)return;
+  if(IS_TESTER&&currentDay>TODAY_IDX)return false;
   if(!stats.results)stats.results={};
-  if(stats.results[currentDay])return;
+  if(stats.results[currentDay])return false;
   stats.results[currentDay]={won:!!won,tries:game.guesses.length};
   recalcStats();
   saveStats();
+  return true;
+}
+function sendFinishEvent(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return;
   trackEvent({game:"slowko",puzzle_no:currentDay+1,
     puzzle_word:game.reveal?game.reveal.word:null,
     won:won,tries:game.guesses.length,max_tries:maxGuesses(),
@@ -701,7 +723,9 @@ function submit(){
     busy=false;
     if(!res||res.ok===false){shake();toast(T().short);return;}
     stateCache[current]=res.states;
+    if(!game.states)game.states=[];
     game.guesses.push(current);
+    game.states[game.guesses.length-1]=res.states;
     paintRow(game.guesses.length-1,arr,res.states,true);
     var won=res.states.every(function(s){return s==="correct";});
     if(won&&res.word)game.reveal={word:res.word,meaning:res.meaning};
@@ -718,8 +742,9 @@ function submit(){
 function finish(won){
   game.status=won?"won":"lost";
   saveDayGame(currentDay,game);
-  recordStats(won);
+  var shouldTrack = recordStats(won);
   var go=function(){
+    if(shouldTrack)sendFinishEvent(won);
     toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
     setTimeout(showEnd,900);
   };
