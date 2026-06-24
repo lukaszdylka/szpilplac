@@ -320,6 +320,7 @@ var ANIM_KEY     = "slowko_anim";    // animacje: "on"|"off"
 var SOUND_KEY    = "slowko_sound";   // dźwięki: "on"|"off"
 var CB_KEY       = "slowko_cb";      // daltonizm: "on"|"off"
 var CAT_KEY      = "slowko_cat";     // kategoria: "on"|"off"
+var SWAP_KEY     = "slowko_swap";    // zamiana Enter/Backspace: "on"|"off"
 var EPOCH        = new Date(2026, 5, 23);
 
 // Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
@@ -330,6 +331,7 @@ var animMode  = store.get(ANIM_KEY)  || "on";
 var soundMode = store.get(SOUND_KEY) || "off";
 var cbMode    = store.get(CB_KEY)    || "off";
 var catMode   = store.get(CAT_KEY)   || "off";
+var swapMode  = store.get(SWAP_KEY)  || "off";
 var currentCategory = null;  // kategoria bieżącego dnia
 
 /* ── TRYB TESTOWY ───────────────────────────────────────────────────── */
@@ -405,6 +407,7 @@ var S={
     settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
     settSoundL:"Dźwięki",settSoundS:"Klik przy wpisywaniu, dźwięk trafienia",
     settCbL:"Tryb dla daltonistów",settCbS:"Wzory zamiast samych kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokaż wskazówkę",
     catPre:"Kategoria: ",
@@ -438,6 +441,7 @@ var S={
     settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
     settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
     settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokoz podpowiydź",
     catPre:"Kategoryjo: ",
@@ -567,7 +571,12 @@ function paintCurrent(){
     else{t.textContent="";t.classList.remove("filled");}}
 }
 function buildKbd(){kbdEl.innerHTML="";keyEls={};
-  KEY_ROWS.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
+  var rows=KEY_ROWS.map(function(r,i){
+    if(i===KEY_ROWS.length-1&&swapMode==="on")
+      return r.map(function(k){return k==="ENTER"?"⌫":k==="⌫"?"ENTER":k;});
+    return r;
+  });
+  rows.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
     row.forEach(function(k){var b=document.createElement("button");b.className="key";
       if(k.length>1)b.classList.add("wide");b.dataset.k=k;
       b.textContent=(k==="ENTER"?T().enter:k);
@@ -672,6 +681,13 @@ function showSettings(){
       tog(soundMode,SOUND_KEY)+
     '</div>'+
 
+    // Zamiana Enter/Backspace
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settSwapL+'</div>'+
+      '<div class="sett-sub">'+t.settSwapS+'</div></div>'+
+      tog(swapMode,SWAP_KEY)+
+    '</div>'+
+
     // Daltonizm
     '<div class="sett-row">'+
       '<div><div class="sett-label">'+t.settCbL+'</div>'+
@@ -692,6 +708,7 @@ function showSettings(){
       if(k===ANIM_KEY){ animMode=v; store.set(ANIM_KEY,v); applyAnimMode(); }
       if(k===SOUND_KEY){soundMode=v;store.set(SOUND_KEY,v);}
       if(k===CB_KEY){   cbMode=v;   store.set(CB_KEY,v);   applyCbMode(); }
+      if(k===SWAP_KEY){swapMode=v;store.set(SWAP_KEY,v);buildKbd();}
     });
   });
 }
