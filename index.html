@@ -46,6 +46,8 @@ header{width:100%;max-width:480px;padding-top:20px}
 .icon-btn svg{display:block;flex:none}
 
 main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:9px}
+
+/* Kafelki gier */
 .game-link{display:flex;align-items:center;gap:14px;padding:13px 15px;
   background:var(--surface);border:1px solid var(--line);border-radius:12px;
   box-shadow:var(--sh);transition:transform .1s,box-shadow .1s}
@@ -63,6 +65,26 @@ main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:9px}
 .badge.live{background:var(--correct);color:#fff}
 .badge.done{color:var(--correct);border:1px solid var(--correct)}
 .badge.soon{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+
+/* Separator */
+.section-sep{display:flex;align-items:center;gap:10px;margin:6px 0 3px}
+.section-sep span{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink2);white-space:nowrap}
+.section-sep::before,.section-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* Kafelki zewnętrzne (escape room, gra) — nieco inny styl */
+.ext-links{display:flex;flex-direction:column;gap:9px}
+.ext-link{display:flex;align-items:center;gap:14px;padding:12px 15px;
+  background:var(--surface2);border:1px solid var(--line);border-radius:12px;
+  transition:transform .1s,box-shadow .1s}
+.ext-link:hover{transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(35,32,26,.35);background:var(--surface)}
+.ext-icon{flex:none;width:42px;height:42px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.ext-icon svg{display:block}
+.ext-lbl{flex:1;min-width:0}
+.ext-lbl .name{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.02em;line-height:1;color:var(--ink)}
+.ext-lbl .desc{font-size:11.5px;color:var(--ink2);margin-top:2px}
+.ext-arr{color:var(--ink2);font-size:14px;flex:none}
 
 footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin-top:22px;line-height:1.8}
 footer a{color:var(--green);font-weight:600}
@@ -91,19 +113,53 @@ footer a:hover{text-decoration:underline}
     </div>
   </div>
 </header>
-<main id="games"></main>
-<footer>
-  <a href="https://www.familock.pl" target="_blank" rel="noopener">Escape Room Familock</a><br><br>
-  <a href="https://gra.familock.pl" target="_blank" rel="noopener">Gra Point&Click "Starzik. TheSzpil"</a><br><br>
-  <div class="footer-sources">
-  <a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a>
-  </div>
 
+<main>
+  <div id="games"></div>
+
+  <div class="section-sep" id="sepLabel"><span>Familock</span></div>
+
+  <div class="ext-links">
+    <a class="ext-link" href="https://www.familock.pl" target="_blank" rel="noopener">
+      <div class="ext-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
+          <path d="M7 18v-6h6v6"/>
+        </svg>
+      </div>
+      <div class="ext-lbl">
+        <div class="name" id="er-name">Escape Room Familock</div>
+        <div class="desc" id="er-desc">Świętochłowice — zarezerwuj pokój</div>
+      </div>
+      <div class="ext-arr">↗</div>
+    </a>
+
+    <a class="ext-link" href="https://gra.familock.pl" target="_blank" rel="noopener">
+      <div class="ext-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="16" height="11" rx="2"/>
+          <path d="M6 10h2m-1-1v2"/>
+          <circle cx="13" cy="9.5" r=".7" fill="currentColor" stroke="none"/>
+          <circle cx="15" cy="11" r=".7" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <div class="ext-lbl">
+        <div class="name" id="game-name">Starzik: TheSzpil</div>
+        <div class="desc" id="game-desc">Gra point&amp;click online — za darmo</div>
+      </div>
+      <div class="ext-arr">↗</div>
+    </a>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-sources">
+    <a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a>
+  </div>
   <div class="footer-sources">
     Słownik śląski: <a href="https://bonclok.pl/slowniczek-wyrazow-slaskich/" target="_blank" rel="noopener">bonclok.pl</a>
     · <a href="https://slunski-chachor.com" target="_blank" rel="noopener">slunski-chachor.com</a>
   </div>
-
   <div class="buycoffee">
     <a href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener">
       <img src="https://buycoffee.to/static/img/share/share-button-dark.png"
@@ -111,6 +167,7 @@ footer a:hover{text-decoration:underline}
     </a>
   </div>
 </footer>
+
 <script>
 "use strict";
 var LK="familock_lang",TK="szpilplac_theme";
@@ -127,6 +184,7 @@ var ICO={
   lock:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
   conn:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>'
 };
+
 var THEME_ICONS={system:ICO.auto,light:ICO.sun,dark:ICO.moon};
 var THEMES=["system","light","dark"];
 var theme=store.get(TK)||"system";
@@ -146,28 +204,57 @@ var ACTIVE_CUZAMEN = false;
 
 var lang=store.get(LK)||"pl";
 var S={
-  pl:{sub:"Codzienne familockowe gry i zagadki",live:"Dzisiaj",done:"Zagrane",soon:"Wkrótce",
-    games:[{ico:ICO.word,name:"Słōwko",       desc:"Zgadnij śląskie słowo dnia — 6 prób.",    href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",       desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.", href:ACTIVE_KLODKA?"klodka.html":null},
-           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znajdź cztery grupy po cztery słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}]},
-  szl:{sub:"Codzienne familockowe szpile i zagadki",live:"Dzisiej",done:"Zagrane",soon:"Niydługo",
-    games:[{ico:ICO.word,name:"Słōwko",       desc:"Zgodnij ślonske słowo dnia — 6 prób.",    href:"slowko.html"},
-           {ico:ICO.lock,name:"Kłōdka",       desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",   href:ACTIVE_KLODKA?"klodka.html":null},
-           {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}]}
+  pl:{
+    sub:"Codzienne familockowe gry i zagadki",
+    live:"Dzisiaj",done:"Zagrane",soon:"Wkrótce",
+    sep:"Familock",
+    erName:"Escape Room Familock",erDesc:"Świętochłowice — zarezerwuj pokój",
+    gameName:"Starzik: TheSzpil",gameDesc:"Gra point&click online — za darmo",
+    games:[
+      {ico:ICO.word,name:"Słōwko",       desc:"Zgadnij śląskie słowo dnia — 6 prób.",    href:"slowko.html"},
+      {ico:ICO.lock,name:"Kłōdka",       desc:"Zgadnij 4-cyfrowy kod. Codziennie nowy.", href:ACTIVE_KLODKA?"klodka.html":null},
+      {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znajdź cztery grupy po cztery słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}
+    ]
+  },
+  szl:{
+    sub:"Codzienne familockowe szpile i zagadki",
+    live:"Dzisiej",done:"Zagrane",soon:"Niydługo",
+    sep:"Familock",
+    erName:"Escape Room Familock",erDesc:"Świyntochłowice — rezerwacyjo",
+    gameName:"Starzik: TheSzpil",gameDesc:"Szpil point&click w internecie — gratis",
+    games:[
+      {ico:ICO.word,name:"Słōwko",       desc:"Zgodnij ślonske słowo dnia — 6 prób.",    href:"slowko.html"},
+      {ico:ICO.lock,name:"Kłōdka",       desc:"Zgodnij 4-cyfrowy kod. Co dziyń nowy.",   href:ACTIVE_KLODKA?"klodka.html":null},
+      {ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa.",    href:ACTIVE_CUZAMEN?"cuzamen.html":null}
+    ]
+  }
 };
+
 function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();
   function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}
   return Math.floor((md(n)-md(s))/86400000);}
 var DAY=daysSince(2026,6,23);
 var KEYS={"slowko.html":"slowko_v2","cuzamen.html":"cuzamen_v1"};
-function playedToday(href){try{var g=JSON.parse(store.get(KEYS[href])||"{}").game;
-  return g&&g.day===DAY&&g.status&&g.status!=="playing";}catch(e){return false;}}
+function playedToday(href){
+  try{
+    // Słōwko używa slowko_d{N} per dzień
+    if(href==="slowko.html"){
+      var dk="slowko_d"+DAY;
+      var dg=JSON.parse(store.get(dk)||"null");
+      return dg&&(dg.status==="won"||dg.status==="lost");
+    }
+    var g=JSON.parse(store.get(KEYS[href])||"{}");
+    return g&&g.day===DAY&&g.status&&g.status!=="playing";
+  }catch(e){return false;}
+}
 
 function render(){
   var s=S[lang];
   document.getElementById("sub").textContent=s.sub;
   document.getElementById("lPl").className=lang==="pl"?"on":"";
   document.getElementById("lSzl").className=lang==="szl"?"on":"";
+
+  // Kafelki gier
   var wrap=document.getElementById("games");wrap.innerHTML="";
   s.games.forEach(function(g){
     var done=g.href&&playedToday(g.href);
@@ -182,7 +269,15 @@ function render(){
       '<div class="badge '+bcls+'">'+badge+'</div>';
     wrap.appendChild(el);
   });
+
+  // Separator i linki zewnętrzne
+  document.getElementById("sepLabel").querySelector("span").textContent=s.sep;
+  document.getElementById("er-name").textContent=s.erName;
+  document.getElementById("er-desc").textContent=s.erDesc;
+  document.getElementById("game-name").textContent=s.gameName;
+  document.getElementById("game-desc").innerHTML=s.gameDesc;
 }
+
 document.getElementById("lPl").addEventListener("click",function(){lang="pl";store.set(LK,lang);render();});
 document.getElementById("lSzl").addEventListener("click",function(){lang="szl";store.set(LK,lang);render();});
 render();
