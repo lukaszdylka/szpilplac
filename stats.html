@@ -88,6 +88,25 @@ tr:hover td{background:var(--surface2)}
 .tab{padding:7px 16px;border-radius:999px;border:1px solid var(--line);
   background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
 .tab.on{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* podgląd słów */
+.words-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:18px 20px;margin-bottom:20px;display:none}
+.words-card.open{display:block}
+.words-card h3{font-family:"Oswald";font-size:16px;text-transform:uppercase;
+  letter-spacing:.06em;margin:0 0 14px;color:var(--ink2)}
+.words-row{display:flex;gap:12px;flex-wrap:wrap}
+.word-tile{flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--line);
+  border-radius:10px;padding:12px 16px}
+.word-tile .wt-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink2);margin-bottom:4px;font-weight:700}
+.word-tile .wt-word{font-family:"Oswald";font-size:26px;color:var(--green);letter-spacing:.06em}
+.word-tile .wt-meaning{font-size:12px;color:var(--ink2);margin-top:3px}
+.word-tile .wt-no{font-size:11px;color:var(--ink2);margin-top:2px}
+.word-tile.tomorrow .wt-word{color:var(--gold)}
+.btn-words{padding:7px 14px;border-radius:999px;border:1px solid var(--gold);
+  background:transparent;font-size:12px;font-weight:700;cursor:pointer;color:var(--gold)}
+.btn-words:hover{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -109,10 +128,18 @@ tr:hover td{background:var(--surface2)}
       <h1 style="margin-top:4px">Statystyki</h1>
     </div>
     <div class="hdr-right">
+      <button class="btn-words" id="wordsBtn">🔤 Dzisiaj / Jutro</button>
       <button class="refresh" id="refreshBtn">↻ Odśwież</button>
       <button class="logout" id="logoutBtn">Wyloguj</button>
     </div>
   </header>
+
+  <div class="words-card" id="wordsCard">
+    <h3>Słowa dnia</h3>
+    <div class="words-row" id="wordsRow">
+      <div class="spinner" style="padding:10px">Pobieram…</div>
+    </div>
+  </div>
 
   <div class="tabs">
     <button class="tab on" data-game="slowko">Słōwko</button>
@@ -129,6 +156,59 @@ tr:hover td{background:var(--surface2)}
 var SUPABASE_URL = "https://xyivrakegwybwhmmcawq.supabase.co";
 // Ten sam projekt co Słōwko — wpisujesz service_role key przy logowaniu poniżej
 var KEY_LS = "szpilplac_stats_key";
+
+/* ── Podgląd słów dnia ── */
+function rpcAdmin(fn, args){
+  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json","apikey":serviceKey,
+             "Authorization":"Bearer "+serviceKey},
+    body:JSON.stringify(args||{})
+  }).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});
+}
+
+function loadWords(){
+  var card=document.getElementById("wordsCard");
+  var row=document.getElementById("wordsRow");
+  card.classList.add("open");
+  row.innerHTML='<div class="spinner" style="padding:10px">Pobieram…</div>';
+
+  // Oblicz numery dni (epoch = 2026-06-23)
+  var epoch=new Date(2026,5,23);
+  function dayIdx(offset){
+    var now=new Date();
+    var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    return Math.floor((today-epoch)/86400000)+offset;
+  }
+  var todayIdx=dayIdx(0), tomorrowIdx=dayIdx(1);
+
+  Promise.all([
+    rpcAdmin("wihajster_reveal_day",{p_day:todayIdx}),
+    rpcAdmin("wihajster_reveal_day",{p_day:tomorrowIdx})
+  ]).then(function(res){
+    var today=res[0], tomorrow=res[1];
+    row.innerHTML=
+      '<div class="word-tile">'+
+        '<div class="wt-label">Dzisiaj · #'+(todayIdx+1)+'</div>'+
+        '<div class="wt-word">'+(today.word||"–")+'</div>'+
+        '<div class="wt-meaning">'+(today.meaning||"")+'</div>'+
+      '</div>'+
+      '<div class="word-tile tomorrow">'+
+        '<div class="wt-label">Jutro · #'+(tomorrowIdx+1)+'</div>'+
+        '<div class="wt-word">'+(tomorrow.word||"–")+'</div>'+
+        '<div class="wt-meaning">'+(tomorrow.meaning||"")+'</div>'+
+      '</div>';
+  }).catch(function(e){
+    row.innerHTML='<p style="color:var(--red);padding:4px">Błąd: '+e.message+'</p>';
+  });
+}
+
+var wordsVisible=false;
+document.getElementById("wordsBtn").addEventListener("click",function(){
+  wordsVisible=!wordsVisible;
+  var card=document.getElementById("wordsCard");
+  if(wordsVisible){loadWords();}
+  else{card.classList.remove("open");}
+});
 
 /* ── Hasło (service_role key) ── */
 var serviceKey = "";
