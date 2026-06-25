@@ -307,6 +307,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
+window.KLODKA_VERSION="local-stats-modal-fix-2026-06-25";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -510,7 +511,18 @@ function loadSavedGame(mode,idx){
   // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
   if(!saved && mode==="daily" && idx===TODAY_NO) saved=loadJSON(DAILY_KEY);
   if(!saved && mode==="weekly" && idx===WEEK_NO) saved=loadJSON(WEEK_KEY);
-  if(saved && saved[idFieldFor(mode)]===idx && saved.game) return saved.game;
+
+  if(!saved) return null;
+
+  // Aktualny format: {day/week: idx, game:{...}}
+  if(saved.game){
+    var savedIdx = saved[idFieldFor(mode)];
+    if(savedIdx===idx || String(savedIdx)===String(idx)) return saved.game;
+  }
+
+  // Awaryjnie: starszy surowy zapis samej gry {status, guesses...}
+  if(saved.status && saved.guesses) return saved;
+
   return null;
 }
 
@@ -761,42 +773,42 @@ function finish(won){
   game.status=won?"won":"lost";
 
   var doneMode=view, doneIdx=currentIdx();
+  var doneTries=(game.guesses||[]).length||MAX_TRIES;
 
-  // Najważniejsze: najpierw zapisz wynik lokalnie.
-  // Archiwalne dni zapisują się pod kluczem klodka_daily_v1_dNUMER_DNIA.
+  // Najważniejsze: najpierw zapisz wynik lokalnie i statystyki.
+  // To NIE może zależeć od modala, animacji ani Supabase.
   persist();
+  recordHistoryFor(doneMode,doneIdx,won,doneTries);
 
   var T=t();
   if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
   else toast(doneMode==="daily"?T.loseD:T.loseW);
 
-  // Modal ze statystykami NIE może czekać na RPC reveal.
-  // Jeżeli Supabase chwilowo zawiesi odpowiedź, statystyki i zapis lokalny i tak się pokażą.
-  setTimeout(function(){ if(sameView(doneMode,doneIdx)) openEnd(); }, animMode==="off"?250:900);
+  // Modal końcowy otwieramy z konkretnego zapisanego dnia/tygodnia, a nie z bieżącego widoku.
+  // Dzięki temu działa też archiwum i nie gubi się przy zmianie dnia.
+  setTimeout(function(){ openEndFor(doneMode,doneIdx); }, animMode==="off"?250:900);
 
   // Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
   rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
     .then(function(code){
       var saved=loadSavedGame(doneMode,doneIdx) || game;
       if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
-      if(sameView(doneMode,doneIdx) && game){
+      if(game && view===doneMode && currentIdx()===doneIdx){
         game.reveal=code;
         saveGameFor(doneMode,doneIdx,game);
-        updateRevealInModal(code);
       }
+      updateRevealInModal(code);
       refreshWeektile();
     })
     .catch(function(){ refreshWeektile(); });
 
-  // log
+  // log globalny do stats.html
   trackEvent({
-    // W tabeli statystyk gra jest zapisywana jako „kodka” (bez polskiego znaku).
-    // Tryb daily/weekly rozróżniamy polem mode, żeby nie łamać check constraint w Supabase.
     game: "kodka",
     mode: doneMode,
     puzzle_no: doneIdx,
-    puzzle_word: null,                 // celowo NIE logujemy kodu (RLS / wyciek)
-    won: won, tries: game.guesses.length, max_tries: MAX_TRIES, lang: lang
+    puzzle_word: null,
+    won: won, tries: doneTries, max_tries: MAX_TRIES, lang: lang
   });
 }
 
@@ -899,28 +911,57 @@ function countdown(toMidnightOrWeek){
 }
 
 function openEnd(){
-  var T=t(), won=game.status==="won";
-  var hist=recordHistory(won);
-  var isArchiveDaily = view==="daily" && DAY_NO<TODAY_NO;
+  openEndFor(view,currentIdx());
+}
+
+function openEndFor(mode,idx){
+  var T=t();
+  var g=loadSavedGame(mode,idx) || (mode===view && idx===currentIdx()?game:null);
+  if(!g || (g.status!=="won" && g.status!=="lost")) return;
+
+  var oldGame=game, oldView=view, oldDay=DAY_NO;
+  // Na czas budowy HTML ustawiamy game na właściwy zapis, żeby podświetlenie paska prób było poprawne.
+  game=g;
+
+  var won=g.status==="won";
+  var hist=hydrateHistory(mode);
+  var isArchiveDaily = mode==="daily" && idx<TODAY_NO;
   var countdownHtml = isArchiveDaily
     ? '<div class="cd">'+T.archiveDone+'</div>'
-    : '<div class="cd">'+(view==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdown()+'</b></div>';
+    : '<div class="cd">'+(mode==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdownForMode(mode)+'</b></div>';
+
   var html=
-    '<button class="modal-close" aria-label="Zamknij">×</button>'+ 
-    '<h2>'+(won?T.endW:T.endL)+'</h2>'+ 
-    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+ 
-      '<div class="reveal-code" id="revealCode">'+(game.reveal||"····")+'</div></div>'+ 
+    '<button class="modal-close" aria-label="Zamknij">×</button>'+
+    '<h2>'+(won?T.endW:T.endL)+'</h2>'+
+    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+
+      '<div class="reveal-code" id="revealCode">'+(g.reveal||"····")+'</div></div>'+
     statsSummaryHtml(hist)+
     distHtml(hist)+
     countdownHtml+
-    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+ 
+    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
     '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
+
   modal.innerHTML=html;
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
   modal.querySelector("#closeBtn").addEventListener("click",closeModal);
   clearInterval(openEnd._t);
-  if(!isArchiveDaily) openEnd._t=setInterval(function(){var el=document.getElementById("cd"); if(el)el.textContent=countdown(); else clearInterval(openEnd._t);},1000);
+  if(!isArchiveDaily){
+    openEnd._t=setInterval(function(){
+      var el=document.getElementById("cd");
+      if(el)el.textContent=countdownForMode(mode);else clearInterval(openEnd._t);
+    },1000);
+  }
+
+  game=oldGame; view=oldView; DAY_NO=oldDay;
+}
+
+function countdownForMode(mode){
+  var oldView=view;
+  view=mode;
+  var out=countdown();
+  view=oldView;
+  return out;
 }
 
 function openFinishedModal(delay){
@@ -929,18 +970,18 @@ function openFinishedModal(delay){
   var doneMode=view, doneIdx=currentIdx();
 
   // Statystyki i okno końcowe pokazują się zawsze, bez czekania na Supabase.
-  setTimeout(function(){ if(sameView(doneMode,doneIdx)) openEnd(); }, delay);
+  setTimeout(function(){ openEndFor(doneMode,doneIdx); }, delay);
 
   if(game.reveal) return;
   rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
     .then(function(code){
       var saved=loadSavedGame(doneMode,doneIdx) || game;
       if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
-      if(sameView(doneMode,doneIdx) && game){
+      if(game && view===doneMode && currentIdx()===doneIdx){
         game.reveal=code;
         saveGameFor(doneMode,doneIdx,game);
-        updateRevealInModal(code);
       }
+      updateRevealInModal(code);
     })
     .catch(function(){});
 }
