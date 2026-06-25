@@ -499,31 +499,42 @@ function freshGame(mode, idx){ return {mode:mode, idx:idx, guesses:[], status:"p
 function currentIdx(){return view==="daily"?DAY_NO:WEEK_NO;}
 function dailyKey(dayNo){return DAILY_KEY+"_d"+dayNo;}
 function weeklyKey(weekNo){return WEEK_KEY+"_w"+weekNo;}
-function storeKey(){return view==="daily"?dailyKey(DAY_NO):weeklyKey(WEEK_NO);}
+function keyFor(mode,idx){return mode==="daily"?dailyKey(idx):weeklyKey(idx);}
+function idFieldFor(mode){return mode==="daily"?"day":"week";}
+function storeKey(){return keyFor(view,currentIdx());}
 function histKey(mode){return (mode==="weekly"?WEEK_KEY:DAILY_KEY)+"__hist";}
-function storeIdField(){return view==="daily"?"day":"week";}
+function storeIdField(){return idFieldFor(view);}
+
+function loadSavedGame(mode,idx){
+  var saved=loadJSON(keyFor(mode,idx));
+  // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
+  if(!saved && mode==="daily" && idx===TODAY_NO) saved=loadJSON(DAILY_KEY);
+  if(!saved && mode==="weekly" && idx===WEEK_NO) saved=loadJSON(WEEK_KEY);
+  if(saved && saved[idFieldFor(mode)]===idx && saved.game) return saved.game;
+  return null;
+}
+
+function saveGameFor(mode,idx,g){
+  var o={}; o[idFieldFor(mode)] = idx; o.game = g;
+  saveJSON(keyFor(mode,idx),o);
+
+  // Dodatkowy zapis bieżącej gry pod starym kluczem — dla zgodności ze stroną główną i starszymi wersjami.
+  if(mode==="daily" && idx===TODAY_NO) saveJSON(DAILY_KEY,o);
+  if(mode==="weekly" && idx===WEEK_NO) saveJSON(WEEK_KEY,o);
+}
 
 function loadGame(){
-  var saved = loadJSON(storeKey());
-  var idx   = currentIdx();
-  // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
-  if(!saved && view==="daily" && DAY_NO===TODAY_NO) saved=loadJSON(DAILY_KEY);
-  if(!saved && view==="weekly") saved=loadJSON(WEEK_KEY);
-  if(saved && saved[storeIdField()]===idx && saved.game){ game = saved.game; }
-  else { game = freshGame(view, idx); }
+  var idx=currentIdx();
+  game = loadSavedGame(view,idx) || freshGame(view,idx);
   if(game && (game.status==="won" || game.status==="lost")){
     recordHistoryFor(view,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
   }
   loadCodeMeta();
 }
+
 function persist(){
   var idx=currentIdx(), mode=view;
-  var o={}; o[storeIdField()] = idx; o.game = game;
-  saveJSON(storeKey(),o);
-
-  // Dodatkowy zapis bieżącej gry pod starym kluczem — dla zgodności ze stroną główną i starszymi wersjami.
-  if(mode==="daily" && idx===TODAY_NO) saveJSON(DAILY_KEY,o);
-  if(mode==="weekly" && idx===WEEK_NO) saveJSON(WEEK_KEY,o);
+  saveGameFor(mode,idx,game);
 
   // Gdy gra jest zakończona, od razu zapisz lokalne statystyki gracza.
   // Dzięki temu statystyki nie zależą od modala ani od pobrania kodu przez RPC reveal.
@@ -531,6 +542,9 @@ function persist(){
     recordHistoryFor(mode,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
   }
 }
+
+function sameView(mode,idx){return view===mode && currentIdx()===idx;}
+function updateRevealInModal(code){var el=document.getElementById("revealCode"); if(el)el.textContent=code||"····";}
 
 /* ── META KODU: informacja o powtórkach cyfr ─────────────────────── */
 var codeMetaCache={};
@@ -745,23 +759,42 @@ function shakeRow(){
 /* ── KONIEC GRY ───────────────────────────────────────────────────── */
 function finish(won){
   game.status=won?"won":"lost";
+
+  var doneMode=view, doneIdx=currentIdx();
+
   // Najważniejsze: najpierw zapisz wynik lokalnie.
   // Archiwalne dni zapisują się pod kluczem klodka_daily_v1_dNUMER_DNIA.
   persist();
+
   var T=t();
   if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
-  else toast(view==="daily"?T.loseD:T.loseW);
-  // pobierz kod do ujawnienia
-  rpc("klodka_reveal",{p_mode:view,p_idx:currentIdx()})
-    .then(function(code){ game.reveal=code; persist(); refreshWeektile(); setTimeout(openEnd,900); })
-    .catch(function(){ refreshWeektile(); setTimeout(openEnd,900); });
+  else toast(doneMode==="daily"?T.loseD:T.loseW);
+
+  // Modal ze statystykami NIE może czekać na RPC reveal.
+  // Jeżeli Supabase chwilowo zawiesi odpowiedź, statystyki i zapis lokalny i tak się pokażą.
+  setTimeout(function(){ if(sameView(doneMode,doneIdx)) openEnd(); }, animMode==="off"?250:900);
+
+  // Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
+  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
+    .then(function(code){
+      var saved=loadSavedGame(doneMode,doneIdx) || game;
+      if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
+      if(sameView(doneMode,doneIdx) && game){
+        game.reveal=code;
+        saveGameFor(doneMode,doneIdx,game);
+        updateRevealInModal(code);
+      }
+      refreshWeektile();
+    })
+    .catch(function(){ refreshWeektile(); });
+
   // log
   trackEvent({
     // W tabeli statystyk gra jest zapisywana jako „kodka” (bez polskiego znaku).
     // Tryb daily/weekly rozróżniamy polem mode, żeby nie łamać check constraint w Supabase.
     game: "kodka",
-    mode: view,
-    puzzle_no: currentIdx(),
+    mode: doneMode,
+    puzzle_no: doneIdx,
     puzzle_word: null,                 // celowo NIE logujemy kodu (RLS / wyciek)
     won: won, tries: game.guesses.length, max_tries: MAX_TRIES, lang: lang
   });
@@ -784,18 +817,8 @@ function normalizeHistory(hist){
   return hist;
 }
 function savedResult(mode,idx){
-  var saved=null;
-  if(mode==="daily"){
-    saved=loadJSON(dailyKey(idx));
-    if(!saved&&idx===TODAY_NO)saved=loadJSON(DAILY_KEY);
-    if(saved&&saved.day!==idx)return null;
-  }else{
-    saved=loadJSON(weeklyKey(idx));
-    if(!saved&&idx===WEEK_NO)saved=loadJSON(WEEK_KEY);
-    if(saved&&saved.week!==idx)return null;
-  }
-  var g=saved&&saved.game?saved.game:null;
-  if(!g||(g.status!=="won"&&g.status!=="lost"))return null;
+  var g=loadSavedGame(mode,idx);
+  if(!g || (g.status!=="won" && g.status!=="lost")) return null;
   return {won:g.status==="won",tries:(g.guesses||[]).length||MAX_TRIES};
 }
 function recalcHistory(mode,hist){
@@ -886,7 +909,7 @@ function openEnd(){
     '<button class="modal-close" aria-label="Zamknij">×</button>'+ 
     '<h2>'+(won?T.endW:T.endL)+'</h2>'+ 
     '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+ 
-      '<div class="reveal-code">'+(game.reveal||"····")+'</div></div>'+ 
+      '<div class="reveal-code" id="revealCode">'+(game.reveal||"····")+'</div></div>'+ 
     statsSummaryHtml(hist)+
     distHtml(hist)+
     countdownHtml+
@@ -903,10 +926,23 @@ function openEnd(){
 function openFinishedModal(delay){
   if(!game || (game.status!=="won" && game.status!=="lost")) return;
   delay = delay===undefined ? 250 : delay;
-  if(game.reveal){ setTimeout(openEnd,delay); return; }
-  rpc("klodka_reveal",{p_mode:view,p_idx:currentIdx()})
-    .then(function(code){ game.reveal=code; persist(); setTimeout(openEnd,delay); })
-    .catch(function(){ setTimeout(openEnd,delay); });
+  var doneMode=view, doneIdx=currentIdx();
+
+  // Statystyki i okno końcowe pokazują się zawsze, bez czekania na Supabase.
+  setTimeout(function(){ if(sameView(doneMode,doneIdx)) openEnd(); }, delay);
+
+  if(game.reveal) return;
+  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
+    .then(function(code){
+      var saved=loadSavedGame(doneMode,doneIdx) || game;
+      if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
+      if(sameView(doneMode,doneIdx) && game){
+        game.reveal=code;
+        saveGameFor(doneMode,doneIdx,game);
+        updateRevealInModal(code);
+      }
+    })
+    .catch(function(){});
 }
 
 /* ── STATYSTYKI I USTAWIENIA ─────────────────────────────────────── */
@@ -965,8 +1001,8 @@ document.getElementById("helpBtn").addEventListener("click",function(){
 function refreshWeektile(){
   var T=t(), badge=document.getElementById("wtBadge"), status=document.getElementById("wtStatus");
   document.getElementById("wtName").firstChild.textContent=T.weekName;
-  var w=loadJSON(weeklyKey(WEEK_NO))||loadJSON(WEEK_KEY);
-  var played = w && w.week===WEEK_NO ? w.game.status : null;
+  var wg=loadSavedGame("weekly",WEEK_NO);
+  var played = wg ? wg.status : null;
   if(played==="won"){ badge.className="badge won"; badge.textContent=T.bWon; status.textContent=T.wtWon; return; }
   if(played==="lost"){ badge.className="badge lost"; badge.textContent=T.bLost; status.textContent=T.wtLost; return; }
   // sprawdź, czy kod tygodnia istnieje
@@ -1031,7 +1067,7 @@ function renderCalendar(){
     var date=new Date(calViewYear,calViewMonth,d), dayNo=Math.floor((midnight(date)-midnight(EPOCH))/86400000)+1;
     var el=document.createElement("div");el.textContent=d;
     if(dayNo<1||dayNo>TODAY_NO){el.className="cal-day future";grid.appendChild(el);continue;}
-    var saved=loadJSON(dailyKey(dayNo)), dg=saved&&saved.day===dayNo?saved.game:null;
+    var dg=loadSavedGame("daily",dayNo);
     var cls="cal-day";
     if(dayNo===TODAY_NO)cls+=" today";else if(dayNo<TODAY_NO)cls+=" past";
     if(dayNo===DAY_NO)cls+=" active";
