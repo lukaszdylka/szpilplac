@@ -587,12 +587,14 @@ function openEditor(rec,game){
         '<input type="number" id="eNo" min="1" value="'+(rec?rec.puzzle_no:"")+'"></div>'+
       '<div class="form-col"><label>Data</label>'+
         '<input type="date" id="eDate" value="'+(rec?rec.puzzle_date:"")+'"></div>'+
+    '</div>'+
+    '<div class="form-row">'+
       '<div class="form-col" style="min-width:80px"><label>Opublikuj</label>'+
         '<select id="ePub"><option value="true"'+((!rec||rec.published)?" selected":"")+'">Tak</option>'+
           '<option value="false"'+((rec&&!rec.published)?" selected":"")+'">Nie (ukryte)</option></select></div>'+
-      '<div class="form-col"><label>Pokaż od (data i godzina)</label>'+
+      '<div class="form-col"><label>⏱ Pokaż od (data i godzina)</label>'+
         '<input type="datetime-local" id="ePublishAt" value="'+(rec&&rec.publish_at?rec.publish_at.slice(0,16):"")+'">'+
-        '<small style="color:var(--ink2);font-size:11px;margin-top:3px">Puste = od razu. Strefa: Europe/Warsaw</small></div>'+
+        '<small style="color:var(--ink2);font-size:11px;margin-top:3px">Puste = natychmiast po opublikowaniu</small></div>'+
     '</div>'+
     '<div class="hints-editor">'+
       '<h4>Wskazówki</h4>'+
