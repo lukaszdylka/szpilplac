@@ -430,11 +430,15 @@ function renderDayCard(d,game){
 
   var notesHtml=d.notes?'<div class="notes-box">📝 '+escH(d.notes)+'</div>':"";
   var unpubHtml=(!d.published&&isAdmin)?'<span style="font-size:10px;color:var(--red);font-weight:700;margin-left:6px">UKRYTE</span>':"";
+  var schedHtml=(isAdmin&&d.publish_at&&new Date(d.publish_at)>new Date())?
+    '<span style="font-size:10px;color:var(--gold);font-weight:700;margin-left:6px">⏱ '+
+    new Date(d.publish_at).toLocaleString("pl-PL",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+
+    '</span>':"";
 
   return'<div class="day-card" data-id="'+d.id+'" data-game="'+game+'">'+
     '<div class="day-header">'+
       '<span class="day-date">'+fmtDate(d.puzzle_date)+'</span>'+
-      '<span class="day-title">#'+d.puzzle_no+unpubHtml+'</span>'+
+      '<span class="day-title">#'+d.puzzle_no+unpubHtml+schedHtml+'</span>'+
       '<div class="day-actions">'+
         '<button class="btn-edit">Edytuj</button>'+
         '<button class="btn-del">Usuń</button>'+
@@ -586,6 +590,9 @@ function openEditor(rec,game){
       '<div class="form-col" style="min-width:80px"><label>Opublikuj</label>'+
         '<select id="ePub"><option value="true"'+((!rec||rec.published)?" selected":"")+'">Tak</option>'+
           '<option value="false"'+((rec&&!rec.published)?" selected":"")+'">Nie (ukryte)</option></select></div>'+
+      '<div class="form-col"><label>Pokaż od (data i godzina)</label>'+
+        '<input type="datetime-local" id="ePublishAt" value="'+(rec&&rec.publish_at?rec.publish_at.slice(0,16):"")+'">'+
+        '<small style="color:var(--ink2);font-size:11px;margin-top:3px">Puste = od razu. Strefa: Europe/Warsaw</small></div>'+
     '</div>'+
     '<div class="hints-editor">'+
       '<h4>Wskazówki</h4>'+
@@ -650,6 +657,9 @@ function openEditor(rec,game){
     var noVal=parseInt(document.getElementById("eNo").value,10);
     var dateVal=document.getElementById("eDate").value;
     var pubVal=document.getElementById("ePub").value==="true";
+    var publishAtRaw=document.getElementById("ePublishAt").value;
+    // datetime-local daje czas lokalny — interpretujemy jako Europe/Warsaw
+    var publishAtVal=publishAtRaw?new Date(publishAtRaw).toISOString():null;
     var notesVal=document.getElementById("eNotes").value.trim();
     var spoilerRaw=document.getElementById("eSpoiler").value.trim();
     var spoilerVal=spoilerRaw?spoilerRaw.split("\n").map(function(s){return s.trim();}).filter(Boolean):null;
@@ -677,7 +687,8 @@ function openEditor(rec,game){
 
     var payload={game:gameVal,puzzle_no:noVal,puzzle_date:dateVal,
       hints:hintsVal,spoiler:spoilerVal||null,
-      notes:notesVal||null,published:pubVal};
+      notes:notesVal||null,published:pubVal,
+      publish_at:publishAtVal};
 
     saveHint(payload,editingId).then(function(){
       document.getElementById("saveMsg").style.display="inline";
