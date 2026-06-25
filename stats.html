@@ -166,6 +166,7 @@ function q(viewOrTable, params){
     headers: { "apikey": serviceKey, "Authorization": "Bearer " + serviceKey }
   }).then(function(r){
     if(r.status===401) throw new Error("auth");
+    if(!r.ok) return r.text().then(function(t){ throw new Error(t||r.status); });
     return r.json();
   });
 }
@@ -324,13 +325,18 @@ function loadData(game){
       document.getElementById("content").innerHTML = html;
     })
     .catch(function(e){
-      if(e.message==="auth"){
-        document.getElementById("content").innerHTML=
-          '<p style="color:var(--red);padding:20px">Nieprawidłowy klucz. <button class="logout" onclick="document.getElementById(\'logoutBtn\').click()">Wyloguj i spróbuj ponownie</button></p>';
-      } else {
-        document.getElementById("content").innerHTML=
-          '<p style="color:var(--red);padding:20px">Błąd połączenia z Supabase. Sprawdź SUPABASE_URL w pliku stats.html.</p>';
-      }
+      var msg = e.message || String(e);
+      var hint = "";
+      if(msg==="auth" || msg.indexOf("401")>=0)
+        hint = "Nieprawidłowy service_role key. <button class='logout' onclick=\"document.getElementById('logoutBtn').click()\">Wpisz ponownie</button>";
+      else if(msg.indexOf("42P01")>=0 || msg.indexOf("relation")>=0)
+        hint = "Tabela <b>szpilplac_events</b> nie istnieje. Uruchom <b>stats.sql</b> w Supabase → SQL Editor.";
+      else if(msg.indexOf("Failed to fetch")>=0 || msg.indexOf("NetworkError")>=0)
+        hint = "Brak połączenia z Supabase. Sprawdź internet lub czy URL projektu jest poprawny.";
+      else
+        hint = "Błąd: <code>"+msg+"</code>";
+      document.getElementById("content").innerHTML=
+        '<p style="color:var(--red);padding:20px;line-height:1.6">'+hint+'</p>';
     });
 }
 </script>
