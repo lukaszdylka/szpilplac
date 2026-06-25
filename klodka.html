@@ -10,11 +10,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
 
-<-- ════════════════════════════════════════════════════════════════════
-     ZAGADKA TYGODNIA  
+<!-- ════════════════════════════════════════════════════════════════════
+     ZAGADKA TYGODNIA  (easter egg — tu wpisujesz trop do kodu tygodniówki)
      ────────────────────────────────────────────────────────────────────
      Tydzień: 1   (23–29.06.2026)
-     Trop:    >>> F12 <<<
+     Widoczny trop ustawiasz w zmiennej WEEKLY_HINT_TEXT w skrypcie.
+     Nie wpisuj podpowiedzi luzem w <head>, bo wtedy może wyświetlić się na samej górze strony.
+
+     Kod tygodnia ustawiasz osobno w bazie (Supabase → SQL Editor).
      ════════════════════════════════════════════════════════════════════ -->
 
 <style>
@@ -67,6 +70,10 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .title{font-family:"Oswald";font-size:30px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
 .pno{font-size:12px;color:var(--ink2);font-weight:700}
 .tagline{font-size:12.5px;color:var(--ink2);margin:2px 2px 0}
+.weekly-hint{display:none;margin:10px 0 8px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);font-size:13px;line-height:1.45;color:var(--ink);box-shadow:0 8px 22px -16px rgba(35,32,26,.55)}
+.weekly-hint.on{display:block}
+.weekly-hint .hint-kicker{display:block;margin-bottom:3px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.weekly-hint b{color:var(--green)}
 
 .toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);
   text-align:center;margin:10px 0 2px;transition:opacity .2s}
@@ -265,6 +272,8 @@ footer a{color:var(--green);font-weight:600}
 
   <div class="toast" id="toast"></div>
 
+  <div class="weekly-hint" id="weeklyHint" aria-live="polite"></div>
+
   <div class="board" id="board"></div>
   <div class="repeat-info" id="repeatInfo"></div>
 
@@ -303,7 +312,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="local-stats-modal-fix-2026-06-25";
+window.KLODKA_VERSION="local-stats-modal-fix-weekly-hint-2026-06-26";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -324,10 +333,14 @@ var ANIM_KEY  = "klodka_anim";
 var REPEAT_KEY= "klodka_repeat_info";
 var DIR_KEY   = "klodka_dir_hints";
 
-/* ── ZAGADKA TYGODNIA — widoczna też pod F12 (Console) ─────────────────
-   Podmieniaj razem z blokiem komentarza w <head>. */
-console.log("%c🗝️ ZAGADKA TYGODNIA","font-size:15px;font-weight:bold;color:#bf8a3a");
-console.log("%cTydzień 1: >>> 5485 <<<","font-size:13px");
+/* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
+   Tu zmieniasz widoczną podpowiedź dla tygodniówki.
+   Będzie pokazana NAD kafelkami prób tylko w trybie tygodniowym. */
+var WEEKLY_HINT_TITLE = "Zagadka tygodnia";
+var WEEKLY_HINT_TEXT  = ">>> Ostatni F <<<";
+
+console.log("%c🗝️ "+WEEKLY_HINT_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
+console.log("%cTydzień 1: "+WEEKLY_HINT_TEXT,"font-size:13px");
 
 /* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
@@ -583,6 +596,26 @@ function applyDirectionHint(tile,g,c){
   if(dir==="higher") tile.classList.add("dir-higher");
   else if(dir==="lower") tile.classList.add("dir-lower");
 }
+function escHtml(x){
+  return String(x).replace(/[&<>"']/g,function(ch){
+    if(ch==="&")return "&amp;";
+    if(ch==="<")return "&lt;";
+    if(ch===">")return "&gt;";
+    if(ch==='"')return "&quot;";
+    if(ch==="'")return "&#39;";
+    return ch;
+  });
+}
+function updateWeeklyHint(){
+  var el=document.getElementById("weeklyHint"); if(!el)return;
+  if(view!=="weekly" || !WEEKLY_HINT_TEXT){
+    el.classList.remove("on");
+    el.innerHTML="";
+    return;
+  }
+  el.classList.add("on");
+  el.innerHTML='<span class="hint-kicker">'+escHtml(WEEKLY_HINT_TITLE)+'</span>'+escHtml(WEEKLY_HINT_TEXT);
+}
 
 /* ── RENDER STATYCZNY (tytuły, plansza, klawiatura) ───────────────── */
 var boardEl=document.getElementById("board"), padEl=document.getElementById("pad"), toastEl=document.getElementById("toast");
@@ -596,7 +629,7 @@ function renderStatic(){
   document.getElementById("subback").classList.toggle("hidden", view==="daily");
   document.getElementById("subback").querySelector("span").textContent = lang==="szl"?"codzienno":"codzienna";
   document.getElementById("wtName").firstChild.textContent = T.weekName;
-  buildBoard(); buildPad(); paintFromGame(); updateNavBar(); updateRepeatInfo();
+  updateWeeklyHint(); buildBoard(); buildPad(); paintFromGame(); updateNavBar(); updateRepeatInfo();
 }
 
 function buildBoard(){
