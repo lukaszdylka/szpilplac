@@ -996,13 +996,21 @@ document.getElementById("helpBtn").addEventListener("click",showHelp);
 /* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
 function share(){
   var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var g=loadDayGame(TODAY_IDX)||game;
-  var lines=(g.guesses||[]).map(function(gs){
-    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
-  var score=g.status==="won"?g.guesses.length:"X";
-  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+  var g=loadDayGame(currentDay)||game;
+  var statesArr=g&&g.states?g.states:[];
+  var lines=((g&&g.guesses)||[]).map(function(gs,i){
+    return((stateCache[gs]||statesArr[i]||[]).map(function(s){return em[s]||"⬛";})).join("");});
+  var score=(g&&g.status==="won")?g.guesses.length:"X";
+  var txt="Słōwko #"+(currentDay+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
     "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
-  if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
+  // Na mobile użyj natywnego share, na desktopie od razu kopiuj do schowka
+  var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(isMobile&&navigator.share){
+    navigator.share({text:txt}).catch(function(){copyTxt(txt);});
+  } else {
+    copyTxt(txt);
+  }
+}
 function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
   if(navigator.clipboard&&navigator.clipboard.writeText)
     navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
@@ -1157,6 +1165,11 @@ applyAnimMode();
 applyCbMode();
 hydrateStatsFromDayGames();
 loadDay(TODAY_IDX);
+// Pierwsze wejście — pokaż instrukcję po załadowaniu gry
+if(!store.get('slowko_intro_seen')){
+  store.set('slowko_intro_seen','1');
+  setTimeout(showHelp, 800);
+}
 </script>
 </body>
 </html>
