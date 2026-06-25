@@ -88,25 +88,6 @@ tr:hover td{background:var(--surface2)}
 .tab{padding:7px 16px;border-radius:999px;border:1px solid var(--line);
   background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
 .tab.on{background:var(--green);color:#fff;border-color:var(--green)}
-
-/* podgląd słów */
-.words-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  padding:18px 20px;margin-bottom:20px;display:none}
-.words-card.open{display:block}
-.words-card h3{font-family:"Oswald";font-size:16px;text-transform:uppercase;
-  letter-spacing:.06em;margin:0 0 14px;color:var(--ink2)}
-.words-row{display:flex;gap:12px;flex-wrap:wrap}
-.word-tile{flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--line);
-  border-radius:10px;padding:12px 16px}
-.word-tile .wt-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--ink2);margin-bottom:4px;font-weight:700}
-.word-tile .wt-word{font-family:"Oswald";font-size:26px;color:var(--green);letter-spacing:.06em}
-.word-tile .wt-meaning{font-size:12px;color:var(--ink2);margin-top:3px}
-.word-tile .wt-no{font-size:11px;color:var(--ink2);margin-top:2px}
-.word-tile.tomorrow .wt-word{color:var(--gold)}
-.btn-words{padding:7px 14px;border-radius:999px;border:1px solid var(--gold);
-  background:transparent;font-size:12px;font-weight:700;cursor:pointer;color:var(--gold)}
-.btn-words:hover{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -128,21 +109,14 @@ tr:hover td{background:var(--surface2)}
       <h1 style="margin-top:4px">Statystyki</h1>
     </div>
     <div class="hdr-right">
-      <button class="btn-words" id="wordsBtn">🔤 Dzisiaj / Jutro</button>
       <button class="refresh" id="refreshBtn">↻ Odśwież</button>
       <button class="logout" id="logoutBtn">Wyloguj</button>
     </div>
   </header>
 
-  <div class="words-card" id="wordsCard">
-    <h3>Słowa dnia</h3>
-    <div class="words-row" id="wordsRow">
-      <div class="spinner" style="padding:10px">Pobieram…</div>
-    </div>
-  </div>
-
   <div class="tabs">
     <button class="tab on" data-game="slowko">Słōwko</button>
+    <button class="tab" data-game="kodka">Kłōdka</button>
     <button class="tab" data-game="cuzamen">Cuzamen Szpil</button>
     <button class="tab" data-game="all">Wszystkie</button>
   </div>
@@ -156,59 +130,6 @@ tr:hover td{background:var(--surface2)}
 var SUPABASE_URL = "https://xyivrakegwybwhmmcawq.supabase.co";
 // Ten sam projekt co Słōwko — wpisujesz service_role key przy logowaniu poniżej
 var KEY_LS = "szpilplac_stats_key";
-
-/* ── Podgląd słów dnia ── */
-function rpcAdmin(fn, args){
-  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
-    headers:{"Content-Type":"application/json","apikey":serviceKey,
-             "Authorization":"Bearer "+serviceKey},
-    body:JSON.stringify(args||{})
-  }).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});
-}
-
-function loadWords(){
-  var card=document.getElementById("wordsCard");
-  var row=document.getElementById("wordsRow");
-  card.classList.add("open");
-  row.innerHTML='<div class="spinner" style="padding:10px">Pobieram…</div>';
-
-  // Oblicz numery dni (epoch = 2026-06-23)
-  var epoch=new Date(2026,5,23);
-  function dayIdx(offset){
-    var now=new Date();
-    var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    return Math.floor((today-epoch)/86400000)+offset;
-  }
-  var todayIdx=dayIdx(0), tomorrowIdx=dayIdx(1);
-
-  Promise.all([
-    rpcAdmin("wihajster_reveal_day",{p_day:todayIdx}),
-    rpcAdmin("wihajster_reveal_day",{p_day:tomorrowIdx})
-  ]).then(function(res){
-    var today=res[0], tomorrow=res[1];
-    row.innerHTML=
-      '<div class="word-tile">'+
-        '<div class="wt-label">Dzisiaj · #'+(todayIdx+1)+'</div>'+
-        '<div class="wt-word">'+(today.word||"–")+'</div>'+
-        '<div class="wt-meaning">'+(today.meaning||"")+'</div>'+
-      '</div>'+
-      '<div class="word-tile tomorrow">'+
-        '<div class="wt-label">Jutro · #'+(tomorrowIdx+1)+'</div>'+
-        '<div class="wt-word">'+(tomorrow.word||"–")+'</div>'+
-        '<div class="wt-meaning">'+(tomorrow.meaning||"")+'</div>'+
-      '</div>';
-  }).catch(function(e){
-    row.innerHTML='<p style="color:var(--red);padding:4px">Błąd: '+e.message+'</p>';
-  });
-}
-
-var wordsVisible=false;
-document.getElementById("wordsBtn").addEventListener("click",function(){
-  wordsVisible=!wordsVisible;
-  var card=document.getElementById("wordsCard");
-  if(wordsVisible){loadWords();}
-  else{card.classList.remove("open");}
-});
 
 /* ── Hasło (service_role key) ── */
 var serviceKey = "";
@@ -246,7 +167,6 @@ function q(viewOrTable, params){
     headers: { "apikey": serviceKey, "Authorization": "Bearer " + serviceKey }
   }).then(function(r){
     if(r.status===401) throw new Error("auth");
-    if(!r.ok) return r.text().then(function(t){ throw new Error(t||r.status); });
     return r.json();
   });
 }
@@ -268,6 +188,19 @@ document.getElementById("refreshBtn").addEventListener("click", function(){
 /* ── Helpers render ── */
 function kpi(n, label){ return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+label+'</div></div>'; }
 function pct(a, b){ return b ? Math.round(a/b*100)+"%" : "–"; }
+function normGame(g){
+  if(g==="klodka"||g==="klodka-weekly"||g==="kodka") return "kodka";
+  return g||"";
+}
+function gameLabel(g){
+  g=normGame(g);
+  if(g==="slowko")return "Słōwko";
+  if(g==="kodka")return "Kłōdka";
+  if(g==="cuzamen")return "Cuzamen";
+  return g||"–";
+}
+function matchesGame(r,game){return game==="all" || normGame(r.game)===game;}
+function safe(p){return p.catch(function(){return [];});}
 
 function distChart(rows, maxKey, valKey, labelFn){
   var max = Math.max.apply(null, rows.map(function(r){return +r[valKey]||0;}));
@@ -290,28 +223,40 @@ function table(cols, rows, renderRow){
 
 /* ── Render overview ── */
 function renderOverview(rows, game){
-  if(!rows||!rows.length) return '<p style="color:var(--ink2);font-size:13px">Brak danych.</p>';
-  var r = game==="all" ? null : rows.find(function(x){return x.game===game;});
-  var filtered = game==="all" ? rows : (r ? [r] : []);
+  var filtered=(rows||[]).filter(function(r){return matchesGame(r,game);});
   if(!filtered.length) return '<p style="color:var(--ink2);font-size:13px">Brak rozegranych partii.</p>';
-  var total=0,wins=0;
-  filtered.forEach(function(x){total+=+x.total_plays||0;wins+=+x.wins||0;});
-  var avgStr = r && r.avg_tries_on_win ? (+r.avg_tries_on_win).toFixed(1) : "–";
+  var total=filtered.length;
+  var wins=filtered.filter(function(r){return !!r.won;}).length;
+  var winRows=filtered.filter(function(r){return !!r.won && r.tries!==null && r.tries!==undefined;});
+  var avgStr="–";
+  if(game!=="all" && winRows.length){
+    var sum=winRows.reduce(function(a,r){return a+(+r.tries||0);},0);
+    avgStr=(sum/winRows.length).toFixed(1);
+  }
   return '<div class="kpi-row">'+
     kpi(total,"Rozegranych")+
     kpi(wins,"Wygranych")+
     kpi(pct(wins,total),"% wygranych")+
-    (game!=="all"?kpi(avgStr,"Śr. prób (wygrane)"):"");
+    (game!=="all"?kpi(avgStr,"Śr. prób (wygrane)"):"")+
+    '</div>';
 }
 
 /* ── Render dzienny ── */
 function renderDaily(rows, game){
-  var filtered = game==="all" ? rows : rows.filter(function(r){return r.game===game;});
+  var map={};
+  (rows||[]).filter(function(r){return matchesGame(r,game);}).forEach(function(r){
+    var d=new Date(r.created_at).toLocaleDateString("pl-PL",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"});
+    var g=normGame(r.game);
+    var key=d+"|"+g;
+    if(!map[key])map[key]={day:d,game:g,plays:0,wins:0};
+    map[key].plays++; if(r.won)map[key].wins++;
+  });
+  var filtered=Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.day.localeCompare(a.day);});
   return table(
     ["Dzień","Gra","Partie","Wygrane","%"],
     filtered.slice(0,30),
     function(r){
-      return '<tr><td>'+r.day+'</td><td>'+r.game+'</td>'+
+      return '<tr><td>'+r.day+'</td><td>'+gameLabel(r.game)+'</td>'+
         '<td>'+r.plays+'</td><td>'+r.wins+'</td>'+
         '<td>'+pct(+r.wins,+r.plays)+'</td></tr>';
     }
@@ -345,6 +290,35 @@ function renderSlowko(dist, guesses, words){
     '<div class="section"><h2>Najtrudniejsze słowa dnia</h2>'+wordsHtml+'</div>';
 }
 
+/* ── Render Kłōdka ── */
+function renderKlodka(log){
+  var rows=(log||[]).filter(function(r){return normGame(r.game)==="kodka";});
+  var wins=rows.filter(function(r){return !!r.won;});
+  var dist=[];
+  for(var i=1;i<=6;i++){
+    dist.push({tries:i,cnt:wins.filter(function(r){return +r.tries===i;}).length});
+  }
+  var distHtml=wins.length
+    ? distChart(dist,"tries","cnt")
+    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak wygranych partii.</p>';
+
+  var modeMap={};
+  rows.forEach(function(r){
+    var m=r.mode||"daily";
+    if(!modeMap[m])modeMap[m]={mode:m,plays:0,wins:0};
+    modeMap[m].plays++; if(r.won)modeMap[m].wins++;
+  });
+  var modeRows=Object.keys(modeMap).map(function(k){return modeMap[k];});
+  var modeHtml=table(
+    ["Tryb","Partie","Wygrane","%"],
+    modeRows,
+    function(r){return '<tr><td>'+(r.mode==="weekly"?"tygodniówka":"codzienna")+'</td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+pct(r.wins,r.plays)+'</td></tr>';}
+  );
+
+  return '<div class="section"><h2>Kłōdka — rozkład prób</h2>'+distHtml+'</div>'+
+         '<div class="section"><h2>Kłōdka — tryby</h2>'+modeHtml+'</div>';
+}
+
 /* ── Render Cuzamen ── */
 function renderCuzamen(dist){
   var distHtml = dist&&dist.length
@@ -355,9 +329,9 @@ function renderCuzamen(dist){
 
 /* ── Ostatnie partie (log) ── */
 function renderLog(rows, game){
-  var filtered = game==="all" ? rows : rows.filter(function(r){return r.game===game;});
+  var filtered = (rows||[]).filter(function(r){return matchesGame(r,game);});
   return table(
-    ["Kiedy","Gra","#","Słowo","Wynik","Prób","Język"],
+    ["Kiedy","Gra","Tryb","#","Słowo","Wynik","Prób","Język"],
     filtered.slice(0,50),
     function(r){
       var dt = new Date(r.created_at).toLocaleString("pl-PL",{timeZone:"Europe/Warsaw",
@@ -366,9 +340,9 @@ function renderLog(rows, game){
         ? '<span class="tag tag-won">wygrana</span>'
         : '<span class="tag tag-lost">przegrana</span>';
       return '<tr><td style="white-space:nowrap">'+dt+'</td>'+
-        '<td>'+r.game+'</td><td>'+r.puzzle_no+'</td>'+
+        '<td>'+gameLabel(r.game)+'</td><td>'+(r.mode||"–")+'</td><td>'+r.puzzle_no+'</td>'+
         '<td>'+(r.puzzle_word||"–")+'</td>'+
-        '<td>'+tag+'</td><td>'+r.tries+'</td>'+
+        '<td>'+tag+'</td><td>'+(r.tries||"–")+'</td>'+
         '<td>'+(r.lang||"–")+'</td></tr>';
     }
   );
@@ -378,25 +352,25 @@ function renderLog(rows, game){
 function loadData(game){
   document.getElementById("content").innerHTML='<div class="spinner">Ładuję dane…</div>';
 
-  var overviewP  = q("stats_overview");
-  var dailyP     = q("stats_daily","limit=60&order=day.desc");
-  var logP       = q("szpilplac_events","select=id,created_at,game,puzzle_no,puzzle_word,won,tries,lang&order=created_at.desc&limit=200");
-  var distP      = game!=="cuzamen" ? q("stats_slowko_dist") : Promise.resolve([]);
-  var guessesP   = game==="slowko"  ? q("stats_slowko_guesses") : Promise.resolve([]);
-  var wordsP     = game==="slowko"  ? q("stats_slowko_words")   : Promise.resolve([]);
-  var cuzDistP   = game!=="slowko"  ? q("stats_cuzamen_dist")   : Promise.resolve([]);
+  var logP       = q("szpilplac_events","select=id,created_at,game,mode,puzzle_no,puzzle_word,won,tries,errors,lang&order=created_at.desc&limit=1000");
+  var distP      = (game==="slowko" || game==="all") ? safe(q("stats_slowko_dist")) : Promise.resolve([]);
+  var guessesP   = (game==="slowko" || game==="all") ? safe(q("stats_slowko_guesses")) : Promise.resolve([]);
+  var wordsP     = (game==="slowko" || game==="all") ? safe(q("stats_slowko_words"))   : Promise.resolve([]);
+  var cuzDistP   = (game==="cuzamen" || game==="all") ? safe(q("stats_cuzamen_dist"))   : Promise.resolve([]);
 
-  Promise.all([overviewP, dailyP, logP, distP, guessesP, wordsP, cuzDistP])
+  Promise.all([logP, distP, guessesP, wordsP, cuzDistP])
     .then(function(results){
-      var overview=results[0], daily=results[1], log=results[2];
-      var dist=results[3], guesses=results[4], words=results[5], cuzDist=results[6];
+      var log=results[0];
+      var dist=results[1], guesses=results[2], words=results[3], cuzDist=results[4];
 
       var html =
-        '<div class="section"><h2>Przegląd</h2>'+renderOverview(overview,game)+'</div>'+
-        '<div class="section"><h2>Aktywność dzienna</h2>'+renderDaily(daily,game)+'</div>';
+        '<div class="section"><h2>Przegląd</h2>'+renderOverview(log,game)+'</div>'+
+        '<div class="section"><h2>Aktywność dzienna</h2>'+renderDaily(log,game)+'</div>';
 
       if(game==="slowko" || game==="all")
         html += renderSlowko(dist,guesses,words);
+      if(game==="kodka" || game==="all")
+        html += renderKlodka(log);
       if(game==="cuzamen" || game==="all")
         html += '<div class="section"><h2>Cuzamen Szpil</h2>'+renderCuzamen(cuzDist)+'</div>';
 
@@ -405,18 +379,13 @@ function loadData(game){
       document.getElementById("content").innerHTML = html;
     })
     .catch(function(e){
-      var msg = e.message || String(e);
-      var hint = "";
-      if(msg==="auth" || msg.indexOf("401")>=0)
-        hint = "Nieprawidłowy service_role key. <button class='logout' onclick=\"document.getElementById('logoutBtn').click()\">Wpisz ponownie</button>";
-      else if(msg.indexOf("42P01")>=0 || msg.indexOf("relation")>=0)
-        hint = "Tabela <b>szpilplac_events</b> nie istnieje. Uruchom <b>stats.sql</b> w Supabase → SQL Editor.";
-      else if(msg.indexOf("Failed to fetch")>=0 || msg.indexOf("NetworkError")>=0)
-        hint = "Brak połączenia z Supabase. Sprawdź internet lub czy URL projektu jest poprawny.";
-      else
-        hint = "Błąd: <code>"+msg+"</code>";
-      document.getElementById("content").innerHTML=
-        '<p style="color:var(--red);padding:20px;line-height:1.6">'+hint+'</p>';
+      if(e.message==="auth"){
+        document.getElementById("content").innerHTML=
+          '<p style="color:var(--red);padding:20px">Nieprawidłowy klucz. <button class="logout" onclick="document.getElementById(\'logoutBtn\').click()">Wyloguj i spróbuj ponownie</button></p>';
+      } else {
+        document.getElementById("content").innerHTML=
+          '<p style="color:var(--red);padding:20px">Błąd połączenia z Supabase. Sprawdź SUPABASE_URL w pliku stats.html.</p>';
+      }
     });
 }
 </script>
