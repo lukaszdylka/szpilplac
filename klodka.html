@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kłōdka · Szpilplac · Familock</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach. Gra od Familocka Starzik.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ZAGADKA TYGODNIA  (easter egg — tu wpisujesz trop do kodu tygodniówki)
+     ────────────────────────────────────────────────────────────────────
+     Tydzień: 1   (23–29.06.2026)
+     Trop:    >>> TU WPISZ ZAGADKĘ / TROP, GDZIE SZUKAĆ KODU <<<
+
+     Kod tygodnia ustawiasz osobno w bazie (Supabase → SQL Editor),
+     plik klodka_weekly.sql. Tu jest TYLKO podpowiedź dla graczy.
+     Co tydzień podmieniasz ten blok + console.log poniżej, commit, push.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;
+}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;--wrong:#a14b3a}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;--wrong:#c06a55}
+
+body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  transition:background .2s,color .2s}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+header{width:100%;max-width:480px;padding:14px 18px 4px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
+.controls{display:flex;align-items:center;gap:7px}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 9px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+
+main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-direction:column}
+
+.title-row{display:flex;align-items:baseline;justify-content:space-between;margin:8px 2px 2px}
+.title{font-family:"Oswald";font-size:30px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+.pno{font-size:12px;color:var(--ink2);font-weight:700}
+.tagline{font-size:12.5px;color:var(--ink2);margin:2px 2px 0}
+
+.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);
+  text-align:center;margin:10px 0 2px;transition:opacity .2s}
+
+/* ── PLANSZA ── */
+.board{display:flex;flex-direction:column;gap:8px;align-items:center;margin:8px 0 4px}
+.row{display:flex;gap:8px}
+.tile{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-family:"Oswald";font-size:30px;color:var(--ink);
+  background:var(--surface2);border:2px solid var(--line);transition:transform .08s}
+.tile.filled{border-color:var(--ink2);animation:pop .1s}
+.tile.correct{background:var(--correct);border-color:var(--correct);color:#fff}
+.tile.present{background:var(--present);border-color:var(--present);color:#fff}
+.tile.absent{background:var(--absent);border-color:var(--absent);color:#fff}
+.tile.wrong{background:var(--surface2);border-color:var(--wrong);color:var(--wrong)}
+.tile.reveal{animation:flip .4s ease forwards}
+.row.shake{animation:shake .35s}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* ── KLAWIATURA NUMERYCZNA ── */
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:300px;margin:14px auto 0;width:100%}
+.key{height:54px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);
+  font-family:"Oswald";font-size:24px;color:var(--ink);display:flex;align-items:center;justify-content:center;
+  transition:transform .06s,background .1s}
+.key:active{transform:scale(.94)}
+.key.wide{font-family:"Inter";font-size:14px;font-weight:800;letter-spacing:.02em}
+.key.enter{background:var(--green);color:#fff;border-color:var(--green)}
+.key.del{color:var(--ink2)}
+.key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
+.key.present{background:var(--present);border-color:var(--present);color:#fff}
+.key.absent{background:var(--absent);border-color:var(--absent);color:#fff}
+.key[disabled]{opacity:.4}
+
+/* ── KAFELEK TYGODNIÓWKI ── */
+.weektile{display:flex;align-items:center;gap:13px;margin:20px 0 0;padding:14px 16px;
+  background:var(--surface2);border:1px solid var(--line);border-radius:13px;width:100%;text-align:left;
+  transition:transform .1s,box-shadow .1s}
+.weektile:hover{transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(35,32,26,.35);background:var(--surface)}
+.weektile .wt-ico{flex:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px}
+.weektile .wt-body{flex:1;min-width:0}
+.weektile .wt-name{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+.weektile .wt-status{font-size:12px;color:var(--ink2);margin-top:3px}
+.weektile .wt-arr{color:var(--ink2);font-size:15px;flex:none}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.badge.new{background:var(--gold);color:#fff}
+.badge.won{background:var(--correct);color:#fff}
+.badge.lost{background:var(--wrong);color:#fff}
+.badge.soon{background:var(--surface);color:var(--ink2);border:1px solid var(--line)}
+
+.subback{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;gap:5px;align-items:center;margin:2px 2px 0}
+
+/* ── MODAL ── */
+.scrim{position:fixed;inset:0;background:rgba(20,16,10,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.scrim.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;max-width:380px;width:100%;padding:22px 22px 20px;
+  border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}
+.modal-close{position:absolute;top:10px;right:12px;font-size:22px;color:var(--ink2);width:30px;height:30px}
+.modal h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;text-align:center;margin-bottom:4px}
+.reveal-card{text-align:center;margin:12px 0 16px;padding:14px;border-radius:10px;
+  background:var(--surface2);border:1px dashed var(--line)}
+.reveal-lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+.reveal-code{font-family:"Oswald";font-size:34px;letter-spacing:.22em;color:var(--green)}
+.stats{display:flex;gap:8px;margin:6px 0 14px}
+.stat{flex:1;text-align:center}
+.stat .n{font-family:"Oswald";font-size:24px;color:var(--green)}
+.stat .l{font-size:10.5px;color:var(--ink2);line-height:1.2;margin-top:2px}
+.cd{text-align:center;font-size:13px;color:var(--ink2);margin:4px 0 14px}
+.cd b{color:var(--ink);font-family:"Oswald";letter-spacing:.05em}
+.btn{display:block;width:100%;padding:12px;border-radius:10px;background:var(--green);color:#fff;
+  font-weight:700;font-size:14px;text-align:center;margin-top:8px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink2)}
+.cta{display:block;text-align:center;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600}
+
+.howlist{font-size:13.5px;color:var(--ink2);line-height:1.6}
+.howlist b{color:var(--ink)}
+.swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+
+footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin:10px 0 18px;line-height:1.8}
+footer a{color:var(--green);font-weight:600}
+
+.hidden{display:none!important}
+@media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake,.key:active{animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <a class="back" href="index.html">← Szpilplac</a>
+    <div class="controls">
+      <div class="lang-tog" role="group" aria-label="Język">
+        <button id="lPl" class="on">PL</button>
+        <button id="lSzl">ŚL</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Motyw" aria-label="Zmień motyw">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
+      </button>
+      <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="title-row">
+    <div class="title" id="title">Kłōdka</div>
+    <div class="pno" id="pno"></div>
+  </div>
+  <div class="tagline" id="tagline"></div>
+
+  <a class="subback hidden" id="subback">← <span>codzienna</span></a>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="board" id="board"></div>
+
+  <div class="pad" id="pad"></div>
+
+  <button class="weektile" id="weektile">
+    <div class="wt-ico">🗝️</div>
+    <div class="wt-body">
+      <div class="wt-name" id="wtName">Zagadka tygodnia<span class="badge soon" id="wtBadge">…</span></div>
+      <div class="wt-status" id="wtStatus">sprawdzam…</div>
+    </div>
+    <div class="wt-arr">→</div>
+  </button>
+</main>
+
+<footer>
+  <div id="footLine"></div>
+  <div><a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a></div>
+</footer>
+
+<div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+"use strict";
+
+/* ── KONFIGURACJA ──────────────────────────────────────────────────── */
+var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
+var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+
+var EPOCH      = new Date(2026, 5, 23);   // dzień 1 = 2026-06-23 (miesiąc 0-indeks => 5=czerwiec)
+var MAX_TRIES  = 6;
+var LEN        = 4;
+
+/* localStorage (wspólne klucze Szpilplaca) */
+var LANG_KEY  = "familock_lang";
+var THEME_KEY = "szpilplac_theme";
+var DAILY_KEY = "klodka_daily_v1";
+var WEEK_KEY  = "klodka_weekly_v1";
+
+/* ── ZAGADKA TYGODNIA — widoczna też pod F12 (Console) ─────────────────
+   Podmieniaj razem z blokiem komentarza w <head>. */
+console.log("%c🗝️ ZAGADKA TYGODNIA","font-size:15px;font-weight:bold;color:#bf8a3a");
+console.log("%cTydzień 1: >>> TU WPISZ TROP DO KODU TYGODNIÓWKI <<<","font-size:13px");
+
+/* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
+function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function daysSince(){return Math.floor((midnight(new Date())-midnight(EPOCH))/86400000);}
+var DAY_NO  = daysSince()+1;
+var WEEK_NO = Math.floor(daysSince()/7)+1;
+
+/* ── storage helpers ──────────────────────────────────────────────── */
+function loadJSON(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ── napisy PL / ŚL ───────────────────────────────────────────────── */
+var S={
+  pl:{
+    titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
+    tagD:"Zgadnij 4-cyfrowy kod. Masz 6 prób.",
+    tagW:"Rozszyfruj zagadkę i wpisz kod. Masz 6 prób.",
+    pnoD:"Kod nr ", pnoW:"Tydzień ",
+    enter:"OK", short:"Wpisz 4 cyfry.",
+    doneD:"Dzisiaj już zagrane. Wróć jutro!",
+    doneW:"Tygodniówkę masz już rozegraną.",
+    soon:"Zagadka w przygotowaniu — zajrzyj wkrótce.",
+    none:"Brak kodu na dziś.",
+    win:["Otwarte!","Brawo!","Świetnie!","Udało się!","Klik!"],
+    loseD:"Nie tym razem.", loseW:"Kłódka pozostała zamknięta.",
+    endW:"Otwarte!", endL:"Nie udało się",
+    revealLbl:"Kod był:",
+    played:"Rozegrane", wpct:"% otwartych", streak:"Seria", best:"Rekord",
+    nextD:"Nowy kod za", nextW:"Nowa zagadka za",
+    again:"Zamknij", cta:"Chcesz więcej zagadek? Wpadnij do Starzika →",
+    weekName:"Zagadka tygodnia",
+    wtNew:"Nowa zagadka — kliknij i graj", wtWon:"Rozwiązane 🎉",
+    wtLost:"Nie udało się w tym tygodniu", wtSoon:"Wkrótce — w przygotowaniu",
+    bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wkrótce",
+    howH:"Jak grać",
+    howD:"<b>Codzienna kłódka.</b> Każdego dnia jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokażą, jak blisko jesteś:",
+    lgC:"cyfra na właściwym miejscu", lgP:"cyfra jest w kodzie, ale gdzie indziej", lgA:"cyfry nie ma w kodzie",
+    howW:"<b>Zagadka tygodnia.</b> Raz w tygodniu specjalny kod ukryty za zagadką — szukaj tropu w grze, w źródle strony albo gdzie indziej. Tu kafelki <b>nie</b> podpowiadają cyfr: dostajesz tylko „dobrze / źle”. Masz 6 prób.",
+    foot:"Codzienna śląska kłódka — Familock Starzik."
+  },
+  szl:{
+    titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
+    tagD:"Zgodnij 4-cyfrowy kod. Mosz 6 prób.",
+    tagW:"Rozszyfruj zogodka i wkluj kod. Mosz 6 prób.",
+    pnoD:"Kod nr ", pnoW:"Tydzień ",
+    enter:"OK", short:"Wkluj 4 cyfry.",
+    doneD:"Dzisiej już grane. Przidź jutro!",
+    doneW:"Tydniówka już je rozegrano.",
+    soon:"Zogodka sie szykuje — zaźrzij niyskorzij.",
+    none:"Ni ma kodu na dzisiej.",
+    win:["Łodewrzite!","Brawo!","Forszt!","Udało sie!","Klik!"],
+    loseD:"Niy tym razym.", loseW:"Kłódka łostała zawarto.",
+    endW:"Łodewrzite!", endL:"Niy podarziło sie",
+    revealLbl:"Kod bōł:",
+    played:"Rozegrane", wpct:"% łodewrzitych", streak:"Seryjo", best:"Rekord",
+    nextD:"Nowy kod za", nextW:"Nowo zogodka za",
+    again:"Zawrzij", cta:"Chcesz wiyncyj zogodek? Wpadnij do Starzika →",
+    weekName:"Zogodka tydnia",
+    wtNew:"Nowo zogodka — klikej i grej", wtWon:"Rozwiōnzane 🎉",
+    wtLost:"Niy podarziło sie w tym tydniu", wtSoon:"Wnet — w szykowaniu",
+    bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wnet",
+    howH:"Jak grać",
+    howD:"<b>Codzienno kłódka.</b> Kożdy dziyń jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożōm, jak blisko jeżeś:",
+    lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfry ni ma w kodzie",
+    howW:"<b>Zogodka tydnia.</b> Roz na tydziyń ekstra kod skryty za zogodkōm — szukej tropu w grze, w zdrzōdle strōny abo kaj indziej. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
+    foot:"Codzienno ślōnsko kłódka — Familock Starzik."
+  }
+};
+var lang = (localStorage.getItem(LANG_KEY)==="ŚL"||localStorage.getItem(LANG_KEY)==="szl") ? "szl" : "pl";
+function t(){return S[lang];}
+
+/* ── motyw ────────────────────────────────────────────────────────── */
+var theme = localStorage.getItem(THEME_KEY)==="dark" ? "dark" : "light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
+applyTheme();
+document.getElementById("themeBtn").addEventListener("click",function(){
+  theme = theme==="dark"?"light":"dark"; localStorage.setItem(THEME_KEY,theme); applyTheme();
+});
+
+/* język */
+function setLang(l){
+  lang=l; localStorage.setItem(LANG_KEY, l==="szl"?"ŚL":"PL");
+  document.getElementById("lPl").classList.toggle("on",l==="pl");
+  document.getElementById("lSzl").classList.toggle("on",l==="szl");
+  renderStatic(); refreshWeektile();
+}
+document.getElementById("lPl").classList.toggle("on",lang==="pl");
+document.getElementById("lSzl").classList.toggle("on",lang==="szl");
+document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
+document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
+
+/* ── SUPABASE ─────────────────────────────────────────────────────── */
+function rpc(fn,args){
+  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json",
+             "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
+    body:JSON.stringify(args||{})
+  }).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
+}
+function trackEvent(p){
+  fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,
+             "Authorization":"Bearer "+SUPABASE_ANON_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify(p)
+  }).catch(function(){});
+}
+
+/* ── STAN GRY ─────────────────────────────────────────────────────── */
+/* view: "daily" | "weekly" */
+var view = "daily";
+var game = null;       // {mode, idx, guesses:[{code,states?,correct}], status, reveal}
+var current = "";      // wpisywane cyfry
+
+function freshGame(mode, idx){ return {mode:mode, idx:idx, guesses:[], status:"playing", reveal:null}; }
+
+function storeKey(){return view==="daily"?DAILY_KEY:WEEK_KEY;}
+function storeIdField(){return view==="daily"?"day":"week";}
+
+function loadGame(){
+  var saved = loadJSON(storeKey());
+  var idx   = view==="daily"?DAY_NO:WEEK_NO;
+  if(saved && saved[storeIdField()]===idx){ game = saved.game; }
+  else { game = freshGame(view, idx); }
+}
+function persist(){
+  var o={}; o[storeIdField()] = (view==="daily"?DAY_NO:WEEK_NO); o.game = game; saveJSON(storeKey(),o);
+}
+
+/* ── RENDER STATYCZNY (tytuły, plansza, klawiatura) ───────────────── */
+var boardEl=document.getElementById("board"), padEl=document.getElementById("pad"), toastEl=document.getElementById("toast");
+
+function renderStatic(){
+  var T=t();
+  document.getElementById("title").textContent   = view==="daily"?T.titleD:T.titleW;
+  document.getElementById("tagline").textContent = view==="daily"?T.tagD:T.tagW;
+  document.getElementById("pno").textContent      = (view==="daily"?T.pnoD+DAY_NO:T.pnoW+WEEK_NO);
+  document.getElementById("footLine").textContent = T.foot;
+  document.getElementById("subback").classList.toggle("hidden", view==="daily");
+  document.getElementById("subback").querySelector("span").textContent = lang==="szl"?"codzienno":"codzienna";
+  document.getElementById("wtName").firstChild.textContent = T.weekName;
+  buildBoard(); buildPad(); paintFromGame();
+}
+
+function buildBoard(){
+  boardEl.innerHTML="";
+  for(var r=0;r<MAX_TRIES;r++){
+    var row=document.createElement("div"); row.className="row"; row.dataset.row=r;
+    for(var c=0;c<LEN;c++){
+      var tl=document.createElement("div"); tl.className="tile"; tl.dataset.col=c; row.appendChild(tl);
+    }
+    boardEl.appendChild(row);
+  }
+}
+function buildPad(){
+  padEl.innerHTML="";
+  var keys=["1","2","3","4","5","6","7","8","9","del","0","enter"];
+  keys.forEach(function(k){
+    var b=document.createElement("button"); b.className="key"; b.dataset.key=k;
+    if(k==="del"){b.classList.add("wide","del");b.innerHTML="⌫";}
+    else if(k==="enter"){b.classList.add("wide","enter");b.textContent=t().enter;}
+    else b.textContent=k;
+    b.addEventListener("click",function(){onKey(k);});
+    padEl.appendChild(b);
+  });
+}
+
+/* maluje całą historię + aktualnie wpisywane cyfry */
+function paintFromGame(){
+  var rows=boardEl.querySelectorAll(".row");
+  for(var r=0;r<MAX_TRIES;r++){
+    var tiles=rows[r].querySelectorAll(".tile");
+    var g=game.guesses[r];
+    for(var c=0;c<LEN;c++){
+      var tile=tiles[c]; tile.className="tile"; tile.textContent="";
+      if(g){
+        tile.textContent=g.code[c];
+        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); }
+        else { tile.classList.add(g.correct?"correct":"wrong"); }
+      } else if(r===game.guesses.length){
+        if(current[c]!==undefined){ tile.textContent=current[c]; tile.classList.add("filled"); }
+      }
+    }
+  }
+  paintPad();
+  document.getElementById("subback").classList.toggle("hidden", view==="daily");
+}
+
+/* kolory klawiszy — tylko dla codziennej (weekly nie zdradza cyfr) */
+function paintPad(){
+  var best={};
+  if(view==="daily"){
+    var rank={absent:0,present:1,correct:2};
+    game.guesses.forEach(function(g){
+      if(!g.states)return;
+      for(var c=0;c<LEN;c++){
+        var d=g.code[c], st=g.states[c];
+        if(best[d]===undefined||rank[st]>rank[best[d]]) best[d]=st;
+      }
+    });
+  }
+  padEl.querySelectorAll(".key").forEach(function(b){
+    var k=b.dataset.key; b.classList.remove("correct","present","absent");
+    if(/[0-9]/.test(k) && best[k]) b.classList.add(best[k]);
+  });
+}
+
+/* ── WEJŚCIE ──────────────────────────────────────────────────────── */
+function toast(msg){toastEl.textContent=msg; toastEl.style.opacity="1";
+  clearTimeout(toast._t); toast._t=setTimeout(function(){toastEl.style.opacity="0";},1600);}
+
+function onKey(k){
+  if(game.status!=="playing") return;
+  if(k==="enter"){ submit(); return; }
+  if(k==="del"){ current=current.slice(0,-1); paintCurrentRow(); return; }
+  if(/[0-9]/.test(k) && current.length<LEN){ current+=k; paintCurrentRow(); }
+}
+function paintCurrentRow(){
+  var row=boardEl.querySelectorAll(".row")[game.guesses.length];
+  if(!row) return;
+  var tiles=row.querySelectorAll(".tile");
+  for(var c=0;c<LEN;c++){
+    tiles[c].className="tile"; tiles[c].textContent="";
+    if(current[c]!==undefined){ tiles[c].textContent=current[c]; tiles[c].classList.add("filled"); }
+  }
+}
+
+document.addEventListener("keydown",function(e){
+  if(document.getElementById("scrim").classList.contains("open")) return;
+  if(e.key==="Enter") onKey("enter");
+  else if(e.key==="Backspace") onKey("del");
+  else if(/^[0-9]$/.test(e.key)) onKey(e.key);
+});
+
+/* ── SUBMIT ───────────────────────────────────────────────────────── */
+var busy=false;
+function submit(){
+  if(busy) return;
+  if(current.length<LEN){ shakeRow(); toast(t().short); return; }
+  var guess=current;
+  busy=true;
+  rpc("klodka_guess",{p_mode:view,p_idx:(view==="daily"?DAY_NO:WEEK_NO),p_guess:guess})
+    .then(function(res){
+      if(res && res.error){ busy=false;
+        if(res.error==="no code"){ toast(view==="daily"?t().none:t().soon); }
+        else toast(t().short);
+        return;
+      }
+      var entry={code:guess};
+      if(view==="daily"){ entry.states=res.states; }
+      entry.correct=!!res.correct;
+      game.guesses.push(entry);
+      current="";
+      revealRow(game.guesses.length-1);
+      if(res.correct){ finish(true); }
+      else if(game.guesses.length>=MAX_TRIES){ finish(false); }
+      else { persist(); }
+      busy=false;
+    })
+    .catch(function(){ busy=false; toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
+}
+
+function revealRow(r){
+  var row=boardEl.querySelectorAll(".row")[r];
+  var tiles=row.querySelectorAll(".tile");
+  var g=game.guesses[r];
+  for(var c=0;c<LEN;c++){
+    (function(tile,c){
+      setTimeout(function(){
+        tile.classList.add("reveal"); tile.textContent=g.code[c];
+        if(view==="daily" && g.states) tile.classList.add(g.states[c]);
+        else tile.classList.add(g.correct?"correct":"wrong");
+        if(c===LEN-1) paintPad();
+      }, c*90);
+    })(tiles[c],c);
+  }
+}
+function shakeRow(){
+  var row=boardEl.querySelectorAll(".row")[game.guesses.length];
+  if(!row) return; row.classList.add("shake");
+  setTimeout(function(){row.classList.remove("shake");},360);
+}
+
+/* ── KONIEC GRY ───────────────────────────────────────────────────── */
+function finish(won){
+  game.status=won?"won":"lost";
+  var T=t();
+  if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
+  else toast(view==="daily"?T.loseD:T.loseW);
+  // pobierz kod do ujawnienia
+  rpc("klodka_reveal",{p_mode:view,p_idx:(view==="daily"?DAY_NO:WEEK_NO)})
+    .then(function(code){ game.reveal=code; persist(); refreshWeektile(); setTimeout(openEnd,900); })
+    .catch(function(){ persist(); refreshWeektile(); setTimeout(openEnd,900); });
+  // log
+  trackEvent({
+    game: view==="daily"?"klodka":"klodka-weekly",
+    puzzle_no: (view==="daily"?DAY_NO:WEEK_NO),
+    puzzle_word: null,                 // celowo NIE logujemy kodu (RLS / wyciek)
+    won: won, tries: game.guesses.length, lang: lang
+  });
+}
+
+/* ── MODAL: koniec + statystyki ───────────────────────────────────── */
+var scrim=document.getElementById("scrim"), modal=document.getElementById("modal");
+function closeModal(){scrim.classList.remove("open");}
+scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
+
+function recordHistory(won){
+  var key=storeKey()+"__hist";
+  var hist=loadJSON(key)||{played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false};
+  var idx=view==="daily"?DAY_NO:WEEK_NO;
+  if(hist.lastIdx===idx) return hist;          // już policzone
+  hist.played++; if(won)hist.won++;
+  // seria: kolejny idx i wygrana
+  if(won){ hist.streak = (hist.lastIdx===idx-1 && hist.lastWon)?hist.streak+1:1; }
+  else hist.streak=0;
+  if(hist.streak>hist.best) hist.best=hist.streak;
+  hist.lastIdx=idx; hist.lastWon=won;
+  saveJSON(key,hist); return hist;
+}
+
+function countdown(toMidnightOrWeek){
+  var now=new Date(), target;
+  if(view==="daily"){ target=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1); }
+  else { var dow=now.getDay(); /* tydzień liczony od epoki — pokaż do najbliższej północy następnego dnia tygodnia kalendarzowego */
+         var d=midnight(EPOCH); var nextWeekStart=new Date(d); nextWeekStart.setDate(d.getDate()+WEEK_NO*7);
+         target=nextWeekStart; }
+  var ms=target-now; if(ms<0)ms=0;
+  var h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000), s=Math.floor(ms%60000/1000);
+  return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+}
+
+function openEnd(){
+  var T=t(), won=game.status==="won";
+  var hist=recordHistory(won);
+  var pct = hist.played?Math.round(hist.won/hist.played*100):0;
+  var html=
+    '<button class="modal-close" aria-label="Zamknij">×</button>'+
+    '<h2>'+(won?T.endW:T.endL)+'</h2>'+
+    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+
+      '<div class="reveal-code">'+(game.reveal||"····")+'</div></div>'+
+    '<div class="stats">'+
+      '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+
+      '<div class="stat"><div class="n">'+pct+'</div><div class="l">'+T.wpct+'</div></div>'+
+      '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+
+      '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+
+    '</div>'+
+    '<div class="cd">'+(view==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdown()+'</b></div>'+
+    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
+    '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
+  modal.innerHTML=html;
+  scrim.classList.add("open");
+  modal.querySelector(".modal-close").addEventListener("click",closeModal);
+  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
+  clearInterval(openEnd._t);
+  openEnd._t=setInterval(function(){var el=document.getElementById("cd"); if(el)el.textContent=countdown(); else clearInterval(openEnd._t);},1000);
+}
+
+/* ── HELP ─────────────────────────────────────────────────────────── */
+document.getElementById("helpBtn").addEventListener("click",function(){
+  var T=t();
+  var legend = view==="daily"
+    ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+
+      '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+
+      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'
+    : '';
+  modal.innerHTML=
+    '<button class="modal-close" aria-label="Zamknij">×</button>'+
+    '<h2>'+T.howH+'</h2>'+
+    '<div class="howlist">'+(view==="daily"?T.howD:T.howW)+legend+'</div>'+
+    '<button class="btn" id="closeBtn" style="margin-top:16px">OK</button>';
+  scrim.classList.add("open");
+  modal.querySelector(".modal-close").addEventListener("click",closeModal);
+  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
+});
+
+/* ── KAFELEK TYGODNIÓWKI ──────────────────────────────────────────── */
+function refreshWeektile(){
+  var T=t(), badge=document.getElementById("wtBadge"), status=document.getElementById("wtStatus");
+  document.getElementById("wtName").firstChild.textContent=T.weekName;
+  var w=loadJSON(WEEK_KEY);
+  var played = w && w.week===WEEK_NO ? w.game.status : null;
+  if(played==="won"){ badge.className="badge won"; badge.textContent=T.bWon; status.textContent=T.wtWon; return; }
+  if(played==="lost"){ badge.className="badge lost"; badge.textContent=T.bLost; status.textContent=T.wtLost; return; }
+  // sprawdź, czy kod tygodnia istnieje
+  rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){
+    if(has){ badge.className="badge new"; badge.textContent=T.bNew; status.textContent=T.wtNew; }
+    else { badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; }
+  }).catch(function(){ badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; });
+}
+
+document.getElementById("weektile").addEventListener("click",function(){ switchView("weekly"); });
+document.getElementById("subback").addEventListener("click",function(){ switchView("daily"); });
+
+function switchView(v){
+  view=v; current="";
+  document.getElementById("weektile").classList.toggle("hidden", v==="weekly");
+  loadGame(); renderStatic();
+  if(v==="weekly" && game.status==="playing"){
+    // jeśli kod jeszcze nie istnieje — komunikat „w przygotowaniu”
+    rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
+  }
+  if(game.status!=="playing") setTimeout(openEnd,250);
+  window.scrollTo(0,0);
+}
+
+/* ── START ────────────────────────────────────────────────────────── */
+loadGame();
+renderStatic();
+refreshWeektile();
+if(game.status!=="playing") setTimeout(openEnd,400);
+</script>
+</body>
+</html>
