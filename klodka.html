@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kłōdka · Szpilplac · Familock</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach. Gra od Familocka Starzik.">
+<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
@@ -178,6 +178,13 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .stat{flex:1;text-align:center}
 .stat .n{font-family:"Oswald";font-size:24px;color:var(--green)}
 .stat .l{font-size:10.5px;color:var(--ink2);line-height:1.2;margin-top:2px}
+.dist{margin:2px 0 14px}
+.dist h3{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 7px}
+.bar-row{display:flex;align-items:center;gap:7px;font-size:12px;margin:3px 0}
+.bar-i{width:12px;font-weight:800;color:var(--ink2);text-align:center}
+.bar-wrap{flex:1;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.04)}
+.bar{background:var(--absent);color:#fff;text-align:right;padding:3px 7px;font-weight:800;font-size:11px;min-width:24px;border-radius:4px}
+.bar.win{background:var(--correct)}
 .cd{text-align:center;font-size:13px;color:var(--ink2);margin:4px 0 14px}
 .cd b{color:var(--ink);font-family:"Oswald";letter-spacing:.05em}
 .btn{display:block;width:100%;padding:12px;border-radius:10px;background:var(--green);color:#fff;
@@ -380,12 +387,14 @@ var S={
     settCbL:"Tryb dla daltonistów", settCbS:"Inne kolory podpowiedzi",
     settAnimL:"Animacje", settAnimS:"Obrót kafelków i efekty",
     settRepeatL:"Informacja o powtórkach", settRepeatS:"Pod planszą pokaże, czy cyfry się powtarzają",
-    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarych kafelkach pokaże, czy ukryta cyfra dla tego kółka jest wyżej czy niżej",
-    dirLegend:"Przy szarym kafelku: <b>↑</b> kręć kółko wyżej, <b>↓</b> kręć niżej. Strzałka pokazuje się tylko przy cyfrze, której nie ma w kodzie.",
+    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarych kafelkach pokaże, czy szukana cyfra jest wyżej czy niżej od wpisanej",
+    dirLegend:"Przy szarym kafelku: <b>↑</b> szukaj wyższej cyfry, <b>↓</b> szukaj niższej. Strzałka pokazuje się tylko wtedy, gdy wpisanej cyfry nie ma w kodzie.",
     repeatYes:"W tym kodzie <b>cyfra się powtarza</b>.",
     repeatNo:"W tym kodzie <b>cyfry się nie powtarzają</b>.",
     repeatMaybe:"Nie udało się sprawdzić powtórek cyfr. Spróbuj odświeżyć stronę.",
-    statsH:"Statystyki", archive:"Archiwum", today:"Dzisiaj"
+    statsH:"Statystyki", dist:"Rozkład prób", archive:"Archiwum", today:"Dzisiaj",
+    optionsInfo:"W ustawieniach możesz włączyć dodatkowe ułatwienia: podpowiedzi góra/dół oraz informację o powtórkach cyfr. Działają tylko w codziennej kłódce. Tygodniówka zostaje bez kolorów i strzałek.",
+    archiveDone:"Archiwalna kłódka zakończona."
   },
   szl:{
     titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
@@ -418,12 +427,14 @@ var S={
     settCbL:"Tryb dlŏ daltonistów", settCbS:"Inksze farby podpowiydzi",
     settAnimL:"Animacyje", settAnimS:"Łobrót kafli i efekty",
     settRepeatL:"Info ô powtōrkach", settRepeatS:"Pod planszōm pokoże, eli cyfry sie powtarzajōm",
-    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwych kafelkach pokoże, eli skryto cyfra dlŏ tego kółka je wyżyj abo niżyj",
-    dirLegend:"Przi siwym kafelku: <b>↑</b> kryńć kółko wyżyj, <b>↓</b> kryńć niżyj. Strzałka pokoże sie ino przi cyfrze, kerej ni ma w kodzie.",
+    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwych kafelkach pokoże, eli szukano cyfra je wyżyj abo niżyj ôd wkludyj",
+    dirLegend:"Przi siwym kafelku: <b>↑</b> szukej wyższyj cyfry, <b>↓</b> szukej niższyj. Strzałka pokoże sie ino wtedy, kej wkludyj cyfry ni ma w kodzie.",
     repeatYes:"W tym kodzie <b>cyfra sie powtarzo</b>.",
     repeatNo:"W tym kodzie <b>cyfry sie niy powtarzajōm</b>.",
     repeatMaybe:"Niy szło sprawdzić powtōrek cyfr. Sprōbuj łodświyżyć strona.",
-    statsH:"Statystyki", archive:"Archiwum", today:"Dzisiej"
+    statsH:"Statystyki", dist:"Rozkłod prób", archive:"Archiwum", today:"Dzisiej",
+    optionsInfo:"W ustawiyniach idzie włōnczyć ekstra ułatwiynia: podpowiydzi góra/dół oraz info ô powtōrkach cyfr. Działajōm ino w codzinnyj kłōdce. Tydniówka ôstowo bez farb i strzałek.",
+    archiveDone:"Archiwalno kłōdka je zakończōno."
   }
 };
 var lang = (localStorage.getItem(LANG_KEY)==="ŚL"||localStorage.getItem(LANG_KEY)==="szl") ? "szl" : "pl";
@@ -682,10 +693,13 @@ function submit(){
       entry.correct=!!res.correct;
       game.guesses.push(entry);
       current="";
+      // Zapisuj od razu po każdej zatwierdzonej próbie — także w archiwum.
+      // Dzięki temu gracz nie straci stanu, nawet gdy zamknie stronę przed animacją albo przed pobraniem kodu do modala końcowego.
+      persist();
       revealRow(game.guesses.length-1);
       if(res.correct){ playSound("win"); finish(true); }
       else if(game.guesses.length>=MAX_TRIES){ playSound("bad"); finish(false); }
-      else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); persist(); }
+      else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); }
       busy=false;
     })
     .catch(function(){ busy=false; toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
@@ -716,13 +730,16 @@ function shakeRow(){
 /* ── KONIEC GRY ───────────────────────────────────────────────────── */
 function finish(won){
   game.status=won?"won":"lost";
+  // Najważniejsze: najpierw zapisz wynik lokalnie.
+  // Archiwalne dni zapisują się pod kluczem klodka_daily_v1_dNUMER_DNIA.
+  persist();
   var T=t();
   if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
   else toast(view==="daily"?T.loseD:T.loseW);
   // pobierz kod do ujawnienia
   rpc("klodka_reveal",{p_mode:view,p_idx:currentIdx()})
     .then(function(code){ game.reveal=code; persist(); refreshWeektile(); setTimeout(openEnd,900); })
-    .catch(function(){ persist(); refreshWeektile(); setTimeout(openEnd,900); });
+    .catch(function(){ refreshWeektile(); setTimeout(openEnd,900); });
   // log
   trackEvent({
     game: view==="daily"?"klodka":"klodka-weekly",
@@ -737,18 +754,93 @@ var scrim=document.getElementById("scrim"), modal=document.getElementById("modal
 function closeModal(){scrim.classList.remove("open");}
 scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
 
+function defaultHistory(){return {played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false,dist:[0,0,0,0,0,0],results:{}};}
+function normalizeHistory(hist){
+  var def=defaultHistory(); hist=hist||{};
+  hist.played=Number(hist.played||0); hist.won=Number(hist.won||0);
+  hist.streak=Number(hist.streak||0); hist.best=Number(hist.best||0);
+  hist.lastIdx=hist.lastIdx===undefined?null:hist.lastIdx; hist.lastWon=!!hist.lastWon;
+  hist.dist=Array.isArray(hist.dist)?hist.dist.slice(0,MAX_TRIES):def.dist.slice();
+  while(hist.dist.length<MAX_TRIES)hist.dist.push(0);
+  hist.results=hist.results||{};
+  return hist;
+}
+function savedResult(mode,idx){
+  var saved=null;
+  if(mode==="daily"){
+    saved=loadJSON(dailyKey(idx));
+    if(!saved&&idx===TODAY_NO)saved=loadJSON(DAILY_KEY);
+    if(saved&&saved.day!==idx)return null;
+  }else{
+    saved=loadJSON(weeklyKey(idx));
+    if(!saved&&idx===WEEK_NO)saved=loadJSON(WEEK_KEY);
+    if(saved&&saved.week!==idx)return null;
+  }
+  var g=saved&&saved.game?saved.game:null;
+  if(!g||(g.status!=="won"&&g.status!=="lost"))return null;
+  return {won:g.status==="won",tries:(g.guesses||[]).length||MAX_TRIES};
+}
+function recalcHistory(mode,hist){
+  hist=normalizeHistory(hist);
+  var maxIdx=mode==="daily"?TODAY_NO:WEEK_NO;
+  var ids=Object.keys(hist.results||{}).map(function(k){return parseInt(k,10);})
+    .filter(function(n){return !isNaN(n)&&n>=1&&n<=maxIdx;})
+    .sort(function(a,b){return a-b;});
+  hist.played=ids.length; hist.won=0; hist.dist=[];
+  for(var d=0;d<MAX_TRIES;d++)hist.dist.push(0);
+  var cur=0,best=0,last=null,lastWin=false;
+  ids.forEach(function(idx){
+    var r=hist.results[idx]||{};
+    if(r.won){
+      hist.won++;
+      var tries=Math.max(1,Math.min(MAX_TRIES,parseInt(r.tries||MAX_TRIES,10)));
+      hist.dist[tries-1]++;
+      cur=(last!==null&&idx===last+1&&lastWin)?cur+1:1;
+      if(cur>best)best=cur;
+    }else cur=0;
+    last=idx; lastWin=!!r.won;
+  });
+  hist.streak=lastWin?cur:0; hist.best=best; hist.lastIdx=last; hist.lastWon=lastWin;
+  return hist;
+}
+function hydrateHistory(mode){
+  var hist=normalizeHistory(loadJSON(histKey(mode)));
+  var maxIdx=mode==="daily"?TODAY_NO:WEEK_NO;
+  for(var i=1;i<=maxIdx;i++){
+    if(!hist.results[i]){
+      var r=savedResult(mode,i);
+      if(r)hist.results[i]=r;
+    }
+  }
+  hist=recalcHistory(mode,hist);
+  saveJSON(histKey(mode),hist);
+  return hist;
+}
 function recordHistory(won){
-  var key=histKey(view);
-  var hist=loadJSON(key)||{played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false};
+  var hist=normalizeHistory(loadJSON(histKey(view)));
   var idx=currentIdx();
-  if(hist.lastIdx===idx) return hist;          // już policzone
-  hist.played++; if(won)hist.won++;
-  // seria: kolejny idx i wygrana
-  if(won){ hist.streak = (hist.lastIdx===idx-1 && hist.lastWon)?hist.streak+1:1; }
-  else hist.streak=0;
-  if(hist.streak>hist.best) hist.best=hist.streak;
-  hist.lastIdx=idx; hist.lastWon=won;
-  saveJSON(key,hist); return hist;
+  if(!hist.results[idx]) hist.results[idx]={won:!!won,tries:game.guesses.length||MAX_TRIES};
+  hist=recalcHistory(view,hist);
+  saveJSON(histKey(view),hist);
+  return hist;
+}
+function statsPct(hist){return hist.played?Math.round(hist.won/hist.played*100):0;}
+function statsSummaryHtml(hist){var T=t();
+  return '<div class="stats">'+
+    '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+
+    '<div class="stat"><div class="n">'+statsPct(hist)+'</div><div class="l">'+T.wpct+'</div></div>'+
+    '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+
+    '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+
+  '</div>';
+}
+function distHtml(hist){var T=t(),max=Math.max(1,Math.max.apply(null,hist.dist||[0])),rows="";
+  for(var i=0;i<MAX_TRIES;i++){
+    var v=(hist.dist&&hist.dist[i])||0;
+    var w=v?Math.max(8,Math.round(v/max*100)):8;
+    var hl=(game&&game.status==="won"&&game.guesses.length===i+1)?" win":"";
+    rows+='<div class="bar-row"><span class="bar-i">'+(i+1)+'</span><div class="bar-wrap"><div class="bar'+hl+'" style="width:'+w+'%">'+v+'</div></div></div>';
+  }
+  return '<div class="dist"><h3>'+T.dist+'</h3>'+rows+'</div>';
 }
 
 function countdown(toMidnightOrWeek){
@@ -765,27 +857,35 @@ function countdown(toMidnightOrWeek){
 function openEnd(){
   var T=t(), won=game.status==="won";
   var hist=recordHistory(won);
-  var pct = hist.played?Math.round(hist.won/hist.played*100):0;
+  var isArchiveDaily = view==="daily" && DAY_NO<TODAY_NO;
+  var countdownHtml = isArchiveDaily
+    ? '<div class="cd">'+T.archiveDone+'</div>'
+    : '<div class="cd">'+(view==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdown()+'</b></div>';
   var html=
-    '<button class="modal-close" aria-label="Zamknij">×</button>'+
-    '<h2>'+(won?T.endW:T.endL)+'</h2>'+
-    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+
-      '<div class="reveal-code">'+(game.reveal||"····")+'</div></div>'+
-    '<div class="stats">'+
-      '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+
-      '<div class="stat"><div class="n">'+pct+'</div><div class="l">'+T.wpct+'</div></div>'+
-      '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+
-      '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+
-    '</div>'+
-    '<div class="cd">'+(view==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdown()+'</b></div>'+
-    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
+    '<button class="modal-close" aria-label="Zamknij">×</button>'+ 
+    '<h2>'+(won?T.endW:T.endL)+'</h2>'+ 
+    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+ 
+      '<div class="reveal-code">'+(game.reveal||"····")+'</div></div>'+ 
+    statsSummaryHtml(hist)+
+    distHtml(hist)+
+    countdownHtml+
+    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+ 
     '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
   modal.innerHTML=html;
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
   modal.querySelector("#closeBtn").addEventListener("click",closeModal);
   clearInterval(openEnd._t);
-  openEnd._t=setInterval(function(){var el=document.getElementById("cd"); if(el)el.textContent=countdown(); else clearInterval(openEnd._t);},1000);
+  if(!isArchiveDaily) openEnd._t=setInterval(function(){var el=document.getElementById("cd"); if(el)el.textContent=countdown(); else clearInterval(openEnd._t);},1000);
+}
+
+function openFinishedModal(delay){
+  if(!game || (game.status!=="won" && game.status!=="lost")) return;
+  delay = delay===undefined ? 250 : delay;
+  if(game.reveal){ setTimeout(openEnd,delay); return; }
+  rpc("klodka_reveal",{p_mode:view,p_idx:currentIdx()})
+    .then(function(code){ game.reveal=code; persist(); setTimeout(openEnd,delay); })
+    .catch(function(){ setTimeout(openEnd,delay); });
 }
 
 /* ── STATYSTYKI I USTAWIENIA ─────────────────────────────────────── */
@@ -794,10 +894,10 @@ function openSimpleModal(html){
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
 }
-function readHistory(mode){return loadJSON(histKey(mode))||{played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false};}
+function readHistory(mode){return hydrateHistory(mode);}
 function showStats(){
-  var T=t(), hist=readHistory(view), pct=hist.played?Math.round(hist.won/hist.played*100):0;
-  openSimpleModal('<h2>'+T.statsH+'</h2>'+    '<div class="stats">'+      '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+      '<div class="stat"><div class="n">'+pct+'</div><div class="l">'+T.wpct+'</div></div>'+      '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+      '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+    '</div><button class="btn" id="closeBtn">OK</button>');
+  var T=t(), hist=readHistory(view);
+  openSimpleModal('<h2>'+T.statsH+'</h2>'+statsSummaryHtml(hist)+distHtml(hist)+'<button class="btn" id="closeBtn">OK</button>');
   modal.querySelector("#closeBtn").addEventListener("click",closeModal);
 }
 function showSettings(){
@@ -824,15 +924,16 @@ document.getElementById("settBtn").addEventListener("click",showSettings);
 document.getElementById("helpBtn").addEventListener("click",function(){
   var T=t();
   var legend = view==="daily"
-    ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+
-      '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+
-      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'+
+    ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+ 
+      '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+ 
+      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'+ 
       '<p style="margin-top:8px">'+T.dirLegend+'</p>'
     : '';
+  var optionsNote = '<p style="margin-top:12px"><b>Opcje.</b> '+T.optionsInfo+'</p>';
   modal.innerHTML=
     '<button class="modal-close" aria-label="Zamknij">×</button>'+
     '<h2>'+T.howH+'</h2>'+
-    '<div class="howlist">'+(view==="daily"?T.howD:T.howW)+legend+'</div>'+
+    '<div class="howlist">'+(view==="daily"?T.howD:T.howW)+legend+optionsNote+'</div>'+
     '<button class="btn" id="closeBtn" style="margin-top:16px">OK</button>';
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
@@ -865,7 +966,7 @@ function switchView(v){
     // jeśli kod jeszcze nie istnieje — komunikat „w przygotowaniu”
     rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
   }
-  if(game.status!=="playing") setTimeout(openEnd,250);
+  if(game.status!=="playing") openFinishedModal(250);
   window.scrollTo(0,0);
 }
 
@@ -876,7 +977,7 @@ function loadDailyDay(no){
   view="daily";DAY_NO=no;current="";
   document.getElementById("weektile").classList.remove("hidden");
   loadGame();renderStatic();refreshWeektile();
-  if(game.status!=="playing")setTimeout(openEnd,250);
+  if(game.status!=="playing")openFinishedModal(250);
   window.scrollTo(0,0);
 }
 function updateNavBar(){
@@ -928,7 +1029,7 @@ function renderCalendar(){
 loadGame();
 renderStatic();
 refreshWeektile();
-if(game.status!=="playing") setTimeout(openEnd,400);
+if(game.status!=="playing") openFinishedModal(400);
 </script>
 </body>
 </html>
