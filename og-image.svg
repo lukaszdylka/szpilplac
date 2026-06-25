@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#161310"/>
+  <rect x="0" y="0" width="1200" height="7" fill="#4a9a6a"/>
+
+  <!-- Duży napis -->
+  <text x="600" y="248" font-family="system-ui,sans-serif" font-weight="800" font-size="112" fill="#ede5d0" text-anchor="middle" letter-spacing="12">SZPILPLAC</text>
+
+  <!-- Podtytuł -->
+  <text x="600" y="312" font-family="system-ui,sans-serif" font-size="32" fill="#9a907a" text-anchor="middle" letter-spacing="2">Codzienne śląskie gry słowne</text>
+
+  <!-- Kafelki dekoracyjne -->
+  <rect x="388" y="368" width="52" height="52" rx="10" fill="#4a9a6a"/>
+  <rect x="452" y="368" width="52" height="52" rx="10" fill="#c49050"/>
+  <rect x="516" y="368" width="52" height="52" rx="10" fill="#4a9a6a"/>
+  <rect x="580" y="368" width="52" height="52" rx="10" fill="#5a5448"/>
+  <rect x="644" y="368" width="52" height="52" rx="10" fill="#4a9a6a"/>
+  <rect x="708" y="368" width="52" height="52" rx="10" fill="#c49050"/>
+  <rect x="772" y="368" width="52" height="52" rx="10" fill="#4a9a6a"/>
+
+  <!-- Litery w kafelkach -->
+  <text x="414" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">S</text>
+  <text x="478" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">Ł</text>
+  <text x="542" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">Ō</text>
+  <text x="606" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">W</text>
+  <text x="670" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">K</text>
+  <text x="734" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">O</text>
+  <text x="798" y="405" font-family="system-ui,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">!</text>
+
+  <!-- Stopka -->
+  <text x="600" y="560" font-family="system-ui,sans-serif" font-size="22" fill="#3d3629" text-anchor="middle" letter-spacing="3">FAMILOCK · ESCAPE ROOM STARZIK · ŚWIĘTOCHŁOWICE</text>
+</svg>
