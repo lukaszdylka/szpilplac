@@ -349,31 +349,22 @@ var IS_TESTER = (function(){
 
 /* ── HELPERS ────────────────────────────────────────────────────────── */
 function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
-
-// Dzień gry liczony według czasu Polski, żeby po północy w Polsce
-// frontend i Supabase nie rozjeżdżały się przez UTC.
+// Dzień gry liczony według czasu Polski
 function warsawDateParts(d){
   var parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Warsaw",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
+    year: "numeric", month: "2-digit", day: "2-digit"
   }).formatToParts(d);
-
   var out = {};
-  parts.forEach(function(p){
-    if(p.type !== "literal") out[p.type] = Number(p.value);
-  });
+  parts.forEach(function(p){ if(p.type !== "literal") out[p.type] = Number(p.value); });
   return out;
 }
-
 function todayIndex(){
   var p = warsawDateParts(new Date());
   var todayUtc = Date.UTC(p.year, p.month - 1, p.day);
   var epochUtc = Date.UTC(2026, 5, 23);
   return Math.floor((todayUtc - epochUtc) / 86400000);
 }
-
 function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
 function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"}); }
 
@@ -1090,9 +1081,16 @@ function renderCalendar(){
 function loadDay(dayIdx){
   current="";busy=false;stateCache={};
   updateNavBar();
-  buildBoard();buildKbd();relabelKbd();
 
   var saved=loadDayGame(dayIdx);
+
+  // Odczytaj LEN z localStorage zanim Supabase odpowie — unika błędnej siatki
+  if(saved&&saved.guesses&&saved.guesses.length>0){
+    LEN=Array.from(saved.guesses[0]).length;
+  }
+  boardEl.innerHTML="";
+  buildKbd();relabelKbd();
+
   var fn="wihajster_day";
   var args={p_day:dayIdx};
 
@@ -1119,8 +1117,8 @@ function loadDay(dayIdx){
         return;
       }
       var g=replay[i],arr=Array.from(g);
-      var fn2="wihajster_guess_day";
-      var a2={p_day:dayIdx,p_guess:g};
+      var fn2=dayIdx===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
+      var a2=dayIdx===TODAY_IDX?{p_guess:g}:{p_day:dayIdx,p_guess:g};
       rpc(fn2,a2).then(function(res){
         var st=res&&res.states?res.states:((s.states&&s.states[i])||arr.map(function(){return"absent";}));
         stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
