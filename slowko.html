@@ -1011,7 +1011,11 @@ function share(){
     copyTxt(txt);
   }
 }
-function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
+function copyTxt(txt){
+  function done(ok){
+    closeModal();
+    setTimeout(function(){toast(ok?T().copied:T().copyerr);},100);
+  }
   if(navigator.clipboard&&navigator.clipboard.writeText)
     navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
   function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
