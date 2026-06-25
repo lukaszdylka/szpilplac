@@ -49,6 +49,22 @@ header{width:100%;max-width:480px;padding:14px 18px 4px}
   background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
 
+/* NAWIGACJA DNI — archiwum jak w Słōwku */
+.nav-bar{display:flex;align-items:center;gap:8px;margin-top:10px}
+.nav-btn{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);font-size:14px;flex:none}
+.nav-btn:hover{background:var(--surface);color:var(--ink)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.nav-day{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}
+.nav-day .dayno{font-family:"Oswald";font-size:18px;color:var(--ink);letter-spacing:.02em}
+.nav-cal{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
+.nav-cal:hover{background:var(--surface);color:var(--ink)}
+.archive-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);
+  color:#fff;margin-left:6px}
+
 main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-direction:column}
 
 .title-row{display:flex;align-items:baseline;justify-content:space-between;margin:8px 2px 2px}
@@ -61,6 +77,9 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 
 /* ── PLANSZA ── */
 .board{display:flex;flex-direction:column;gap:8px;align-items:center;margin:8px 0 4px}
+.repeat-info{min-height:22px;text-align:center;font-size:12px;color:var(--ink2);font-weight:700;
+  margin:2px 0 4px;letter-spacing:.02em}
+.repeat-info b{color:var(--green)}
 .row{display:flex;gap:8px}
 .tile{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;
   font-family:"Oswald";font-size:30px;color:var(--ink);
@@ -69,7 +88,12 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .tile.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .tile.present{background:var(--present);border-color:var(--present);color:#fff}
 .tile.absent{background:var(--absent);border-color:var(--absent);color:#fff}
+.tile.dir-higher,.tile.dir-lower{position:relative;overflow:hidden}
+.tile.dir-higher::after,.tile.dir-lower::after{position:absolute;right:5px;bottom:3px;font-family:"Inter",system-ui,sans-serif;font-size:16px;font-weight:900;line-height:1;color:#fff;opacity:.98;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.tile.dir-higher::after{content:"↑"}
+.tile.dir-lower::after{content:"↓"}
 .tile.wrong{background:var(--surface2);border-color:var(--wrong);color:var(--wrong)}
+.tile.neutral{background:var(--surface2);border-color:var(--ink2);color:var(--ink)}
 .tile.reveal{animation:flip .4s ease forwards}
 .row.shake{animation:shake .35s}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
@@ -108,6 +132,35 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .badge.lost{background:var(--wrong);color:#fff}
 .badge.soon{background:var(--surface);color:var(--ink2);border:1px solid var(--line)}
 
+/* KALENDARZ ARCHIWUM */
+.cal-scrim{position:fixed;inset:0;z-index:60;display:none;
+  align-items:flex-start;justify-content:center;padding-top:80px;background:rgba(20,16,10,.28)}
+.cal-scrim.open{display:flex}
+.cal-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:16px;box-shadow:0 16px 40px -12px rgba(0,0,0,.45);
+  max-width:340px;width:calc(100vw - 32px)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-head h3{font-family:"Oswald";text-transform:uppercase;font-size:17px;margin:0;color:var(--ink)}
+.cal-head button{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);color:var(--ink2);font-size:14px;display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-dow{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
+  padding:2px 0;font-weight:700}
+.cal-day{aspect-ratio:1;border-radius:8px;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;color:var(--ink2)}
+.cal-day.empty{cursor:default}
+.cal-day.today{border-color:var(--green);color:var(--ink);background:var(--surface2)}
+.cal-day.active{box-shadow:0 0 0 2px var(--gold) inset;color:var(--ink)}
+.cal-day.played{background:var(--gold);color:#fff;border-color:var(--gold)}
+.cal-day.played.won{background:var(--correct);border-color:var(--correct)}
+.cal-day.past:not(.played){border-color:var(--line);color:var(--ink2)}
+.cal-day.past:not(.played):hover{background:var(--surface2);border-color:var(--ink2)}
+.cal-day.future{opacity:.25;cursor:default}
+.cal-nav{display:flex;justify-content:space-between;margin-top:10px}
+.cal-nav button{font-size:12px;font-weight:600;color:var(--green);padding:4px 8px;
+  border-radius:6px;border:1px solid var(--line);background:var(--surface2)}
+.cal-nav button:disabled{opacity:.3;cursor:default}
+
 .subback{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;gap:5px;align-items:center;margin:2px 2px 0}
 
 /* ── MODAL ── */
@@ -136,6 +189,19 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .howlist b{color:var(--ink)}
 .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
 
+/* USTAWIENIA */
+.sett-row{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:12px 0;border-bottom:1px solid var(--line)}
+.sett-row:last-child{border-bottom:none;padding-bottom:0}
+.sett-label{font-size:14px;color:var(--ink);font-weight:700}
+.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.35}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2);flex:none}
+.seg button{font-size:11px;font-weight:800;padding:6px 10px;color:var(--ink2);white-space:nowrap}
+.seg button.on{background:var(--green);color:#fff}
+.cb{--correct:#1a6fc4;--present:#e07b1a;--absent:#555}
+[data-theme=dark].cb{--correct:#3a8fe4;--present:#f09030;--absent:#555}
+.no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake,.no-anim .key:active{animation:none!important;transition:none!important}
+
 footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin:10px 0 18px;line-height:1.8}
 footer a{color:var(--green);font-weight:600}
 
@@ -159,7 +225,29 @@ footer a{color:var(--green);font-weight:600}
       <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
+      <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 4.01 8.51 1.25h6.98l-.89 2.76 1.21.51 1.32-2.59 4.94 4.94-2.59 1.32.51 1.21 2.76-.89v6.98l-2.76-.89-.51 1.21 2.59 1.32-4.94 4.94-1.32-2.59-1.21.51.89 2.76H8.51l.89-2.76-1.21-.51-1.32 2.59-4.94-4.94 2.59-1.32-.51-1.21-2.76.89V8.51l2.76.89.51-1.21-2.59-1.32 4.94-4.94 1.32 2.59z"/><circle cx="12" cy="12" r="4.4"/></svg>
+      </button>
+      <button class="icon-btn" id="statBtn" title="Statystyki" aria-label="Statystyki">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
+      </button>
     </div>
+  </div>
+
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn" id="prevBtn" title="Poprzedni dzień" aria-label="Poprzedni dzień" disabled>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="10,3 5,8 10,13"/></svg>
+    </button>
+    <div class="nav-day">
+      <div class="dayno" id="navDayNo"></div>
+      <div id="navDayLabel"></div>
+    </div>
+    <button class="nav-btn" id="nextBtn" title="Następny dzień" aria-label="Następny dzień" disabled>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,3 11,8 6,13"/></svg>
+    </button>
+    <button class="nav-cal" id="calBtn" title="Kalendarz" aria-label="Kalendarz">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="13" height="12" rx="2"/><line x1="1.5" y1="6" x2="14.5" y2="6"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/></svg>
+    </button>
   </div>
 </header>
 
@@ -175,6 +263,7 @@ footer a{color:var(--green);font-weight:600}
   <div class="toast" id="toast"></div>
 
   <div class="board" id="board"></div>
+  <div class="repeat-info" id="repeatInfo"></div>
 
   <div class="pad" id="pad"></div>
 
@@ -195,6 +284,20 @@ footer a{color:var(--green);font-weight:600}
 
 <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 
+<div class="cal-scrim" id="calScrim">
+  <div class="cal-box" id="calBox">
+    <div class="cal-head">
+      <h3 id="calTitle">Archiwum</h3>
+      <button id="calClose" aria-label="Zamknij">×</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-nav">
+      <button id="calPrev">← Poprzedni miesiąc</button>
+      <button id="calNext">Następny miesiąc →</button>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 
@@ -211,6 +314,11 @@ var LANG_KEY  = "familock_lang";
 var THEME_KEY = "szpilplac_theme";
 var DAILY_KEY = "klodka_daily_v1";
 var WEEK_KEY  = "klodka_weekly_v1";
+var SOUND_KEY = "klodka_sound";
+var CB_KEY    = "klodka_cb";
+var ANIM_KEY  = "klodka_anim";
+var REPEAT_KEY= "klodka_repeat_info";
+var DIR_KEY   = "klodka_dir_hints";
 
 /* ── ZAGADKA TYGODNIA — widoczna też pod F12 (Console) ─────────────────
    Podmieniaj razem z blokiem komentarza w <head>. */
@@ -219,9 +327,21 @@ console.log("%cTydzień 1: >>> TU WPISZ TROP DO KODU TYGODNIÓWKI <<<","font-siz
 
 /* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
-function daysSince(){return Math.floor((midnight(new Date())-midnight(EPOCH))/86400000);}
-var DAY_NO  = daysSince()+1;
-var WEEK_NO = Math.floor(daysSince()/7)+1;
+function warsawDateParts(d){
+  var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+  var out={};parts.forEach(function(p){if(p.type!=="literal")out[p.type]=Number(p.value);});return out;
+}
+function daysSince(){
+  var p=warsawDateParts(new Date());
+  var todayUtc=Date.UTC(p.year,p.month-1,p.day);
+  var epochUtc=Date.UTC(2026,5,23);
+  return Math.floor((todayUtc-epochUtc)/86400000);
+}
+function dateOfDayNo(no){var d=new Date(EPOCH);d.setDate(d.getDate()+no-1);return d;}
+function fmtDate(d){return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"});}
+var TODAY_NO = daysSince()+1;
+var DAY_NO   = TODAY_NO; // aktualnie oglądany dzień codziennej kłódki
+var WEEK_NO  = Math.floor(daysSince()/7)+1;
 
 /* ── storage helpers ──────────────────────────────────────────────── */
 function loadJSON(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
@@ -252,9 +372,20 @@ var S={
     bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wkrótce",
     howH:"Jak grać",
     howD:"<b>Codzienna kłódka.</b> Każdego dnia jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokażą, jak blisko jesteś:",
-    lgC:"cyfra na właściwym miejscu", lgP:"cyfra jest w kodzie, ale gdzie indziej", lgA:"cyfry nie ma w kodzie",
+    lgC:"cyfra na właściwym miejscu", lgP:"cyfra jest w kodzie, ale gdzie indziej", lgA:"cyfra nie pasuje do tej próby",
     howW:"<b>Zagadka tygodnia.</b> Raz w tygodniu specjalny kod ukryty za zagadką — szukaj tropu w grze, w źródle strony albo gdzie indziej. Tu kafelki <b>nie</b> podpowiadają cyfr: dostajesz tylko „dobrze / źle”. Masz 6 prób.",
-    foot:"Codzienna śląska kłódka — Familock Starzik."
+    foot:"Codzienna śląska kłódka — Familock Starzik.",
+    settH:"Ustawienia", settOn:"Wł.", settOff:"Wył.",
+    settSoundL:"Dźwięki", settSoundS:"Kliknięcia, błędy i otwarcie kłódki",
+    settCbL:"Tryb dla daltonistów", settCbS:"Inne kolory podpowiedzi",
+    settAnimL:"Animacje", settAnimS:"Obrót kafelków i efekty",
+    settRepeatL:"Informacja o powtórkach", settRepeatS:"Pod planszą pokaże, czy cyfry się powtarzają",
+    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarych kafelkach pokaże, czy ukryta cyfra dla tego kółka jest wyżej czy niżej",
+    dirLegend:"Przy szarym kafelku: <b>↑</b> kręć kółko wyżej, <b>↓</b> kręć niżej. Strzałka pokazuje się tylko przy cyfrze, której nie ma w kodzie.",
+    repeatYes:"W tym kodzie <b>cyfra się powtarza</b>.",
+    repeatNo:"W tym kodzie <b>cyfry się nie powtarzają</b>.",
+    repeatMaybe:"Nie udało się sprawdzić powtórek cyfr. Spróbuj odświeżyć stronę.",
+    statsH:"Statystyki", archive:"Archiwum", today:"Dzisiaj"
   },
   szl:{
     titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
@@ -279,13 +410,29 @@ var S={
     bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wnet",
     howH:"Jak grać",
     howD:"<b>Codzienno kłódka.</b> Kożdy dziyń jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożōm, jak blisko jeżeś:",
-    lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfry ni ma w kodzie",
+    lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfra niy pasuje do tyj prōby",
     howW:"<b>Zogodka tydnia.</b> Roz na tydziyń ekstra kod skryty za zogodkōm — szukej tropu w grze, w zdrzōdle strōny abo kaj indziej. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
-    foot:"Codzienno ślōnsko kłódka — Familock Starzik."
+    foot:"Codzienno ślōnsko kłódka — Familock Starzik.",
+    settH:"Ustawiynia", settOn:"Wł.", settOff:"Wył.",
+    settSoundL:"Dźwiyki", settSoundS:"Klikniyncia, błyndy i łodewrzicie kłódki",
+    settCbL:"Tryb dlŏ daltonistów", settCbS:"Inksze farby podpowiydzi",
+    settAnimL:"Animacyje", settAnimS:"Łobrót kafli i efekty",
+    settRepeatL:"Info ô powtōrkach", settRepeatS:"Pod planszōm pokoże, eli cyfry sie powtarzajōm",
+    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwych kafelkach pokoże, eli skryto cyfra dlŏ tego kółka je wyżyj abo niżyj",
+    dirLegend:"Przi siwym kafelku: <b>↑</b> kryńć kółko wyżyj, <b>↓</b> kryńć niżyj. Strzałka pokoże sie ino przi cyfrze, kerej ni ma w kodzie.",
+    repeatYes:"W tym kodzie <b>cyfra sie powtarzo</b>.",
+    repeatNo:"W tym kodzie <b>cyfry sie niy powtarzajōm</b>.",
+    repeatMaybe:"Niy szło sprawdzić powtōrek cyfr. Sprōbuj łodświyżyć strona.",
+    statsH:"Statystyki", archive:"Archiwum", today:"Dzisiej"
   }
 };
 var lang = (localStorage.getItem(LANG_KEY)==="ŚL"||localStorage.getItem(LANG_KEY)==="szl") ? "szl" : "pl";
 function t(){return S[lang];}
+var soundMode = localStorage.getItem(SOUND_KEY) || "off";
+var cbMode    = localStorage.getItem(CB_KEY)    || "off";
+var animMode  = localStorage.getItem(ANIM_KEY)  || "on";
+var repeatMode= localStorage.getItem(REPEAT_KEY)|| "off";
+var dirMode   = localStorage.getItem(DIR_KEY)   || "off";
 
 /* ── motyw ────────────────────────────────────────────────────────── */
 var theme = localStorage.getItem(THEME_KEY)==="dark" ? "dark" : "light";
@@ -294,6 +441,9 @@ applyTheme();
 document.getElementById("themeBtn").addEventListener("click",function(){
   theme = theme==="dark"?"light":"dark"; localStorage.setItem(THEME_KEY,theme); applyTheme();
 });
+function applyCbMode(){document.documentElement.classList.toggle("cb",cbMode==="on");}
+function applyAnimMode(){document.documentElement.classList.toggle("no-anim",animMode==="off");}
+applyCbMode();applyAnimMode();
 
 /* język */
 function setLang(l){
@@ -306,6 +456,10 @@ document.getElementById("lPl").classList.toggle("on",lang==="pl");
 document.getElementById("lSzl").classList.toggle("on",lang==="szl");
 document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
 document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
+document.addEventListener("click",function(e){
+  var btn=e.target&&e.target.closest?e.target.closest("button"):null;
+  if(btn){setTimeout(function(){btn.blur();},0);}
+});
 
 /* ── SUPABASE ─────────────────────────────────────────────────────── */
 function rpc(fn,args){
@@ -331,17 +485,55 @@ var current = "";      // wpisywane cyfry
 
 function freshGame(mode, idx){ return {mode:mode, idx:idx, guesses:[], status:"playing", reveal:null}; }
 
-function storeKey(){return view==="daily"?DAILY_KEY:WEEK_KEY;}
+function currentIdx(){return view==="daily"?DAY_NO:WEEK_NO;}
+function dailyKey(dayNo){return DAILY_KEY+"_d"+dayNo;}
+function weeklyKey(weekNo){return WEEK_KEY+"_w"+weekNo;}
+function storeKey(){return view==="daily"?dailyKey(DAY_NO):weeklyKey(WEEK_NO);}
+function histKey(mode){return (mode==="weekly"?WEEK_KEY:DAILY_KEY)+"__hist";}
 function storeIdField(){return view==="daily"?"day":"week";}
 
 function loadGame(){
   var saved = loadJSON(storeKey());
-  var idx   = view==="daily"?DAY_NO:WEEK_NO;
+  var idx   = currentIdx();
+  // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
+  if(!saved && view==="daily" && DAY_NO===TODAY_NO) saved=loadJSON(DAILY_KEY);
+  if(!saved && view==="weekly") saved=loadJSON(WEEK_KEY);
   if(saved && saved[storeIdField()]===idx){ game = saved.game; }
   else { game = freshGame(view, idx); }
+  loadCodeMeta();
 }
 function persist(){
-  var o={}; o[storeIdField()] = (view==="daily"?DAY_NO:WEEK_NO); o.game = game; saveJSON(storeKey(),o);
+  var o={}; o[storeIdField()] = currentIdx(); o.game = game; saveJSON(storeKey(),o);
+}
+
+/* ── META KODU: informacja o powtórkach cyfr ─────────────────────── */
+var codeMetaCache={};
+function metaKey(mode,idx){return mode+":"+idx;}
+function loadCodeMeta(){
+  var idx=currentIdx(), key=metaKey(view,idx);
+  if(repeatMode!=="on"||codeMetaCache[key]){updateRepeatInfo();return;}
+  // RPC z Supabase zwraca faktyczną informację, czy w kodzie są powtórzone cyfry. Nie zwraca samego kodu.
+  rpc("klodka_meta",{p_mode:view,p_idx:idx}).then(function(meta){
+    codeMetaCache[key]=meta||{}; updateRepeatInfo();
+  }).catch(function(){
+    codeMetaCache[key]={has_repeat:null}; updateRepeatInfo();
+  });
+}
+function updateRepeatInfo(){
+  var el=document.getElementById("repeatInfo"); if(!el)return;
+  if(repeatMode!=="on"||view!=="daily"){el.textContent="";el.style.display="none";return;}
+  el.style.display="block";
+  var meta=codeMetaCache[metaKey(view,currentIdx())]||{};
+  if(meta.has_repeat===true) el.innerHTML=t().repeatYes;
+  else if(meta.has_repeat===false) el.innerHTML=t().repeatNo;
+  else el.innerHTML=t().repeatMaybe;
+}
+
+function applyDirectionHint(tile,g,c){
+  if(dirMode!=="on"||view!=="daily"||!g||!g.states||g.states[c]!=="absent"||!g.directions)return;
+  var dir=g.directions[c];
+  if(dir==="higher") tile.classList.add("dir-higher");
+  else if(dir==="lower") tile.classList.add("dir-lower");
 }
 
 /* ── RENDER STATYCZNY (tytuły, plansza, klawiatura) ───────────────── */
@@ -356,7 +548,7 @@ function renderStatic(){
   document.getElementById("subback").classList.toggle("hidden", view==="daily");
   document.getElementById("subback").querySelector("span").textContent = lang==="szl"?"codzienno":"codzienna";
   document.getElementById("wtName").firstChild.textContent = T.weekName;
-  buildBoard(); buildPad(); paintFromGame();
+  buildBoard(); buildPad(); paintFromGame(); updateNavBar(); updateRepeatInfo();
 }
 
 function buildBoard(){
@@ -392,8 +584,8 @@ function paintFromGame(){
       var tile=tiles[c]; tile.className="tile"; tile.textContent="";
       if(g){
         tile.textContent=g.code[c];
-        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); }
-        else { tile.classList.add(g.correct?"correct":"wrong"); }
+        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); applyDirectionHint(tile,g,c); }
+        else { tile.classList.add(g.correct?"correct":"neutral"); }
       } else if(r===game.guesses.length){
         if(current[c]!==undefined){ tile.textContent=current[c]; tile.classList.add("filled"); }
       }
@@ -401,6 +593,7 @@ function paintFromGame(){
   }
   paintPad();
   document.getElementById("subback").classList.toggle("hidden", view==="daily");
+  updateRepeatInfo();
 }
 
 /* kolory klawiszy — tylko dla codziennej (weekly nie zdradza cyfr) */
@@ -422,6 +615,20 @@ function paintPad(){
   });
 }
 
+/* ── DŹWIĘKI ──────────────────────────────────────────────────────── */
+var _ctx=null;
+function getCtx(){if(!_ctx){try{_ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return _ctx;}
+function playSound(type){
+  if(soundMode!=="on")return;
+  var ctx=getCtx();if(!ctx)return;
+  var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+  if(type==="key"){o.frequency.value=420;g.gain.setValueAtTime(.07,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);o.stop(ctx.currentTime+.08);}
+  else if(type==="ok"){o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.08);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);o.stop(ctx.currentTime+.28);}
+  else if(type==="bad"){o.frequency.value=180;g.gain.setValueAtTime(.09,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.14);o.stop(ctx.currentTime+.16);}
+  else if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.1);o.frequency.setValueAtTime(780,ctx.currentTime+.2);g.gain.setValueAtTime(.14,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);o.stop(ctx.currentTime+.48);}
+  o.start();
+}
+
 /* ── WEJŚCIE ──────────────────────────────────────────────────────── */
 function toast(msg){toastEl.textContent=msg; toastEl.style.opacity="1";
   clearTimeout(toast._t); toast._t=setTimeout(function(){toastEl.style.opacity="0";},1600);}
@@ -429,8 +636,8 @@ function toast(msg){toastEl.textContent=msg; toastEl.style.opacity="1";
 function onKey(k){
   if(game.status!=="playing") return;
   if(k==="enter"){ submit(); return; }
-  if(k==="del"){ current=current.slice(0,-1); paintCurrentRow(); return; }
-  if(/[0-9]/.test(k) && current.length<LEN){ current+=k; paintCurrentRow(); }
+  if(k==="del"){ current=current.slice(0,-1); paintCurrentRow(); playSound("key"); return; }
+  if(/[0-9]/.test(k) && current.length<LEN){ current+=k; paintCurrentRow(); playSound("key"); }
 }
 function paintCurrentRow(){
   var row=boardEl.querySelectorAll(".row")[game.guesses.length];
@@ -450,13 +657,20 @@ document.addEventListener("keydown",function(e){
 });
 
 /* ── SUBMIT ───────────────────────────────────────────────────────── */
+function guessCode(args){
+  if(view==="daily"){
+    // Nowe RPC dodaje tylko tablicę directions. Fallback zostawia grę działającą, jeśli SQL nie został jeszcze uruchomiony.
+    return rpc("klodka_guess_hints",args).catch(function(){return rpc("klodka_guess",args);});
+  }
+  return rpc("klodka_guess",args);
+}
 var busy=false;
 function submit(){
   if(busy) return;
-  if(current.length<LEN){ shakeRow(); toast(t().short); return; }
+  if(current.length<LEN){ shakeRow(); toast(t().short); playSound("bad"); return; }
   var guess=current;
   busy=true;
-  rpc("klodka_guess",{p_mode:view,p_idx:(view==="daily"?DAY_NO:WEEK_NO),p_guess:guess})
+  guessCode({p_mode:view,p_idx:currentIdx(),p_guess:guess})
     .then(function(res){
       if(res && res.error){ busy=false;
         if(res.error==="no code"){ toast(view==="daily"?t().none:t().soon); }
@@ -464,14 +678,14 @@ function submit(){
         return;
       }
       var entry={code:guess};
-      if(view==="daily"){ entry.states=res.states; }
+      if(view==="daily"){ entry.states=res.states; if(res.directions) entry.directions=res.directions; }
       entry.correct=!!res.correct;
       game.guesses.push(entry);
       current="";
       revealRow(game.guesses.length-1);
-      if(res.correct){ finish(true); }
-      else if(game.guesses.length>=MAX_TRIES){ finish(false); }
-      else { persist(); }
+      if(res.correct){ playSound("win"); finish(true); }
+      else if(game.guesses.length>=MAX_TRIES){ playSound("bad"); finish(false); }
+      else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); persist(); }
       busy=false;
     })
     .catch(function(){ busy=false; toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
@@ -483,12 +697,13 @@ function revealRow(r){
   var g=game.guesses[r];
   for(var c=0;c<LEN;c++){
     (function(tile,c){
-      setTimeout(function(){
+      var apply=function(){
         tile.classList.add("reveal"); tile.textContent=g.code[c];
-        if(view==="daily" && g.states) tile.classList.add(g.states[c]);
-        else tile.classList.add(g.correct?"correct":"wrong");
+        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); applyDirectionHint(tile,g,c); }
+        else tile.classList.add(g.correct?"correct":"neutral");
         if(c===LEN-1) paintPad();
-      }, c*90);
+      };
+      if(animMode==="off")apply();else setTimeout(apply,c*90);
     })(tiles[c],c);
   }
 }
@@ -505,13 +720,13 @@ function finish(won){
   if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
   else toast(view==="daily"?T.loseD:T.loseW);
   // pobierz kod do ujawnienia
-  rpc("klodka_reveal",{p_mode:view,p_idx:(view==="daily"?DAY_NO:WEEK_NO)})
+  rpc("klodka_reveal",{p_mode:view,p_idx:currentIdx()})
     .then(function(code){ game.reveal=code; persist(); refreshWeektile(); setTimeout(openEnd,900); })
     .catch(function(){ persist(); refreshWeektile(); setTimeout(openEnd,900); });
   // log
   trackEvent({
     game: view==="daily"?"klodka":"klodka-weekly",
-    puzzle_no: (view==="daily"?DAY_NO:WEEK_NO),
+    puzzle_no: currentIdx(),
     puzzle_word: null,                 // celowo NIE logujemy kodu (RLS / wyciek)
     won: won, tries: game.guesses.length, lang: lang
   });
@@ -523,9 +738,9 @@ function closeModal(){scrim.classList.remove("open");}
 scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
 
 function recordHistory(won){
-  var key=storeKey()+"__hist";
+  var key=histKey(view);
   var hist=loadJSON(key)||{played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false};
-  var idx=view==="daily"?DAY_NO:WEEK_NO;
+  var idx=currentIdx();
   if(hist.lastIdx===idx) return hist;          // już policzone
   hist.played++; if(won)hist.won++;
   // seria: kolejny idx i wygrana
@@ -573,13 +788,46 @@ function openEnd(){
   openEnd._t=setInterval(function(){var el=document.getElementById("cd"); if(el)el.textContent=countdown(); else clearInterval(openEnd._t);},1000);
 }
 
+/* ── STATYSTYKI I USTAWIENIA ─────────────────────────────────────── */
+function openSimpleModal(html){
+  modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
+  scrim.classList.add("open");
+  modal.querySelector(".modal-close").addEventListener("click",closeModal);
+}
+function readHistory(mode){return loadJSON(histKey(mode))||{played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false};}
+function showStats(){
+  var T=t(), hist=readHistory(view), pct=hist.played?Math.round(hist.won/hist.played*100):0;
+  openSimpleModal('<h2>'+T.statsH+'</h2>'+    '<div class="stats">'+      '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+      '<div class="stat"><div class="n">'+pct+'</div><div class="l">'+T.wpct+'</div></div>'+      '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+      '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+    '</div><button class="btn" id="closeBtn">OK</button>');
+  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
+}
+function showSettings(){
+  var T=t();
+  function tog(cur,key){return '<div class="seg"><button data-k="'+key+'" data-v="on" class="seg-opt'+(cur==="on"?' on':'')+'">'+T.settOn+'</button><button data-k="'+key+'" data-v="off" class="seg-opt'+(cur==="off"?' on':'')+'">'+T.settOff+'</button></div>';}
+  openSimpleModal('<h2>'+T.settH+'</h2>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settSoundL+'</div><div class="sett-sub">'+T.settSoundS+'</div></div>'+tog(soundMode,SOUND_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settAnimL+'</div><div class="sett-sub">'+T.settAnimS+'</div></div>'+tog(animMode,ANIM_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settCbL+'</div><div class="sett-sub">'+T.settCbS+'</div></div>'+tog(cbMode,CB_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settDirL+'</div><div class="sett-sub">'+T.settDirS+'</div></div>'+tog(dirMode,DIR_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settRepeatL+'</div><div class="sett-sub">'+T.settRepeatS+'</div></div>'+tog(repeatMode,REPEAT_KEY)+'</div>');
+  modal.querySelectorAll(".seg-opt").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var k=btn.dataset.k, v=btn.dataset.v;
+      modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){b.classList.toggle("on",b.dataset.v===v);});
+      localStorage.setItem(k,v);
+      if(k===SOUND_KEY)soundMode=v;
+      if(k===ANIM_KEY){animMode=v;applyAnimMode();}
+      if(k===CB_KEY){cbMode=v;applyCbMode();}
+      if(k===DIR_KEY){dirMode=v;paintFromGame();}
+      if(k===REPEAT_KEY){repeatMode=v;loadCodeMeta();updateRepeatInfo();}
+    });
+  });
+}
+document.getElementById("statBtn").addEventListener("click",showStats);
+document.getElementById("settBtn").addEventListener("click",showSettings);
+
 /* ── HELP ─────────────────────────────────────────────────────────── */
 document.getElementById("helpBtn").addEventListener("click",function(){
   var T=t();
   var legend = view==="daily"
     ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+
       '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+
-      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'
+      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'+
+      '<p style="margin-top:8px">'+T.dirLegend+'</p>'
     : '';
   modal.innerHTML=
     '<button class="modal-close" aria-label="Zamknij">×</button>'+
@@ -595,7 +843,7 @@ document.getElementById("helpBtn").addEventListener("click",function(){
 function refreshWeektile(){
   var T=t(), badge=document.getElementById("wtBadge"), status=document.getElementById("wtStatus");
   document.getElementById("wtName").firstChild.textContent=T.weekName;
-  var w=loadJSON(WEEK_KEY);
+  var w=loadJSON(weeklyKey(WEEK_NO))||loadJSON(WEEK_KEY);
   var played = w && w.week===WEEK_NO ? w.game.status : null;
   if(played==="won"){ badge.className="badge won"; badge.textContent=T.bWon; status.textContent=T.wtWon; return; }
   if(played==="lost"){ badge.className="badge lost"; badge.textContent=T.bLost; status.textContent=T.wtLost; return; }
@@ -619,6 +867,61 @@ function switchView(v){
   }
   if(game.status!=="playing") setTimeout(openEnd,250);
   window.scrollTo(0,0);
+}
+
+/* ── ARCHIWUM DNI ─────────────────────────────────────────────────── */
+var calScrim=document.getElementById("calScrim"), calViewYear, calViewMonth;
+function loadDailyDay(no){
+  if(no<1||no>TODAY_NO)return;
+  view="daily";DAY_NO=no;current="";
+  document.getElementById("weektile").classList.remove("hidden");
+  loadGame();renderStatic();refreshWeektile();
+  if(game.status!=="playing")setTimeout(openEnd,250);
+  window.scrollTo(0,0);
+}
+function updateNavBar(){
+  var T=t(), nav=document.getElementById("navBar"); if(!nav)return;
+  nav.classList.toggle("hidden",view!=="daily");
+  if(view!=="daily")return;
+  document.getElementById("navDayNo").textContent="Kłōdka #"+DAY_NO;
+  document.getElementById("navDayLabel").innerHTML=(DAY_NO===TODAY_NO?T.today:fmtDate(dateOfDayNo(DAY_NO)))+(DAY_NO<TODAY_NO?"<span class='archive-badge'>"+T.archive+"</span>":"");
+  document.getElementById("prevBtn").disabled=DAY_NO<=1;
+  document.getElementById("nextBtn").disabled=DAY_NO>=TODAY_NO;
+}
+document.getElementById("prevBtn").addEventListener("click",function(){loadDailyDay(DAY_NO-1);});
+document.getElementById("nextBtn").addEventListener("click",function(){loadDailyDay(DAY_NO+1);});
+function openCalendar(){var d=dateOfDayNo(DAY_NO);calViewYear=d.getFullYear();calViewMonth=d.getMonth();renderCalendar();calScrim.classList.add("open");}
+function closeCalendar(){calScrim.classList.remove("open");}
+document.getElementById("calBtn").addEventListener("click",openCalendar);
+document.getElementById("calClose").addEventListener("click",closeCalendar);
+calScrim.addEventListener("click",function(e){if(e.target===calScrim)closeCalendar();});
+document.getElementById("calPrev").addEventListener("click",function(){calViewMonth--;if(calViewMonth<0){calViewMonth=11;calViewYear--;}renderCalendar();});
+document.getElementById("calNext").addEventListener("click",function(){calViewMonth++;if(calViewMonth>11){calViewMonth=0;calViewYear++;}renderCalendar();});
+function renderCalendar(){
+  var T=t(), months=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+  document.getElementById("calTitle").textContent=T.archive+" — "+months[calViewMonth]+" "+calViewYear;
+  var grid=document.getElementById("calGrid");grid.innerHTML="";
+  ["Pn","Wt","Śr","Cz","Pt","Sb","Nd"].forEach(function(d){var el=document.createElement("div");el.className="cal-dow";el.textContent=d;grid.appendChild(el);});
+  var first=new Date(calViewYear,calViewMonth,1), dow=(first.getDay()+6)%7;
+  for(var e=0;e<dow;e++){var empty=document.createElement("div");empty.className="cal-day empty";grid.appendChild(empty);}
+  var daysInMonth=new Date(calViewYear,calViewMonth+1,0).getDate();
+  for(var d=1;d<=daysInMonth;d++){
+    var date=new Date(calViewYear,calViewMonth,d), dayNo=Math.floor((midnight(date)-midnight(EPOCH))/86400000)+1;
+    var el=document.createElement("div");el.textContent=d;
+    if(dayNo<1||dayNo>TODAY_NO){el.className="cal-day future";grid.appendChild(el);continue;}
+    var saved=loadJSON(dailyKey(dayNo)), dg=saved&&saved.day===dayNo?saved.game:null;
+    var cls="cal-day";
+    if(dayNo===TODAY_NO)cls+=" today";else if(dayNo<TODAY_NO)cls+=" past";
+    if(dayNo===DAY_NO)cls+=" active";
+    if(dg&&dg.status==="won")cls+=" played won";
+    else if(dg&&dg.status==="lost")cls+=" played";
+    el.className=cls;
+    (function(no){el.addEventListener("click",function(){closeCalendar();loadDailyDay(no);});})(dayNo);
+    grid.appendChild(el);
+  }
+  var epochMonth=new Date(EPOCH.getFullYear(),EPOCH.getMonth(),1), curView=new Date(calViewYear,calViewMonth,1), maxMonth=new Date(dateOfDayNo(TODAY_NO).getFullYear(),dateOfDayNo(TODAY_NO).getMonth(),1);
+  document.getElementById("calPrev").disabled=curView<=epochMonth;
+  document.getElementById("calNext").disabled=curView>=maxMonth;
 }
 
 /* ── START ────────────────────────────────────────────────────────── */
