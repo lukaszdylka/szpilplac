@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kłōdka · Szpilplac · Familock</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach.">
+<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach. Gra od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
@@ -509,12 +509,27 @@ function loadGame(){
   // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
   if(!saved && view==="daily" && DAY_NO===TODAY_NO) saved=loadJSON(DAILY_KEY);
   if(!saved && view==="weekly") saved=loadJSON(WEEK_KEY);
-  if(saved && saved[storeIdField()]===idx){ game = saved.game; }
+  if(saved && saved[storeIdField()]===idx && saved.game){ game = saved.game; }
   else { game = freshGame(view, idx); }
+  if(game && (game.status==="won" || game.status==="lost")){
+    recordHistoryFor(view,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
+  }
   loadCodeMeta();
 }
 function persist(){
-  var o={}; o[storeIdField()] = currentIdx(); o.game = game; saveJSON(storeKey(),o);
+  var idx=currentIdx(), mode=view;
+  var o={}; o[storeIdField()] = idx; o.game = game;
+  saveJSON(storeKey(),o);
+
+  // Dodatkowy zapis bieżącej gry pod starym kluczem — dla zgodności ze stroną główną i starszymi wersjami.
+  if(mode==="daily" && idx===TODAY_NO) saveJSON(DAILY_KEY,o);
+  if(mode==="weekly" && idx===WEEK_NO) saveJSON(WEEK_KEY,o);
+
+  // Gdy gra jest zakończona, od razu zapisz lokalne statystyki gracza.
+  // Dzięki temu statystyki nie zależą od modala ani od pobrania kodu przez RPC reveal.
+  if(game && (game.status==="won" || game.status==="lost")){
+    recordHistoryFor(mode,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
+  }
 }
 
 /* ── META KODU: informacja o powtórkach cyfr ─────────────────────── */
@@ -742,10 +757,13 @@ function finish(won){
     .catch(function(){ refreshWeektile(); setTimeout(openEnd,900); });
   // log
   trackEvent({
-    game: view==="daily"?"klodka":"klodka-weekly",
+    // W tabeli statystyk gra jest zapisywana jako „kodka” (bez polskiego znaku).
+    // Tryb daily/weekly rozróżniamy polem mode, żeby nie łamać check constraint w Supabase.
+    game: "kodka",
+    mode: view,
     puzzle_no: currentIdx(),
     puzzle_word: null,                 // celowo NIE logujemy kodu (RLS / wyciek)
-    won: won, tries: game.guesses.length, lang: lang
+    won: won, tries: game.guesses.length, max_tries: MAX_TRIES, lang: lang
   });
 }
 
@@ -816,13 +834,16 @@ function hydrateHistory(mode){
   saveJSON(histKey(mode),hist);
   return hist;
 }
-function recordHistory(won){
-  var hist=normalizeHistory(loadJSON(histKey(view)));
-  var idx=currentIdx();
-  if(!hist.results[idx]) hist.results[idx]={won:!!won,tries:game.guesses.length||MAX_TRIES};
-  hist=recalcHistory(view,hist);
-  saveJSON(histKey(view),hist);
+function recordHistoryFor(mode,idx,won,tries){
+  var hist=normalizeHistory(loadJSON(histKey(mode)));
+  tries=Math.max(1,Math.min(MAX_TRIES,parseInt(tries||MAX_TRIES,10)));
+  hist.results[idx]={won:!!won,tries:tries};
+  hist=recalcHistory(mode,hist);
+  saveJSON(histKey(mode),hist);
   return hist;
+}
+function recordHistory(won){
+  return recordHistoryFor(view,currentIdx(),!!won,(game&&game.guesses?game.guesses.length:MAX_TRIES)||MAX_TRIES);
 }
 function statsPct(hist){return hist.played?Math.round(hist.won/hist.played*100):0;}
 function statsSummaryHtml(hist){var T=t();
