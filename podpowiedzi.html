@@ -200,6 +200,27 @@ main{width:100%;max-width:680px}
 footer{width:100%;max-width:680px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px}
 footer a{color:var(--green);font-weight:600}
 footer a:hover{text-decoration:underline}
+.words-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.words-head h3{margin:0}
+#daysAhead{font-family:inherit;font-size:12px;padding:5px 8px;border-radius:8px;
+  border:1px solid var(--line);background:var(--surface2);color:var(--ink)}
+.words-row{display:block}
+.day-row{display:grid;grid-template-columns:118px 1fr 64px;gap:10px;align-items:center;
+  padding:7px 4px;border-bottom:1px solid var(--line)}
+.day-row:last-child{border-bottom:none}
+.day-row.dr-header{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink2);font-weight:700;border-bottom:1px solid var(--line)}
+.dr-when{display:flex;flex-direction:column;line-height:1.25}
+.dr-no{font-family:"Oswald";font-size:15px;color:var(--green)}
+.dr-date{font-size:11px;color:var(--ink2)}
+.dr-now{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+  color:#fff;background:var(--gold);border-radius:999px;padding:1px 6px;width:max-content;margin-top:2px}
+.dr-mid{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.dr-word{font-family:"Oswald";font-size:17px;color:var(--ink);letter-spacing:.02em}
+.dr-mean{font-size:11.5px;color:var(--ink2)}
+.dr-code{font-family:"Oswald";font-size:20px;letter-spacing:.12em;color:var(--gold);text-align:right}
+.dr-code b{font-weight:inherit}
+.dr-dim{color:var(--ink2);opacity:.5}
 </style>
 </head>
 <body>
@@ -217,11 +238,18 @@ footer a:hover{text-decoration:underline}
   <div class="admin-bar" id="adminBar">
     <span class="admin-badge">Admin</span>
     <span style="font-size:13px;color:var(--ink2)">Tryb edycji aktywny</span>
-    <button class="btn-words" id="wordsBtn">🔤 Dzisiaj / Jutro</button>
+    <button class="btn-words" id="wordsBtn">🔮 Słowa i kody dni</button>
     <button class="logout-small" id="adminLogoutBtn">Wyloguj</button>
   </div>
   <div class="words-card" id="wordsCard">
-    <h3>Słowa dnia</h3>
+    <div class="words-head">
+      <h3>Podgląd dni</h3>
+      <select id="daysAhead">
+        <option value="7">7 dni</option>
+        <option value="14" selected>14 dni</option>
+        <option value="30">30 dni</option>
+      </select>
+    </div>
     <div class="words-row" id="wordsRow"><div class="spinner" style="padding:8px">Pobieram…</div></div>
   </div>
 
@@ -238,8 +266,6 @@ footer a:hover{text-decoration:underline}
 <main>
   <div class="game-tabs">
     <button class="game-tab on" data-game="slowko">Słōwko</button>
-    <button class="game-tab" data-game="klodka">Kłōdka</button>
-    <button class="game-tab" data-game="cuzamen">Cuzamen Szpil</button>
   </div>
 
   <div class="editor-panel" id="editorPanel"></div>
@@ -251,24 +277,6 @@ footer a:hover{text-decoration:underline}
       <button class="btn-add admin-only" id="addSlowko" style="display:none">+ Dodaj dzień</button>
     </div>
     <div class="days-list" id="listSlowko"><div class="spinner">Ładuję…</div></div>
-  </div>
-
-  <div class="game-section" id="sec-klodka">
-    <div class="toolbar">
-      <input type="search" id="filterKlodka" placeholder="Szukaj…">
-      <button class="btn-ghost" id="expandKlodka">Rozwiń wszystkie</button>
-      <button class="btn-add admin-only" id="addKlodka" style="display:none">+ Dodaj dzień</button>
-    </div>
-    <div class="days-list" id="listKlodka"><div class="spinner">Ładuję…</div></div>
-  </div>
-
-  <div class="game-section" id="sec-cuzamen">
-    <div class="toolbar">
-      <input type="search" id="filterCuzamen" placeholder="Szukaj…">
-      <button class="btn-ghost" id="expandCuzamen">Rozwiń wszystkie</button>
-      <button class="btn-add admin-only" id="addCuzamen" style="display:none">+ Dodaj dzień</button>
-    </div>
-    <div class="days-list" id="listCuzamen"><div class="spinner">Ładuję…</div></div>
   </div>
 </main>
 
@@ -537,12 +545,12 @@ function loadGame(game){
     el.innerHTML='<div class="empty-msg" style="color:var(--red)">Błąd: '+escH(e.message)+'</div>';
   });
 }
-function loadAll(){loadGame("slowko");loadGame("klodka");loadGame("cuzamen");}
+function loadAll(){loadGame("slowko");}
 function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 
 /* ── FILTRY ── */
 var ft={};
-["Slowko","Klodka","Cuzamen"].forEach(function(g){
+["Slowko"].forEach(function(g){
   var gl=g.toLowerCase();
   document.getElementById("filter"+g).addEventListener("input",function(){
     var v=this.value; clearTimeout(ft[gl]);
@@ -554,8 +562,6 @@ var ft={};
   });
 });
 document.getElementById("addSlowko").addEventListener("click",function(){openEditor(null,"slowko");});
-document.getElementById("addKlodka").addEventListener("click",function(){openEditor(null,"klodka");});
-document.getElementById("addCuzamen").addEventListener("click",function(){openEditor(null,"cuzamen");});
 
 /* ── ZAKŁADKI ── */
 document.querySelectorAll(".game-tab").forEach(function(btn){
@@ -603,7 +609,7 @@ function openEditor(rec,game){
     '<div class="form-row">'+
       '<div class="form-col"><label>Gra</label>'+
         '<select id="eGame">'+
-          ['slowko','klodka','cuzamen'].map(function(g){
+          ['slowko'].map(function(g){
             return'<option value="'+g+'"'+(g===game?" selected":"")+'>'+(g==="slowko"?"Słōwko":g==="klodka"?"Kłōdka":"Cuzamen Szpil")+'</option>';
           }).join("")+
         '</select></div>'+
@@ -745,12 +751,11 @@ function loadWords(){
   var row=document.getElementById("wordsRow");
   row.innerHTML='<div class="spinner" style="padding:8px">Pobieram…</div>';
   var epoch=new Date(2026,5,23);
-  function dayIdx(offset){
-    var now=new Date();
-    var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    return Math.floor((today-epoch)/86400000)+offset;
-  }
-  var todayIdx=dayIdx(0), tomorrowIdx=dayIdx(1);
+  var now=new Date();
+  var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var todayIdx=Math.floor((today-epoch)/86400000);
+  var sel=document.getElementById("daysAhead");
+  var n=(sel&&parseInt(sel.value,10))||14;
   function rpcAdmin(fn,args){
     return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
       headers:{"Content-Type":"application/json","apikey":adminKey,
@@ -758,21 +763,37 @@ function loadWords(){
       body:JSON.stringify(args||{})
     }).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});
   }
-  Promise.all([
-    rpcAdmin("wihajster_reveal_day",{p_day:todayIdx}),
-    rpcAdmin("wihajster_reveal_day",{p_day:tomorrowIdx})
-  ]).then(function(res){
+  var dows=["niedz","pon","wt","śr","czw","pt","sob"];
+  function fmtDate(d){return dows[d.getDay()]+" "+("0"+d.getDate()).slice(-2)+"."+("0"+(d.getMonth()+1)).slice(-2);}
+  var tasks=[];
+  for(var i=0;i<n;i++){
+    (function(off){
+      var sIdx=todayIdx+off;        // Słōwko: numeracja 0-based
+      var kIdx=todayIdx+off+1;      // Kłōdka: numeracja 1-based
+      var d=new Date(today); d.setDate(today.getDate()+off);
+      tasks.push(Promise.all([
+        rpcAdmin("wihajster_reveal_day",{p_day:sIdx}).catch(function(){return{word:null,meaning:null};}),
+        rpcAdmin("klodka_reveal",{p_mode:"daily",p_idx:kIdx}).catch(function(){return null;})
+      ]).then(function(r){
+        var code=(typeof r[1]==="string"?r[1]:(r[1]&&r[1].klodka_reveal)||null);
+        return {idx:kIdx, date:fmtDate(d),
+                word:(r[0]&&r[0].word)||"–", meaning:(r[0]&&r[0].meaning)||"",
+                code:code};
+      }));
+    })(i);
+  }
+  Promise.all(tasks).then(function(days){
     row.innerHTML=
-      '<div class="word-tile">'+
-        '<div class="wt-label">Dzisiaj · #'+(todayIdx+1)+'</div>'+
-        '<div class="wt-word">'+(res[0].word||"–")+'</div>'+
-        '<div class="wt-meaning">'+(res[0].meaning||"")+'</div>'+
-      '</div>'+
-      '<div class="word-tile tomorrow">'+
-        '<div class="wt-label">Jutro · #'+(tomorrowIdx+1)+'</div>'+
-        '<div class="wt-word">'+(res[1].word||"–")+'</div>'+
-        '<div class="wt-meaning">'+(res[1].meaning||"")+'</div>'+
-      '</div>';
+      '<div class="day-row dr-header"><div class="dr-when">Dzień</div><div class="dr-mid">Słōwko</div><div class="dr-code">Kłōdka</div></div>'+
+      days.map(function(x,i){
+        return '<div class="day-row">'+
+          '<div class="dr-when"><span class="dr-no">#'+x.idx+'</span><span class="dr-date">'+x.date+'</span>'+
+            (i===0?'<span class="dr-now">dziś</span>':'')+'</div>'+
+          '<div class="dr-mid"><span class="dr-word">'+escH(x.word)+'</span>'+
+            (x.meaning?'<span class="dr-mean">'+escH(x.meaning)+'</span>':'')+'</div>'+
+          '<div class="dr-code">'+(x.code?'<b>'+escH(x.code)+'</b>':'<span class="dr-dim">—</span>')+'</div>'+
+        '</div>';
+      }).join("");
   }).catch(function(e){
     row.innerHTML='<p style="color:var(--red);padding:4px;font-size:13px">Błąd: '+e.message+'</p>';
   });
@@ -784,6 +805,9 @@ document.getElementById("wordsBtn").addEventListener("click",function(){
   wordsVisible=!wordsVisible;
   if(wordsVisible){card.classList.add("open");loadWords();}
   else{card.classList.remove("open");}
+});
+document.getElementById("daysAhead").addEventListener("change",function(){
+  if(wordsVisible) loadWords();
 });
 
 /* ── INIT ── */
