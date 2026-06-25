@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cuzamen Szpil · Szpilplac · Familock</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
 <meta name="description" content="Codziennie cztery grupy po cztery śląskie słowa — Cuzamen Szpil od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +18,7 @@
   --sh:0 6px 18px -10px rgba(35,32,26,.38);
   --c0:#3f8a5a; --c1:#bf8a3a; --c2:#5a7ab8; --c3:#9a5a3a;
 }
-@media(prefers-color-scheme:dark){:root{
-  --bg:#161310;--surface:#262018;--surface2:#2e2820;
-  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
-  --green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;
-  --c0:#4a9a6a;--c1:#c49050;--c2:#6a8ac8;--c3:#aa6a4a;
-}}
+
 [data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--c0:#3f8a5a;--c1:#bf8a3a;--c2:#5a7ab8;--c3:#9a5a3a;}
 [data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--c0:#4a9a6a;--c1:#c49050;--c2:#6a8ac8;--c3:#aa6a4a;}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
@@ -174,6 +171,19 @@ footer a:hover{text-decoration:underline}
 "use strict";
 var LK="familock_lang", TK="szpilplac_theme", SK="cuzamen_v1";
 
+// Statystyki globalne — wpisz ten sam URL i anon key co w slowko.html
+var STATS_URL="", STATS_KEY="";
+
+function trackEvent(payload){
+  if(!STATS_URL||!STATS_KEY)return;
+  fetch(STATS_URL+"/rest/v1/szpilplac_events",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":STATS_KEY,
+             "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify(payload)
+  }).catch(function(){});
+}
+
 /* ── Dane zestawów ─────────────────────────────────────────────────────────
    Każdy zestaw to obiekt:
    { no, cats: [ {label, words:[], color:0-3}, ... ] }
@@ -251,11 +261,10 @@ var TSVG={
   light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
   dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
 };
-var THEMES=["system","light","dark"];
-var theme=store.get(TK)||"system";
+var THEMES=["light","dark"];
+var theme=store.get(TK)||"light";
 function applyTheme(){
-  if(theme==="system")document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme",theme);
+  document.documentElement.setAttribute("data-theme",theme);
   document.getElementById("themeBtn").innerHTML=TSVG[theme];
 }
 document.getElementById("themeBtn").addEventListener("click",function(){
@@ -439,6 +448,15 @@ function buildShareGrid(){
 }
 
 function endGame(won){
+  // trackEvent tylko przy pierwszym zakończeniu (nie przy odtworzeniu po odświeżeniu)
+  if(!savedGame||savedGame.finished!==true){
+    trackEvent({
+      game:"cuzamen", puzzle_no:SET.no,
+      puzzle_word:null, won:won,
+      tries:errors, max_tries:MAX_ERRORS,
+      guesses:null, lang:lang, mode:"local"
+    });
+  }
   finished=true;saveGame();
   var t=T();
   var endCats=SET.cats.map(function(cat){
