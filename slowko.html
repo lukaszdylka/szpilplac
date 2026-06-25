@@ -326,7 +326,7 @@ var SOUND_KEY    = "slowko_sound";   // dźwięki: "on"|"off"
 var CB_KEY       = "slowko_cb";      // daltonizm: "on"|"off"
 var CAT_KEY      = "slowko_cat";     // kategoria: "on"|"off"
 var SWAP_KEY     = "slowko_swap";    // zamiana Enter/Backspace: "on"|"off"
-var EPOCH        = new Date(2026, 5, 25);
+var EPOCH        = new Date(2026, 5, 23);
 
 // Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
 var hintMode = store.get(HINT_KEY) || "off";
@@ -1088,8 +1088,9 @@ function loadDay(dayIdx){
   if(saved&&saved.guesses&&saved.guesses.length>0){
     LEN=Array.from(saved.guesses[0]).length;
   }
-  boardEl.innerHTML="";
-  buildKbd();relabelKbd();
+  // Zbuduj planszę od razu (z LEN z localStorage lub domyślnym 5)
+  // żeby gracz nie widział pustego ekranu podczas ładowania
+  buildBoard();buildKbd();relabelKbd();
 
   var fn="wihajster_day";
   var args={p_day:dayIdx};
@@ -1142,6 +1143,15 @@ document.getElementById("lPl").addEventListener("click",function(){setLang("pl")
 document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
 
 /* ── START ──────────────────────────────────────────────────────────── */
+// Jednorazowe czyszczenie dni 0 i 1 (błędna kolejność słów przed fix_pick)
+// Usuń ten blok po ~2 tygodniach
+(function(){
+  if(!store.get('slowko_cleaned_v2')){
+    store.set('slowko_d0','');
+    store.set('slowko_d1','');
+    store.set('slowko_cleaned_v2','1');
+  }
+})();
 applyLang();
 applyAnimMode();
 applyCbMode();
