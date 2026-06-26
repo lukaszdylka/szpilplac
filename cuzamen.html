@@ -18,109 +18,43 @@
   --sh:0 6px 18px -10px rgba(35,32,26,.38);
   --c0:#3f8a5a; --c1:#bf8a3a; --c2:#5a7ab8; --c3:#9a5a3a;
 }
-
 [data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--c0:#3f8a5a;--c1:#bf8a3a;--c2:#5a7ab8;--c3:#9a5a3a;}
 [data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--c0:#4a9a6a;--c1:#c49050;--c2:#6a8ac8;--c3:#aa6a4a;}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
 html,body{margin:0;min-height:100%}
-body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
-  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
-  align-items:center;padding:0 12px 24px;min-height:100vh}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;padding:0 12px 24px;min-height:100vh}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
-
 header{width:100%;max-width:520px;padding-top:14px}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
-.back:hover{text-decoration:underline}
+.back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}.back:hover{text-decoration:underline}
 .controls{display:flex;gap:5px;align-items:center}
 .lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
-.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
-.lang-tog button.on{background:var(--green);color:#fff}
-.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
 .title-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
-h1{font-family:"Oswald";font-weight:700;font-size:clamp(24px,7vw,34px);
-  text-transform:uppercase;letter-spacing:.02em;margin:0;color:var(--ink)}
+h1{font-family:"Oswald";font-weight:700;font-size:clamp(24px,7vw,34px);text-transform:uppercase;letter-spacing:.02em;margin:0;color:var(--ink)}
 .pno{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink2)}
 .tagline{font-size:12.5px;color:var(--ink2);margin-bottom:10px}
-
 main{width:100%;max-width:520px}
-
-/* kategorie rozwiązane */
 .solved-list{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
-.solved-cat{border-radius:10px;padding:11px 14px;color:#fff}
-.solved-cat .cat-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;opacity:.85}
-.solved-cat .cat-words{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
-
-/* siatka kafelków */
+.solved-cat{border-radius:10px;padding:11px 14px;color:#fff}.solved-cat .cat-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;opacity:.85}.solved-cat .cat-words{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
-.tile{padding:0 6px;height:58px;border-radius:9px;border:2px solid var(--line);
-  background:var(--surface2);font-weight:800;font-size:clamp(11px,3.5vw,14px);
-  text-transform:uppercase;letter-spacing:.03em;color:var(--ink);
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  cursor:pointer;user-select:none;transition:transform .08s,background .12s,border-color .12s}
-.tile:hover{background:var(--surface);border-color:#a99f84}
-.tile.selected{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.tile.wrong{animation:wrong .5s ease}
+.tile{padding:0 6px;height:58px;border-radius:9px;border:2px solid var(--line);background:var(--surface2);font-weight:800;font-size:clamp(11px,3.5vw,14px);text-transform:uppercase;letter-spacing:.03em;color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;user-select:none;transition:transform .08s,background .12s,border-color .12s}
+.tile:hover{background:var(--surface);border-color:#a99f84}.tile.selected{background:var(--ink);color:var(--bg);border-color:var(--ink)}.tile.wrong{animation:wrong .5s ease}
 @keyframes wrong{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-5px)}30%,60%{transform:translateX(5px)}}
-.tile.pop{animation:pop .25s ease}
-@keyframes pop{50%{transform:scale(1.08)}}
-.tile.fly-out{animation:flyout .35s ease forwards}
-@keyframes flyout{to{transform:scale(.8);opacity:0}}
-
-/* dolne przyciski */
-.actions{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
-.btn{padding:11px 22px;border-radius:9px;font-weight:800;font-size:13px;
-  letter-spacing:.04em;text-transform:uppercase}
-.btn-ghost{border:1px solid var(--line);color:var(--ink2)}
-.btn-ghost:hover{background:var(--surface);color:var(--ink)}
-.btn-primary{background:var(--correct);color:#fff}
-.btn-primary:hover{filter:brightness(1.08)}
-.btn-primary:disabled{opacity:.4;cursor:default;filter:none}
-
-/* próby */
-.tries{display:flex;gap:5px;justify-content:center;margin-bottom:12px}
-.try-dot{width:10px;height:10px;border-radius:50%;background:var(--ink);opacity:.18;transition:opacity .2s}
-.try-dot.used{opacity:.7}
-
-.toast{min-height:20px;font-weight:700;font-size:13px;color:var(--green);
-  text-align:center;margin:2px 0 6px;transition:opacity .2s}
-
-/* modal */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
-  align-items:center;justify-content:center;padding:16px;z-index:50}
-.scrim.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;max-width:360px;width:100%;
-  padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);
-  border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}
-.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2)}
-.modal h2{font-family:"Oswald";text-transform:uppercase;margin:0 0 14px;font-size:22px;color:var(--ink)}
-.end-cats{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
-.end-cat{border-radius:9px;padding:10px 14px;color:#fff}
-.end-cat .lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.85}
-.end-cat .words{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
-.share-result{display:flex;flex-direction:column;gap:2px;align-items:center;
-  font-size:22px;line-height:1.2;margin:14px 0}
-.btn-share{display:block;width:100%;text-align:center;padding:12px;border-radius:9px;
-  font-weight:800;font-size:14px;background:var(--correct);color:#fff;
-  text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
-.btn-share:hover{filter:brightness(1.08)}
-.btn-cta{display:block;text-align:center;margin-top:8px;padding:10px;border-radius:9px;
-  color:var(--green);font-weight:700;font-size:13px;
-  border:1px solid var(--line);background:var(--surface2)}
-.btn-cta:hover{background:var(--surface)}
-.help-body{font-size:13.5px;line-height:1.55;color:var(--ink2)}
-.help-body b{color:var(--ink)}
-.help-body ol{margin:10px 0 0 18px;padding:0}
-.help-body li{margin:5px 0}
-
-footer{width:100%;max-width:520px;text-align:center;color:var(--ink2);
-  font-size:11.5px;margin-top:14px;line-height:1.8}
-footer a{color:var(--green);font-weight:600}
-footer a:hover{text-decoration:underline}
+.tile.pop{animation:pop .25s ease}@keyframes pop{50%{transform:scale(1.08)}}.tile.fly-out{animation:flyout .35s ease forwards}@keyframes flyout{to{transform:scale(.8);opacity:0}}
+.actions{display:flex;gap:8px;justify-content:center;margin-bottom:10px}.btn{padding:11px 22px;border-radius:9px;font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase}.btn-ghost{border:1px solid var(--line);color:var(--ink2)}.btn-ghost:hover{background:var(--surface);color:var(--ink)}.btn-primary{background:var(--correct);color:#fff}.btn-primary:hover{filter:brightness(1.08)}.btn-primary:disabled{opacity:.4;cursor:default;filter:none}
+.tries{display:flex;gap:5px;justify-content:center;margin-bottom:12px}.try-dot{width:10px;height:10px;border-radius:50%;background:var(--ink);opacity:.18;transition:opacity .2s}.try-dot.used{opacity:.7}
+.toast{min-height:20px;font-weight:700;font-size:13px;color:var(--green);text-align:center;margin:2px 0 6px;transition:opacity .2s}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.scrim.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;max-width:360px;width:100%;padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2)}.modal h2{font-family:"Oswald";text-transform:uppercase;margin:0 0 14px;font-size:22px;color:var(--ink)}
+.end-cats{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}.end-cat{border-radius:9px;padding:10px 14px;color:#fff}.end-cat .lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;opacity:.85}.end-cat .words{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.share-result{display:flex;flex-direction:column;gap:2px;align-items:center;font-size:22px;line-height:1.2;margin:14px 0}.btn-share{display:block;width:100%;text-align:center;padding:12px;border-radius:9px;font-weight:800;font-size:14px;background:var(--correct);color:#fff;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}.btn-share:hover{filter:brightness(1.08)}.btn-cta{display:block;text-align:center;margin-top:8px;padding:10px;border-radius:9px;color:var(--green);font-weight:700;font-size:13px;border:1px solid var(--line);background:var(--surface2)}.btn-cta:hover{background:var(--surface)}
+.help-body{font-size:13.5px;line-height:1.55;color:var(--ink2)}.help-body b{color:var(--ink)}.help-body ol{margin:10px 0 0 18px;padding:0}.help-body li{margin:5px 0}
+footer{width:100%;max-width:520px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:14px;line-height:1.8}footer a{color:var(--green);font-weight:600}footer a:hover{text-decoration:underline}
 @media(prefers-reduced-motion:reduce){.tile.wrong,.tile.pop,.tile.fly-out{animation:none!important}}
 </style>
 </head>
@@ -129,429 +63,86 @@ footer a:hover{text-decoration:underline}
   <div class="topbar">
     <a class="back" href="index.html">← Szpilplac</a>
     <div class="controls">
-      <div class="lang-tog" role="group">
-        <button id="lPl" class="on">PL</button>
-        <button id="lSzl">ŚL</button>
-      </div>
-      <button class="icon-btn" id="themeBtn" title="Zmień motyw">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
-      </button>
-      <button class="icon-btn" id="helpBtn" title="Jak grać">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
-      </button>
+      <div class="lang-tog" role="group"><button id="lPl" class="on">PL</button><button id="lSzl">ŚL</button></div>
+      <button class="icon-btn" id="themeBtn" title="Zmień motyw"></button>
+      <button class="icon-btn" id="helpBtn" title="Jak grać"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg></button>
     </div>
   </div>
-  <div class="title-row">
-    <h1>Cuzamen Szpil</h1>
-    <span class="pno" id="pno">#–</span>
-  </div>
+  <div class="title-row"><h1>Cuzamen Szpil</h1><span class="pno" id="pno">#–</span></div>
   <div class="tagline" id="tagline"></div>
 </header>
-
 <main>
   <div class="solved-list" id="solvedList"></div>
   <div class="grid" id="grid"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="tries" id="tries"></div>
-  <div class="actions">
-    <button class="btn btn-ghost" id="shuffleBtn"></button>
-    <button class="btn btn-ghost" id="clearBtn"></button>
-    <button class="btn btn-primary" id="submitBtn" disabled></button>
-  </div>
+  <div class="actions"><button class="btn btn-ghost" id="shuffleBtn"></button><button class="btn btn-ghost" id="clearBtn"></button><button class="btn btn-primary" id="submitBtn" disabled></button></div>
 </main>
-
-<footer>
-  <a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> ·
-  escape room <b>Starzik</b>, Świyntochłowice
-</footer>
-
+<footer><a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> · escape room <b>Starzik</b>, Świyntochłowice</footer>
 <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
-
 <script>
 "use strict";
+var CUZAMEN_VERSION="stats-cuzamen-2026-06-26";
 var LK="familock_lang", TK="szpilplac_theme", SK="cuzamen_v1";
 
-// Statystyki globalne — wpisz ten sam URL i anon key co w slowko.html
-var STATS_URL="", STATS_KEY="";
+// Statystyki globalne — anon public key z Supabase
+var STATS_URL="https://xyivrakegwybwhmmcawq.supabase.co";
+var STATS_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
 
 function trackEvent(payload){
   if(!STATS_URL||!STATS_KEY)return;
   fetch(STATS_URL+"/rest/v1/szpilplac_events",{
     method:"POST",
-    headers:{"Content-Type":"application/json","apikey":STATS_KEY,
-             "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
+    headers:{"Content-Type":"application/json","apikey":STATS_KEY,"Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
     body:JSON.stringify(payload)
   }).catch(function(){});
 }
 
-/* ── Dane zestawów ─────────────────────────────────────────────────────────
-   Każdy zestaw to obiekt:
-   { no, cats: [ {label, words:[], color:0-3}, ... ] }
-   color: 0=zielony 1=złoty 2=niebieski 3=brązowy (trudność rosnąca)
-   Słowa WIELKIMI literami.
-   ──────────────────────────────────────────────────────────────────────── */
-var SETS = [
-  {
-    no: 1,
-    cats: [
-      { color: 0, label: { pl: "Jedzenie",               szl: "Jodło"               }, words: ["WUSZT","KOLOCZ","WODZIONKA","KRUPNIOK"] },
-      { color: 1, label: { pl: "Mieszkanie / familok",   szl: "Chałpa / familok"    }, words: ["SZRANK","BIFYJ","ANTRYJ","IZBA"]        },
-      { color: 2, label: { pl: "Kolory kart do gry",     szl: "Farby kart"          }, words: ["HERC","GRIN","KROJC","SZEL"]            },
-      { color: 3, label: { pl: "Kolej i transport",      szl: "Kolej i bana"        }, words: ["CUG","BANA","GLAJZA","BANHOF"]          }
-    ]
-  }
-  /* kolejne zestawy dopisuj tutaj: */
-];
+var SETS=[{no:1,cats:[
+  {color:0,label:{pl:"Jedzenie",szl:"Jodło"},words:["WUSZT","KOLOCZ","WODZIONKA","KRUPNIOK"]},
+  {color:1,label:{pl:"Mieszkanie / familok",szl:"Chałpa / familok"},words:["SZRANK","BIFYJ","ANTRYJ","IZBA"]},
+  {color:2,label:{pl:"Kolory kart do gry",szl:"Farby kart"},words:["HERC","GRIN","KROJC","SZEL"]},
+  {color:3,label:{pl:"Kolej i transport",szl:"Kolej i bana"},words:["CUG","BANA","GLAJZA","BANHOF"]}
+]}];
 
-/* ── Teksty ─────────────────────────────────────────────────────────────── */
-var S = {
-  pl: {
-    tagline:  "Znajdź cztery grupy po cztery słowa.",
-    shuffle:  "Tasuj",
-    clear:    "Odznacz",
-    submit:   "Sprawdź",
-    select4:  "Zaznacz dokładnie 4 słowa.",
-    already:  "Tę grupę już znalazłeś!",
-    wrong1:   "Prawie! Jedno słowo nie pasuje.",
-    wrong:    "Nie tym razem — spróbuj jeszcze raz.",
-    tries:    "Błędy:",
-    endW:     "Brawo!",
-    endL:     "Szkoda — może jutro!",
-    share:    "Podziel się wynikiem",
-    copied:   "Skopiowano!",
-    copyerr:  "Nie udało się skopiować.",
-    cta:      "Chcesz więcej? Przyjdź do Starzika →",
-    howH:     "Jak grać",
-    howB:     "<ol><li>Na planszy jest 16 śląskich słów.</li><li>Zaznacz 4 słowa, które łączy jeden temat.</li><li>Kliknij <b>Sprawdź</b> — jeśli trafisz, grupa znika z planszy.</li><li>Masz <b>4 błędy</b>. Przy piątym błędzie gra kończy się.</li><li>Grupy mają różną trudność: 🟩 łatwa → 🟫 podchwytliwa.</li></ol>"
-  },
-  szl: {
-    tagline:  "Znojdź sztyry grupy po sztyry słowa.",
-    shuffle:  "Tasuj",
-    clear:    "Łodznacz",
-    submit:   "Sprawdź",
-    select4:  "Łoznacz dokładnie sztyry słowa.",
-    already:  "Tyn gruba już trofiłeś!",
-    wrong1:   "Prawie! Jedno słowo niy pasuje.",
-    wrong:    "Niy tym razym — spróbuj jeszcze roz.",
-    tries:    "Błyndy:",
-    endW:     "Brawo!",
-    endL:     "Szkoda — może jutro!",
-    share:    "Podziel sie wynikym",
-    copied:   "Skopiowane!",
-    copyerr:  "Niy szło skopiować.",
-    cta:      "Chcesz wiyncyj? Przidź do Starzika →",
-    howH:     "Jak grać",
-    howB:     "<ol><li>Na planszy je 16 ślonskich słów.</li><li>Łoznacz sztyry słowa, co mo je cosik wspolnego.</li><li>Klikni <b>Sprawdź</b> — jak trofiłeś, grupa ginie z planszy.</li><li>Mosz <b>sztyry błyndy</b>. Przi piontym szpil sie kónczy.</li><li>Grupy mom rozno ciónskość: 🟩 łacna → 🟫 podchwytliwo.</li></ol>"
-  }
-};
+var S={pl:{tagline:"Znajdź cztery grupy po cztery słowa.",shuffle:"Tasuj",clear:"Odznacz",submit:"Sprawdź",select4:"Zaznacz dokładnie 4 słowa.",already:"Tę grupę już znalazłeś!",wrong1:"Prawie! Jedno słowo nie pasuje.",wrong:"Nie tym razem — spróbuj jeszcze raz.",tries:"Błędy:",endW:"Brawo!",endL:"Szkoda — może jutro!",share:"Podziel się wynikiem",copied:"Skopiowano!",copyerr:"Nie udało się skopiować.",cta:"Chcesz więcej? Przyjdź do Starzika →",howH:"Jak grać",howB:"<ol><li>Na planszy jest 16 śląskich słów.</li><li>Zaznacz 4 słowa, które łączy jeden temat.</li><li>Kliknij <b>Sprawdź</b> — jeśli trafisz, grupa znika z planszy.</li><li>Masz <b>4 błędy</b>. Przy piątym błędzie gra kończy się.</li><li>Grupy mają różną trudność: 🟩 łatwa → 🟫 podchwytliwa.</li></ol>"},
+szl:{tagline:"Znojdź sztyry grupy po sztyry słowa.",shuffle:"Tasuj",clear:"Łodznacz",submit:"Sprawdź",select4:"Łoznacz dokładnie sztyry słowa.",already:"Tyn gruba już trofiłeś!",wrong1:"Prawie! Jedno słowo niy pasuje.",wrong:"Niy tym razym — spróbuj jeszcze roz.",tries:"Błyndy:",endW:"Brawo!",endL:"Szkoda — może jutro!",share:"Podziel sie wynikym",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",cta:"Chcesz wiyncyj? Przidź do Starzika →",howH:"Jak grać",howB:"<ol><li>Na planszy je 16 ślonskich słów.</li><li>Łoznacz sztyry słowa, co mo je cosik wspolnego.</li><li>Klikni <b>Sprawdź</b> — jak trofiłeś, grupa ginie z planszy.</li><li>Mosz <b>sztyry błyndy</b>. Przi piontym szpil sie kónczy.</li><li>Grupy mom rozno ciónskość: 🟩 łacna → 🟫 podchwytliwo.</li></ol>"}};
+var COLORS=["--c0","--c1","--c2","--c3"], EMOJIS=["🟩","🟨","🟦","🟫"], MAX_ERRORS=4;
 
-var COLORS = ["--c0","--c1","--c2","--c3"];
-var EMOJIS = ["🟩","🟨","🟦","🟫"];
-var MAX_ERRORS = 4;
+var store=(function(){var m={},ok=false;try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+var TSVG={light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'};
+var THEMES=["light","dark"], theme=store.get(TK)||"light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);document.getElementById("themeBtn").innerHTML=TSVG[theme];}
+document.getElementById("themeBtn").addEventListener("click",function(){theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(TK,theme);applyTheme();});applyTheme();
 
-/* ── Store ── */
-var store=(function(){var m={},ok=false;
-  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
-  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
-         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
-
-/* ── Motyw ── */
-var TSVG={
-  system:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><path d="M8 1.5a6.5 6.5 0 010 13z" fill="currentColor" stroke="none"/></svg>',
-  light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
-  dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
-};
-var THEMES=["light","dark"];
-var theme=store.get(TK)||"light";
-function applyTheme(){
-  document.documentElement.setAttribute("data-theme",theme);
-  document.getElementById("themeBtn").innerHTML=TSVG[theme];
-}
-document.getElementById("themeBtn").addEventListener("click",function(){
-  theme=THEMES[(THEMES.indexOf(theme)+1)%THEMES.length];store.set(TK,theme);applyTheme();
-});
-applyTheme();
-
-/* ── Język ── */
-var lang=store.get(LK)||"pl";
-function T(){return S[lang];}
-function setLang(l){lang=l;store.set(LK,l);applyLang();}
-document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
-document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
-
-/* ── Helpers ── */
+var lang=store.get(LK)||"pl";function T(){return S[lang];}function setLang(l){lang=l;store.set(LK,l);applyLang();}
+document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
 function todayStr(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
-function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();
-  function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}
-  return Math.floor((md(n)-md(s))/86400000);}
-function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
-
-/* ── Stan gry ── */
-var SET, tiles=[], selected=[], solvedColors=[], errors=0, finished=false;
-var savedGame=JSON.parse(store.get(SK)||"null");
-
-function pickSet(){
-  var day=daysSince(2026,6,23);
-  return SETS[((day%SETS.length)+SETS.length)%SETS.length];
-}
-
-function saveGame(){
-  store.set(SK,JSON.stringify({
-    date:todayStr(), no:SET.no,
-    solvedColors:solvedColors, errors:errors, finished:finished
-  }));
-}
-
-/* ── DOM refs ── */
-var gridEl=document.getElementById("grid");
-var solvedListEl=document.getElementById("solvedList");
-var toastEl=document.getElementById("toast");
-var triesEl=document.getElementById("tries");
-var submitBtn=document.getElementById("submitBtn");
-var clearBtn=document.getElementById("clearBtn");
-var shuffleBtn=document.getElementById("shuffleBtn");
-
-/* ── Toast ── */
-var toastTimer;
-function toast(m){toastEl.textContent=m;toastEl.style.opacity="1";
-  clearTimeout(toastTimer);toastTimer=setTimeout(function(){toastEl.style.opacity="0";},1900);}
-
-/* ── Tries (kropki błędów) ── */
-function renderTries(){
-  triesEl.innerHTML="";
-  for(var i=0;i<MAX_ERRORS;i++){
-    var d=document.createElement("div");
-    d.className="try-dot"+(i<errors?" used":"");
-    triesEl.appendChild(d);
-  }
-}
-
-/* ── Siatka ── */
-function getRemaining(){
-  return SET.cats
-    .filter(function(c){return solvedColors.indexOf(c.color)<0;})
-    .reduce(function(a,c){return a.concat(c.words);},[]);
-}
-
-function buildGrid(){
-  gridEl.innerHTML="";
-  tiles=[];
-  var words=shuffle(getRemaining());
-  words.forEach(function(w){
-    var el=document.createElement("button");
-    el.className="tile";
-    el.textContent=w;
-    el.setAttribute("aria-label",w);
-    el.addEventListener("click",function(){toggleTile(w,el);});
-    gridEl.appendChild(el);
-    tiles.push({w:w,el:el});
-  });
-}
-
-function findTileEl(w){
-  for(var i=0;i<tiles.length;i++)if(tiles[i].w===w)return tiles[i].el;
-  return null;
-}
-
-function toggleTile(w,el){
-  if(finished)return;
-  var idx=selected.indexOf(w);
-  if(idx>=0){
-    selected.splice(idx,1);
-    el.classList.remove("selected");
-  } else {
-    if(selected.length>=4){toast(T().select4);return;}
-    selected.push(w);
-    el.classList.add("selected");
-    el.classList.add("pop");
-    setTimeout(function(){el.classList.remove("pop");},250);
-  }
-  submitBtn.disabled=selected.length!==4;
-}
-
-function clearSelection(){
-  selected.forEach(function(w){
-    var el=findTileEl(w);if(el)el.classList.remove("selected");
-  });
-  selected=[];
-  submitBtn.disabled=true;
-}
-
-/* ── Kategoria rozwiązana ── */
-function renderSolvedCat(cat){
-  var el=document.createElement("div");
-  el.className="solved-cat";
-  el.style.background="var("+COLORS[cat.color]+")";
-  el.innerHTML='<div class="cat-label">'+cat.label[lang]+'</div>'+
-    '<div class="cat-words">'+cat.words.join(" · ")+'</div>';
-  solvedListEl.appendChild(el);
-}
-
-/* ── Sprawdź ── */
-function submit(){
-  if(selected.length!==4||finished)return;
-  var t=T();
-
-  // czy już była?
-  for(var i=0;i<SET.cats.length;i++){
-    if(solvedColors.indexOf(SET.cats[i].color)>=0)continue;
-    var cat=SET.cats[i];
-    var match=cat.words.every(function(w){return selected.indexOf(w)>=0;});
-    if(match){
-      // animacja wylotu
-      selected.forEach(function(w){
-        var el=findTileEl(w);if(el){el.classList.add("fly-out");}
-      });
-      setTimeout(function(c){return function(){
-        solvedColors.push(c.color);
-        renderSolvedCat(c);
-        clearSelection();
-        buildGrid();
-        renderTries();
-        saveGame();
-        if(solvedColors.length===SET.cats.length)endGame(true);
-      };}(cat),350);
-      return;
-    }
-  }
-
-  // czy prawie (3 z 4 pasują do jednej kategorii)?
-  var near=false;
-  for(var j=0;j<SET.cats.length;j++){
-    if(solvedColors.indexOf(SET.cats[j].color)>=0)continue;
-    var cnt=0;
-    SET.cats[j].words.forEach(function(w){if(selected.indexOf(w)>=0)cnt++;});
-    if(cnt===3){near=true;break;}
-  }
-
-  // błąd
-  errors++;
-  renderTries();
-  tiles.forEach(function(t){if(selected.indexOf(t.w)>=0)t.el.classList.add("wrong");});
-  setTimeout(function(){tiles.forEach(function(t){t.el.classList.remove("wrong");});},520);
-  toast(near?t.wrong1:t.wrong);
-
-  if(errors>=MAX_ERRORS){
-    setTimeout(function(){endGame(false);},600);
-  }
-  saveGame();
-}
-
-/* ── Koniec gry ── */
-function buildShareGrid(){
-  var rows=[];
-  SET.cats.forEach(function(cat){
-    var solved=solvedColors.indexOf(cat.color)>=0;
-    rows.push(solved?EMOJIS[cat.color]+"✅":EMOJIS[cat.color]+"❌");
-  });
-  return rows.join("\n");
-}
-
-function endGame(won){
-  // trackEvent tylko przy pierwszym zakończeniu (nie przy odtworzeniu po odświeżeniu)
-  if(!savedGame||savedGame.finished!==true){
-    trackEvent({
-      game:"cuzamen", puzzle_no:SET.no,
-      puzzle_word:null, won:won,
-      tries:errors, max_tries:MAX_ERRORS,
-      guesses:null, lang:lang, mode:"local"
-    });
-  }
-  finished=true;saveGame();
-  var t=T();
-  var endCats=SET.cats.map(function(cat){
-    return'<div class="end-cat" style="background:var('+COLORS[cat.color]+')">'+
-      '<div class="lbl">'+cat.label[lang]+'</div>'+
-      '<div class="words">'+cat.words.join(" · ")+'</div></div>';
-  }).join("");
-  var grid=buildShareGrid();
-  openModal(
-    '<h2>'+(won?t.endW:t.endL)+'</h2>'+
-    '<div class="end-cats">'+endCats+'</div>'+
-    '<div class="share-result">'+SET.cats.map(function(c){
-      return EMOJIS[c.color].repeat(4);
-    }).join("<br>")+'</div>'+
-    '<button class="btn-share" id="shareBtn">'+t.share+'</button>'+
-    '<a class="btn-cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>'
-  );
-  document.getElementById("shareBtn").addEventListener("click",function(){
-    var txt="Cuzamen Szpil #"+SET.no+"\n\n"+grid+"\n\nszpilplac.familock.pl";
-    if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt,t);});
-    else copyTxt(txt,t);
-  });
-}
-
-function copyTxt(txt,t){
-  function done(ok){toast(ok?t.copied:t.copyerr);}
-  if(navigator.clipboard&&navigator.clipboard.writeText)
-    navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});
-  else fb();
-  function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
-    ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
-    document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}
-}
-
-/* ── Modal ── */
-var scrim=document.getElementById("scrim"),modal=document.getElementById("modal");
-function openModal(html){
-  modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
-  modal.querySelector(".modal-close").addEventListener("click",closeModal);
-  scrim.classList.add("open");
-}
-function closeModal(){scrim.classList.remove("open");}
-scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
-document.getElementById("helpBtn").addEventListener("click",function(){
-  var t=T();
-  openModal('<h2>'+t.howH+'</h2><div class="help-body">'+t.howB+'</div>');
-});
-
-/* ── Interfejs ── */
-function applyLang(){
-  var t=T();
-  document.documentElement.lang=lang==="szl"?"szl":"pl";
-  document.getElementById("lPl").className=lang==="pl"?"on":"";
-  document.getElementById("lSzl").className=lang==="szl"?"on":"";
-  document.getElementById("tagline").textContent=t.tagline;
-  shuffleBtn.textContent=t.shuffle;
-  clearBtn.textContent=t.clear;
-  submitBtn.textContent=t.submit;
-  // odśwież etykiety kategorii już rozwiązanych
-  var els=solvedListEl.querySelectorAll(".solved-cat");
-  var solved=SET.cats.filter(function(c){return solvedColors.indexOf(c.color)>=0;});
-  els.forEach(function(el,i){
-    if(solved[i])el.querySelector(".cat-label").textContent=solved[i].label[lang];
-  });
-  if(scrim.classList.contains("open"))closeModal();
-}
-
-submitBtn.addEventListener("click",submit);
-clearBtn.addEventListener("click",clearSelection);
-shuffleBtn.addEventListener("click",function(){clearSelection();buildGrid();});
-
-/* ── Start ── */
-function start(){
-  SET=pickSet();
-  document.getElementById("pno").textContent="#"+SET.no;
-
-  // wczytaj zapis jeśli ten sam dzień i ten sam zestaw
-  if(savedGame&&savedGame.date===todayStr()&&savedGame.no===SET.no){
-    solvedColors=savedGame.solvedColors||[];
-    errors=savedGame.errors||0;
-    finished=savedGame.finished||false;
-  }
-
-  // odtwórz rozwiązane kategorie
-  SET.cats.forEach(function(cat){
-    if(solvedColors.indexOf(cat.color)>=0)renderSolvedCat(cat);
-  });
-
-  buildGrid();
-  renderTries();
-  applyLang();
-
-  if(finished)setTimeout(function(){endGame(solvedColors.length===SET.cats.length);},400);
-}
-
+function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}return Math.floor((md(n)-md(s))/86400000);}
+function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+var SET,tiles=[],selected=[],solvedColors=[],errors=0,finished=false,savedGame=JSON.parse(store.get(SK)||"null");
+function pickSet(){var day=daysSince(2026,6,23);return SETS[((day%SETS.length)+SETS.length)%SETS.length];}
+function saveGame(){store.set(SK,JSON.stringify({date:todayStr(),no:SET.no,solvedColors:solvedColors,errors:errors,finished:finished}));}
+var gridEl=document.getElementById("grid"),solvedListEl=document.getElementById("solvedList"),toastEl=document.getElementById("toast"),triesEl=document.getElementById("tries"),submitBtn=document.getElementById("submitBtn"),clearBtn=document.getElementById("clearBtn"),shuffleBtn=document.getElementById("shuffleBtn");
+var toastTimer;function toast(m){toastEl.textContent=m;toastEl.style.opacity="1";clearTimeout(toastTimer);toastTimer=setTimeout(function(){toastEl.style.opacity="0";},1900);}
+function renderTries(){triesEl.innerHTML="";for(var i=0;i<MAX_ERRORS;i++){var d=document.createElement("div");d.className="try-dot"+(i<errors?" used":"");triesEl.appendChild(d);}}
+function getRemaining(){return SET.cats.filter(function(c){return solvedColors.indexOf(c.color)<0;}).reduce(function(a,c){return a.concat(c.words);},[]);}
+function buildGrid(){gridEl.innerHTML="";tiles=[];shuffle(getRemaining()).forEach(function(w){var el=document.createElement("button");el.className="tile";el.textContent=w;el.setAttribute("aria-label",w);el.addEventListener("click",function(){toggleTile(w,el);});gridEl.appendChild(el);tiles.push({w:w,el:el});});}
+function findTileEl(w){for(var i=0;i<tiles.length;i++)if(tiles[i].w===w)return tiles[i].el;return null;}
+function toggleTile(w,el){if(finished)return;var idx=selected.indexOf(w);if(idx>=0){selected.splice(idx,1);el.classList.remove("selected");}else{if(selected.length>=4){toast(T().select4);return;}selected.push(w);el.classList.add("selected");el.classList.add("pop");setTimeout(function(){el.classList.remove("pop");},250);}submitBtn.disabled=selected.length!==4;}
+function clearSelection(){selected.forEach(function(w){var el=findTileEl(w);if(el)el.classList.remove("selected");});selected=[];submitBtn.disabled=true;}
+function renderSolvedCat(cat){var el=document.createElement("div");el.className="solved-cat";el.style.background="var("+COLORS[cat.color]+")";el.innerHTML='<div class="cat-label">'+cat.label[lang]+'</div><div class="cat-words">'+cat.words.join(" · ")+'</div>';solvedListEl.appendChild(el);}
+function submit(){if(selected.length!==4||finished)return;var t=T();for(var i=0;i<SET.cats.length;i++){if(solvedColors.indexOf(SET.cats[i].color)>=0)continue;var cat=SET.cats[i];var match=cat.words.every(function(w){return selected.indexOf(w)>=0;});if(match){selected.forEach(function(w){var el=findTileEl(w);if(el)el.classList.add("fly-out");});setTimeout(function(c){return function(){solvedColors.push(c.color);renderSolvedCat(c);clearSelection();buildGrid();renderTries();saveGame();if(solvedColors.length===SET.cats.length)endGame(true);};}(cat),350);return;}}
+  var near=false;for(var j=0;j<SET.cats.length;j++){if(solvedColors.indexOf(SET.cats[j].color)>=0)continue;var cnt=0;SET.cats[j].words.forEach(function(w){if(selected.indexOf(w)>=0)cnt++;});if(cnt===3){near=true;break;}}
+  errors++;renderTries();tiles.forEach(function(ti){if(selected.indexOf(ti.w)>=0)ti.el.classList.add("wrong");});setTimeout(function(){tiles.forEach(function(ti){ti.el.classList.remove("wrong");});},520);toast(near?t.wrong1:t.wrong);if(errors>=MAX_ERRORS)setTimeout(function(){endGame(false);},600);saveGame();}
+function buildShareGrid(){return SET.cats.map(function(cat){var solved=solvedColors.indexOf(cat.color)>=0;return solved?EMOJIS[cat.color]+"✅":EMOJIS[cat.color]+"❌";}).join("\n");}
+function endGame(won){if(!savedGame||savedGame.finished!==true){trackEvent({game:"cuzamen",mode:"daily",puzzle_no:SET.no,puzzle_word:null,won:won,tries:errors,errors:errors,max_tries:MAX_ERRORS,guesses:null,lang:lang});}
+  finished=true;saveGame();var t=T();var endCats=SET.cats.map(function(cat){return'<div class="end-cat" style="background:var('+COLORS[cat.color]+')"><div class="lbl">'+cat.label[lang]+'</div><div class="words">'+cat.words.join(" · ")+'</div></div>';}).join("");var grid=buildShareGrid();openModal('<h2>'+(won?t.endW:t.endL)+'</h2><div class="end-cats">'+endCats+'</div><div class="share-result">'+SET.cats.map(function(c){return EMOJIS[c.color].repeat(4);}).join("<br>")+'</div><button class="btn-share" id="shareBtn">'+t.share+'</button><a class="btn-cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');document.getElementById("shareBtn").addEventListener("click",function(){var txt="Cuzamen Szpil #"+SET.no+"\n\n"+grid+"\n\nszpilplac.familock.pl";if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt,t);});else copyTxt(txt,t);});}
+function copyTxt(txt,t){function done(ok){toast(ok?t.copied:t.copyerr);}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();function fb(){try{var ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}}
+var scrim=document.getElementById("scrim"),modal=document.getElementById("modal");function openModal(html){modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;modal.querySelector(".modal-close").addEventListener("click",closeModal);scrim.classList.add("open");}function closeModal(){scrim.classList.remove("open");}scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});document.getElementById("helpBtn").addEventListener("click",function(){var t=T();openModal('<h2>'+t.howH+'</h2><div class="help-body">'+t.howB+'</div>');});
+function applyLang(){var t=T();document.documentElement.lang=lang==="szl"?"szl":"pl";document.getElementById("lPl").className=lang==="pl"?"on":"";document.getElementById("lSzl").className=lang==="szl"?"on":"";document.getElementById("tagline").textContent=t.tagline;shuffleBtn.textContent=t.shuffle;clearBtn.textContent=t.clear;submitBtn.textContent=t.submit;var els=solvedListEl.querySelectorAll(".solved-cat");var solved=SET.cats.filter(function(c){return solvedColors.indexOf(c.color)>=0;});els.forEach(function(el,i){if(solved[i])el.querySelector(".cat-label").textContent=solved[i].label[lang];});if(scrim.classList.contains("open"))closeModal();}
+submitBtn.addEventListener("click",submit);clearBtn.addEventListener("click",clearSelection);shuffleBtn.addEventListener("click",function(){clearSelection();buildGrid();});
+function start(){SET=pickSet();document.getElementById("pno").textContent="#"+SET.no;if(savedGame&&savedGame.date===todayStr()&&savedGame.no===SET.no){solvedColors=savedGame.solvedColors||[];errors=savedGame.errors||0;finished=savedGame.finished||false;}SET.cats.forEach(function(cat){if(solvedColors.indexOf(cat.color)>=0)renderSolvedCat(cat);});buildGrid();renderTries();applyLang();if(finished)setTimeout(function(){endGame(solvedColors.length===SET.cats.length);},400);}
 start();
 </script>
 </body>
