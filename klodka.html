@@ -833,7 +833,8 @@ function finish(won){
 
   // log globalny do stats.html
 trackEvent({
-    game: doneMode==="daily" ? "klodka" : "klodka-weekly",
+    game: "kodka",
+    mode: doneMode,
     puzzle_no: doneIdx,
     puzzle_word: null,
     won: won, tries: doneTries, max_tries: MAX_TRIES, lang: lang
