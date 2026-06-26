@@ -3,53 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kłōdka · Szpilplac · Familock</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Codziennie nowy 4-cyfrowy kod do kłódki — zgadnij go w 6 próbach. Gra od Familocka Starzik.">
+<title>Słōwko · Szpilplac · Familock</title>
+<meta name="description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach. Gra od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
-
-<!-- ════════════════════════════════════════════════════════════════════
-     ZAGADKA TYGODNIA  (easter egg — tu wpisujesz trop do kodu tygodniówki)
-     ────────────────────────────────────────────────────────────────────
-     Tydzień: 1   (23–29.06.2026)
-     Widoczny trop ustawiasz w zmiennej WEEKLY_HINT_TEXT w skrypcie.
-     Nie wpisuj podpowiedzi luzem w <head>, bo wtedy może wyświetlić się na samej górze strony.
-
-     Kod tygodnia ustawiasz osobno w bazie (Supabase → SQL Editor).
-     ════════════════════════════════════════════════════════════════════ -->
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
   --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
   --green:#2f4a39;--gold:#bf8a3a;
+  --correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;
 }
-[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;--wrong:#a14b3a}
-[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;--wrong:#c06a55}
-
-body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--ink);
-  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
-  transition:background .2s,color .2s}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--present:#bf8a3a;--absent:#736d5f;}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--present:#c49050;--absent:#5a5448;}
+*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;min-height:100vh;padding:0 12px 16px}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
 
-header{width:100%;max-width:480px;padding:14px 18px 4px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+/* HEADER */
+header{width:100%;max-width:500px;padding-top:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
-.controls{display:flex;align-items:center;gap:7px}
+.back:hover{text-decoration:underline}
+.controls{display:flex;gap:5px;align-items:center}
 .lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
-.lang-tog button{font-size:11px;font-weight:700;padding:5px 9px;color:var(--ink2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
 .lang-tog button.on{background:var(--green);color:#fff}
 .icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
   background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
 
-/* NAWIGACJA DNI — archiwum jak w Słōwku */
-.nav-bar{display:flex;align-items:center;gap:8px;margin-top:10px}
+/* NAWIGACJA DNI */
+.nav-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .nav-btn{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
   background:var(--surface2);display:flex;align-items:center;justify-content:center;
   color:var(--ink2);font-size:14px;flex:none}
@@ -58,86 +49,153 @@ header{width:100%;max-width:480px;padding:14px 18px 4px}
 .nav-day{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}
 .nav-day .dayno{font-family:"Oswald";font-size:18px;color:var(--ink);letter-spacing:.02em}
 .nav-cal{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);flex:none}
 .nav-cal:hover{background:var(--surface);color:var(--ink)}
 .archive-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;
-  font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);
-  color:#fff;margin-left:6px}
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--gold);color:#fff;margin-left:6px}
+.tester-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  background:#8a4ab8;color:#fff;margin-left:6px}
 
-main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-direction:column}
-
-.title-row{display:flex;align-items:baseline;justify-content:space-between;margin:8px 2px 2px}
-.title{font-family:"Oswald";font-size:30px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
-.pno{font-size:12px;color:var(--ink2);font-weight:700}
-.tagline{font-size:12.5px;color:var(--ink2);margin:2px 2px 0}
-.weekly-hint{display:none;margin:10px 0 8px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);font-size:13px;line-height:1.45;color:var(--ink);box-shadow:0 8px 22px -16px rgba(35,32,26,.55)}
-.weekly-hint.on{display:block}
-.weekly-hint .hint-kicker{display:block;margin-bottom:3px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
-.weekly-hint b{color:var(--green)}
-
-.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);
-  text-align:center;margin:10px 0 2px;transition:opacity .2s}
-
-/* ── PLANSZA ── */
-.board{display:flex;flex-direction:column;gap:8px;align-items:center;margin:8px 0 4px}
-.repeat-info{min-height:22px;text-align:center;font-size:12px;color:var(--ink2);font-weight:700;
-  margin:2px 0 4px;letter-spacing:.02em}
-.repeat-info b{color:var(--green)}
-.row{display:flex;gap:8px}
-.tile{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-family:"Oswald";font-size:30px;color:var(--ink);
-  background:var(--surface2);border:2px solid var(--line);transition:transform .08s}
-.tile.filled{border-color:var(--ink2);animation:pop .1s}
+/* PLANSZA */
+main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1;min-height:0}
+.board{display:grid;gap:6px;margin:10px 0 3px;width:min(92vw,calc(var(--len,5)*56px))}
+.row{display:grid;grid-template-columns:repeat(var(--len,5),1fr);gap:6px}
+.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:calc(min(92vw,calc(var(--len,5)*56px))/var(--len,5)*.46);
+  text-transform:uppercase;background:var(--surface2);border:2px solid var(--line);
+  border-radius:7px;user-select:none}
+.tile.filled{border-color:#a99f84;animation:pop .12s ease}
+@keyframes pop{50%{transform:scale(1.07)}}
+.tile.reveal{animation:flip .45s ease forwards}
+@keyframes flip{0%{transform:rotateX(0)}45%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
 .tile.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .tile.present{background:var(--present);border-color:var(--present);color:#fff}
-.tile.absent{background:var(--absent);border-color:var(--absent);color:#fff}
-.tile.dir-higher,.tile.dir-lower{position:relative;overflow:hidden}
-.tile.dir-higher::after,.tile.dir-lower::after{position:absolute;right:5px;bottom:3px;font-family:"Inter",system-ui,sans-serif;font-size:16px;font-weight:900;line-height:1;color:#fff;opacity:.98;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.tile.dir-higher::after{content:"↑"}
-.tile.dir-lower::after{content:"↓"}
-.tile.wrong{background:var(--surface2);border-color:var(--wrong);color:var(--wrong)}
-.tile.neutral{background:var(--surface2);border-color:var(--ink2);color:var(--ink)}
-.tile.reveal{animation:flip .4s ease forwards}
-.row.shake{animation:shake .35s}
-@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
-@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.tile.absent{background:var(--absent);border-color:var(--absent);color:#ddd}
+.row.shake{animation:shake .38s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+  30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.toast{min-height:21px;font-weight:700;font-size:13px;color:var(--green);
+  text-align:center;margin:1px 0 2px;transition:opacity .2s}
 
-/* ── KLAWIATURA NUMERYCZNA ── */
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:300px;margin:14px auto 0;width:100%}
-.key{height:54px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);
-  font-family:"Oswald";font-size:24px;color:var(--ink);display:flex;align-items:center;justify-content:center;
-  transition:transform .06s,background .1s}
-.key:active{transform:scale(.94)}
-.key.wide{font-family:"Inter";font-size:14px;font-weight:800;letter-spacing:.02em}
-.key.enter{background:var(--green);color:#fff;border-color:var(--green)}
-.key.del{color:var(--ink2)}
+/* KLAWIATURA */
+.kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
+  margin-top:5px;padding-top:1px;overflow:visible}
+.kbd-row{display:flex;gap:4px;justify-content:center;width:100%}
+.key{flex:1;min-width:0;height:44px;border-radius:7px;background:var(--surface2);
+  border:1px solid var(--line);font-weight:700;font-size:clamp(10px,3.2vw,14px);
+  color:var(--ink);display:flex;align-items:center;justify-content:center;
+  text-transform:uppercase;transition:transform .05s,background .12s}
+.key:active{transform:translateY(1px)}
+.key.wide{flex:1.65;min-width:0;font-size:clamp(9px,2.8vw,11px);letter-spacing:.02em}
 .key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .key.present{background:var(--present);border-color:var(--present);color:#fff}
-.key.absent{background:var(--absent);border-color:var(--absent);color:#fff}
-.key[disabled]{opacity:.4}
+.key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
 
-/* ── KAFELEK TYGODNIÓWKI ── */
-.weektile{display:flex;align-items:center;gap:13px;margin:20px 0 0;padding:14px 16px;
-  background:var(--surface2);border:1px solid var(--line);border-radius:13px;width:100%;text-align:left;
-  transition:transform .1s,box-shadow .1s}
-.weektile:hover{transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(35,32,26,.35);background:var(--surface)}
-.weektile .wt-ico{flex:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);
-  background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px}
-.weektile .wt-body{flex:1;min-width:0}
-.weektile .wt-name{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
-.weektile .wt-status{font-size:12px;color:var(--ink2);margin-top:3px}
-.weektile .wt-arr{color:var(--ink2);font-size:15px;flex:none}
-.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
-  padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
-.badge.new{background:var(--gold);color:#fff}
-.badge.won{background:var(--correct);color:#fff}
-.badge.lost{background:var(--wrong);color:#fff}
-.badge.soon{background:var(--surface);color:var(--ink2);border:1px solid var(--line)}
+footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:8px}
+footer a{color:var(--green);font-weight:600}
 
-/* KALENDARZ ARCHIWUM */
+@media (max-width:380px){
+  body{padding-left:8px;padding-right:8px;padding-bottom:10px}
+  header{padding-top:10px}
+  .topbar{margin-bottom:7px}
+  .nav-bar{gap:6px;margin-bottom:4px}
+  .board{width:min(94vw,calc(var(--len,5)*51px));gap:5px;margin:8px 0 2px}
+  .row{gap:5px}
+  .tile{font-size:calc(min(94vw,calc(var(--len,5)*51px))/var(--len,5)*.45);border-radius:6px}
+  .kbd{gap:5px;margin-top:3px}
+  .kbd-row{gap:3px}
+  .key{height:41px;font-size:clamp(9px,3vw,12px);border-radius:6px}
+  .key.wide{font-size:9px}
+  .toast{min-height:18px;font-size:12px;margin:0 0 1px}
+  footer{font-size:10.5px;margin-top:6px}
+}
+
+@media (min-width:700px){
+  body{padding-bottom:10px}
+  header{padding-top:10px}
+  .topbar{margin-bottom:7px}
+  .nav-bar{margin-bottom:4px}
+  .board{width:min(86vw,calc(var(--len,5)*52px));gap:5px;margin:7px 0 2px}
+  .row{gap:5px}
+  .tile{font-size:calc(min(86vw,calc(var(--len,5)*52px))/var(--len,5)*.45);border-radius:7px}
+  .kbd{gap:5px;margin-top:3px;padding-top:0}
+  .key{height:40px;font-size:13px}
+  .key.wide{font-size:10px}
+  .toast{min-height:18px;font-size:12px;margin:0 0 2px}
+  footer{font-size:10.5px;margin-top:5px}
+}
+
+@media (min-width:700px) and (max-height:760px){
+  header{padding-top:6px}
+  .topbar{margin-bottom:5px}
+  .nav-day .dayno{font-size:16px}
+  .nav-bar{margin-bottom:2px}
+  .board{width:min(84vw,calc(var(--len,5)*46px));gap:4px;margin:4px 0 1px}
+  .row{gap:4px}
+  .tile{font-size:calc(min(84vw,calc(var(--len,5)*46px))/var(--len,5)*.44);border-radius:6px}
+  .kbd{gap:4px;margin-top:2px}
+  .kbd-row{gap:4px}
+  .key{height:35px;font-size:12px;border-radius:6px}
+  .key.wide{font-size:9px}
+  footer{display:none}
+}
+
+/* MODAL */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
+  align-items:center;justify-content:center;padding:16px;z-index:50}
+.scrim.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;max-width:380px;width:100%;
+  padding:20px;box-shadow:0 24px 48px -16px rgba(0,0,0,.5);
+  border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}
+.modal-close{position:absolute;top:10px;right:12px;font-size:20px;color:var(--ink2);line-height:1;cursor:pointer}
+.modal h2{font-family:"Oswald";text-transform:uppercase;margin:0 0 14px;font-size:22px;color:var(--ink)}
+.reveal-card{text-align:center;margin:0 0 16px;padding:14px;border-radius:10px;
+  background:var(--surface2);border:1px dashed var(--line)}
+.reveal-word{font-family:"Oswald";font-size:30px;letter-spacing:.1em;color:var(--ink)}
+.reveal-pl{margin-top:5px;font-size:14px;color:var(--ink2)}
+.reveal-pl b{color:var(--green)}
+.stats{display:flex;justify-content:space-between;text-align:center;margin:0 0 14px}
+.stat .n{font-family:"Oswald";font-size:24px;color:var(--green)}
+.stat .l{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-top:1px}
+.dist h3{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 7px}
+.bar-row{display:flex;align-items:center;gap:7px;font-size:12px;margin:2px 0}
+.bar-i{width:12px;font-weight:700;color:var(--ink2)}
+.bar-wrap{flex:1;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar{background:var(--absent);color:#fff;text-align:right;padding:2px 6px;
+  font-weight:700;font-size:11px;min-width:24px;border-radius:3px}
+.bar.win{background:var(--correct)}
+.cd{text-align:center;margin:14px 0}
+.cd-l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.cd-t{font-family:"Oswald";font-size:26px;color:var(--ink);letter-spacing:.04em}
+.btn{display:block;width:100%;text-align:center;padding:13px;border-radius:9px;
+  font-weight:800;font-size:14px;background:var(--correct);color:#fff;
+  text-transform:uppercase;letter-spacing:.04em;margin-top:14px}
+.btn:hover{filter:brightness(1.07)}
+.cta{display:block;text-align:center;margin-top:10px;padding:11px;border-radius:9px;
+  color:var(--green);font-weight:700;font-size:13px;border:1px solid var(--line);
+  background:var(--surface2)}
+.cta:hover{background:var(--surface)}
+.help-body{font-size:13.5px;line-height:1.55;color:var(--ink2)}
+.help-body b{color:var(--ink)}
+.legend{margin-top:12px}
+.legend-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px;color:var(--ink2)}
+.swatch{width:32px;height:32px;border-radius:6px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-weight:800;color:#fff;font-size:16px}
+.spelling-note{margin-top:14px;padding:11px;border-radius:8px;background:var(--surface2);
+  font-size:12.5px;color:var(--ink2);line-height:1.5}
+.spelling-note b{color:var(--ink)}
+.contact-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.contact-btn{flex:1;min-width:0;text-align:center;padding:9px 12px;border-radius:9px;
+  font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--line);
+  background:var(--surface2);cursor:pointer;font-family:inherit}
+.contact-btn:hover{background:var(--surface);color:var(--ink)}
+
+/* KALENDARZ POPUP */
 .cal-scrim{position:fixed;inset:0;z-index:60;display:none;
-  align-items:flex-start;justify-content:center;padding-top:80px;background:rgba(20,16,10,.28)}
+  align-items:flex-start;justify-content:center;padding-top:80px}
 .cal-scrim.open{display:flex}
 .cal-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:16px;box-shadow:0 16px 40px -12px rgba(0,0,0,.45);
@@ -145,15 +203,17 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-head h3{font-family:"Oswald";text-transform:uppercase;font-size:17px;margin:0;color:var(--ink)}
 .cal-head button{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);color:var(--ink2);font-size:14px;display:flex;align-items:center;justify-content:center}
+  background:var(--surface2);color:var(--ink2);font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+.cal-head button:hover{background:var(--surface);color:var(--ink)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .cal-dow{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
   padding:2px 0;font-weight:700}
 .cal-day{aspect-ratio:1;border-radius:8px;font-size:12px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;color:var(--ink2)}
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border:1px solid transparent;color:var(--ink2)}
 .cal-day.empty{cursor:default}
 .cal-day.today{border-color:var(--green);color:var(--ink);background:var(--surface2)}
-.cal-day.active{box-shadow:0 0 0 2px var(--gold) inset;color:var(--ink)}
 .cal-day.played{background:var(--gold);color:#fff;border-color:var(--gold)}
 .cal-day.played.won{background:var(--correct);border-color:var(--correct)}
 .cal-day.past:not(.played){border-color:var(--line);color:var(--ink2)}
@@ -162,145 +222,117 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .cal-nav{display:flex;justify-content:space-between;margin-top:10px}
 .cal-nav button{font-size:12px;font-weight:600;color:var(--green);padding:4px 8px;
   border-radius:6px;border:1px solid var(--line);background:var(--surface2)}
+.cal-nav button:hover{background:var(--surface)}
 .cal-nav button:disabled{opacity:.3;cursor:default}
 
-.subback{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;gap:5px;align-items:center;margin:2px 2px 0}
+/* ARCHIWUM — widok readonly */
+.archive-view{opacity:.85;pointer-events:none}
+.archive-msg{text-align:center;padding:10px 0 4px;font-size:12px;color:var(--ink2);font-style:italic}
 
-/* ── MODAL ── */
-.scrim{position:fixed;inset:0;background:rgba(20,16,10,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
-.scrim.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;max-width:380px;width:100%;padding:22px 22px 20px;
-  border:1px solid var(--line);position:relative;max-height:88vh;overflow-y:auto}
-.modal-close{position:absolute;top:10px;right:12px;font-size:22px;color:var(--ink2);width:30px;height:30px}
-.modal h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;text-align:center;margin-bottom:4px}
-.reveal-card{text-align:center;margin:12px 0 16px;padding:14px;border-radius:10px;
-  background:var(--surface2);border:1px dashed var(--line)}
-.reveal-lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
-.reveal-code{font-family:"Oswald";font-size:34px;letter-spacing:.22em;color:var(--green)}
-.stats{display:flex;gap:8px;margin:6px 0 14px}
-.stat{flex:1;text-align:center}
-.stat .n{font-family:"Oswald";font-size:24px;color:var(--green)}
-.stat .l{font-size:10.5px;color:var(--ink2);line-height:1.2;margin-top:2px}
-.dist{margin:2px 0 14px}
-.dist h3{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 7px}
-.bar-row{display:flex;align-items:center;gap:7px;font-size:12px;margin:3px 0}
-.bar-i{width:12px;font-weight:800;color:var(--ink2);text-align:center}
-.bar-wrap{flex:1;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.04)}
-.bar{background:var(--absent);color:#fff;text-align:right;padding:3px 7px;font-weight:800;font-size:11px;min-width:24px;border-radius:4px}
-.bar.win{background:var(--correct)}
-.cd{text-align:center;font-size:13px;color:var(--ink2);margin:4px 0 14px}
-.cd b{color:var(--ink);font-family:"Oswald";letter-spacing:.05em}
-.btn{display:block;width:100%;padding:12px;border-radius:10px;background:var(--green);color:#fff;
-  font-weight:700;font-size:14px;text-align:center;margin-top:8px}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink2)}
-.cta{display:block;text-align:center;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600}
-
-.howlist{font-size:13.5px;color:var(--ink2);line-height:1.6}
-.howlist b{color:var(--ink)}
-.swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
-
-/* USTAWIENIA */
-.sett-row{display:flex;align-items:center;justify-content:space-between;gap:14px;
+/* PANEL USTAWIEŃ */
+.sett-row{display:flex;align-items:center;justify-content:space-between;
   padding:12px 0;border-bottom:1px solid var(--line)}
 .sett-row:last-child{border-bottom:none;padding-bottom:0}
-.sett-label{font-size:14px;color:var(--ink);font-weight:700}
-.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.35}
-.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2);flex:none}
-.seg button{font-size:11px;font-weight:800;padding:6px 10px;color:var(--ink2);white-space:nowrap}
+.sett-label{font-size:14px;color:var(--ink)}
+.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;
+  overflow:hidden;background:var(--surface2)}
+.seg button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2);white-space:nowrap}
 .seg button.on{background:var(--green);color:#fff}
-.cb{--correct:#1a6fc4;--present:#e07b1a;--absent:#555}
-[data-theme=dark].cb{--correct:#3a8fe4;--present:#f09030;--absent:#555}
-.no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake,.no-anim .key:active{animation:none!important;transition:none!important}
 
-footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:12px;margin:10px 0 18px;line-height:1.8}
-footer a{color:var(--green);font-weight:600}
+/* WSKAZÓWKA */
+.hint-bar{display:flex;align-items:center;gap:8px;margin:2px 0 4px;min-height:28px}
+.hint-btn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+  border:1px solid var(--gold);color:var(--gold);background:transparent;white-space:nowrap}
+.hint-btn:hover{background:var(--surface2)}
+.hint-text{font-size:12.5px;color:var(--ink2);font-style:italic}
+.hint-text b{color:var(--ink);font-style:normal}
 
-.hidden{display:none!important}
-@media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake,.key:active{animation:none!important}}
+/* KATEGORIA (tak samo jak hint-bar ale nad nią) */
+.cat-bar{display:flex;align-items:center;gap:8px;margin:2px 0 2px;min-height:26px}
+.cat-text{font-size:12px;color:var(--ink2);font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;padding:3px 10px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface2)}
+
+/* DALTONIZM — inne kolory rozróżnialne bez rozróżniania czerwień/zieleń */
+.cb .tile.correct,.cb .key.correct{background:#1a6fc4!important;border-color:#1a6fc4!important}
+.cb .tile.present,.cb .key.present{background:#e07b1a!important;border-color:#e07b1a!important}
+.cb .tile.absent,.cb .key.absent{background:#555!important;border-color:#555!important}
+[data-theme=dark] .cb .tile.correct,[data-theme=dark] .cb .key.correct{background:#3a8fe4!important;border-color:#3a8fe4!important}
+[data-theme=dark] .cb .tile.present,[data-theme=dark] .cb .key.present{background:#f09030!important;border-color:#f09030!important}
+/* Nadpisanie zmiennych CSS — obejmuje swatch w helpie i wszystkie inne elementy */
+.cb{--correct:#1a6fc4;--present:#e07b1a}
+[data-theme=dark] .cb{--correct:#3a8fe4;--present:#f09030}
+
+@media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
+.no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake{animation:none!important}
 </style>
 </head>
 <body>
-
 <header>
   <div class="topbar">
     <a class="back" href="index.html">← Szpilplac</a>
     <div class="controls">
-      <div class="lang-tog" role="group" aria-label="Język">
+      <div class="lang-tog" role="group">
         <button id="lPl" class="on">PL</button>
         <button id="lSzl">ŚL</button>
       </div>
-      <button class="icon-btn" id="themeBtn" title="Motyw" aria-label="Zmień motyw">
+      <button class="icon-btn" id="themeBtn">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>
       </button>
-      <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
+      <button class="icon-btn" id="helpBtn" title="Jak grać">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 4.01 8.51 1.25h6.98l-.89 2.76 1.21.51 1.32-2.59 4.94 4.94-2.59 1.32.51 1.21 2.76-.89v6.98l-2.76-.89-.51 1.21 2.59 1.32-4.94 4.94-1.32-2.59-1.21.51.89 2.76H8.51l.89-2.76-1.21-.51-1.32 2.59-4.94-4.94 2.59-1.32-.51-1.21-2.76.89V8.51l2.76.89.51-1.21-2.59-1.32 4.94-4.94 1.32 2.59z"/><circle cx="12" cy="12" r="4.4"/></svg>
+      <button class="icon-btn" id="settBtn" title="Ustawienia">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.40,4.01 L8.51,1.25 L15.49,1.25 L14.60,4.01 L15.81,4.52 L17.13,1.93 L22.07,6.87 L19.48,8.19 L19.99,9.40 L22.75,8.51 L22.75,15.49 L19.99,14.60 L19.48,15.81 L22.07,17.13 L17.13,22.07 L15.81,19.48 L14.60,19.99 L15.49,22.75 L8.51,22.75 L9.40,19.99 L8.19,19.48 L6.87,22.07 L1.93,17.13 L4.52,15.81 L4.01,14.60 L1.25,15.49 L1.25,8.51 L4.01,9.40 L4.52,8.19 L1.93,6.87 L6.87,1.93 L8.19,4.52 Z"/><circle cx="12" cy="12" r="4.4"/></svg>
       </button>
-      <button class="icon-btn" id="statBtn" title="Statystyki" aria-label="Statystyki">
+      <button class="icon-btn" id="statBtn" title="Statystyki">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
       </button>
     </div>
   </div>
 
+  <!-- Pasek nawigacji dni -->
   <div class="nav-bar" id="navBar">
-    <button class="nav-btn" id="prevBtn" title="Poprzedni dzień" aria-label="Poprzedni dzień" disabled>
+    <button class="nav-btn" id="prevBtn" title="Poprzedni dzień" disabled>
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="10,3 5,8 10,13"/></svg>
     </button>
     <div class="nav-day">
       <div class="dayno" id="navDayNo"></div>
       <div id="navDayLabel"></div>
     </div>
-    <button class="nav-btn" id="nextBtn" title="Następny dzień" aria-label="Następny dzień" disabled>
+    <button class="nav-btn" id="nextBtn" title="Następny dzień" disabled>
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,3 11,8 6,13"/></svg>
     </button>
-    <button class="nav-cal" id="calBtn" title="Kalendarz" aria-label="Kalendarz">
+    <button class="nav-cal icon-btn" id="calBtn" title="Kalendarz">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="13" height="12" rx="2"/><line x1="1.5" y1="6" x2="14.5" y2="6"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/></svg>
     </button>
   </div>
 </header>
 
 <main>
-  <div class="title-row">
-    <div class="title" id="title">Kłōdka</div>
-    <div class="pno" id="pno"></div>
-  </div>
-  <div class="tagline" id="tagline"></div>
-
-  <a class="subback hidden" id="subback">← <span>codzienna</span></a>
-
-  <div class="toast" id="toast"></div>
-
-  <div class="weekly-hint" id="weeklyHint" aria-live="polite"></div>
-
   <div class="board" id="board"></div>
-  <div class="repeat-info" id="repeatInfo"></div>
-
-  <div class="pad" id="pad"></div>
-
-  <button class="weektile" id="weektile">
-    <div class="wt-ico">🗝️</div>
-    <div class="wt-body">
-      <div class="wt-name" id="wtName">Zagadka tygodnia<span class="badge soon" id="wtBadge">…</span></div>
-      <div class="wt-status" id="wtStatus">sprawdzam…</div>
-    </div>
-    <div class="wt-arr">→</div>
-  </button>
+  <div class="cat-bar" id="catBar" style="display:none"></div>
+  <div class="hint-bar" id="hintBar" style="display:none"></div>
+  <div class="archive-msg" id="archiveMsg" style="display:none"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="kbd" id="kbd"></div>
 </main>
 
 <footer>
-  <div id="footLine"></div>
-  <div><a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a></div>
+  <a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> ·
+  escape room <b>Starzik</b>, Świyntochłowice
 </footer>
 
+<!-- Modal główny -->
 <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 
+<!-- Kalendarz popup -->
 <div class="cal-scrim" id="calScrim">
   <div class="cal-box" id="calBox">
     <div class="cal-head">
       <h3 id="calTitle">Archiwum</h3>
-      <button id="calClose" aria-label="Zamknij">×</button>
+      <button id="calClose">×</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
     <div class="cal-nav">
@@ -312,177 +344,98 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="local-stats-modal-fix-weekly-hint-2026-06-26";
+var store=(function(){
+  var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+/* ── KONFIGURACJA ───────────────────────────────────────────────────── */
+var SUPABASE_URL     = "https://xyivrakegwybwhmmcawq.supabase.co";
+var SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+var STATS_URL        = SUPABASE_URL;
+var STATS_KEY        = SUPABASE_ANON_KEY;
 
-/* ── KONFIGURACJA ──────────────────────────────────────────────────── */
-var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
-var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+// Tryb testowy: wejdź przez slowko.html?test=TWOJE_HASLO
+// Tester: nieograniczona liczba słów dziennie + dostęp do archiwum
+var TEST_PASSWORD    = "starzik";      // ← zmień na swoje hasło
+var MAX_GUESSES      = 6;
+var MAX_GUESSES_TEST = 20;             // tester może zgadywać więcej
 
-var EPOCH      = new Date(2026, 5, 23);   // dzień 1 = 2026-06-23 (miesiąc 0-indeks => 5=czerwiec)
-var MAX_TRIES  = 6;
-var LEN        = 4;
+var STORAGE_KEY  = "slowko_v2";
+var LANG_KEY     = "familock_lang";
+var THEME_KEY    = "szpilplac_theme";
+var HINT_KEY     = "slowko_hint";
+var ANIM_KEY     = "slowko_anim";    // animacje: "on"|"off"
+var SOUND_KEY    = "slowko_sound";   // dźwięki: "on"|"off"
+var CB_KEY       = "slowko_cb";      // daltonizm: "on"|"off"
+var CAT_KEY      = "slowko_cat";     // kategoria: "on"|"off"
+var SWAP_KEY     = "slowko_swap";    // zamiana Enter/Backspace: "on"|"off"
+var EPOCH        = new Date(2026, 5, 23);
 
-/* localStorage (wspólne klucze Szpilplaca) */
-var LANG_KEY  = "familock_lang";
-var THEME_KEY = "szpilplac_theme";
-var DAILY_KEY = "klodka_daily_v1";
-var WEEK_KEY  = "klodka_weekly_v1";
-var SOUND_KEY = "klodka_sound";
-var CB_KEY    = "klodka_cb";
-var ANIM_KEY  = "klodka_anim";
-var REPEAT_KEY= "klodka_repeat_info";
-var DIR_KEY   = "klodka_dir_hints";
+// Ustawienie wskazówki: "off" | "manual" | "3" | "4" | "5"
+var hintMode = store.get(HINT_KEY) || "off";
+var currentHint = null;   // tłumaczenie bieżącego dnia (z meta)
+var hintShown = false;
+var animMode  = store.get(ANIM_KEY)  || "on";
+var soundMode = store.get(SOUND_KEY) || "off";
+var cbMode    = store.get(CB_KEY)    || "off";
+var catMode   = store.get(CAT_KEY)   || "off";
+var swapMode  = store.get(SWAP_KEY)  || "off";
+var currentCategory = null;  // kategoria bieżącego dnia
 
-/* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
-   Tu zmieniasz widoczną podpowiedź dla tygodniówki.
-   Będzie pokazana NAD kafelkami prób tylko w trybie tygodniowym. */
-var WEEKLY_HINT_TITLE = "Zagadka tygodnia";
-var WEEKLY_HINT_TEXT  = ">>> F12 <<<";
+/* ── TRYB TESTOWY ───────────────────────────────────────────────────── */
+var IS_TESTER = (function(){
+  try {
+    var p = new URLSearchParams(window.location.search).get("test");
+    return p === TEST_PASSWORD;
+  } catch(e){ return false; }
+})();
 
-console.log("%c🗝️ "+WEEKLY_HINT_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
-console.log("%cTydzień 1: "+WEEKLY_HINT_TEXT,"font-size:13px");
+/* ── HELPERS ────────────────────────────────────────────────────────── */
+function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 
-/* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
-function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+// Dzień gry liczony według czasu Polski, żeby po północy w Polsce
+// frontend i Supabase nie rozjeżdżały się przez UTC.
 function warsawDateParts(d){
-  var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
-  var out={};parts.forEach(function(p){if(p.type!=="literal")out[p.type]=Number(p.value);});return out;
-}
-function daysSince(){
-  var p=warsawDateParts(new Date());
-  var todayUtc=Date.UTC(p.year,p.month-1,p.day);
-  var epochUtc=Date.UTC(2026,5,23);
-  return Math.floor((todayUtc-epochUtc)/86400000);
-}
-function dateOfDayNo(no){var d=new Date(EPOCH);d.setDate(d.getDate()+no-1);return d;}
-function fmtDate(d){return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"});}
-var TODAY_NO = daysSince()+1;
-var DAY_NO   = TODAY_NO; // aktualnie oglądany dzień codziennej kłódki
-var WEEK_NO  = Math.floor(daysSince()/7)+1;
+  var parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Warsaw",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(d);
 
-/* ── storage helpers ──────────────────────────────────────────────── */
-function loadJSON(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
-function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  var out = {};
+  parts.forEach(function(p){
+    if(p.type !== "literal") out[p.type] = Number(p.value);
+  });
+  return out;
+}
 
-/* ── napisy PL / ŚL ───────────────────────────────────────────────── */
-var S={
-  pl:{
-    titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
-    tagD:"Zgadnij 4-cyfrowy kod. Masz 6 prób.",
-    tagW:"Rozszyfruj zagadkę i wpisz kod. Masz 6 prób.",
-    pnoD:"Kod nr ", pnoW:"Tydzień ",
-    enter:"OK", short:"Wpisz 4 cyfry.",
-    doneD:"Dzisiaj już zagrane. Wróć jutro!",
-    doneW:"Tygodniówkę masz już rozegraną.",
-    soon:"Zagadka w przygotowaniu — zajrzyj wkrótce.",
-    none:"Brak kodu na dziś.",
-    win:["Otwarte!","Brawo!","Świetnie!","Udało się!","Klik!"],
-    loseD:"Nie tym razem.", loseW:"Kłódka pozostała zamknięta.",
-    endW:"Otwarte!", endL:"Nie udało się",
-    revealLbl:"Kod był:",
-    played:"Rozegrane", wpct:"% otwartych", streak:"Seria", best:"Rekord",
-    nextD:"Nowy kod za", nextW:"Nowa zagadka za",
-    again:"Zamknij", cta:"Chcesz więcej zagadek? Wpadnij do Starzika →",
-    weekName:"Zagadka tygodnia",
-    wtNew:"Nowa zagadka — kliknij i graj", wtWon:"Rozwiązane 🎉",
-    wtLost:"Nie udało się w tym tygodniu", wtSoon:"Wkrótce — w przygotowaniu",
-    bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wkrótce",
-    howH:"Jak grać",
-    howD:"<b>Codzienna kłódka.</b> Każdego dnia jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokażą, jak blisko jesteś:",
-    lgC:"cyfra na właściwym miejscu", lgP:"cyfra jest w kodzie, ale gdzie indziej", lgA:"cyfra nie pasuje do tej próby",
-    howW:"<b>Zagadka tygodnia.</b> Raz w tygodniu specjalny kod ukryty za zagadką — szukaj tropu w grze, w źródle strony albo gdzie indziej. Tu kafelki <b>nie</b> podpowiadają cyfr: dostajesz tylko „dobrze / źle”. Masz 6 prób.",
-    foot:"Codzienna śląska kłódka — Familock Starzik.",
-    settH:"Ustawienia", settOn:"Wł.", settOff:"Wył.",
-    settSoundL:"Dźwięki", settSoundS:"Kliknięcia, błędy i otwarcie kłódki",
-    settCbL:"Tryb dla daltonistów", settCbS:"Inne kolory podpowiedzi",
-    settAnimL:"Animacje", settAnimS:"Obrót kafelków i efekty",
-    settRepeatL:"Informacja o powtórkach", settRepeatS:"Pod planszą pokaże, czy cyfry się powtarzają",
-    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarych kafelkach pokaże, czy szukana cyfra jest wyżej czy niżej od wpisanej",
-    dirLegend:"Przy szarym kafelku: <b>↑</b> szukaj wyższej cyfry, <b>↓</b> szukaj niższej. Strzałka pokazuje się tylko wtedy, gdy wpisanej cyfry nie ma w kodzie.",
-    repeatYes:"W tym kodzie <b>cyfra się powtarza</b>.",
-    repeatNo:"W tym kodzie <b>cyfry się nie powtarzają</b>.",
-    repeatMaybe:"Nie udało się sprawdzić powtórek cyfr. Spróbuj odświeżyć stronę.",
-    statsH:"Statystyki", dist:"Rozkład prób", archive:"Archiwum", today:"Dzisiaj",
-    optionsInfo:"W ustawieniach możesz włączyć dodatkowe ułatwienia: podpowiedzi góra/dół oraz informację o powtórkach cyfr. Działają tylko w codziennej kłódce. Tygodniówka zostaje bez kolorów i strzałek.",
-    archiveDone:"Archiwalna kłódka zakończona."
-  },
-  szl:{
-    titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
-    tagD:"Zgodnij 4-cyfrowy kod. Mosz 6 prób.",
-    tagW:"Rozszyfruj zogodka i wkluj kod. Mosz 6 prób.",
-    pnoD:"Kod nr ", pnoW:"Tydzień ",
-    enter:"OK", short:"Wkluj 4 cyfry.",
-    doneD:"Dzisiej już grane. Przidź jutro!",
-    doneW:"Tydniówka już je rozegrano.",
-    soon:"Zogodka sie szykuje — zaźrzij niyskorzij.",
-    none:"Ni ma kodu na dzisiej.",
-    win:["Łodewrzite!","Brawo!","Forszt!","Udało sie!","Klik!"],
-    loseD:"Niy tym razym.", loseW:"Kłódka łostała zawarto.",
-    endW:"Łodewrzite!", endL:"Niy podarziło sie",
-    revealLbl:"Kod bōł:",
-    played:"Rozegrane", wpct:"% łodewrzitych", streak:"Seryjo", best:"Rekord",
-    nextD:"Nowy kod za", nextW:"Nowo zogodka za",
-    again:"Zawrzij", cta:"Chcesz wiyncyj zogodek? Wpadnij do Starzika →",
-    weekName:"Zogodka tydnia",
-    wtNew:"Nowo zogodka — klikej i grej", wtWon:"Rozwiōnzane 🎉",
-    wtLost:"Niy podarziło sie w tym tydniu", wtSoon:"Wnet — w szykowaniu",
-    bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wnet",
-    howH:"Jak grać",
-    howD:"<b>Codzienno kłódka.</b> Kożdy dziyń jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożōm, jak blisko jeżeś:",
-    lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfra niy pasuje do tyj prōby",
-    howW:"<b>Zogodka tydnia.</b> Roz na tydziyń ekstra kod skryty za zogodkōm — szukej tropu w grze, w zdrzōdle strōny abo kaj indziej. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
-    foot:"Codzienno ślōnsko kłódka — Familock Starzik.",
-    settH:"Ustawiynia", settOn:"Wł.", settOff:"Wył.",
-    settSoundL:"Dźwiyki", settSoundS:"Klikniyncia, błyndy i łodewrzicie kłódki",
-    settCbL:"Tryb dlŏ daltonistów", settCbS:"Inksze farby podpowiydzi",
-    settAnimL:"Animacyje", settAnimS:"Łobrót kafli i efekty",
-    settRepeatL:"Info ô powtōrkach", settRepeatS:"Pod planszōm pokoże, eli cyfry sie powtarzajōm",
-    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwych kafelkach pokoże, eli szukano cyfra je wyżyj abo niżyj ôd wkludyj",
-    dirLegend:"Przi siwym kafelku: <b>↑</b> szukej wyższyj cyfry, <b>↓</b> szukej niższyj. Strzałka pokoże sie ino wtedy, kej wkludyj cyfry ni ma w kodzie.",
-    repeatYes:"W tym kodzie <b>cyfra sie powtarzo</b>.",
-    repeatNo:"W tym kodzie <b>cyfry sie niy powtarzajōm</b>.",
-    repeatMaybe:"Niy szło sprawdzić powtōrek cyfr. Sprōbuj łodświyżyć strona.",
-    statsH:"Statystyki", dist:"Rozkłod prób", archive:"Archiwum", today:"Dzisiej",
-    optionsInfo:"W ustawiyniach idzie włōnczyć ekstra ułatwiynia: podpowiydzi góra/dół oraz info ô powtōrkach cyfr. Działajōm ino w codzinnyj kłōdce. Tydniówka ôstowo bez farb i strzałek.",
-    archiveDone:"Archiwalno kłōdka je zakończōno."
+function todayIndex(){
+  var p = warsawDateParts(new Date());
+  var todayUtc = Date.UTC(p.year, p.month - 1, p.day);
+  var epochUtc = Date.UTC(2026, 5, 23);
+  return Math.floor((todayUtc - epochUtc) / 86400000);
+}
+
+function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
+function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"}); }
+
+/* ── STORE ──────────────────────────────────────────────────────────── */
+
+
+// Klucz per-dzień: "slowko_d42" itd.
+function dayKey(idx){ return "slowko_d"+idx; }
+function loadDayGame(idx){ return JSON.parse(store.get(dayKey(idx))||"null"); }
+function saveDayGame(idx, g){
+  var copy=Object.assign({},g||{});
+  if(g&&Array.isArray(g.guesses)&&typeof stateCache!=="undefined"){
+    copy.states=g.guesses.map(function(gs){return stateCache&&stateCache[gs]?stateCache[gs]:null;});
   }
-};
-var lang = (localStorage.getItem(LANG_KEY)==="ŚL"||localStorage.getItem(LANG_KEY)==="szl") ? "szl" : "pl";
-function t(){return S[lang];}
-var soundMode = localStorage.getItem(SOUND_KEY) || "off";
-var cbMode    = localStorage.getItem(CB_KEY)    || "off";
-var animMode  = localStorage.getItem(ANIM_KEY)  || "on";
-var repeatMode= localStorage.getItem(REPEAT_KEY)|| "off";
-var dirMode   = localStorage.getItem(DIR_KEY)   || "off";
-
-/* ── motyw ────────────────────────────────────────────────────────── */
-var theme = localStorage.getItem(THEME_KEY)==="dark" ? "dark" : "light";
-function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
-applyTheme();
-document.getElementById("themeBtn").addEventListener("click",function(){
-  theme = theme==="dark"?"light":"dark"; localStorage.setItem(THEME_KEY,theme); applyTheme();
-});
-function applyCbMode(){document.documentElement.classList.toggle("cb",cbMode==="on");}
-function applyAnimMode(){document.documentElement.classList.toggle("no-anim",animMode==="off");}
-applyCbMode();applyAnimMode();
-
-/* język */
-function setLang(l){
-  lang=l; localStorage.setItem(LANG_KEY, l==="szl"?"ŚL":"PL");
-  document.getElementById("lPl").classList.toggle("on",l==="pl");
-  document.getElementById("lSzl").classList.toggle("on",l==="szl");
-  renderStatic(); refreshWeektile();
+  store.set(dayKey(idx), JSON.stringify(copy));
 }
-document.getElementById("lPl").classList.toggle("on",lang==="pl");
-document.getElementById("lSzl").classList.toggle("on",lang==="szl");
-document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
-document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
-document.addEventListener("click",function(e){
-  var btn=e.target&&e.target.closest?e.target.closest("button"):null;
-  if(btn){setTimeout(function(){btn.blur();},0);}
-});
 
-/* ── SUPABASE ─────────────────────────────────────────────────────── */
+/* ── SUPABASE RPC ───────────────────────────────────────────────────── */
 function rpc(fn,args){
   return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
     headers:{"Content-Type":"application/json","Accept":"application/json",
@@ -490,673 +443,756 @@ function rpc(fn,args){
     body:JSON.stringify(args||{})
   }).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
 }
-function trackEvent(p){
-  fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
-    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,
-             "Authorization":"Bearer "+SUPABASE_ANON_KEY,"Prefer":"return=minimal"},
-    body:JSON.stringify(p)
+
+/* ── STATYSTYKI ─────────────────────────────────────────────────────── */
+function trackEvent(payload){
+  fetch(STATS_URL+"/rest/v1/szpilplac_events",{method:"POST",
+    headers:{"Content-Type":"application/json","apikey":STATS_KEY,
+             "Authorization":"Bearer "+STATS_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify(payload)
   }).catch(function(){});
 }
 
-/* ── STAN GRY ─────────────────────────────────────────────────────── */
-/* view: "daily" | "weekly" */
-var view = "daily";
-var game = null;       // {mode, idx, guesses:[{code,states?,correct}], status, reveal}
-var current = "";      // wpisywane cyfry
+/* ── NAPISY ─────────────────────────────────────────────────────────── */
+var S={
+  pl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiaj już zagrane. Wróć jutro!",
+    doneArchive:"Ten dzień już rozegrałeś.",
+    archive:"Archiwum",today:"Dzisiaj",tester:"Tryb testowy",
+    win:["Genialnie!","Ekstra!","Brawo!","Świetnie!","Udało się!","O mało!","Niezłe!"],
+    lose:"Nie tym razem.",endW:"Zgadnięte!",endL:"Nie udało się",
+    meaning:"to po polsku:",played:"Rozegrane",wpct:"% wygranych",
+    streak:"Seria",best:"Rekord",dist:"Rozkład prób",next:"Nowe słowo za",
+    share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
+    cta:"Chcesz więcej? Przyjdź do Starzika →",
+    howH:"Jak grać",
+    howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli tam grałeś — zobaczysz swój wynik (tryb tylko do odczytu).",
+    lgC:"Litera jest na właściwym miejscu.",
+    lgP:"Litera jest w słowie, ale na innym miejscu.",
+    lgA:"Tej litery nie ma w słowie.",
+    contactBug:"Zgłoś błąd / propozycję",
+    contactMe:"Kontakt z autorem",
+    spH:"Jak wpisywać?",
+    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>",
+    settH:"Ustawienia",
+    settCatL:"Kategoria słowa",settCatS:"Temat/kategoria jako podpowiedź",
+    settHintL:"Tłumaczenie",
 
-function freshGame(mode, idx){ return {mode:mode, idx:idx, guesses:[], status:"playing", reveal:null}; }
-
-function currentIdx(){return view==="daily"?DAY_NO:WEEK_NO;}
-function dailyKey(dayNo){return DAILY_KEY+"_d"+dayNo;}
-function weeklyKey(weekNo){return WEEK_KEY+"_w"+weekNo;}
-function keyFor(mode,idx){return mode==="daily"?dailyKey(idx):weeklyKey(idx);}
-function idFieldFor(mode){return mode==="daily"?"day":"week";}
-function storeKey(){return keyFor(view,currentIdx());}
-function histKey(mode){return (mode==="weekly"?WEEK_KEY:DAILY_KEY)+"__hist";}
-function storeIdField(){return idFieldFor(view);}
-
-function loadSavedGame(mode,idx){
-  var saved=loadJSON(keyFor(mode,idx));
-  // wsteczna zgodność ze starą wersją, która trzymała tylko bieżący dzień/tydzień
-  if(!saved && mode==="daily" && idx===TODAY_NO) saved=loadJSON(DAILY_KEY);
-  if(!saved && mode==="weekly" && idx===WEEK_NO) saved=loadJSON(WEEK_KEY);
-
-  if(!saved) return null;
-
-  // Aktualny format: {day/week: idx, game:{...}}
-  if(saved.game){
-    var savedIdx = saved[idFieldFor(mode)];
-    if(savedIdx===idx || String(savedIdx)===String(idx)) return saved.game;
+    settHintS:"Tłumaczenie słowa po polsku",
+    settOff:"Wył.",settManual:"Na żądanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
+    settSoundL:"Dźwięki",settSoundS:"Klik przy wpisywaniu, dźwięk trafienia",
+    settCbL:"Tryb dla daltonistów",settCbS:"Wzory zamiast samych kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
+    settOn:"Wł.",
+    hintBtn:"Pokaż wskazówkę",
+    catPre:"Kategoria: ",
+    hintPre:"Wskazówka: to po polsku ",
+    archReadonly:"Archiwum — podgląd Twojego wyniku",
+    archNotPlayed:"Ten dzień minął — nie grałeś wtedy.",
+    calTitle:"Archiwum",
+    errConn:"Błąd połączenia. Odśwież stronę."
+  },
+  szl:{enter:"Enter",short:"Za mało liter.",done:"Dzisiej już zagrane. Wroc jutro!",
+    doneArchive:"Tyn dziyń już rozegrałeś.",
+    archive:"Archiwum",today:"Dzisiej",tester:"Tryb testowy",
+    win:["Gynialnie!","Ekstra!","Brawo!","Festelnie!","Podarziło sie!","O mało!","Niy źle!"],
+    lose:"Niy tym razym.",endW:"Trefiłeś!",endL:"Niy podarziło sie",
+    meaning:"to po polsku:",played:"Granych",wpct:"% wygranych",
+    streak:"Seryja",best:"Rekord",dist:"Rozkłod prób",next:"Nowe słowo za",
+    share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
+    cta:"Chcesz wiyncyj? Przidź do Starzika →",
+    howH:"Jak grać",
+    howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwalo wrócić do wcześniyjszych dni.",
+    lgC:"Litera je na dobrym placu.",
+    lgP:"Litera je w słowie, ale na inkszym placu.",
+    lgA:"Tyj litery w słowie niy ma.",
+    contactBug:"Zgłoś błąd / propozycja",
+    contactMe:"Kontakt z autorim",
+    spH:"Jak wpisywać?",
+    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>",
+    settH:"Ustawiynia",
+    settCatL:"Kategoryjo słowa",settCatS:"Tymat jako podpowiydź",
+    settHintL:"Tłumaczynie",
+    settHintS:"Tłumaczynie słowa po polsku",
+    settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
+    settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
+    settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
+    settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
+    settOn:"Wł.",
+    hintBtn:"Pokoz podpowiydź",
+    catPre:"Kategoryjo: ",
+    hintPre:"Podpowiydź: to po polsku ",
+    archReadonly:"Archiwum — podglond twojego wyniku",
+    archNotPlayed:"Tyn dziyń minął — niy grałeś wtynczos.",
+    calTitle:"Archiwum",
+    errConn:"Błond połonczenia. Łodświyż strona."
   }
+};
+var lang=store.get(LANG_KEY)||"pl";
+function T(){return S[lang];}
 
-  // Awaryjnie: starszy surowy zapis samej gry {status, guesses...}
-  if(saved.status && saved.guesses) return saved;
+/* Zdejmij fokus z klikniętych przycisków — spacja nie uruchomi ponownie */
+document.addEventListener("click",function(e){
+  var btn=e.target&&e.target.closest?e.target.closest("button"):null;
+  if(btn){setTimeout(function(){btn.blur();},0);}
+});
 
-  return null;
+/* ── MOTYW ──────────────────────────────────────────────────────────── */
+var TSVG={
+  light:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  dark:'<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+};
+var THEMES=["light","dark"];
+var theme=store.get(THEME_KEY)||"light";
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",theme);
+  document.getElementById("themeBtn").innerHTML=TSVG[theme];
 }
+document.getElementById("themeBtn").addEventListener("click",function(){
+  theme=theme==="light"?"dark":"light";store.set(THEME_KEY,theme);applyTheme();
+});
+applyTheme();
 
-function saveGameFor(mode,idx,g){
-  var o={}; o[idFieldFor(mode)] = idx; o.game = g;
-  saveJSON(keyFor(mode,idx),o);
+/* ── STAN GLOBALNY ──────────────────────────────────────────────────── */
+var TODAY_IDX = todayIndex();
+var currentDay = TODAY_IDX;  // który dzień aktualnie wyświetlamy
+var LEN=5, PNO=1;
+var game = null;    // {guesses:[], status:"playing"|"won"|"lost", reveal:null}
+var stateCache = {};
+var current = "";
+var busy = false;
 
-  // Dodatkowy zapis bieżącej gry pod starym kluczem — dla zgodności ze stroną główną i starszymi wersjami.
-  if(mode==="daily" && idx===TODAY_NO) saveJSON(DAILY_KEY,o);
-  if(mode==="weekly" && idx===WEEK_NO) saveJSON(WEEK_KEY,o);
-}
-
-function loadGame(){
-  var idx=currentIdx();
-  game = loadSavedGame(view,idx) || freshGame(view,idx);
-  if(game && (game.status==="won" || game.status==="lost")){
-    recordHistoryFor(view,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
-  }
-  loadCodeMeta();
-}
-
-function persist(){
-  var idx=currentIdx(), mode=view;
-  saveGameFor(mode,idx,game);
-
-  // Gdy gra jest zakończona, od razu zapisz lokalne statystyki gracza.
-  // Dzięki temu statystyki nie zależą od modala ani od pobrania kodu przez RPC reveal.
-  if(game && (game.status==="won" || game.status==="lost")){
-    recordHistoryFor(mode,idx,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
-  }
-}
-
-function sameView(mode,idx){return view===mode && currentIdx()===idx;}
-function updateRevealInModal(code){var el=document.getElementById("revealCode"); if(el)el.textContent=code||"····";}
-
-/* ── META KODU: informacja o powtórkach cyfr ─────────────────────── */
-var codeMetaCache={};
-function metaKey(mode,idx){return mode+":"+idx;}
-function loadCodeMeta(){
-  var idx=currentIdx(), key=metaKey(view,idx);
-  if(repeatMode!=="on"||codeMetaCache[key]){updateRepeatInfo();return;}
-  // RPC z Supabase zwraca faktyczną informację, czy w kodzie są powtórzone cyfry. Nie zwraca samego kodu.
-  rpc("klodka_meta",{p_mode:view,p_idx:idx}).then(function(meta){
-    codeMetaCache[key]=meta||{}; updateRepeatInfo();
-  }).catch(function(){
-    codeMetaCache[key]={has_repeat:null}; updateRepeatInfo();
+// Statystyki globalne (tylko dla "dziś")
+var DEF_STATS={played:0,wins:0,streak:0,maxStreak:0,dist:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lastDay:null,lastWin:false};
+var stats=Object.assign({},DEF_STATS,JSON.parse(store.get(STORAGE_KEY)||"{}").stats||{});
+function saveStats(){ store.set(STORAGE_KEY, JSON.stringify({stats:stats})); }
+function recalcStats(){
+  var results=stats.results||{};
+  var days=Object.keys(results).map(function(k){return parseInt(k,10);})
+    .filter(function(d){return !isNaN(d)&&d<=TODAY_IDX;})
+    .sort(function(a,b){return a-b;});
+  stats.played=days.length;
+  stats.wins=0;
+  stats.dist=DEF_STATS.dist.slice();
+  var cur=0,max=0,last=null;
+  days.forEach(function(d){
+    var r=results[d]||{};
+    if(r.won){
+      stats.wins++;
+      var tries=Math.max(1,parseInt(r.tries||1,10));
+      stats.dist[Math.min(tries-1,stats.dist.length-1)]++;
+      cur=(last!==null&&d===last+1&&results[last]&&results[last].won)?cur+1:1;
+      if(cur>max)max=cur;
+    }else cur=0;
+    last=d;
   });
+  var latest=days.length?days[days.length-1]:null;
+  stats.lastDay=latest;
+  stats.lastWin=latest!==null?!!results[latest].won:false;
+  stats.streak=stats.lastWin?cur:0;
+  stats.maxStreak=max;
 }
-function updateRepeatInfo(){
-  var el=document.getElementById("repeatInfo"); if(!el)return;
-  if(repeatMode!=="on"||view!=="daily"){el.textContent="";el.style.display="none";return;}
-  el.style.display="block";
-  var meta=codeMetaCache[metaKey(view,currentIdx())]||{};
-  if(meta.has_repeat===true) el.innerHTML=t().repeatYes;
-  else if(meta.has_repeat===false) el.innerHTML=t().repeatNo;
-  else el.innerHTML=t().repeatMaybe;
-}
-
-function applyDirectionHint(tile,g,c){
-  if(dirMode!=="on"||view!=="daily"||!g||!g.states||g.states[c]!=="absent"||!g.directions)return;
-  var dir=g.directions[c];
-  if(dir==="higher") tile.classList.add("dir-higher");
-  else if(dir==="lower") tile.classList.add("dir-lower");
-}
-function escHtml(x){
-  return String(x).replace(/[&<>"']/g,function(ch){
-    if(ch==="&")return "&amp;";
-    if(ch==="<")return "&lt;";
-    if(ch===">")return "&gt;";
-    if(ch==='"')return "&quot;";
-    if(ch==="'")return "&#39;";
-    return ch;
-  });
-}
-function updateWeeklyHint(){
-  var el=document.getElementById("weeklyHint"); if(!el)return;
-  if(view!=="weekly" || !WEEKLY_HINT_TEXT){
-    el.classList.remove("on");
-    el.innerHTML="";
-    return;
+function hydrateStatsFromDayGames(){
+  if(!stats.results)stats.results={};
+  for(var i=0;i<=TODAY_IDX;i++){
+    var dg=loadDayGame(i);
+    if(dg&&(dg.status==="won"||dg.status==="lost")&&!stats.results[i]){
+      stats.results[i]={won:dg.status==="won",tries:(dg.guesses||[]).length||MAX_GUESSES};
+    }
   }
-  el.classList.add("on");
-  el.innerHTML='<span class="hint-kicker">'+escHtml(WEEKLY_HINT_TITLE)+'</span>'+escHtml(WEEKLY_HINT_TEXT);
+  recalcStats();
+  saveStats();
 }
 
-/* ── RENDER STATYCZNY (tytuły, plansza, klawiatura) ───────────────── */
-var boardEl=document.getElementById("board"), padEl=document.getElementById("pad"), toastEl=document.getElementById("toast");
+/* ── KLAWIATURA ─────────────────────────────────────────────────────── */
+var KEY_ROWS=[
+  ["Ą","Ć","Ę","Ł","Ń","Ó","Ś","Ź","Ż","Ō","Ô","Ŏ"],
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","⌫"]
+];
+var ALPHABET={};
+KEY_ROWS.forEach(function(r){r.forEach(function(k){if(k.length===1)ALPHABET[k]=1;});});
 
-function renderStatic(){
-  var T=t();
-  document.getElementById("title").textContent   = view==="daily"?T.titleD:T.titleW;
-  document.getElementById("tagline").textContent = view==="daily"?T.tagD:T.tagW;
-  document.getElementById("pno").textContent      = (view==="daily"?T.pnoD+DAY_NO:T.pnoW+WEEK_NO);
-  document.getElementById("footLine").textContent = T.foot;
-  document.getElementById("subback").classList.toggle("hidden", view==="daily");
-  document.getElementById("subback").querySelector("span").textContent = lang==="szl"?"codzienno":"codzienna";
-  document.getElementById("wtName").firstChild.textContent = T.weekName;
-  updateWeeklyHint(); buildBoard(); buildPad(); paintFromGame(); updateNavBar(); updateRepeatInfo();
-}
+/* ── RENDER PLANSZY ─────────────────────────────────────────────────── */
+var boardEl=document.getElementById("board"),
+    kbdEl=document.getElementById("kbd"),
+    toastEl=document.getElementById("toast"),
+    archiveMsgEl=document.getElementById("archiveMsg");
+var keyEls={};
 
 function buildBoard(){
-  boardEl.innerHTML="";
-  for(var r=0;r<MAX_TRIES;r++){
-    var row=document.createElement("div"); row.className="row"; row.dataset.row=r;
-    for(var c=0;c<LEN;c++){
-      var tl=document.createElement("div"); tl.className="tile"; tl.dataset.col=c; row.appendChild(tl);
-    }
+  boardEl.style.setProperty("--len",LEN);boardEl.innerHTML="";
+  var max=IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;
+  for(var r=0;r<max;r++){
+    var row=document.createElement("div");row.className="row";row.style.setProperty("--len",LEN);
+    for(var c=0;c<LEN;c++){var t=document.createElement("div");t.className="tile";row.appendChild(t);}
     boardEl.appendChild(row);
   }
 }
-function buildPad(){
-  padEl.innerHTML="";
-  var keys=["1","2","3","4","5","6","7","8","9","del","0","enter"];
-  keys.forEach(function(k){
-    var b=document.createElement("button"); b.className="key"; b.dataset.key=k;
-    if(k==="del"){b.classList.add("wide","del");b.innerHTML="⌫";}
-    else if(k==="enter"){b.classList.add("wide","enter");b.textContent=t().enter;}
-    else b.textContent=k;
-    b.addEventListener("click",function(){onKey(k);});
-    padEl.appendChild(b);
-  });
-}
-
-/* maluje całą historię + aktualnie wpisywane cyfry */
-function paintFromGame(){
-  var rows=boardEl.querySelectorAll(".row");
-  for(var r=0;r<MAX_TRIES;r++){
-    var tiles=rows[r].querySelectorAll(".tile");
-    var g=game.guesses[r];
-    for(var c=0;c<LEN;c++){
-      var tile=tiles[c]; tile.className="tile"; tile.textContent="";
-      if(g){
-        tile.textContent=g.code[c];
-        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); applyDirectionHint(tile,g,c); }
-        else { tile.classList.add(g.correct?"correct":"neutral"); }
-      } else if(r===game.guesses.length){
-        if(current[c]!==undefined){ tile.textContent=current[c]; tile.classList.add("filled"); }
-      }
-    }
+function paintRow(r,arr,states,anim){
+  var rows=boardEl.children; if(r>=rows.length)return;
+  var tiles=rows[r].children;
+  for(var i=0;i<LEN;i++){(function(i){var t=tiles[i];t.textContent=arr[i];
+    if(anim){t.classList.add("reveal");t.style.animationDelay=(i*.15)+"s";
+      setTimeout(function(){t.classList.add(states[i]);},i*150+180);}
+    else t.classList.add(states[i]);})(i);
   }
-  paintPad();
-  document.getElementById("subback").classList.toggle("hidden", view==="daily");
-  updateRepeatInfo();
+}
+function paintCurrent(){
+  var rows=boardEl.children; if(!game||game.guesses.length>=rows.length)return;
+  var row=rows[game.guesses.length];var arr=Array.from(current),tiles=row.children;
+  for(var i=0;i<LEN;i++){var t=tiles[i];
+    if(i<arr.length){t.textContent=arr[i];t.classList.add("filled");}
+    else{t.textContent="";t.classList.remove("filled");}}
+}
+function buildKbd(){kbdEl.innerHTML="";keyEls={};
+  var rows=KEY_ROWS.map(function(r,i){
+    if(i===KEY_ROWS.length-1&&swapMode==="on")
+      return r.map(function(k){return k==="ENTER"?"⌫":k==="⌫"?"ENTER":k;});
+    return r;
+  });
+  rows.forEach(function(row){var rEl=document.createElement("div");rEl.className="kbd-row";
+    row.forEach(function(k){var b=document.createElement("button");b.className="key";
+      if(k.length>1)b.classList.add("wide");b.dataset.k=k;
+      b.textContent=(k==="ENTER"?T().enter:k);
+      b.addEventListener("click",function(){onKey(k);});
+      if(k.length===1)keyEls[k]=b;rEl.appendChild(b);});kbdEl.appendChild(rEl);});}
+function relabelKbd(){var e=kbdEl.querySelector('[data-k="ENTER"]');if(e)e.textContent=T().enter;}
+function paintKbd(){
+  var best={},rank={absent:0,present:1,correct:2};
+  if(game)game.guesses.forEach(function(g){var arr=Array.from(g),st=stateCache[g]||[];
+    for(var i=0;i<arr.length;i++){var c=arr[i],s=st[i];if(!s)continue;if(!best[c]||rank[s]>rank[best[c]])best[c]=s;}});
+  Object.keys(keyEls).forEach(function(c){var el=keyEls[c];
+    el.classList.remove("correct","present","absent");if(best[c])el.classList.add(best[c]);});
 }
 
-/* kolory klawiszy — tylko dla codziennej (weekly nie zdradza cyfr) */
-function paintPad(){
-  var best={};
-  if(view==="daily"){
-    var rank={absent:0,present:1,correct:2};
-    game.guesses.forEach(function(g){
-      if(!g.states)return;
-      for(var c=0;c<LEN;c++){
-        var d=g.code[c], st=g.states[c];
-        if(best[d]===undefined||rank[st]>rank[best[d]]) best[d]=st;
-      }
+/* ── WSKAZÓWKA ──────────────────────────────────────────────────────── */
+var hintBarEl = document.getElementById("hintBar");
+
+function updateHintBar(){
+  if(!currentHint||hintMode==="off"){hintBarEl.style.display="none";return;}
+  var isToday=currentDay===TODAY_IDX;
+  var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
+  if(!isToday&&!isFutureTester){hintBarEl.style.display="none";return;}
+  if(!game||game.status!=="playing"){hintBarEl.style.display="none";return;}
+  var t=T();
+  var tryCount=game?game.guesses.length:0;
+  var autoAt=parseInt(hintMode,10); // NaN gdy "off" lub "manual"
+
+  if(hintShown){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text">'+t.hintPre+'<b>'+currentHint+'</b></span>';
+    return;
+  }
+  if(hintMode==="manual"){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<button class="hint-btn" id="hintShowBtn">'+t.hintBtn+'</button>';
+    document.getElementById("hintShowBtn").addEventListener("click",function(){
+      hintShown=true;updateHintBar();});
+    return;
+  }
+  if(!isNaN(autoAt)&&tryCount>=autoAt){
+    hintShown=true;
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text">'+t.hintPre+'<b>'+currentHint+'</b></span>';
+    return;
+  }
+  if(!isNaN(autoAt)&&tryCount<autoAt){
+    hintBarEl.style.display="flex";
+    hintBarEl.innerHTML='<span class="hint-text" style="opacity:.5">'+
+      t.hintPre+'<b>???</b> (po '+(autoAt-tryCount)+' próbac'+(autoAt-tryCount===1?"ie":"h")+')</span>';
+    return;
+  }
+  hintBarEl.style.display="none";
+}
+
+/* ── USTAWIENIA ─────────────────────────────────────────────────────── */
+function showSettings(){
+  var t=T();
+  function tog(cur,key,onL,offL){
+    return'<div class="seg">'+
+      '<button data-v="on" data-k="'+key+'" class="seg-opt'+(cur==="on"?" on":"")+'">'+(onL||t.settOn)+'</button>'+
+      '<button data-v="off" data-k="'+key+'" class="seg-opt'+(cur==="off"?" on":"")+'">'+(offL||t.settOff)+'</button>'+
+    '</div>';
+  }
+  function seg(opts,cur,key){
+    return'<div class="seg">'+opts.map(function(o){
+      return'<button data-v="'+o.v+'" data-k="'+key+'" class="seg-opt'+(cur===o.v?" on":"")+'" >'+o.l+'</button>';
+    }).join("")+'</div>';
+  }
+  var hintOpts=[
+    {v:"off",l:t.settOff},{v:"manual",l:t.settManual},
+    {v:"3",l:t.sett3},{v:"4",l:t.sett4},{v:"5",l:t.sett5}
+  ];
+
+  openModal(
+    '<h2>'+t.settH+'</h2>'+
+
+    // Kategoria słowa
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settCatL+'</div>'+
+      '<div class="sett-sub">'+t.settCatS+'</div></div>'+
+      tog(catMode,CAT_KEY)+
+    '</div>'+
+
+    // Tłumaczenie (wskazówka PL)
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settHintL+'</div>'+
+      '<div class="sett-sub">'+t.settHintS+'</div></div>'+
+      seg(hintOpts,hintMode,HINT_KEY)+
+    '</div>'+
+
+    // Animacje
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settAnimL+'</div>'+
+      '<div class="sett-sub">'+t.settAnimS+'</div></div>'+
+      tog(animMode,ANIM_KEY)+
+    '</div>'+
+
+    // Dźwięki
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settSoundL+'</div>'+
+      '<div class="sett-sub">'+t.settSoundS+'</div></div>'+
+      tog(soundMode,SOUND_KEY)+
+    '</div>'+
+
+    // Zamiana Enter/Backspace
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settSwapL+'</div>'+
+      '<div class="sett-sub">'+t.settSwapS+'</div></div>'+
+      tog(swapMode,SWAP_KEY)+
+    '</div>'+
+
+    // Daltonizm
+    '<div class="sett-row">'+
+      '<div><div class="sett-label">'+t.settCbL+'</div>'+
+      '<div class="sett-sub">'+t.settCbS+'</div></div>'+
+      tog(cbMode,CB_KEY)+
+    '</div>'
+  );
+
+  modal.querySelectorAll(".seg-opt").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var v=btn.dataset.v, k=btn.dataset.k;
+      // Zaznacz aktywny w tej grupie
+      modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){
+        b.classList.toggle("on",b.dataset.v===v);
+      });
+      if(k===HINT_KEY){ hintMode=v; store.set(HINT_KEY,v); hintShown=false; updateHintBar(); }
+      if(k===CAT_KEY){  catMode=v;  store.set(CAT_KEY,v);  updateCatBar(); }
+      if(k===ANIM_KEY){ animMode=v; store.set(ANIM_KEY,v); applyAnimMode(); }
+      if(k===SOUND_KEY){soundMode=v;store.set(SOUND_KEY,v);}
+      if(k===CB_KEY){   cbMode=v;   store.set(CB_KEY,v);   applyCbMode(); }
+      if(k===SWAP_KEY){swapMode=v;store.set(SWAP_KEY,v);buildKbd();}
     });
-  }
-  padEl.querySelectorAll(".key").forEach(function(b){
-    var k=b.dataset.key; b.classList.remove("correct","present","absent");
-    if(/[0-9]/.test(k) && best[k]) b.classList.add(best[k]);
   });
 }
+document.getElementById("settBtn").addEventListener("click",showSettings);
 
-/* ── DŹWIĘKI ──────────────────────────────────────────────────────── */
+/* ── KATEGORIA ──────────────────────────────────────────────────────── */
+var catBarEl = document.getElementById("catBar");
+function updateCatBar(){
+  if(!currentCategory||catMode!=="on"){catBarEl.style.display="none";return;}
+  var isActive=currentDay<=TODAY_IDX||(IS_TESTER&&currentDay>TODAY_IDX);
+  if(!isActive){catBarEl.style.display="none";return;}
+  catBarEl.style.display="flex";
+  catBarEl.innerHTML='<span class="cat-text">'+T().catPre+'<b>'+currentCategory+'</b></span>';
+}
+
+/* ── ANIMACJE ───────────────────────────────────────────────────────── */
+function applyAnimMode(){
+  document.documentElement.classList.toggle("no-anim", animMode==="off");
+}
+
+/* ── DALTONIZM ──────────────────────────────────────────────────────── */
+function applyCbMode(){
+  document.documentElement.classList.toggle("cb", cbMode==="on");
+}
+
+/* ── DŹWIĘKI (Web Audio API) ────────────────────────────────────────── */
 var _ctx=null;
-function getCtx(){if(!_ctx){try{_ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return _ctx;}
+function getCtx(){
+  if(!_ctx){try{_ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  return _ctx;
+}
 function playSound(type){
   if(soundMode!=="on")return;
   var ctx=getCtx();if(!ctx)return;
-  var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
-  if(type==="key"){o.frequency.value=420;g.gain.setValueAtTime(.07,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);o.stop(ctx.currentTime+.08);}
-  else if(type==="ok"){o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.08);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);o.stop(ctx.currentTime+.28);}
-  else if(type==="bad"){o.frequency.value=180;g.gain.setValueAtTime(.09,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.14);o.stop(ctx.currentTime+.16);}
-  else if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.1);o.frequency.setValueAtTime(780,ctx.currentTime+.2);g.gain.setValueAtTime(.14,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);o.stop(ctx.currentTime+.48);}
-  o.start();
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  if(type==="key"){o.frequency.value=440;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);}
+  else if(type==="correct"){o.frequency.setValueAtTime(523,ctx.currentTime);o.frequency.setValueAtTime(659,ctx.currentTime+.08);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);}
+  else if(type==="present"){o.frequency.value=392;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.15);}
+  else if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(523,ctx.currentTime);o.frequency.setValueAtTime(659,ctx.currentTime+.1);o.frequency.setValueAtTime(784,ctx.currentTime+.2);g.gain.setValueAtTime(.14,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);}
+  else if(type==="error"){o.frequency.value=220;g.gain.setValueAtTime(.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.12);}
+  o.start();o.stop(ctx.currentTime+.5);
 }
 
-/* ── WEJŚCIE ──────────────────────────────────────────────────────── */
-function toast(msg){toastEl.textContent=msg; toastEl.style.opacity="1";
-  clearTimeout(toast._t); toast._t=setTimeout(function(){toastEl.style.opacity="0";},1600);}
-
-function onKey(k){
-  if(game.status!=="playing") return;
-  if(k==="enter"){ submit(); return; }
-  if(k==="del"){ current=current.slice(0,-1); paintCurrentRow(); playSound("key"); return; }
-  if(/[0-9]/.test(k) && current.length<LEN){ current+=k; paintCurrentRow(); playSound("key"); }
-}
-function paintCurrentRow(){
-  var row=boardEl.querySelectorAll(".row")[game.guesses.length];
-  if(!row) return;
-  var tiles=row.querySelectorAll(".tile");
-  for(var c=0;c<LEN;c++){
-    tiles[c].className="tile"; tiles[c].textContent="";
-    if(current[c]!==undefined){ tiles[c].textContent=current[c]; tiles[c].classList.add("filled"); }
+/* ── NAWIGACJA DNI ──────────────────────────────────────────────────── */
+function updateNavBar(){
+  var t=T();
+  var isToday=currentDay===TODAY_IDX;
+  var isArchive=currentDay<TODAY_IDX;
+  document.getElementById("navDayNo").textContent="Słōwko #"+(currentDay+1);
+  var label=isToday?t.today:fmtDate(dateOfDay(currentDay));
+  if(IS_TESTER&&currentDay>TODAY_IDX)label="▶ "+t.tester;
+  document.getElementById("navDayLabel").innerHTML=label+
+    (IS_TESTER?"<span class='tester-badge'>TEST</span>":"")+
+    (isArchive&&!IS_TESTER?"<span class='archive-badge'>"+t.archive+"</span>":"");
+  document.getElementById("prevBtn").disabled=(currentDay<=0);
+  document.getElementById("nextBtn").disabled=(!IS_TESTER&&currentDay>=TODAY_IDX);
+  // archiveMsg
+  if(isToday){
+    archiveMsgEl.style.display="none";
+    kbdEl.style.display="";
+  } else if(isArchive){
+    var dg=loadDayGame(currentDay);
+    if(dg&&dg.status!=="playing"){
+      archiveMsgEl.textContent=t.archReadonly;
+      kbdEl.style.display="none";
+    } else {
+      archiveMsgEl.textContent=t.archNotPlayed;
+      kbdEl.style.display="";
+    }
+    archiveMsgEl.style.display="block";
+  } else {
+    // przyszłość (tester)
+    archiveMsgEl.style.display="none";
+    kbdEl.style.display="";
   }
+}
+document.getElementById("prevBtn").addEventListener("click",function(){
+  if(currentDay>0){currentDay--;loadDay(currentDay);}
+});
+document.getElementById("nextBtn").addEventListener("click",function(){
+  if(IS_TESTER||currentDay<TODAY_IDX){currentDay++;loadDay(currentDay);}
+});
+
+/* ── TOAST / SHAKE ──────────────────────────────────────────────────── */
+var toastT;
+function toast(m){toastEl.textContent=m;toastEl.style.opacity="1";
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.style.opacity="0";},1800);}
+function shake(){var rows=boardEl.children;if(!game||game.guesses.length>=rows.length)return;
+  var row=rows[game.guesses.length];row.classList.add("shake");
+  setTimeout(function(){row.classList.remove("shake");},400);}
+
+/* ── INPUT ──────────────────────────────────────────────────────────── */
+function maxGuesses(){return IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;}
+function onKey(k){
+  var isToday=currentDay===TODAY_IDX;
+  var isFutureTester=IS_TESTER&&currentDay>TODAY_IDX;
+  var isArchiveUnplayed=currentDay<TODAY_IDX&&(!game||game.status==="playing");
+  var canPlay=isToday||isFutureTester||isArchiveUnplayed;
+  if(!canPlay){return;}
+  if(!game||game.status!=="playing"){
+    toast(isToday?T().done:T().doneArchive);return;
+  }
+  if(k==="⌫"){current=current.slice(0,-1);paintCurrent();return;}
+  if(k==="ENTER"){submit();return;}
+  if(ALPHABET[k]&&Array.from(current).length<LEN){current+=k;paintCurrent();playSound('key');}
+}
+function submit(){
+  if(busy)return;
+  var arr=Array.from(current);
+  if(arr.length<LEN){shake();toast(T().short);return;}
+  busy=true;
+  var fn="wihajster_guess_day";
+  var args={p_day:currentDay,p_guess:current};
+  rpc(fn,args).then(function(res){
+    busy=false;
+    if(!res||res.ok===false){shake();toast(T().short);return;}
+    stateCache[current]=res.states;
+    game.guesses.push(current);
+    paintRow(game.guesses.length-1,arr,res.states,true);
+    var won=res.states.every(function(s){return s==="correct";});
+    if(won)playSound('win');
+    else if(res.states.some(function(s){return s==="correct";}))playSound('correct');
+    else if(res.states.some(function(s){return s==="present";}))playSound('present');
+    else playSound('error');
+    if(won&&res.word)game.reveal={word:res.word,meaning:res.meaning};
+    current="";
+    setTimeout(function(){
+      paintKbd();
+      updateCatBar();
+      updateHintBar();
+      if(won)finish(true);
+      else if(game.guesses.length>=maxGuesses())finish(false);
+      else saveDayGame(currentDay,game);
+    },LEN*150+220);
+  }).catch(function(){busy=false;toast(T().errConn);});
+}
+function recordStats(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return false;
+  if(!stats.results)stats.results={};
+  if(stats.results[currentDay])return false;
+  stats.results[currentDay]={won:!!won,tries:game.guesses.length};
+  recalcStats();
+  saveStats();
+  return true;
+}
+function sendFinishEvent(won){
+  if(IS_TESTER&&currentDay>TODAY_IDX)return;
+  trackEvent({game:"slowko",puzzle_no:currentDay+1,
+    puzzle_word:game.reveal?game.reveal.word:null,
+    won:won,tries:game.guesses.length,max_tries:maxGuesses(),
+    guesses:game.guesses.slice(),lang:lang,
+    mode:IS_TESTER?"tester":"supabase"});
+}
+function finish(won){
+  game.status=won?"won":"lost";
+  saveDayGame(currentDay,game);
+  var shouldTrack=recordStats(won);
+  var go=function(){
+    if(shouldTrack)sendFinishEvent(won);
+    toast(won?T().win[Math.min(game.guesses.length-1,T().win.length-1)]:T().lose);
+    setTimeout(showEnd,900);
+  };
+  if(!won&&!game.reveal){
+    var fn="wihajster_reveal_day";
+    var args={p_day:currentDay};
+    rpc(fn,args).then(function(r){game.reveal=r;saveDayGame(currentDay,game);go();}).catch(go);
+  } else go();
 }
 
 document.addEventListener("keydown",function(e){
-  if(document.getElementById("scrim").classList.contains("open")) return;
-  if(e.key==="Enter") onKey("enter");
-  else if(e.key==="Backspace") onKey("del");
-  else if(/^[0-9]$/.test(e.key)) onKey(e.key);
+  if(document.getElementById("scrim").classList.contains("open")||
+     document.getElementById("calScrim").classList.contains("open")){
+    if(e.key==="Escape"){closeModal();closeCalendar();}return;}
+  if(e.key==="Enter")onKey("ENTER");
+  else if(e.key==="Backspace")onKey("⌫");
+  else{var ch=e.key.toUpperCase();if(ALPHABET[ch])onKey(ch);}
 });
 
-/* ── SUBMIT ───────────────────────────────────────────────────────── */
-function guessCode(args){
-  if(view==="daily"){
-    // Nowe RPC dodaje tylko tablicę directions. Fallback zostawia grę działającą, jeśli SQL nie został jeszcze uruchomiony.
-    return rpc("klodka_guess_hints",args).catch(function(){return rpc("klodka_guess",args);});
-  }
-  return rpc("klodka_guess",args);
-}
-var busy=false;
-function submit(){
-  if(busy) return;
-  if(current.length<LEN){ shakeRow(); toast(t().short); playSound("bad"); return; }
-  var guess=current;
-  busy=true;
-  guessCode({p_mode:view,p_idx:currentIdx(),p_guess:guess})
-    .then(function(res){
-      if(res && res.error){ busy=false;
-        if(res.error==="no code"){ toast(view==="daily"?t().none:t().soon); }
-        else toast(t().short);
-        return;
-      }
-      var entry={code:guess};
-      if(view==="daily"){ entry.states=res.states; if(res.directions) entry.directions=res.directions; }
-      entry.correct=!!res.correct;
-      game.guesses.push(entry);
-      current="";
-      // Zapisuj od razu po każdej zatwierdzonej próbie — także w archiwum.
-      // Dzięki temu gracz nie straci stanu, nawet gdy zamknie stronę przed animacją albo przed pobraniem kodu do modala końcowego.
-      persist();
-      revealRow(game.guesses.length-1);
-      if(res.correct){ playSound("win"); finish(true); }
-      else if(game.guesses.length>=MAX_TRIES){ playSound("bad"); finish(false); }
-      else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); }
-      busy=false;
-    })
-    .catch(function(){ busy=false; toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
-}
-
-function revealRow(r){
-  var row=boardEl.querySelectorAll(".row")[r];
-  var tiles=row.querySelectorAll(".tile");
-  var g=game.guesses[r];
-  for(var c=0;c<LEN;c++){
-    (function(tile,c){
-      var apply=function(){
-        tile.classList.add("reveal"); tile.textContent=g.code[c];
-        if(view==="daily" && g.states){ tile.classList.add(g.states[c]); applyDirectionHint(tile,g,c); }
-        else tile.classList.add(g.correct?"correct":"neutral");
-        if(c===LEN-1) paintPad();
-      };
-      if(animMode==="off")apply();else setTimeout(apply,c*90);
-    })(tiles[c],c);
-  }
-}
-function shakeRow(){
-  var row=boardEl.querySelectorAll(".row")[game.guesses.length];
-  if(!row) return; row.classList.add("shake");
-  setTimeout(function(){row.classList.remove("shake");},360);
-}
-
-/* ── KONIEC GRY ───────────────────────────────────────────────────── */
-function finish(won){
-  game.status=won?"won":"lost";
-
-  var doneMode=view, doneIdx=currentIdx();
-  var doneTries=(game.guesses||[]).length||MAX_TRIES;
-
-  // Najważniejsze: najpierw zapisz wynik lokalnie i statystyki.
-  // To NIE może zależeć od modala, animacji ani Supabase.
-  persist();
-  recordHistoryFor(doneMode,doneIdx,won,doneTries);
-
-  var T=t();
-  if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
-  else toast(doneMode==="daily"?T.loseD:T.loseW);
-
-  // Modal końcowy otwieramy z konkretnego zapisanego dnia/tygodnia, a nie z bieżącego widoku.
-  // Dzięki temu działa też archiwum i nie gubi się przy zmianie dnia.
-  setTimeout(function(){ openEndFor(doneMode,doneIdx); }, animMode==="off"?250:900);
-
-  // Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
-  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
-    .then(function(code){
-      var saved=loadSavedGame(doneMode,doneIdx) || game;
-      if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
-      if(game && view===doneMode && currentIdx()===doneIdx){
-        game.reveal=code;
-        saveGameFor(doneMode,doneIdx,game);
-      }
-      updateRevealInModal(code);
-      refreshWeektile();
-    })
-    .catch(function(){ refreshWeektile(); });
-
-  // log globalny do stats.html
-trackEvent({
-    game: "kodka",
-    mode: doneMode,
-    puzzle_no: doneIdx,
-    puzzle_word: null,
-    won: won, tries: doneTries, max_tries: MAX_TRIES, lang: lang
-  });
-}
-
-/* ── MODAL: koniec + statystyki ───────────────────────────────────── */
-var scrim=document.getElementById("scrim"), modal=document.getElementById("modal");
+/* ── MODAL ──────────────────────────────────────────────────────────── */
+var scrim=document.getElementById("scrim"),modal=document.getElementById("modal");
+function openModal(html){
+  modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
+  modal.querySelector(".modal-close").addEventListener("click",closeModal);
+  scrim.classList.add("open");}
 function closeModal(){scrim.classList.remove("open");}
 scrim.addEventListener("click",function(e){if(e.target===scrim)closeModal();});
 
-function defaultHistory(){return {played:0,won:0,streak:0,best:0,lastIdx:null,lastWon:false,dist:[0,0,0,0,0,0],results:{}};}
-function normalizeHistory(hist){
-  var def=defaultHistory(); hist=hist||{};
-  hist.played=Number(hist.played||0); hist.won=Number(hist.won||0);
-  hist.streak=Number(hist.streak||0); hist.best=Number(hist.best||0);
-  hist.lastIdx=hist.lastIdx===undefined?null:hist.lastIdx; hist.lastWon=!!hist.lastWon;
-  hist.dist=Array.isArray(hist.dist)?hist.dist.slice(0,MAX_TRIES):def.dist.slice();
-  while(hist.dist.length<MAX_TRIES)hist.dist.push(0);
-  hist.results=hist.results||{};
-  return hist;
-}
-function savedResult(mode,idx){
-  var g=loadSavedGame(mode,idx);
-  if(!g || (g.status!=="won" && g.status!=="lost")) return null;
-  return {won:g.status==="won",tries:(g.guesses||[]).length||MAX_TRIES};
-}
-function recalcHistory(mode,hist){
-  hist=normalizeHistory(hist);
-  var maxIdx=mode==="daily"?TODAY_NO:WEEK_NO;
-  var ids=Object.keys(hist.results||{}).map(function(k){return parseInt(k,10);})
-    .filter(function(n){return !isNaN(n)&&n>=1&&n<=maxIdx;})
-    .sort(function(a,b){return a-b;});
-  hist.played=ids.length; hist.won=0; hist.dist=[];
-  for(var d=0;d<MAX_TRIES;d++)hist.dist.push(0);
-  var cur=0,best=0,last=null,lastWin=false;
-  ids.forEach(function(idx){
-    var r=hist.results[idx]||{};
-    if(r.won){
-      hist.won++;
-      var tries=Math.max(1,Math.min(MAX_TRIES,parseInt(r.tries||MAX_TRIES,10)));
-      hist.dist[tries-1]++;
-      cur=(last!==null&&idx===last+1&&lastWin)?cur+1:1;
-      if(cur>best)best=cur;
-    }else cur=0;
-    last=idx; lastWin=!!r.won;
-  });
-  hist.streak=lastWin?cur:0; hist.best=best; hist.lastIdx=last; hist.lastWon=lastWin;
-  return hist;
-}
-function hydrateHistory(mode){
-  var hist=normalizeHistory(loadJSON(histKey(mode)));
-  var maxIdx=mode==="daily"?TODAY_NO:WEEK_NO;
-  for(var i=1;i<=maxIdx;i++){
-    if(!hist.results[i]){
-      var r=savedResult(mode,i);
-      if(r)hist.results[i]=r;
-    }
-  }
-  hist=recalcHistory(mode,hist);
-  saveJSON(histKey(mode),hist);
-  return hist;
-}
-function recordHistoryFor(mode,idx,won,tries){
-  var hist=normalizeHistory(loadJSON(histKey(mode)));
-  tries=Math.max(1,Math.min(MAX_TRIES,parseInt(tries||MAX_TRIES,10)));
-  hist.results[idx]={won:!!won,tries:tries};
-  hist=recalcHistory(mode,hist);
-  saveJSON(histKey(mode),hist);
-  return hist;
-}
-function recordHistory(won){
-  return recordHistoryFor(view,currentIdx(),!!won,(game&&game.guesses?game.guesses.length:MAX_TRIES)||MAX_TRIES);
-}
-function statsPct(hist){return hist.played?Math.round(hist.won/hist.played*100):0;}
-function statsSummaryHtml(hist){var T=t();
-  return '<div class="stats">'+
-    '<div class="stat"><div class="n">'+hist.played+'</div><div class="l">'+T.played+'</div></div>'+
-    '<div class="stat"><div class="n">'+statsPct(hist)+'</div><div class="l">'+T.wpct+'</div></div>'+
-    '<div class="stat"><div class="n">'+hist.streak+'</div><div class="l">'+T.streak+'</div></div>'+
-    '<div class="stat"><div class="n">'+hist.best+'</div><div class="l">'+T.best+'</div></div>'+
-  '</div>';
-}
-function distHtml(hist){var T=t(),max=Math.max(1,Math.max.apply(null,hist.dist||[0])),rows="";
-  for(var i=0;i<MAX_TRIES;i++){
-    var v=(hist.dist&&hist.dist[i])||0;
-    var w=v?Math.max(8,Math.round(v/max*100)):8;
-    var hl=(game&&game.status==="won"&&game.guesses.length===i+1)?" win":"";
-    rows+='<div class="bar-row"><span class="bar-i">'+(i+1)+'</span><div class="bar-wrap"><div class="bar'+hl+'" style="width:'+w+'%">'+v+'</div></div></div>';
-  }
-  return '<div class="dist"><h3>'+T.dist+'</h3>'+rows+'</div>';
-}
+function pct(){return stats.played?Math.round(stats.wins/stats.played*100):0;}
+function statsHtml(){var t=T();
+  return'<div class="stats">'+
+    '<div class="stat"><div class="n">'+stats.played+'</div><div class="l">'+t.played+'</div></div>'+
+    '<div class="stat"><div class="n">'+pct()+'</div><div class="l">'+t.wpct+'</div></div>'+
+    '<div class="stat"><div class="n">'+stats.streak+'</div><div class="l">'+t.streak+'</div></div>'+
+    '<div class="stat"><div class="n">'+stats.maxStreak+'</div><div class="l">'+t.best+'</div></div></div>';}
+function distHtml(){var t=T(),max=Math.max(1,Math.max.apply(null,stats.dist)),rows="";
+  var mg=IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES;
+  for(var i=0;i<mg;i++){var v=stats.dist[i]||0,w=Math.max(8,Math.round(v/max*100));
+    var hl=(game&&currentDay===TODAY_IDX&&game.status==="won"&&game.guesses.length===i+1)?" win":"";
+    rows+='<div class="bar-row"><span class="bar-i">'+(i+1)+'</span>'+
+      '<div class="bar-wrap"><div class="bar'+hl+'" style="width:'+w+'%">'+v+'</div></div></div>';}
+  return'<div class="dist"><h3>'+t.dist+'</h3>'+rows+'</div>';}
+var cdTimer;
+function cdHtml(t){return'<div class="cd"><div class="cd-l">'+t.next+'</div>'+
+  '<div class="cd-t" id="cd">--:--:--</div></div>';}
+function startCd(){clearInterval(cdTimer);
+  function tick(){var el=document.getElementById("cd");if(!el){clearInterval(cdTimer);return;}
+    var n=new Date(),nx=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);
+    var s=Math.max(0,Math.floor((nx-n)/1000));
+    el.textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60]
+      .map(function(x){return String(x).padStart(2,"0");}).join(":");}
+  tick();cdTimer=setInterval(tick,1000);}
 
-function countdown(toMidnightOrWeek){
-  var now=new Date(), target;
-  if(view==="daily"){ target=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1); }
-  else { var dow=now.getDay(); /* tydzień liczony od epoki — pokaż do najbliższej północy następnego dnia tygodnia kalendarzowego */
-         var d=midnight(EPOCH); var nextWeekStart=new Date(d); nextWeekStart.setDate(d.getDate()+WEEK_NO*7);
-         target=nextWeekStart; }
-  var ms=target-now; if(ms<0)ms=0;
-  var h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000), s=Math.floor(ms%60000/1000);
-  return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
-}
+function showEnd(){
+  var t=T(),won=game.status==="won",rev=game.reveal||{word:"",meaning:""};
+  var isToday=currentDay===TODAY_IDX;
+  var isArchive=currentDay<TODAY_IDX;
+  openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
+    '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
+    '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
+    statsHtml()+distHtml()+  // statystyki zawsze
+    (isToday?cdHtml(t):'')+  // odliczanie tylko dla dzisiaj
+    '<button class="btn" id="shareBtn">'+t.share+'</button>'+
+    '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
+  var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
+  if(isToday)startCd();}
 
-function openEnd(){
-  openEndFor(view,currentIdx());
-}
-
-function openEndFor(mode,idx){
-  var T=t();
-  var g=loadSavedGame(mode,idx) || (mode===view && idx===currentIdx()?game:null);
-  if(!g || (g.status!=="won" && g.status!=="lost")) return;
-
-  var oldGame=game, oldView=view, oldDay=DAY_NO;
-  // Na czas budowy HTML ustawiamy game na właściwy zapis, żeby podświetlenie paska prób było poprawne.
-  game=g;
-
-  var won=g.status==="won";
-  var hist=hydrateHistory(mode);
-  var isArchiveDaily = mode==="daily" && idx<TODAY_NO;
-  var countdownHtml = isArchiveDaily
-    ? '<div class="cd">'+T.archiveDone+'</div>'
-    : '<div class="cd">'+(mode==="daily"?T.nextD:T.nextW)+' <b id="cd">'+countdownForMode(mode)+'</b></div>';
-
-  var html=
-    '<button class="modal-close" aria-label="Zamknij">×</button>'+
-    '<h2>'+(won?T.endW:T.endL)+'</h2>'+
-    '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+
-      '<div class="reveal-code" id="revealCode">'+(g.reveal||"····")+'</div></div>'+
-    statsSummaryHtml(hist)+
-    distHtml(hist)+
-    countdownHtml+
-    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
-    '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
-
-  modal.innerHTML=html;
-  scrim.classList.add("open");
-  modal.querySelector(".modal-close").addEventListener("click",closeModal);
-  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
-  clearInterval(openEnd._t);
-  if(!isArchiveDaily){
-    openEnd._t=setInterval(function(){
-      var el=document.getElementById("cd");
-      if(el)el.textContent=countdownForMode(mode);else clearInterval(openEnd._t);
-    },1000);
-  }
-
-  game=oldGame; view=oldView; DAY_NO=oldDay;
-}
-
-function countdownForMode(mode){
-  var oldView=view;
-  view=mode;
-  var out=countdown();
-  view=oldView;
-  return out;
-}
-
-function openFinishedModal(delay){
-  if(!game || (game.status!=="won" && game.status!=="lost")) return;
-  delay = delay===undefined ? 250 : delay;
-  var doneMode=view, doneIdx=currentIdx();
-
-  // Statystyki i okno końcowe pokazują się zawsze, bez czekania na Supabase.
-  setTimeout(function(){ openEndFor(doneMode,doneIdx); }, delay);
-
-  if(game.reveal) return;
-  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
-    .then(function(code){
-      var saved=loadSavedGame(doneMode,doneIdx) || game;
-      if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
-      if(game && view===doneMode && currentIdx()===doneIdx){
-        game.reveal=code;
-        saveGameFor(doneMode,doneIdx,game);
-      }
-      updateRevealInModal(code);
-    })
-    .catch(function(){});
-}
-
-/* ── STATYSTYKI I USTAWIENIA ─────────────────────────────────────── */
-function openSimpleModal(html){
-  modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button>'+html;
-  scrim.classList.add("open");
-  modal.querySelector(".modal-close").addEventListener("click",closeModal);
-}
-function readHistory(mode){return hydrateHistory(mode);}
 function showStats(){
-  var T=t(), hist=readHistory(view);
-  openSimpleModal('<h2>'+T.statsH+'</h2>'+statsSummaryHtml(hist)+distHtml(hist)+'<button class="btn" id="closeBtn">OK</button>');
-  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
-}
-function showSettings(){
-  var T=t();
-  function tog(cur,key){return '<div class="seg"><button data-k="'+key+'" data-v="on" class="seg-opt'+(cur==="on"?' on':'')+'">'+T.settOn+'</button><button data-k="'+key+'" data-v="off" class="seg-opt'+(cur==="off"?' on':'')+'">'+T.settOff+'</button></div>';}
-  openSimpleModal('<h2>'+T.settH+'</h2>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settSoundL+'</div><div class="sett-sub">'+T.settSoundS+'</div></div>'+tog(soundMode,SOUND_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settAnimL+'</div><div class="sett-sub">'+T.settAnimS+'</div></div>'+tog(animMode,ANIM_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settCbL+'</div><div class="sett-sub">'+T.settCbS+'</div></div>'+tog(cbMode,CB_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settDirL+'</div><div class="sett-sub">'+T.settDirS+'</div></div>'+tog(dirMode,DIR_KEY)+'</div>'+    '<div class="sett-row"><div><div class="sett-label">'+T.settRepeatL+'</div><div class="sett-sub">'+T.settRepeatS+'</div></div>'+tog(repeatMode,REPEAT_KEY)+'</div>');
-  modal.querySelectorAll(".seg-opt").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      var k=btn.dataset.k, v=btn.dataset.v;
-      modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){b.classList.toggle("on",b.dataset.v===v);});
-      localStorage.setItem(k,v);
-      if(k===SOUND_KEY)soundMode=v;
-      if(k===ANIM_KEY){animMode=v;applyAnimMode();}
-      if(k===CB_KEY){cbMode=v;applyCbMode();}
-      if(k===DIR_KEY){dirMode=v;paintFromGame();}
-      if(k===REPEAT_KEY){repeatMode=v;loadCodeMeta();updateRepeatInfo();}
-    });
-  });
-}
-document.getElementById("statBtn").addEventListener("click",showStats);
-document.getElementById("settBtn").addEventListener("click",showSettings);
+  var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
+  var html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
+  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  openModal(html);
+  var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
+  if(document.getElementById("cd"))startCd();}
 
-/* ── HELP ─────────────────────────────────────────────────────────── */
-document.getElementById("helpBtn").addEventListener("click",function(){
-  var T=t();
-  var legend = view==="daily"
-    ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+ 
-      '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+ 
-      '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'+ 
-      '<p style="margin-top:8px">'+T.dirLegend+'</p>'
-    : '';
-  var optionsNote = '<p style="margin-top:12px"><b>Opcje.</b> '+T.optionsInfo+'</p>';
-  modal.innerHTML=
-    '<button class="modal-close" aria-label="Zamknij">×</button>'+
-    '<h2>'+T.howH+'</h2>'+
-    '<div class="howlist">'+(view==="daily"?T.howD:T.howW)+legend+optionsNote+'</div>'+
-    '<button class="btn" id="closeBtn" style="margin-top:16px">OK</button>';
-  scrim.classList.add("open");
-  modal.querySelector(".modal-close").addEventListener("click",closeModal);
-  modal.querySelector("#closeBtn").addEventListener("click",closeModal);
-});
-
-/* ── KAFELEK TYGODNIÓWKI ──────────────────────────────────────────── */
-function refreshWeektile(){
-  var T=t(), badge=document.getElementById("wtBadge"), status=document.getElementById("wtStatus");
-  document.getElementById("wtName").firstChild.textContent=T.weekName;
-  var wg=loadSavedGame("weekly",WEEK_NO);
-  var played = wg ? wg.status : null;
-  if(played==="won"){ badge.className="badge won"; badge.textContent=T.bWon; status.textContent=T.wtWon; return; }
-  if(played==="lost"){ badge.className="badge lost"; badge.textContent=T.bLost; status.textContent=T.wtLost; return; }
-  // sprawdź, czy kod tygodnia istnieje
-  rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){
-    if(has){ badge.className="badge new"; badge.textContent=T.bNew; status.textContent=T.wtNew; }
-    else { badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; }
-  }).catch(function(){ badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; });
-}
-
-document.getElementById("weektile").addEventListener("click",function(){ switchView("weekly"); });
-document.getElementById("subback").addEventListener("click",function(){ switchView("daily"); });
-
-function switchView(v){
-  view=v; current="";
-  document.getElementById("weektile").classList.toggle("hidden", v==="weekly");
-  loadGame(); renderStatic();
-  if(v==="weekly" && game.status==="playing"){
-    // jeśli kod jeszcze nie istnieje — komunikat „w przygotowaniu”
-    rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
+function showHelp(){var t=T();
+  openModal('<h2>'+t.howH+'</h2><div class="help-body">'+t.howB+'</div>'+
+    '<div class="legend">'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--correct)">B</div>'+t.lgC+'</div>'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
+    '<div class="legend-row"><div class="swatch" style="background:var(--absent)">F</div>'+t.lgA+'</div></div>'+
+    '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>'+
+    '<div class="contact-row">'+
+      '<button class="contact-btn" id="btnBug">✉ '+t.contactBug+'</button>'+
+      '<button class="contact-btn" id="btnContact">✉ '+t.contactMe+'</button>'+
+    '</div>');
+  // Adres składany w JS — ochrona przed spamerami
+  function openMail(sub){
+    var u=["kont","akt","@","fami","lock",".","pl"].join("");
+    var s=encodeURIComponent(sub);
+    window.location.href="mai"+"lto:"+u+"?subject="+s;
   }
-  if(game.status!=="playing") openFinishedModal(250);
-  window.scrollTo(0,0);
-}
+  var bb=document.getElementById("btnBug");
+  if(bb)bb.addEventListener("click",function(){openMail("Słōwko: błąd / propozycja");});
+  var bc=document.getElementById("btnContact");
+  if(bc)bc.addEventListener("click",function(){openMail("Szpilplac: kontakt");});}
 
-/* ── ARCHIWUM DNI ─────────────────────────────────────────────────── */
-var calScrim=document.getElementById("calScrim"), calViewYear, calViewMonth;
-function loadDailyDay(no){
-  if(no<1||no>TODAY_NO)return;
-  view="daily";DAY_NO=no;current="";
-  document.getElementById("weektile").classList.remove("hidden");
-  loadGame();renderStatic();refreshWeektile();
-  if(game.status!=="playing")openFinishedModal(250);
-  window.scrollTo(0,0);
-}
-function updateNavBar(){
-  var T=t(), nav=document.getElementById("navBar"); if(!nav)return;
-  nav.classList.toggle("hidden",view!=="daily");
-  if(view!=="daily")return;
-  document.getElementById("navDayNo").textContent="Kłōdka #"+DAY_NO;
-  document.getElementById("navDayLabel").innerHTML=(DAY_NO===TODAY_NO?T.today:fmtDate(dateOfDayNo(DAY_NO)))+(DAY_NO<TODAY_NO?"<span class='archive-badge'>"+T.archive+"</span>":"");
-  document.getElementById("prevBtn").disabled=DAY_NO<=1;
-  document.getElementById("nextBtn").disabled=DAY_NO>=TODAY_NO;
-}
-document.getElementById("prevBtn").addEventListener("click",function(){loadDailyDay(DAY_NO-1);});
-document.getElementById("nextBtn").addEventListener("click",function(){loadDailyDay(DAY_NO+1);});
-function openCalendar(){var d=dateOfDayNo(DAY_NO);calViewYear=d.getFullYear();calViewMonth=d.getMonth();renderCalendar();calScrim.classList.add("open");}
+document.getElementById("statBtn").addEventListener("click",showStats);
+document.getElementById("helpBtn").addEventListener("click",showHelp);
+
+/* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
+function share(){
+  var em={correct:"🟩",present:"🟨",absent:"⬛"};
+  var g=loadDayGame(TODAY_IDX)||game;
+  var lines=(g.guesses||[]).map(function(gs){
+    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
+  var score=g.status==="won"?g.guesses.length:"X";
+  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+    "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
+  if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
+function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
+  function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
+    ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}}
+
+/* ── KALENDARZ ──────────────────────────────────────────────────────── */
+var calScrim=document.getElementById("calScrim");
+var calViewYear, calViewMonth;
+
+function openCalendar(){
+  var d=dateOfDay(currentDay);
+  calViewYear=d.getFullYear(); calViewMonth=d.getMonth();
+  renderCalendar();
+  calScrim.classList.add("open");}
 function closeCalendar(){calScrim.classList.remove("open");}
 document.getElementById("calBtn").addEventListener("click",openCalendar);
 document.getElementById("calClose").addEventListener("click",closeCalendar);
 calScrim.addEventListener("click",function(e){if(e.target===calScrim)closeCalendar();});
-document.getElementById("calPrev").addEventListener("click",function(){calViewMonth--;if(calViewMonth<0){calViewMonth=11;calViewYear--;}renderCalendar();});
-document.getElementById("calNext").addEventListener("click",function(){calViewMonth++;if(calViewMonth>11){calViewMonth=0;calViewYear++;}renderCalendar();});
+
+document.getElementById("calPrev").addEventListener("click",function(){
+  calViewMonth--;if(calViewMonth<0){calViewMonth=11;calViewYear--;}renderCalendar();});
+document.getElementById("calNext").addEventListener("click",function(){
+  calViewMonth++;if(calViewMonth>11){calViewMonth=0;calViewYear++;}renderCalendar();});
+
 function renderCalendar(){
-  var T=t(), months=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
-  document.getElementById("calTitle").textContent=T.archive+" — "+months[calViewMonth]+" "+calViewYear;
+  var t=T();
+  var MONTHS_PL=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
+    "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+  document.getElementById("calTitle").textContent=
+    t.calTitle+" — "+MONTHS_PL[calViewMonth]+" "+calViewYear;
   var grid=document.getElementById("calGrid");grid.innerHTML="";
-  ["Pn","Wt","Śr","Cz","Pt","Sb","Nd"].forEach(function(d){var el=document.createElement("div");el.className="cal-dow";el.textContent=d;grid.appendChild(el);});
-  var first=new Date(calViewYear,calViewMonth,1), dow=(first.getDay()+6)%7;
-  for(var e=0;e<dow;e++){var empty=document.createElement("div");empty.className="cal-day empty";grid.appendChild(empty);}
+  var DOWS=["Pn","Wt","Śr","Cz","Pt","Sb","Nd"];
+  DOWS.forEach(function(d){var el=document.createElement("div");el.className="cal-dow";el.textContent=d;grid.appendChild(el);});
+
+  var first=new Date(calViewYear,calViewMonth,1);
+  var dow=(first.getDay()+6)%7; // 0=pn
+  for(var e=0;e<dow;e++){var emp=document.createElement("div");emp.className="cal-day empty";grid.appendChild(emp);}
+
   var daysInMonth=new Date(calViewYear,calViewMonth+1,0).getDate();
+  var epochDate=midnightOf(EPOCH);
+  var todayDate=midnightOf(new Date());
+
   for(var d=1;d<=daysInMonth;d++){
-    var date=new Date(calViewYear,calViewMonth,d), dayNo=Math.floor((midnight(date)-midnight(EPOCH))/86400000)+1;
-    var el=document.createElement("div");el.textContent=d;
-    if(dayNo<1||dayNo>TODAY_NO){el.className="cal-day future";grid.appendChild(el);continue;}
-    var dg=loadSavedGame("daily",dayNo);
+    var date=new Date(calViewYear,calViewMonth,d);
+    var dayIdx=Math.floor((midnightOf(date)-epochDate)/86400000);
+    var el=document.createElement("div");
+    el.textContent=d;
+    if(dayIdx<0){el.className="cal-day future";grid.appendChild(el);continue;}
+    if(date>todayDate&&!IS_TESTER){el.className="cal-day future";grid.appendChild(el);continue;}
+    var dg=dayIdx>=0?loadDayGame(dayIdx):null;
     var cls="cal-day";
-    if(dayNo===TODAY_NO)cls+=" today";else if(dayNo<TODAY_NO)cls+=" past";
-    if(dayNo===DAY_NO)cls+=" active";
+    if(midnightOf(date).getTime()===todayDate.getTime())cls+=" today";
+    else if(date<todayDate||IS_TESTER)cls+=" past";
     if(dg&&dg.status==="won")cls+=" played won";
     else if(dg&&dg.status==="lost")cls+=" played";
     el.className=cls;
-    (function(no){el.addEventListener("click",function(){closeCalendar();loadDailyDay(no);});})(dayNo);
+    (function(idx){el.addEventListener("click",function(){
+      if(idx<0)return;
+      if(idx>TODAY_IDX&&!IS_TESTER)return;
+      closeCalendar();currentDay=idx;loadDay(idx);});
+    })(dayIdx);
     grid.appendChild(el);
   }
-  var epochMonth=new Date(EPOCH.getFullYear(),EPOCH.getMonth(),1), curView=new Date(calViewYear,calViewMonth,1), maxMonth=new Date(dateOfDayNo(TODAY_NO).getFullYear(),dateOfDayNo(TODAY_NO).getMonth(),1);
-  document.getElementById("calPrev").disabled=curView<=epochMonth;
-  document.getElementById("calNext").disabled=curView>=maxMonth;
+
+  // Nawigacja miesiąca — ogranicz do zakresu gry
+  var epochMonth=new Date(EPOCH.getFullYear(),EPOCH.getMonth(),1);
+  var curView=new Date(calViewYear,calViewMonth,1);
+  document.getElementById("calPrev").disabled=(curView<=epochMonth);
+  var maxMonth=IS_TESTER?new Date(calViewYear+1,0,1):new Date(todayDate.getFullYear(),todayDate.getMonth(),1);
+  document.getElementById("calNext").disabled=(curView>=maxMonth);
 }
 
-/* ── START ────────────────────────────────────────────────────────── */
-loadGame();
-renderStatic();
-refreshWeektile();
-if(game.status!=="playing") openFinishedModal(400);
+/* ── ŁADOWANIE DNIA ─────────────────────────────────────────────────── */
+function loadDay(dayIdx){
+  current="";busy=false;stateCache={};
+  updateNavBar();
+  buildBoard();buildKbd();relabelKbd();
+
+  var saved=loadDayGame(dayIdx);
+  var fn="wihajster_day";
+  var args={p_day:dayIdx};
+
+  rpc(fn,args).then(function(meta){
+    LEN=meta.length; PNO=meta.puzzle_no||dayIdx+1;
+    currentHint=meta.hint||null;
+    currentCategory=meta.category||null;
+    hintShown=false;
+    document.getElementById("navDayNo").textContent="Słōwko #"+PNO;
+    buildBoard();buildKbd();relabelKbd();
+
+    var s=saved||{guesses:[],status:"playing",reveal:null};
+    var savedStatus=(s.status==="won"||s.status==="lost")?s.status:"playing";
+    game={guesses:[],status:savedStatus,reveal:s.reveal||null};
+
+    var replay=s.guesses||[];
+    (function step(i){
+      if(i>=replay.length){
+        paintKbd();
+        updateCatBar();
+        updateHintBar();
+        updateNavBar();
+        if(game.status!=="playing")setTimeout(function(){showEnd();},300);
+        return;
+      }
+      var g=replay[i],arr=Array.from(g);
+      var fn2="wihajster_guess_day";
+      var a2={p_day:dayIdx,p_guess:g};
+      rpc(fn2,a2).then(function(res){
+        var st=res&&res.states?res.states:((s.states&&s.states[i])||arr.map(function(){return"absent";}));
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
+      }).catch(function(){
+        var st=(s.states&&s.states[i])||arr.map(function(){return"absent";});
+        stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
+      });
+    })(0);
+  }).catch(function(){toast(T().errConn);});
+}
+
+/* ── JĘZYK ──────────────────────────────────────────────────────────── */
+function applyLang(){
+  document.documentElement.lang=lang==="szl"?"szl":"pl";
+  document.getElementById("lPl").className=lang==="pl"?"on":"";
+  document.getElementById("lSzl").className=lang==="szl"?"on":"";
+  relabelKbd();updateNavBar();
+  if(scrim.classList.contains("open"))closeModal();}
+function setLang(l){lang=l;store.set(LANG_KEY,l);applyLang();}
+document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
+document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
+
+/* ── START ──────────────────────────────────────────────────────────── */
+applyLang();
+applyAnimMode();
+applyCbMode();
+hydrateStatsFromDayGames();
+loadDay(TODAY_IDX);
 </script>
 </body>
 </html>
