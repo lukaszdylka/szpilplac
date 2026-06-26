@@ -338,9 +338,10 @@ var DIR_KEY   = "klodka_dir_hints";
    Będzie pokazana NAD kafelkami prób tylko w trybie tygodniowym. */
 var WEEKLY_HINT_TITLE = "Zagadka tygodnia";
 var WEEKLY_HINT_TEXT  = ">>> Ostatni F <<<";
+var WEEKLY_CONSOLE_TEXT = "5485";
 
 console.log("%c🗝️ "+WEEKLY_HINT_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
-console.log("%cTydzień 1: 5485,"font-size:13px");
+console.log("%cTydzień 1: "+WEEKLY_CONSOLE_TEXT,"font-size:13px");
 
 /* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
