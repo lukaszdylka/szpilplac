@@ -8,20 +8,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <style>
-:root{
+:root,
+[data-theme=light]{
   --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
   --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
   --green:#2f4a39;--gold:#bf8a3a;--red:#b84040;
   --c0:#3f8a5a;--c1:#bf8a3a;--c2:#5a7ab8;--c3:#9a5a3a;
+  --tag-won-bg:#d4eddf;--tag-won-ink:#1e6b3f;
+  --tag-lost-bg:#f4d9d9;--tag-lost-ink:#8a2020;
 }
-*{box-sizing:border-box}
+[data-theme=dark]{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;
+  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
+  --green:#4a7a56;--gold:#d4a04a;--red:#d4776d;
+  --c0:#4a9a6a;--c1:#c49050;--c2:#6f8fd0;--c3:#b97755;
+  --tag-won-bg:#1f3a2a;--tag-won-ink:#9ee0b5;
+  --tag-lost-bg:#3e2320;--tag-lost-ink:#efa397;
+}
+*{box-sizing:border-box;transition:background-color .18s,color .18s,border-color .18s}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
   font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
 h1,h2,h3{font-family:"Oswald";text-transform:uppercase;letter-spacing:.02em;margin:0}
 a{color:var(--green);font-weight:600;text-decoration:none}
 a:hover{text-decoration:underline}
-button{font-family:inherit;cursor:pointer;border:none}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
 
 /* login */
 #login{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -33,6 +44,12 @@ button{font-family:inherit;cursor:pointer;border:none}
 #login button{width:100%;padding:12px;border-radius:9px;background:var(--green);
   color:#fff;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
 #login button:hover{filter:brightness(1.08)}
+.theme-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  width:auto;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
+.theme-btn:hover{background:var(--surface);color:var(--ink)}
+#login .theme-btn{align-self:flex-end;width:auto;padding:6px 12px;background:var(--surface2);
+  color:var(--ink2);font-size:12px;letter-spacing:0;text-transform:none}
 .err{color:var(--red);font-size:13px;display:none}
 
 /* dashboard */
@@ -69,8 +86,8 @@ td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--surface2)}
 .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
-.tag-won{background:#d4eddf;color:#1e6b3f}
-.tag-lost{background:#f4d9d9;color:#8a2020}
+.tag-won{background:var(--tag-won-bg);color:var(--tag-won-ink)}
+.tag-lost{background:var(--tag-lost-bg);color:var(--tag-lost-ink)}
 
 /* rozkład prób */
 .dist-row{display:flex;align-items:center;gap:10px;margin:4px 0;font-size:13px}
@@ -94,6 +111,7 @@ tr:hover td{background:var(--surface2)}
 
 <!-- LOGIN -->
 <div id="login">
+  <button class="theme-btn themeBtn" type="button" aria-label="Zmień motyw">☀ Jasny</button>
   <h1>Szpilplac Stats</h1>
   <input type="password" id="pwInput" placeholder="Service role key" autocomplete="current-password">
   <p class="err" id="loginErr">Nieprawidłowy klucz.</p>
@@ -109,6 +127,7 @@ tr:hover td{background:var(--surface2)}
       <h1 style="margin-top:4px">Statystyki</h1>
     </div>
     <div class="hdr-right">
+      <button class="theme-btn themeBtn" type="button" aria-label="Zmień motyw">☀ Jasny</button>
       <button class="refresh" id="refreshBtn">↻ Odśwież</button>
       <button class="logout" id="logoutBtn">Wyloguj</button>
     </div>
@@ -130,6 +149,25 @@ tr:hover td{background:var(--surface2)}
 var SUPABASE_URL = "https://xyivrakegwybwhmmcawq.supabase.co";
 // Ten sam projekt co Słōwko — wpisujesz service_role key przy logowaniu poniżej
 var KEY_LS = "szpilplac_stats_key";
+var THEME_LS = "szpilplac_stats_theme";
+
+/* ── Motyw ── */
+var theme = "light";
+try { theme = localStorage.getItem(THEME_LS) || localStorage.getItem("szpilplac_theme") || "light"; } catch(e) {}
+if(theme!=="dark") theme="light";
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",theme);
+  document.querySelectorAll(".themeBtn").forEach(function(btn){
+    btn.textContent = theme==="dark" ? "☾ Ciemny" : "☀ Jasny";
+  });
+}
+function toggleTheme(){
+  theme = theme==="dark" ? "light" : "dark";
+  try { localStorage.setItem(THEME_LS,theme); localStorage.setItem("szpilplac_theme",theme); } catch(e) {}
+  applyTheme();
+}
+document.querySelectorAll(".themeBtn").forEach(function(btn){btn.addEventListener("click",toggleTheme);});
+applyTheme();
 
 /* ── Hasło (service_role key) ── */
 var serviceKey = "";
