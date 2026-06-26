@@ -760,20 +760,22 @@ function submit(){
         return;
       }
       var entry={code:guess};
-      if(view==="daily"){ entry.states=res.states; if(res.directions) entry.directions=res.directions; }
-      entry.correct=!!res.correct;
-      game.guesses.push(entry);
-      current="";
-      // Zapisuj od razu po każdej zatwierdzonej próbie — także w archiwum.
-      // Dzięki temu gracz nie straci stanu, nawet gdy zamknie stronę przed animacją albo przed pobraniem kodu do modala końcowego.
-      persist();
-      revealRow(game.guesses.length-1);
-      if(res.correct){ playSound("win"); finish(true); }
-      else if(game.guesses.length>=MAX_TRIES){ playSound("bad"); finish(false); }
-      else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); }
+      try{
+        if(view==="daily"){ entry.states=res.states; if(res.directions) entry.directions=res.directions; }
+        entry.correct=!!res.correct;
+        game.guesses.push(entry);
+        current="";
+        // Zapisuj od razu po każdej zatwierdzonej próbie — także w archiwum.
+        // Dzięki temu gracz nie straci stanu, nawet gdy zamknie stronę przed animacją albo przed pobraniem kodu do modala końcowego.
+        persist();
+        revealRow(game.guesses.length-1);
+        if(res.correct){ playSound("win"); finish(true); }
+        else if(game.guesses.length>=MAX_TRIES){ playSound("bad"); finish(false); }
+        else { playSound(view==="daily" && res.states && res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad"); }
+      }catch(err){ console.error("Kłōdka: błąd po ocenie próby:",err); }
       busy=false;
     })
-    .catch(function(){ busy=false; toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
+    .catch(function(err){ busy=false; console.error("Kłōdka: RPC nie powiodło się:",err); toast(lang==="szl"?"Coś niy pyknyło, sprōbuj zaś.":"Coś nie pykło, spróbuj jeszcze raz."); });
 }
 
 function revealRow(r){
@@ -805,41 +807,45 @@ function finish(won){
   var doneMode=view, doneIdx=currentIdx();
   var doneTries=(game.guesses||[]).length||MAX_TRIES;
 
-  // Najważniejsze: najpierw zapisz wynik lokalnie i statystyki.
-  // To NIE może zależeć od modala, animacji ani Supabase.
-  persist();
-  recordHistoryFor(doneMode,doneIdx,won,doneTries);
+  // 1) NAJPIERW planujemy okno końcowe — żeby pojawiło się ZAWSZE, nawet
+  //    gdyby zapis stanu albo statystyki niżej rzuciły wyjątkiem.
+  setTimeout(function(){ try{ openEndFor(doneMode,doneIdx); }catch(e){ console.error("Kłōdka: openEndFor:",e); } }, animMode==="off"?250:900);
 
-  var T=t();
-  if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
-  else toast(doneMode==="daily"?T.loseD:T.loseW);
+  // 2) Zapis wyniku + statystyki — każde niezależnie, błąd jednego nie blokuje reszty.
+  try{ persist(); }catch(e){ console.error("Kłōdka: persist:",e); }
+  try{ recordHistoryFor(doneMode,doneIdx,won,doneTries); }catch(e){ console.error("Kłōdka: history:",e); }
 
-  // Modal końcowy otwieramy z konkretnego zapisanego dnia/tygodnia, a nie z bieżącego widoku.
-  // Dzięki temu działa też archiwum i nie gubi się przy zmianie dnia.
-  setTimeout(function(){ openEndFor(doneMode,doneIdx); }, animMode==="off"?250:900);
+  try{
+    var T=t();
+    if(won) toast(T.win[Math.floor(Math.random()*T.win.length)]);
+    else toast(doneMode==="daily"?T.loseD:T.loseW);
+  }catch(e){}
 
-  // Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
+  // 3) Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
   rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
     .then(function(code){
-      var saved=loadSavedGame(doneMode,doneIdx) || game;
-      if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
-      if(game && view===doneMode && currentIdx()===doneIdx){
-        game.reveal=code;
-        saveGameFor(doneMode,doneIdx,game);
-      }
-      updateRevealInModal(code);
-      refreshWeektile();
+      try{
+        var saved=loadSavedGame(doneMode,doneIdx) || game;
+        if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
+        if(game && view===doneMode && currentIdx()===doneIdx){
+          game.reveal=code;
+          saveGameFor(doneMode,doneIdx,game);
+        }
+        updateRevealInModal(code);
+        refreshWeektile();
+      }catch(e){ console.error("Kłōdka: reveal apply:",e); }
     })
-    .catch(function(){ refreshWeektile(); });
+    .catch(function(){ try{refreshWeektile();}catch(e){} });
 
-  // log globalny do stats.html
-  trackEvent({
-    game: "kodka",
-    mode: doneMode,
-    puzzle_no: doneIdx,
-    puzzle_word: null,
-    won: won, tries: doneTries, max_tries: MAX_TRIES, lang: lang
-  });
+  // 4) Log globalny do stats.html
+  try{
+    trackEvent({
+      game: doneMode==="daily" ? "klodka" : "klodka-weekly",
+      puzzle_no: doneIdx,
+      puzzle_word: null,
+      won: won, tries: doneTries, max_tries: MAX_TRIES, lang: lang
+    });
+  }catch(e){}
 }
 
 /* ── MODAL: koniec + statystyki ───────────────────────────────────── */
@@ -954,7 +960,12 @@ function openEndFor(mode,idx){
   game=g;
 
   var won=g.status==="won";
-  var hist=hydrateHistory(mode);
+  var hist;
+  try{ hist=hydrateHistory(mode); }
+  catch(e){ console.error("Kłōdka: hydrateHistory:",e);
+    try{ saveJSON(histKey(mode),defaultHistory()); }catch(_){}
+    hist=normalizeHistory(null);
+  }
   var isArchiveDaily = mode==="daily" && idx<TODAY_NO;
   var countdownHtml = isArchiveDaily
     ? '<div class="cd">'+T.archiveDone+'</div>'
