@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Słōwko · Szpilplac · Familock</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
 <meta name="description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach. Gra od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,11 +60,11 @@ header{width:100%;max-width:500px;padding-top:14px}
   background:#8a4ab8;color:#fff;margin-left:6px}
 
 /* PLANSZA */
-main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1}
-.board{display:grid;gap:6px;margin:12px 0 4px;width:min(90vw,calc(var(--len,5)*58px))}
+main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1;min-height:0}
+.board{display:grid;gap:6px;margin:10px 0 3px;width:min(92vw,calc(var(--len,5)*56px))}
 .row{display:grid;grid-template-columns:repeat(var(--len,5),1fr);gap:6px}
 .tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:calc(min(90vw,calc(var(--len,5)*58px))/var(--len,5)*.46);
+  font-weight:800;font-size:calc(min(92vw,calc(var(--len,5)*56px))/var(--len,5)*.46);
   text-transform:uppercase;background:var(--surface2);border:2px solid var(--line);
   border-radius:7px;user-select:none}
 .tile.filled{border-color:#a99f84;animation:pop .12s ease}
@@ -79,25 +77,71 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 .row.shake{animation:shake .38s}
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
   30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
-.toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);
-  text-align:center;margin:2px 0 3px;transition:opacity .2s}
+.toast{min-height:21px;font-weight:700;font-size:13px;color:var(--green);
+  text-align:center;margin:1px 0 2px;transition:opacity .2s}
 
 /* KLAWIATURA */
 .kbd{width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;
-  margin-top:6px;padding-top:2px}
-.kbd-row{display:flex;gap:4px;justify-content:center}
-.key{width:clamp(27px,8.2vw,40px);flex:none;height:46px;border-radius:7px;
-  background:var(--surface2);border:1px solid var(--line);font-weight:700;
-  font-size:clamp(10px,3.2vw,14px);color:var(--ink);display:flex;align-items:center;
-  justify-content:center;text-transform:uppercase;transition:transform .05s,background .12s}
+  margin-top:5px;padding-top:1px;overflow:visible}
+.kbd-row{display:flex;gap:4px;justify-content:center;width:100%}
+.key{flex:1;min-width:0;height:44px;border-radius:7px;background:var(--surface2);
+  border:1px solid var(--line);font-weight:700;font-size:clamp(10px,3.2vw,14px);
+  color:var(--ink);display:flex;align-items:center;justify-content:center;
+  text-transform:uppercase;transition:transform .05s,background .12s}
 .key:active{transform:translateY(1px)}
-.key.wide{width:clamp(42px,12.5vw,60px);font-size:clamp(9px,2.8vw,11px);letter-spacing:.02em}
+.key.wide{flex:1.65;min-width:0;font-size:clamp(9px,2.8vw,11px);letter-spacing:.02em}
 .key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .key.present{background:var(--present);border-color:var(--present);color:#fff}
 .key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
 
-footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:10px}
+footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:8px}
 footer a{color:var(--green);font-weight:600}
+
+@media (max-width:380px){
+  body{padding-left:8px;padding-right:8px;padding-bottom:10px}
+  header{padding-top:10px}
+  .topbar{margin-bottom:7px}
+  .nav-bar{gap:6px;margin-bottom:4px}
+  .board{width:min(94vw,calc(var(--len,5)*51px));gap:5px;margin:8px 0 2px}
+  .row{gap:5px}
+  .tile{font-size:calc(min(94vw,calc(var(--len,5)*51px))/var(--len,5)*.45);border-radius:6px}
+  .kbd{gap:5px;margin-top:3px}
+  .kbd-row{gap:3px}
+  .key{height:41px;font-size:clamp(9px,3vw,12px);border-radius:6px}
+  .key.wide{font-size:9px}
+  .toast{min-height:18px;font-size:12px;margin:0 0 1px}
+  footer{font-size:10.5px;margin-top:6px}
+}
+
+@media (min-width:700px){
+  body{padding-bottom:10px}
+  header{padding-top:10px}
+  .topbar{margin-bottom:7px}
+  .nav-bar{margin-bottom:4px}
+  .board{width:min(86vw,calc(var(--len,5)*52px));gap:5px;margin:7px 0 2px}
+  .row{gap:5px}
+  .tile{font-size:calc(min(86vw,calc(var(--len,5)*52px))/var(--len,5)*.45);border-radius:7px}
+  .kbd{gap:5px;margin-top:3px;padding-top:0}
+  .key{height:40px;font-size:13px}
+  .key.wide{font-size:10px}
+  .toast{min-height:18px;font-size:12px;margin:0 0 2px}
+  footer{font-size:10.5px;margin-top:5px}
+}
+
+@media (min-width:700px) and (max-height:760px){
+  header{padding-top:6px}
+  .topbar{margin-bottom:5px}
+  .nav-day .dayno{font-size:16px}
+  .nav-bar{margin-bottom:2px}
+  .board{width:min(84vw,calc(var(--len,5)*46px));gap:4px;margin:4px 0 1px}
+  .row{gap:4px}
+  .tile{font-size:calc(min(84vw,calc(var(--len,5)*46px))/var(--len,5)*.44);border-radius:6px}
+  .kbd{gap:4px;margin-top:2px}
+  .kbd-row{gap:4px}
+  .key{height:35px;font-size:12px;border-radius:6px}
+  .key.wide{font-size:9px}
+  footer{display:none}
+}
 
 /* MODAL */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
@@ -144,8 +188,6 @@ footer a{color:var(--green);font-weight:600}
   font-size:12.5px;color:var(--ink2);line-height:1.5}
 .spelling-note b{color:var(--ink)}
 .contact-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.contact-btn-full{display:block;width:100%;text-align:center;padding:11px 12px;border-radius:9px;font-size:13px;font-weight:700;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);cursor:pointer;font-family:inherit;margin-top:14px}
-.contact-btn-full:hover{background:var(--surface);color:var(--ink)}
 .contact-btn{flex:1;min-width:0;text-align:center;padding:9px 12px;border-radius:9px;
   font-size:12px;font-weight:700;color:var(--ink2);border:1px solid var(--line);
   background:var(--surface2);cursor:pointer;font-family:inherit}
@@ -225,20 +267,6 @@ footer a{color:var(--green);font-weight:600}
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
 .no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake{animation:none!important}
 </style>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://szpilplac.familock.pl/slowko.html">
-<meta property="og:title" content="Słōwko · Szpilplac · Familock">
-<meta property="og:description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach. Gra od Familocka Starzik.">
-<meta property="og:image" content="https://szpilplac.familock.pl/og-image.svg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="pl_PL">
-<meta property="og:site_name" content="Szpilplac · Familock">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Słōwko · Szpilplac · Familock">
-<meta name="twitter:description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach.">
-<meta name="twitter:image" content="https://szpilplac.familock.pl/og-image.svg">
-<link rel="canonical" href="https://szpilplac.familock.pl/slowko.html">
 </head>
 <body>
 <header>
@@ -365,22 +393,31 @@ var IS_TESTER = (function(){
 
 /* ── HELPERS ────────────────────────────────────────────────────────── */
 function midnightOf(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
-// Dzień gry liczony według czasu Polski
+
+// Dzień gry liczony według czasu Polski, żeby po północy w Polsce
+// frontend i Supabase nie rozjeżdżały się przez UTC.
 function warsawDateParts(d){
   var parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Warsaw",
-    year: "numeric", month: "2-digit", day: "2-digit"
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
   }).formatToParts(d);
+
   var out = {};
-  parts.forEach(function(p){ if(p.type !== "literal") out[p.type] = Number(p.value); });
+  parts.forEach(function(p){
+    if(p.type !== "literal") out[p.type] = Number(p.value);
+  });
   return out;
 }
+
 function todayIndex(){
   var p = warsawDateParts(new Date());
   var todayUtc = Date.UTC(p.year, p.month - 1, p.day);
   var epochUtc = Date.UTC(2026, 5, 23);
   return Math.floor((todayUtc - epochUtc) / 86400000);
 }
+
 function dateOfDay(idx){ var d=new Date(EPOCH); d.setDate(d.getDate()+idx); return d; }
 function fmtDate(d){ return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",timeZone:"Europe/Warsaw"}); }
 
@@ -432,7 +469,6 @@ var S={
     lgC:"Litera jest na właściwym miejscu.",
     lgP:"Litera jest w słowie, ale na innym miejscu.",
     lgA:"Tej litery nie ma w słowie.",
-    fbGroup:"Podpowiedzi — na grupie FB Mieszkańcy Familoka",
     contactBug:"Zgłoś błąd / propozycję",
     contactMe:"Kontakt z autorem",
     spH:"Jak wpisywać?",
@@ -470,7 +506,6 @@ var S={
     lgC:"Litera je na dobrym placu.",
     lgP:"Litera je w słowie, ale na inkszym placu.",
     lgA:"Tyj litery w słowie niy ma.",
-    fbGroup:"Podpowiydzi — na grupie FB Mieszkańcy Familoka",
     contactBug:"Zgłoś błąd / propozycja",
     contactMe:"Kontakt z autorim",
     spH:"Jak wpisywać?",
@@ -993,7 +1028,6 @@ function showHelp(){var t=T();
     '<div class="legend-row"><div class="swatch" style="background:var(--present)">Y</div>'+t.lgP+'</div>'+
     '<div class="legend-row"><div class="swatch" style="background:var(--absent)">F</div>'+t.lgA+'</div></div>'+
     '<div class="spelling-note"><b>'+t.spH+'</b><br><br>'+t.spB+'</div>'+
-    '<button class="contact-btn-full" id="btnFb">'+t.fbGroup+'</button>'+
     '<div class="contact-row">'+
       '<button class="contact-btn" id="btnBug">✉ '+t.contactBug+'</button>'+
       '<button class="contact-btn" id="btnContact">✉ '+t.contactMe+'</button>'+
@@ -1004,8 +1038,6 @@ function showHelp(){var t=T();
     var s=encodeURIComponent(sub);
     window.location.href="mai"+"lto:"+u+"?subject="+s;
   }
-  var bf=document.getElementById("btnFb");
-  if(bf)bf.addEventListener("click",function(){window.open("https://www.facebook.com/groups/mieszkancy.familoka","_blank","noopener");});
   var bb=document.getElementById("btnBug");
   if(bb)bb.addEventListener("click",function(){openMail("Słōwko: błąd / propozycja");});
   var bc=document.getElementById("btnContact");
@@ -1017,26 +1049,14 @@ document.getElementById("helpBtn").addEventListener("click",showHelp);
 /* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
 function share(){
   var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var g=loadDayGame(currentDay)||game;
-  var statesArr=g&&g.states?g.states:[];
-  var lines=((g&&g.guesses)||[]).map(function(gs,i){
-    return((stateCache[gs]||statesArr[i]||[]).map(function(s){return em[s]||"⬛";})).join("");});
-  var score=(g&&g.status==="won")?g.guesses.length:"X";
-  var txt="Słōwko #"+(currentDay+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
+  var g=loadDayGame(TODAY_IDX)||game;
+  var lines=(g.guesses||[]).map(function(gs){
+    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
+  var score=g.status==="won"?g.guesses.length:"X";
+  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
     "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
-  // Na mobile użyj natywnego share, na desktopie od razu kopiuj do schowka
-  var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  if(isMobile&&navigator.share){
-    navigator.share({text:txt}).catch(function(){copyTxt(txt);});
-  } else {
-    copyTxt(txt);
-  }
-}
-function copyTxt(txt){
-  function done(ok){
-    closeModal();
-    setTimeout(function(){toast(ok?T().copied:T().copyerr);},100);
-  }
+  if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
+function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
   if(navigator.clipboard&&navigator.clipboard.writeText)
     navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
   function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
@@ -1114,17 +1134,9 @@ function renderCalendar(){
 function loadDay(dayIdx){
   current="";busy=false;stateCache={};
   updateNavBar();
-
-  var saved=loadDayGame(dayIdx);
-
-  // Odczytaj LEN z localStorage zanim Supabase odpowie — unika błędnej siatki
-  if(saved&&saved.guesses&&saved.guesses.length>0){
-    LEN=Array.from(saved.guesses[0]).length;
-  }
-  // Zbuduj planszę od razu (z LEN z localStorage lub domyślnym 5)
-  // żeby gracz nie widział pustego ekranu podczas ładowania
   buildBoard();buildKbd();relabelKbd();
 
+  var saved=loadDayGame(dayIdx);
   var fn="wihajster_day";
   var args={p_day:dayIdx};
 
@@ -1151,8 +1163,8 @@ function loadDay(dayIdx){
         return;
       }
       var g=replay[i],arr=Array.from(g);
-      var fn2=dayIdx===TODAY_IDX?"wihajster_guess":"wihajster_guess_day";
-      var a2=dayIdx===TODAY_IDX?{p_guess:g}:{p_day:dayIdx,p_guess:g};
+      var fn2="wihajster_guess_day";
+      var a2={p_day:dayIdx,p_guess:g};
       rpc(fn2,a2).then(function(res){
         var st=res&&res.states?res.states:((s.states&&s.states[i])||arr.map(function(){return"absent";}));
         stateCache[g]=st;game.guesses.push(g);paintRow(i,arr,st,false);step(i+1);
@@ -1176,25 +1188,11 @@ document.getElementById("lPl").addEventListener("click",function(){setLang("pl")
 document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
 
 /* ── START ──────────────────────────────────────────────────────────── */
-// Jednorazowe czyszczenie dni 0 i 1 (błędna kolejność słów przed fix_pick)
-// Usuń ten blok po ~2 tygodniach
-(function(){
-  if(!store.get('slowko_cleaned_v2')){
-    store.set('slowko_d0','');
-    store.set('slowko_d1','');
-    store.set('slowko_cleaned_v2','1');
-  }
-})();
 applyLang();
 applyAnimMode();
 applyCbMode();
 hydrateStatsFromDayGames();
 loadDay(TODAY_IDX);
-// Pierwsze wejście — pokaż instrukcję po załadowaniu gry
-if(!store.get('slowko_intro_seen')){
-  store.set('slowko_intro_seen','1');
-  setTimeout(showHelp, 800);
-}
 </script>
 </body>
 </html>
