@@ -123,7 +123,8 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
   transition:transform .1s,box-shadow .1s}
 .weektile:hover{transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(35,32,26,.35);background:var(--surface)}
 .weektile .wt-ico{flex:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);
-  background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px}
+  background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--green)}
+.weektile .wt-ico svg{width:22px;height:22px;display:block}
 .weektile .wt-body{flex:1;min-width:0}
 .weektile .wt-name{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
 .weektile .wt-status{font-size:12px;color:var(--ink2);margin-top:3px}
@@ -283,7 +284,14 @@ footer a{color:var(--green);font-weight:600}
   <div class="pad" id="pad"></div>
 
   <button class="weektile" id="weektile">
-    <div class="wt-ico">🗝️</div>
+    <div class="wt-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="12" r="3.5"></circle>
+        <path d="M11.5 12H21"></path>
+        <path d="M18 12V9.5"></path>
+        <path d="M15.5 12V10.5"></path>
+      </svg>
+    </div>
     <div class="wt-body">
       <div class="wt-name" id="wtName">Zagadka tygodnia<span class="badge soon" id="wtBadge">…</span></div>
       <div class="wt-status" id="wtStatus">sprawdzam…</div>
@@ -315,7 +323,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="public-share-clipboard-modal-msg-2026-06-27";
+window.KLODKA_VERSION="public-translation-fix-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -392,7 +400,7 @@ var S={
     again:"Zamknij", cta:"Chcesz więcej zagadek? Wpadnij do Starzika →",
     share:"Udostępnij wynik", copied:"Skopiowano do schowka", copyFail:"Nie udało się skopiować — skopiuj ręcznie",
     weekName:"Zagadka tygodnia",
-    wtNew:"Nowa zagadka — kliknij i graj", wtWon:"Rozwiązane 🎉",
+    wtNew:"Nowa zagadka — kliknij i graj", wtWon:"Rozwiązane",
     wtLost:"Nie udało się w tym tygodniu", wtSoon:"Wkrótce — w przygotowaniu",
     bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wkrótce",
     howH:"Jak grać",
@@ -417,29 +425,29 @@ var S={
   szl:{
     titleD:"Kłōdka", titleW:"Kłōdka — tydzień",
     tagD:"Zgodnij 4-cyfrowy kod. Mosz 6 prób.",
-    tagW:"Rozszyfruj zogodka i wkluj kod. Mosz 6 prób.",
+    tagW:"Rozszyfruj zagadka i wkludź kod. Mosz 6 prób.",
     pnoD:"Kod nr ", pnoW:"Tydzień ",
-    enter:"OK", short:"Wkluj 4 cyfry.",
+    enter:"OK", short:"Wkludź 4 cyfry.",
     doneD:"Dzisiej już grane. Przidź jutro!",
     doneW:"Tydniówka już je rozegrano.",
-    soon:"Zogodka sie szykuje — zaźrzij niyskorzij.",
+    soon:"Zagadka sie szykuje — zajrzij niyskorzij.",
     none:"Ni ma kodu na dzisiej.",
     win:["Łodewrzite!","Brawo!","Forszt!","Udało sie!","Klik!"],
     loseD:"Niy tym razym.", loseW:"Kłódka łostała zawarto.",
-    endW:"Łodewrzite!", endL:"Niy podarziło sie",
+    endW:"Łotwarte!", endL:"Niy podarziło sie",
     revealLbl:"Kod bōł:",
     played:"Rozegrane", wpct:"% łodewrzitych", streak:"Seryjo", best:"Rekord",
-    nextD:"Nowy kod za", nextW:"Nowo zogodka za",
+    nextD:"Nowy kod za", nextW:"Nowo zagadka za",
     again:"Zawrzij", cta:"Chcesz wiyncyj zogodek? Wpadnij do Starzika →",
     share:"Udostympnij wynik", copied:"Skopiowano do schowka", copyFail:"Niy szło skopiować — skopiuj ryncznie",
-    weekName:"Zogodka tydnia",
-    wtNew:"Nowo zogodka — klikej i grej", wtWon:"Rozwiōnzane 🎉",
+    weekName:"zagadka tydnia",
+    wtNew:"Nowo zagadka — klikej i grej", wtWon:"Rozwiōnzane",
     wtLost:"Niy podarziło sie w tym tydniu", wtSoon:"Wnet — w szykowaniu",
     bNew:"nowe", bWon:"ok", bLost:"pudło", bSoon:"wnet",
     howH:"Jak grać",
     howD:"<b>Codzienno kłódka.</b> Kożdy dziyń jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożōm, jak blisko jeżeś:",
     lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfra niy pasuje do tyj prōby",
-    howW:"<b>Zogodka tydnia.</b> Roz na tydziyń pokoże sie ekstra kod skryty za zogodkōm. Nojprzōd znojdź trop — może być w treści strōny, w konsoli, w grafice, w socialach abo kaj indziej, jak podpowiydź cie tam pośle. Potym wkluj 4-cyfrowy kod. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
+    howW:"<b>zagadka tydnia.</b> Roz na tydziyń pokoże sie ekstra kod skryty za zogodkōm. Nojprzōd znojdź trop — może być w treści strōny, w konsoli, w grafice, w socialach abo kaj indziej, jak podpowiydź cie tam pośle. Potym wkluj 4-cyfrowy kod. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
     foot:"Codzienno ślōnsko kłódka — Familock Starzik.",
     settH:"Ustawiynia", settOn:"Wł.", settOff:"Wył.",
     settSoundL:"Dźwiyki", settSoundS:"Klikniyncia, błyndy i łodewrzicie kłódki",
@@ -628,7 +636,7 @@ function printWeeklyConsoleHint(force){
   if(!force && weeklyConsolePrinted)return;
   if(!h.console_hint)return;
   weeklyConsolePrinted=true;
-  console.log("%c🗝️ "+(h.console_title||"Trop z konsoli"),"font-size:15px;font-weight:bold;color:#bf8a3a");
+  console.log("%cKłōdka · "+(h.console_title||"Trop z konsoli"),"font-size:15px;font-weight:bold;color:#bf8a3a");
   console.log("%cTydzień "+WEEK_NO+": "+h.console_hint,"font-size:13px");
 }
 function fetchWeeklyHint(){
