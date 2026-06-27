@@ -462,7 +462,7 @@ var S={
     lose:"Nie tym razem.",endW:"Zgadnięte!",endL:"Nie udało się",
     meaning:"to po polsku:",played:"Rozegrane",wpct:"% wygranych",
     streak:"Seria",best:"Rekord",dist:"Rozkład prób",next:"Nowe słowo za",
-    share:"Podziel się",copied:"Skopiowano!",copyerr:"Błąd kopiowania.",
+    share:"Podziel się",copied:"Skopiowano do schowka",copyerr:"Błąd kopiowania.",
     cta:"Chcesz więcej? Przyjdź do Starzika →",
     howH:"Jak grać",
     howB:"Zgadnij ukryte śląskie słowo. Liczba liter zmienia się każdego dnia. Masz 6 prób — kafelki po każdej próbie pokażą jak blisko jesteś.<br><br>Strzałka ← pozwala cofnąć się do wcześniejszych dni. Jeśli tam grałeś — zobaczysz swój wynik (tryb tylko do odczytu).",
@@ -481,7 +481,7 @@ var S={
     settOff:"Wył.",settManual:"Na żądanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
     settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
     settSoundL:"Dźwięki",settSoundS:"Klik przy wpisywaniu, dźwięk trafienia",
-    settCbL:"Tryb dla daltonistów",settCbS:"Wzory zamiast samych kolorów",
+    settCbL:"Tryb dla daltonistów",settCbS:"Dostosowane kolory",
     settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokaż wskazówkę",
@@ -499,7 +499,7 @@ var S={
     lose:"Niy tym razym.",endW:"Trefiłeś!",endL:"Niy podarziło sie",
     meaning:"to po polsku:",played:"Granych",wpct:"% wygranych",
     streak:"Seryja",best:"Rekord",dist:"Rozkłod prób",next:"Nowe słowo za",
-    share:"Podziel sie",copied:"Skopiowane!",copyerr:"Niy szło skopiować.",
+    share:"Podziel sie",copied:"Skopiowano do schowka",copyerr:"Niy szło skopiować.",
     cta:"Chcesz wiyncyj? Przidź do Starzika →",
     howH:"Jak grać",
     howB:"Zgodnij skryte ślonske słowo. Wielość liter sie co dziyń miyni. Mosz 6 prób — kafle pokożom jak blisko żeś je.<br><br>Strzoła ← pozwalo wrócić do wcześniyjszych dni.",
@@ -514,10 +514,10 @@ var S={
     settCatL:"Kategoryjo słowa",settCatS:"Tymat jako podpowiydź",
     settHintL:"Tłumaczynie",
     settHintS:"Tłumaczynie słowa po polsku",
-    settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settOff:"Wył.",settManual:"Na życzynie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
     settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
     settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
-    settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
+    settCbL:"Tryb dlŏ daltonistów",settCbS:"Inksze kolory",
     settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokoz podpowiydź",
@@ -1049,19 +1049,42 @@ document.getElementById("helpBtn").addEventListener("click",showHelp);
 /* ── UDOSTĘPNIANIE ──────────────────────────────────────────────────── */
 function share(){
   var em={correct:"🟩",present:"🟨",absent:"⬛"};
-  var g=loadDayGame(TODAY_IDX)||game;
-  var lines=(g.guesses||[]).map(function(gs){
-    return (stateCache[gs]||[]).map(function(s){return em[s]||"⬛";}).join("");});
-  var score=g.status==="won"?g.guesses.length:"X";
-  var txt="Słōwko #"+(TODAY_IDX+1)+" "+score+"/"+(IS_TESTER?MAX_GUESSES_TEST:MAX_GUESSES)+
-    "\n\n"+lines.join("\n")+"\n\nszpilplac.familock.pl";
-  if(navigator.share)navigator.share({text:txt}).catch(function(){copyTxt(txt);});else copyTxt(txt);}
-function copyTxt(txt){function done(ok){toast(ok?T().copied:T().copyerr);}
-  if(navigator.clipboard&&navigator.clipboard.writeText)
-    navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});else fb();
-  function fb(){try{var ta=document.createElement("textarea");ta.value=txt;
-    ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
-    document.execCommand("copy");document.body.removeChild(ta);done(true);}catch(e){done(false);}}}
+  var shareDay=(typeof currentDay==="number"?currentDay:TODAY_IDX);
+  var g=loadDayGame(shareDay)||game||{guesses:[],status:"playing"};
+  var savedStates=(g&&Array.isArray(g.states))?g.states:[];
+  var lines=(g.guesses||[]).map(function(gs,i){
+    var st=(savedStates[i]||stateCache[gs]||[]);
+    return st.map(function(s){return em[s]||"⬛";}).join("");
+  });
+  var max=(IS_TESTER&&shareDay>TODAY_IDX)?MAX_GUESSES_TEST:MAX_GUESSES;
+  var score=g.status==="won"?(g.guesses||[]).length:"X";
+  var txt="Słōwko #"+(shareDay+1)+" "+score+"/"+max+
+    "\nSzpilplac · Familock\n"+
+    lines.join("\n")+
+    "\nhttps://szpilplac.familock.pl/slowko.html";
+  copyTxt(txt);
+}
+function copyTxt(txt){
+  function done(ok){toast(ok?T().copied:T().copyerr);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});
+  } else fb();
+  function fb(){
+    try{
+      var ta=document.createElement("textarea");
+      ta.value=txt;
+      ta.setAttribute("readonly","");
+      ta.style.cssText="position:fixed;top:-1000px;left:-1000px;opacity:0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0,ta.value.length);
+      var ok=document.execCommand("copy");
+      document.body.removeChild(ta);
+      done(ok!==false);
+    }catch(e){done(false);}
+  }
+}
 
 /* ── KALENDARZ ──────────────────────────────────────────────────────── */
 var calScrim=document.getElementById("calScrim");
