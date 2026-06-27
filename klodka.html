@@ -323,7 +323,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="public-translation-fix-2026-06-27";
+window.KLODKA_VERSION="public-archive-submit-fix-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -796,10 +796,50 @@ document.addEventListener("keydown",function(e){
 });
 
 /* ── SUBMIT ───────────────────────────────────────────────────────── */
+function computeDailyStates(guess,answer){
+  guess=String(guess||""); answer=String(answer||"");
+  var states=[], usedA=[false,false,false,false], usedG=[false,false,false,false];
+  for(var i=0;i<LEN;i++){
+    if(guess[i]===answer[i]){states[i]="correct";usedA[i]=true;usedG[i]=true;}
+    else states[i]="absent";
+  }
+  for(var g=0;g<LEN;g++){
+    if(usedG[g])continue;
+    for(var a=0;a<LEN;a++){
+      if(!usedA[a] && guess[g]===answer[a]){states[g]="present";usedA[a]=true;usedG[g]=true;break;}
+    }
+  }
+  return states;
+}
+function computeDirections(guess,answer,states){
+  var dirs=[];
+  for(var i=0;i<LEN;i++){
+    dirs[i]=null;
+    if(states && states[i]==="absent" && answer.indexOf(guess[i])===-1){
+      var gv=parseInt(guess[i],10), av=parseInt(answer[i],10);
+      if(!isNaN(gv)&&!isNaN(av)) dirs[i]=gv<av?"higher":(gv>av?"lower":null);
+    }
+  }
+  return dirs;
+}
+function guessArchiveFromReveal(args){
+  return rpc("klodka_reveal",{p_mode:args.p_mode,p_idx:args.p_idx}).then(function(answer){
+    answer=String(answer||"");
+    if(answer.length!==LEN) throw new Error("archive reveal empty");
+    var states=computeDailyStates(String(args.p_guess||""),answer);
+    return {correct:String(args.p_guess)===answer,states:states,directions:computeDirections(String(args.p_guess||""),answer,states)};
+  });
+}
 function guessCode(args){
   if(view==="daily"){
-    // Nowe RPC dodaje tylko tablicę directions. Fallback zostawia grę działającą, jeśli SQL nie został jeszcze uruchomiony.
-    return rpc("klodka_guess_hints",args).catch(function(){return rpc("klodka_guess",args);});
+    // Nowe RPC dodaje directions. Dla archiwum mamy jeszcze awaryjne sprawdzanie przez reveal,
+    // żeby stare dni nie kończyły się komunikatem „coś nie pykło”, jeśli RPC guess odmówi współpracy.
+    return rpc("klodka_guess_hints",args).catch(function(){
+      return rpc("klodka_guess",args).catch(function(err){
+        if(args.p_mode==="daily" && args.p_idx<TODAY_NO) return guessArchiveFromReveal(args);
+        throw err;
+      });
+    });
   }
   return rpc("klodka_guess",args);
 }
@@ -891,7 +931,7 @@ function finish(won){
 
   // log globalny do stats.html
   trackEvent({
-    game: "kodka",
+    game: "klodka",
     mode: doneMode,
     puzzle_no: doneIdx,
     puzzle_word: null,
