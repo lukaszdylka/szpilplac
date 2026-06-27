@@ -760,12 +760,41 @@ function getCtx(){if(!_ctx){try{_ctx=new(window.AudioContext||window.webkitAudio
 function playSound(type){
   if(soundMode!=="on")return;
   var ctx=getCtx();if(!ctx)return;
-  var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
-  if(type==="key"){o.frequency.value=420;g.gain.setValueAtTime(.07,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06);o.stop(ctx.currentTime+.08);}
-  else if(type==="ok"){o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.08);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);o.stop(ctx.currentTime+.28);}
-  else if(type==="bad"){o.frequency.value=180;g.gain.setValueAtTime(.09,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.14);o.stop(ctx.currentTime+.16);}
-  else if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(520,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.1);o.frequency.setValueAtTime(780,ctx.currentTime+.2);g.gain.setValueAtTime(.14,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);o.stop(ctx.currentTime+.48);}
-  o.start();
+  try{
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    var now=ctx.currentTime, stopAt=now+.1;
+    if(type==="key"){
+      o.frequency.value=420;
+      g.gain.setValueAtTime(.07,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.06);
+      stopAt=now+.08;
+    }
+    else if(type==="ok"){
+      o.frequency.setValueAtTime(520,now);
+      o.frequency.setValueAtTime(660,now+.08);
+      g.gain.setValueAtTime(.12,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.25);
+      stopAt=now+.28;
+    }
+    else if(type==="bad"){
+      o.frequency.value=180;
+      g.gain.setValueAtTime(.09,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.14);
+      stopAt=now+.16;
+    }
+    else if(type==="win"){
+      o.type="triangle";
+      o.frequency.setValueAtTime(520,now);
+      o.frequency.setValueAtTime(660,now+.1);
+      o.frequency.setValueAtTime(780,now+.2);
+      g.gain.setValueAtTime(.14,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.45);
+      stopAt=now+.48;
+    }
+    o.start(now);
+    o.stop(stopAt);
+  }catch(e){}
 }
 
 /* ── WEJŚCIE ──────────────────────────────────────────────────────── */
