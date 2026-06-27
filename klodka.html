@@ -14,7 +14,7 @@
      ZAGADKA TYGODNIA  (easter egg — tu wpisujesz trop do kodu tygodniówki)
      ────────────────────────────────────────────────────────────────────
      Tydzień: 1   (23–29.06.2026)
-     Widoczny trop i trop z konsoli pobierają się z Supabase: klodka_weekly_hints.
+     Widoczny trop i trop z konsoli pobierają się z Supabase: kodka_weekly_hints.
      Nie wpisuj podpowiedzi luzem w <head>, bo wtedy może wyświetlić się na samej górze strony.
 
      Kod tygodnia ustawiasz osobno w bazie (Supabase → SQL Editor).
@@ -323,7 +323,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="public-archive-submit-fix-2026-06-27";
+window.kodka_VERSION="public-archive-submit-fix-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -336,17 +336,17 @@ var LEN        = 4;
 /* localStorage (wspólne klucze Szpilplaca) */
 var LANG_KEY  = "familock_lang";
 var THEME_KEY = "szpilplac_theme";
-var DAILY_KEY = "klodka_daily_v1";
-var WEEK_KEY  = "klodka_weekly_v1";
-var SOUND_KEY = "klodka_sound";
-var CB_KEY    = "klodka_cb";
-var ANIM_KEY  = "klodka_anim";
-var REPEAT_KEY= "klodka_repeat_info";
-var DIR_KEY   = "klodka_dir_hints";
-var HELP_KEY  = "klodka_help_seen_v1";
+var DAILY_KEY = "kodka_daily_v1";
+var WEEK_KEY  = "kodka_weekly_v1";
+var SOUND_KEY = "kodka_sound";
+var CB_KEY    = "kodka_cb";
+var ANIM_KEY  = "kodka_anim";
+var REPEAT_KEY= "kodka_repeat_info";
+var DIR_KEY   = "kodka_dir_hints";
+var HELP_KEY  = "kodka_help_seen_v1";
 
 /* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
-   Treści tygodniówki są pobierane z Supabase z tabeli klodka_weekly_hints.
+   Treści tygodniówki są pobierane z Supabase z tabeli kodka_weekly_hints.
    Fallback niżej działa tylko wtedy, gdy tabela/wiersz nie są jeszcze dostępne. */
 var WEEKLY_HINT_DEFAULTS = {
   title: "Zagadka tygodnia",
@@ -596,7 +596,7 @@ function loadCodeMeta(){
   var idx=currentIdx(), key=metaKey(view,idx);
   if(repeatMode!=="on"||codeMetaCache[key]){updateRepeatInfo();return;}
   // RPC z Supabase zwraca faktyczną informację, czy w kodzie są powtórzone cyfry. Nie zwraca samego kodu.
-  rpc("klodka_meta",{p_mode:view,p_idx:idx}).then(function(meta){
+  rpc("kodka_meta",{p_mode:view,p_idx:idx}).then(function(meta){
     codeMetaCache[key]=meta||{}; updateRepeatInfo();
   }).catch(function(){
     codeMetaCache[key]={has_repeat:null}; updateRepeatInfo();
@@ -641,7 +641,7 @@ function printWeeklyConsoleHint(force){
 }
 function fetchWeeklyHint(){
   var select="week_no,title,visible_hint,console_title,console_hint,published,publish_at";
-  var path="/rest/v1/klodka_weekly_hints?week_no=eq."+encodeURIComponent(WEEK_NO)+"&published=eq.true&select="+encodeURIComponent(select)+"&limit=1";
+  var path="/rest/v1/kodka_weekly_hints?week_no=eq."+encodeURIComponent(WEEK_NO)+"&published=eq.true&select="+encodeURIComponent(select)+"&limit=1";
   return restGet(path).then(function(rows){
     var row=rows && rows[0] ? rows[0] : null;
     if(row && row.publish_at && new Date(row.publish_at).getTime()>Date.now()) row=null;
@@ -852,7 +852,7 @@ function computeDirections(guess,answer,states){
   return dirs;
 }
 function guessArchiveFromReveal(args){
-  return rpc("klodka_reveal",{p_mode:args.p_mode,p_idx:args.p_idx}).then(function(answer){
+  return rpc("kodka_reveal",{p_mode:args.p_mode,p_idx:args.p_idx}).then(function(answer){
     answer=String(answer||"");
     if(answer.length!==LEN) throw new Error("archive reveal empty");
     var states=computeDailyStates(String(args.p_guess||""),answer);
@@ -863,14 +863,14 @@ function guessCode(args){
   if(view==="daily"){
     // Nowe RPC dodaje directions. Dla archiwum mamy jeszcze awaryjne sprawdzanie przez reveal,
     // żeby stare dni nie kończyły się komunikatem „coś nie pykło”, jeśli RPC guess odmówi współpracy.
-    return rpc("klodka_guess_hints",args).catch(function(){
-      return rpc("klodka_guess",args).catch(function(err){
+    return rpc("kodka_guess_hints",args).catch(function(){
+      return rpc("kodka_guess",args).catch(function(err){
         if(args.p_mode==="daily" && args.p_idx<TODAY_NO) return guessArchiveFromReveal(args);
         throw err;
       });
     });
   }
-  return rpc("klodka_guess",args);
+  return rpc("kodka_guess",args);
 }
 var busy=false;
 function submit(){
@@ -945,7 +945,7 @@ function finish(won){
   setTimeout(function(){ openEndFor(doneMode,doneIdx); }, animMode==="off"?250:900);
 
   // Kod do ujawnienia dociągamy równolegle i aktualizujemy modal, jeśli jest już otwarty.
-  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
+  rpc("kodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
     .then(function(code){
       var saved=loadSavedGame(doneMode,doneIdx) || game;
       if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
@@ -960,7 +960,7 @@ function finish(won){
 
   // log globalny do stats.html
   trackEvent({
-    game: "klodka",
+    game: "kodka",
     mode: doneMode,
     puzzle_no: doneIdx,
     puzzle_word: null,
@@ -1084,7 +1084,7 @@ function buildShareText(mode,idx,g){
     for(var c=0;c<LEN;c++) row+=resultEmoji(entry,c,mode);
     lines.push(row);
   });
-  lines.push("https://szpilplac.familock.pl/klodka.html");
+  lines.push("https://szpilplac.familock.pl/kodka.html");
   return lines.join("\n");
 }
 function fallbackCopy(text){
@@ -1199,7 +1199,7 @@ function openFinishedModal(delay){
   setTimeout(function(){ openEndFor(doneMode,doneIdx); }, delay);
 
   if(game.reveal) return;
-  rpc("klodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
+  rpc("kodka_reveal",{p_mode:doneMode,p_idx:doneIdx})
     .then(function(code){
       var saved=loadSavedGame(doneMode,doneIdx) || game;
       if(saved){ saved.reveal=code; saveGameFor(doneMode,doneIdx,saved); }
@@ -1277,7 +1277,7 @@ function refreshWeektile(){
   if(played==="won"){ badge.className="badge won"; badge.textContent=T.bWon; status.textContent=T.wtWon; return; }
   if(played==="lost"){ badge.className="badge lost"; badge.textContent=T.bLost; status.textContent=T.wtLost; return; }
   // sprawdź, czy kod tygodnia istnieje
-  rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){
+  rpc("kodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){
     if(has){ badge.className="badge new"; badge.textContent=T.bNew; status.textContent=T.wtNew; }
     else { badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; }
   }).catch(function(){ badge.className="badge soon"; badge.textContent=T.bSoon; status.textContent=T.wtSoon; });
@@ -1293,7 +1293,7 @@ function switchView(v){
   if(v==="weekly") fetchWeeklyHint();
   if(v==="weekly" && game.status==="playing"){
     // jeśli kod jeszcze nie istnieje — komunikat „w przygotowaniu”
-    rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
+    rpc("kodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
   }
   if(game.status!=="playing") openFinishedModal(250);
   window.scrollTo(0,0);
