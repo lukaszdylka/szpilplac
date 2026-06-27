@@ -174,6 +174,8 @@ footer a{color:var(--green);font-weight:600}
   font-weight:800;font-size:14px;background:var(--correct);color:#fff;
   text-transform:uppercase;letter-spacing:.04em;margin-top:14px}
 .btn:hover{filter:brightness(1.07)}
+.share-msg{text-align:center;font-size:12px;font-weight:800;color:var(--correct);min-height:18px;margin-top:7px;opacity:0;transition:opacity .18s;display:none}
+.share-msg.on{display:block;opacity:1;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .cta{display:block;text-align:center;margin-top:10px;padding:11px;border-radius:9px;
   color:var(--green);font-weight:700;font-size:13px;border:1px solid var(--line);
   background:var(--surface2)}
@@ -481,7 +483,7 @@ var S={
     settOff:"Wył.",settManual:"Na żądanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
     settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
     settSoundL:"Dźwięki",settSoundS:"Klik przy wpisywaniu, dźwięk trafienia",
-    settCbL:"Tryb dla daltonistów",settCbS:"Dostosowane kolory",
+    settCbL:"Tryb dla daltonistów",settCbS:"Wzory zamiast samych kolorów",
     settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokaż wskazówkę",
@@ -514,10 +516,10 @@ var S={
     settCatL:"Kategoryjo słowa",settCatS:"Tymat jako podpowiydź",
     settHintL:"Tłumaczynie",
     settHintS:"Tłumaczynie słowa po polsku",
-    settOff:"Wył.",settManual:"Na życzynie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
+    settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
     settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
     settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
-    settCbL:"Tryb dlŏ daltonistów",settCbS:"Inksze kolory",
+    settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
     settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokoz podpowiydź",
@@ -1009,6 +1011,7 @@ function showEnd(){
     statsHtml()+distHtml()+  // statystyki zawsze
     (isToday?cdHtml(t):'')+  // odliczanie tylko dla dzisiaj
     '<button class="btn" id="shareBtn">'+t.share+'</button>'+
+    '<div class="share-msg" id="shareMsg" aria-live="polite"></div>'+
     '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(isToday)startCd();}
@@ -1016,7 +1019,7 @@ function showEnd(){
 function showStats(){
   var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
   var html='<h2>'+t.played+'</h2>'+statsHtml()+distHtml();
-  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button>';
+  if(dg.status!=="playing")html+=cdHtml(t)+'<button class="btn" id="shareBtn">'+t.share+'</button><div class="share-msg" id="shareMsg" aria-live="polite"></div>';
   openModal(html);
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(document.getElementById("cd"))startCd();}
@@ -1065,7 +1068,35 @@ function share(){
   copyTxt(txt);
 }
 function copyTxt(txt){
-  function done(ok){toast(ok?T().copied:T().copyerr);}
+  function done(ok){
+    var msg=ok?T().copied:T().copyerr;
+    var btn=document.getElementById("shareBtn");
+    var el=document.getElementById("shareMsg");
+
+    // Komunikat ma być widoczny w samym okienku wyniku, nie na stronie pod spodem.
+    // Jeśli z jakiegoś powodu element nie istnieje, tworzymy go od razu pod przyciskiem.
+    if(!el && btn){
+      el=document.createElement("div");
+      el.id="shareMsg";
+      el.className="share-msg";
+      el.setAttribute("aria-live","polite");
+      btn.insertAdjacentElement("afterend",el);
+    }
+    if(el){
+      el.textContent=msg;
+      el.style.color=ok?"var(--correct)":"#a14b3a";
+      el.classList.add("on");
+      el.style.display="block";
+      el.style.opacity="1";
+      try{el.scrollIntoView({block:"nearest",behavior:"smooth"});}catch(e){}
+    }
+    if(btn){
+      var old=btn.getAttribute("data-old-text")||btn.textContent;
+      btn.setAttribute("data-old-text",old);
+      btn.textContent=ok?("✓ "+T().copied):T().copyerr;
+      clearTimeout(copyTxt._btnT);
+    }
+  }
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(function(){done(true);},function(){fb();});
   } else fb();
