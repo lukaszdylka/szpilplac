@@ -1,0 +1,38 @@
+-- Kłōdka · tygodniowe podpowiedzi z Supabase
+-- Uruchom w Supabase SQL Editor.
+
+create table if not exists public.klodka_weekly_hints (
+  week_no int primary key,
+  title text not null default 'Zagadka tygodnia',
+  visible_hint text,
+  console_title text not null default 'Trop z konsoli',
+  console_hint text,
+  published boolean not null default true,
+  publish_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.klodka_weekly_hints enable row level security;
+
+drop policy if exists "klodka_weekly_hints_public_read" on public.klodka_weekly_hints;
+create policy "klodka_weekly_hints_public_read"
+on public.klodka_weekly_hints
+for select
+to anon, authenticated
+using (
+  published = true
+  and (publish_at is null or publish_at <= now())
+);
+
+grant select on public.klodka_weekly_hints to anon, authenticated;
+grant all on public.klodka_weekly_hints to service_role;
+
+-- Pierwszy przykładowy wpis. Potem edytujesz już z panelu admina.
+insert into public.klodka_weekly_hints
+  (week_no, title, visible_hint, console_title, console_hint, published)
+values
+  (1, 'Zagadka tygodnia', '>>> F12 <<<', 'Trop z konsoli', 'Tu wpisz osobną podpowiedź do konsoli.', true)
+on conflict (week_no) do nothing;
+
+notify pgrst, 'reload schema';
