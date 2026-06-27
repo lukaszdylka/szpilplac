@@ -14,7 +14,7 @@
      ZAGADKA TYGODNIA  (easter egg — tu wpisujesz trop do kodu tygodniówki)
      ────────────────────────────────────────────────────────────────────
      Tydzień: 1   (23–29.06.2026)
-     Widoczny trop ustawiasz w zmiennej WEEKLY_HINT_TEXT w skrypcie.
+     Widoczny trop i trop z konsoli pobierają się z Supabase: klodka_weekly_hints.
      Nie wpisuj podpowiedzi luzem w <head>, bo wtedy może wyświetlić się na samej górze strony.
 
      Kod tygodnia ustawiasz osobno w bazie (Supabase → SQL Editor).
@@ -195,7 +195,7 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink2)}
 .btn.share{background:var(--gold);color:#fff;border:1px solid var(--gold)}
 .share-msg{text-align:center;font-size:12px;font-weight:800;color:var(--correct);min-height:18px;margin-top:6px;opacity:0;transition:opacity .18s}
-.share-msg.on{opacity:1}
+.share-msg.on{opacity:1;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .cta{display:block;text-align:center;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600}
 
 .howlist{font-size:13.5px;color:var(--ink2);line-height:1.6}
@@ -315,7 +315,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="public-share-clipboard-2026-06-27";
+window.KLODKA_VERSION="public-share-clipboard-modal-msg-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -338,17 +338,16 @@ var DIR_KEY   = "klodka_dir_hints";
 var HELP_KEY  = "klodka_help_seen_v1";
 
 /* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
-   WEEKLY_HINT_* = widoczny trop NAD kafelkami prób w trybie tygodniowym.
-   WEEKLY_CONSOLE_* = osobny trop wypisywany tylko w konsoli przeglądarki.
-   Dzięki temu na stronie i w konsoli mogą być dwa różne komunikaty. */
-var WEEKLY_HINT_TITLE = "Zagadka tygodnia";
-var WEEKLY_HINT_TEXT  = ">>> ôstatni EF <<<";
-
-var WEEKLY_CONSOLE_TITLE = "Brawo!";
-var WEEKLY_CONSOLE_TEXT  = "V→IV→VIII→V";
-
-console.log("%c🗝️ "+WEEKLY_CONSOLE_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
-console.log("%cTydzień 1: "+WEEKLY_CONSOLE_TEXT,"font-size:13px");
+   Treści tygodniówki są pobierane z Supabase z tabeli klodka_weekly_hints.
+   Fallback niżej działa tylko wtedy, gdy tabela/wiersz nie są jeszcze dostępne. */
+var WEEKLY_HINT_DEFAULTS = {
+  title: "Zagadka tygodnia",
+  visible_hint: ">>> F12 <<<",
+  console_title: "Trop z konsoli",
+  console_hint: "Tu wpisz osobną podpowiedź do konsoli."
+};
+var weeklyHintData = null;
+var weeklyConsolePrinted = false;
 
 /* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
@@ -500,6 +499,11 @@ function rpc(fn,args){
     body:JSON.stringify(args||{})
   }).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
 }
+function restGet(path){
+  return fetch(SUPABASE_URL+path,{method:"GET",
+    headers:{"Accept":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}
+  }).then(function(r){if(!r.ok)throw new Error("GET "+path+" "+r.status);return r.json();});
+}
 function trackEvent(p){
   fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
     headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,
@@ -616,15 +620,51 @@ function escHtml(x){
     return ch;
   });
 }
+function activeWeeklyHint(){
+  return weeklyHintData || WEEKLY_HINT_DEFAULTS;
+}
+function printWeeklyConsoleHint(force){
+  var h=activeWeeklyHint();
+  if(!force && weeklyConsolePrinted)return;
+  if(!h.console_hint)return;
+  weeklyConsolePrinted=true;
+  console.log("%c🗝️ "+(h.console_title||"Trop z konsoli"),"font-size:15px;font-weight:bold;color:#bf8a3a");
+  console.log("%cTydzień "+WEEK_NO+": "+h.console_hint,"font-size:13px");
+}
+function fetchWeeklyHint(){
+  var select="week_no,title,visible_hint,console_title,console_hint,published,publish_at";
+  var path="/rest/v1/klodka_weekly_hints?week_no=eq."+encodeURIComponent(WEEK_NO)+"&published=eq.true&select="+encodeURIComponent(select)+"&limit=1";
+  return restGet(path).then(function(rows){
+    var row=rows && rows[0] ? rows[0] : null;
+    if(row && row.publish_at && new Date(row.publish_at).getTime()>Date.now()) row=null;
+    if(row){
+      weeklyHintData={
+        title:row.title||WEEKLY_HINT_DEFAULTS.title,
+        visible_hint:row.visible_hint||"",
+        console_title:row.console_title||WEEKLY_HINT_DEFAULTS.console_title,
+        console_hint:row.console_hint||""
+      };
+    }else{
+      weeklyHintData=null;
+    }
+    updateWeeklyHint();
+    printWeeklyConsoleHint(false);
+  }).catch(function(){
+    weeklyHintData=null;
+    updateWeeklyHint();
+    printWeeklyConsoleHint(false);
+  });
+}
 function updateWeeklyHint(){
   var el=document.getElementById("weeklyHint"); if(!el)return;
-  if(view!=="weekly" || !WEEKLY_HINT_TEXT){
+  var h=activeWeeklyHint();
+  if(view!=="weekly" || !h.visible_hint){
     el.classList.remove("on");
     el.innerHTML="";
     return;
   }
   el.classList.add("on");
-  el.innerHTML='<span class="hint-kicker">'+escHtml(WEEKLY_HINT_TITLE)+'</span>'+escHtml(WEEKLY_HINT_TEXT);
+  el.innerHTML='<span class="hint-kicker">'+escHtml(h.title||"Zagadka tygodnia")+'</span>'+escHtml(h.visible_hint);
 }
 
 /* ── RENDER STATYCZNY (tytuły, plansza, klawiatura) ───────────────── */
@@ -996,12 +1036,18 @@ function copyShareText(text,onDone,onFail){
 }
 function showShareMsg(msg,ok){
   var el=document.getElementById("shareMsg");
-  if(!el) return;
-  el.textContent=msg;
-  el.style.color=ok?"var(--correct)":"var(--wrong)";
-  el.classList.add("on");
-  clearTimeout(showShareMsg._t);
-  showShareMsg._t=setTimeout(function(){el.classList.remove("on");},1800);
+  if(el){
+    el.textContent=msg;
+    el.style.color=ok?"var(--correct)":"var(--wrong)";
+    el.classList.add("on");
+  }
+  var btn=document.getElementById("shareBtn");
+  if(btn){
+    var old=btn.getAttribute("data-old-text")||btn.textContent;
+    btn.setAttribute("data-old-text",old);
+    btn.textContent=ok?("✓ "+msg):msg;
+    clearTimeout(showShareMsg._bt);
+  }
 }
 
 function openEnd(){
@@ -1167,6 +1213,7 @@ function switchView(v){
   view=v; current="";
   document.getElementById("weektile").classList.toggle("hidden", v==="weekly");
   loadGame(); renderStatic();
+  if(v==="weekly") fetchWeeklyHint();
   if(v==="weekly" && game.status==="playing"){
     // jeśli kod jeszcze nie istnieje — komunikat „w przygotowaniu”
     rpc("klodka_has",{p_mode:"weekly",p_idx:WEEK_NO}).then(function(has){ if(!has) toast(t().soon); });
@@ -1234,6 +1281,7 @@ function renderCalendar(){
 loadGame();
 renderStatic();
 refreshWeektile();
+fetchWeeklyHint();
 if(game.status!=="playing") openFinishedModal(400);
 else if(!localStorage.getItem(HELP_KEY)){
   setTimeout(function(){
