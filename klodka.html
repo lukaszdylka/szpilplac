@@ -193,6 +193,9 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .btn{display:block;width:100%;padding:12px;border-radius:10px;background:var(--green);color:#fff;
   font-weight:700;font-size:14px;text-align:center;margin-top:8px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink2)}
+.btn.share{background:var(--gold);color:#fff;border:1px solid var(--gold)}
+.share-msg{text-align:center;font-size:12px;font-weight:800;color:var(--correct);min-height:18px;margin-top:6px;opacity:0;transition:opacity .18s}
+.share-msg.on{opacity:1}
 .cta{display:block;text-align:center;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600}
 
 .howlist{font-size:13.5px;color:var(--ink2);line-height:1.6}
@@ -312,7 +315,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="public-unified-help-2026-06-27";
+window.KLODKA_VERSION="public-share-clipboard-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -335,13 +338,17 @@ var DIR_KEY   = "klodka_dir_hints";
 var HELP_KEY  = "klodka_help_seen_v1";
 
 /* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
-   Tu zmieniasz widoczną podpowiedź dla tygodniówki.
-   Będzie pokazana NAD kafelkami prób tylko w trybie tygodniowym. */
+   WEEKLY_HINT_* = widoczny trop NAD kafelkami prób w trybie tygodniowym.
+   WEEKLY_CONSOLE_* = osobny trop wypisywany tylko w konsoli przeglądarki.
+   Dzięki temu na stronie i w konsoli mogą być dwa różne komunikaty. */
 var WEEKLY_HINT_TITLE = "Zagadka tygodnia";
 var WEEKLY_HINT_TEXT  = ">>> F12 <<<";
 
-console.log("%c🗝️ "+WEEKLY_HINT_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
-console.log("%cTydzień 1: "+WEEKLY_HINT_TEXT,"font-size:13px");
+var WEEKLY_CONSOLE_TITLE = "Trop z konsoli";
+var WEEKLY_CONSOLE_TEXT  = "Tu wpisz osobną podpowiedź do konsoli.";
+
+console.log("%c🗝️ "+WEEKLY_CONSOLE_TITLE,"font-size:15px;font-weight:bold;color:#bf8a3a");
+console.log("%cTydzień 1: "+WEEKLY_CONSOLE_TEXT,"font-size:13px");
 
 /* ── numeracja dni/tygodni (OD 1) ──────────────────────────────────── */
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
@@ -384,6 +391,7 @@ var S={
     played:"Rozegrane", wpct:"% otwartych", streak:"Seria", best:"Rekord",
     nextD:"Nowy kod za", nextW:"Nowa zagadka za",
     again:"Zamknij", cta:"Chcesz więcej zagadek? Wpadnij do Starzika →",
+    share:"Udostępnij wynik", copied:"Skopiowano do schowka", copyFail:"Nie udało się skopiować — skopiuj ręcznie",
     weekName:"Zagadka tygodnia",
     wtNew:"Nowa zagadka — kliknij i graj", wtWon:"Rozwiązane 🎉",
     wtLost:"Nie udało się w tym tygodniu", wtSoon:"Wkrótce — w przygotowaniu",
@@ -424,6 +432,7 @@ var S={
     played:"Rozegrane", wpct:"% łodewrzitych", streak:"Seryjo", best:"Rekord",
     nextD:"Nowy kod za", nextW:"Nowo zogodka za",
     again:"Zawrzij", cta:"Chcesz wiyncyj zogodek? Wpadnij do Starzika →",
+    share:"Udostympnij wynik", copied:"Skopiowano do schowka", copyFail:"Niy szło skopiować — skopiuj ryncznie",
     weekName:"Zogodka tydnia",
     wtNew:"Nowo zogodka — klikej i grej", wtWon:"Rozwiōnzane 🎉",
     wtLost:"Niy podarziło sie w tym tydniu", wtSoon:"Wnet — w szykowaniu",
@@ -940,6 +949,61 @@ function countdown(toMidnightOrWeek){
   return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
 }
 
+function resultEmoji(entry,c,mode){
+  if(mode==="weekly") return entry.correct?"🟩":"⬛";
+  var st=entry.states&&entry.states[c];
+  if(st==="correct") return "🟩";
+  if(st==="present") return "🟨";
+  return "⬛";
+}
+function buildShareText(mode,idx,g){
+  var won=g&&g.status==="won";
+  var tries=(g&&g.guesses?g.guesses.length:0)||MAX_TRIES;
+  var score=won?tries+"/"+MAX_TRIES:"X/"+MAX_TRIES;
+  var title=mode==="daily"?"Kłōdka #"+idx:"Kłōdka — tydzień "+idx;
+  var lines=[title+" "+score,"Szpilplac · Familock"];
+  (g.guesses||[]).forEach(function(entry){
+    var row="";
+    for(var c=0;c<LEN;c++) row+=resultEmoji(entry,c,mode);
+    lines.push(row);
+  });
+  lines.push("https://szpilplac.familock.pl/klodka.html");
+  return lines.join("\n");
+}
+function fallbackCopy(text){
+  var ta=document.createElement("textarea");
+  ta.value=text;
+  ta.setAttribute("readonly","");
+  ta.style.position="fixed";
+  ta.style.top="-1000px";
+  ta.style.left="-1000px";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  var ok=false;
+  try{ok=document.execCommand("copy");}catch(e){ok=false;}
+  document.body.removeChild(ta);
+  return ok;
+}
+function copyShareText(text,onDone,onFail){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(onDone).catch(function(){
+      if(fallbackCopy(text)) onDone(); else onFail();
+    });
+  } else {
+    if(fallbackCopy(text)) onDone(); else onFail();
+  }
+}
+function showShareMsg(msg,ok){
+  var el=document.getElementById("shareMsg");
+  if(!el) return;
+  el.textContent=msg;
+  el.style.color=ok?"var(--correct)":"var(--wrong)";
+  el.classList.add("on");
+  clearTimeout(showShareMsg._t);
+  showShareMsg._t=setTimeout(function(){el.classList.remove("on");},1800);
+}
+
 function openEnd(){
   openEndFor(view,currentIdx());
 }
@@ -969,12 +1033,21 @@ function openEndFor(mode,idx){
     distHtml(hist)+
     countdownHtml+
     '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
+    '<button class="btn share" id="shareBtn">'+T.share+'</button>'+
+    '<div class="share-msg" id="shareMsg" aria-live="polite"></div>'+
     '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
 
   modal.innerHTML=html;
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
   modal.querySelector("#closeBtn").addEventListener("click",closeModal);
+  var shareBtn=modal.querySelector("#shareBtn");
+  if(shareBtn){
+    shareBtn.addEventListener("click",function(){
+      var text=buildShareText(mode,idx,g);
+      copyShareText(text,function(){showShareMsg(T.copied,true);},function(){showShareMsg(T.copyFail,false);});
+    });
+  }
   clearInterval(openEnd._t);
   if(!isArchiveDaily){
     openEnd._t=setInterval(function(){
