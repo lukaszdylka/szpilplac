@@ -312,7 +312,7 @@ footer a{color:var(--green);font-weight:600}
 
 <script>
 "use strict";
-window.KLODKA_VERSION="local-stats-modal-fix-weekly-hint-2026-06-26";
+window.KLODKA_VERSION="public-unified-help-2026-06-27";
 
 /* ── KONFIGURACJA ──────────────────────────────────────────────────── */
 var SUPABASE_URL      = "https://xyivrakegwybwhmmcawq.supabase.co";
@@ -332,6 +332,7 @@ var CB_KEY    = "klodka_cb";
 var ANIM_KEY  = "klodka_anim";
 var REPEAT_KEY= "klodka_repeat_info";
 var DIR_KEY   = "klodka_dir_hints";
+var HELP_KEY  = "klodka_help_seen_v1";
 
 /* ── ZAGADKA TYGODNIA ────────────────────────────────────────────────
    Tu zmieniasz widoczną podpowiedź dla tygodniówki.
@@ -390,15 +391,15 @@ var S={
     howH:"Jak grać",
     howD:"<b>Codzienna kłódka.</b> Każdego dnia jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokażą, jak blisko jesteś:",
     lgC:"cyfra na właściwym miejscu", lgP:"cyfra jest w kodzie, ale gdzie indziej", lgA:"cyfra nie pasuje do tej próby",
-    howW:"<b>Zagadka tygodnia.</b> Raz w tygodniu specjalny kod ukryty za zagadką — szukaj tropu w grze, w źródle strony albo gdzie indziej. Tu kafelki <b>nie</b> podpowiadają cyfr: dostajesz tylko „dobrze / źle”. Masz 6 prób.",
+    howW:"<b>Zagadka tygodnia.</b> Raz w tygodniu pojawia się specjalny kod ukryty za zagadką. Najpierw znajdź trop — może być w treści strony, w konsoli, w grafice, w socialach albo w innym miejscu wskazanym przez podpowiedź. Potem wpisz 4-cyfrowy kod. Tu kafelki <b>nie</b> podpowiadają cyfr: dostajesz tylko „dobrze / źle”. Masz 6 prób.",
     foot:"Codzienna śląska kłódka — Familock Starzik.",
     settH:"Ustawienia", settOn:"Wł.", settOff:"Wył.",
     settSoundL:"Dźwięki", settSoundS:"Kliknięcia, błędy i otwarcie kłódki",
     settCbL:"Tryb dla daltonistów", settCbS:"Inne kolory podpowiedzi",
     settAnimL:"Animacje", settAnimS:"Obrót kafelków i efekty",
     settRepeatL:"Informacja o powtórkach", settRepeatS:"Pod planszą pokaże, czy cyfry się powtarzają",
-    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarych kafelkach pokaże, czy szukana cyfra jest wyżej czy niżej od wpisanej",
-    dirLegend:"Przy szarym kafelku: <b>↑</b> szukaj wyższej cyfry, <b>↓</b> szukaj niższej. Strzałka pokazuje się tylko wtedy, gdy wpisanej cyfry nie ma w kodzie.",
+    settDirL:"Podpowiedzi góra/dół", settDirS:"Przy szarym kafelku pokaże, czy cyfra w tej konkretnej pozycji jest większa lub mniejsza od wpisanej",
+    dirLegend:"Przy szarym kafelku: <b>↑</b> w tej pozycji szukaj wyższej cyfry, <b>↓</b> w tej pozycji szukaj niższej. Strzałka dotyczy konkretnego kafelka/kolumny i pojawia się tylko wtedy, gdy wpisanej cyfry nie ma w kodzie.",
     repeatYes:"W tym kodzie <b>cyfra się powtarza</b>.",
     repeatNo:"W tym kodzie <b>cyfry się nie powtarzają</b>.",
     repeatMaybe:"Nie udało się sprawdzić powtórek cyfr. Spróbuj odświeżyć stronę.",
@@ -430,15 +431,15 @@ var S={
     howH:"Jak grać",
     howD:"<b>Codzienno kłódka.</b> Kożdy dziyń jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożōm, jak blisko jeżeś:",
     lgC:"cyfra na włściwym miyjscu", lgP:"cyfra je w kodzie, ale kaj indziej", lgA:"cyfra niy pasuje do tyj prōby",
-    howW:"<b>Zogodka tydnia.</b> Roz na tydziyń ekstra kod skryty za zogodkōm — szukej tropu w grze, w zdrzōdle strōny abo kaj indziej. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
+    howW:"<b>Zogodka tydnia.</b> Roz na tydziyń pokoże sie ekstra kod skryty za zogodkōm. Nojprzōd znojdź trop — może być w treści strōny, w konsoli, w grafice, w socialach abo kaj indziej, jak podpowiydź cie tam pośle. Potym wkluj 4-cyfrowy kod. Tu kachle <b>niy</b> podpowiadajōm cyfr: dostowosz ino „dobrze / źle”. Mosz 6 prób.",
     foot:"Codzienno ślōnsko kłódka — Familock Starzik.",
     settH:"Ustawiynia", settOn:"Wł.", settOff:"Wył.",
     settSoundL:"Dźwiyki", settSoundS:"Klikniyncia, błyndy i łodewrzicie kłódki",
     settCbL:"Tryb dlŏ daltonistów", settCbS:"Inksze farby podpowiydzi",
     settAnimL:"Animacyje", settAnimS:"Łobrót kafli i efekty",
     settRepeatL:"Info ô powtōrkach", settRepeatS:"Pod planszōm pokoże, eli cyfry sie powtarzajōm",
-    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwych kafelkach pokoże, eli szukano cyfra je wyżyj abo niżyj ôd wkludyj",
-    dirLegend:"Przi siwym kafelku: <b>↑</b> szukej wyższyj cyfry, <b>↓</b> szukej niższyj. Strzałka pokoże sie ino wtedy, kej wkludyj cyfry ni ma w kodzie.",
+    settDirL:"Podpowiydzi góra/dół", settDirS:"Przi siwym kafelku pokoże, eli cyfra w tym konkretnym placu je wyższo abo niższo ôd wkludyj",
+    dirLegend:"Przi siwym kafelku: <b>↑</b> w tym placu szukej wyższyj cyfry, <b>↓</b> w tym placu szukej niższyj. Strzałka tyczy sie konkretnego kafelka/kolumny i pokoże sie ino wtedy, kej wkludyj cyfry ni ma w kodzie.",
     repeatYes:"W tym kodzie <b>cyfra sie powtarzo</b>.",
     repeatNo:"W tym kodzie <b>cyfry sie niy powtarzajōm</b>.",
     repeatMaybe:"Niy szło sprawdzić powtōrek cyfr. Sprōbuj łodświyżyć strona.",
@@ -1048,24 +1049,28 @@ document.getElementById("statBtn").addEventListener("click",showStats);
 document.getElementById("settBtn").addEventListener("click",showSettings);
 
 /* ── HELP ─────────────────────────────────────────────────────────── */
-document.getElementById("helpBtn").addEventListener("click",function(){
+function showHelp(){
+  try{localStorage.setItem(HELP_KEY,"seen");}catch(e){}
   var T=t();
-  var legend = view==="daily"
-    ? '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+ 
+  var dailyLegend =
+      '<p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p>'+ 
       '<p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p>'+ 
       '<p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>'+ 
-      '<p style="margin-top:8px">'+T.dirLegend+'</p>'
-    : '';
+      '<p style="margin-top:8px">'+T.dirLegend+'</p>';
   var optionsNote = '<p style="margin-top:12px"><b>Opcje.</b> '+T.optionsInfo+'</p>';
+  var html =
+    '<p>'+T.howD+'</p>'+dailyLegend+
+    '<p style="margin-top:14px">'+T.howW+'</p>'+optionsNote;
   modal.innerHTML=
     '<button class="modal-close" aria-label="Zamknij">×</button>'+
     '<h2>'+T.howH+'</h2>'+
-    '<div class="howlist">'+(view==="daily"?T.howD:T.howW)+legend+optionsNote+'</div>'+
+    '<div class="howlist">'+html+'</div>'+
     '<button class="btn" id="closeBtn" style="margin-top:16px">OK</button>';
   scrim.classList.add("open");
   modal.querySelector(".modal-close").addEventListener("click",closeModal);
   modal.querySelector("#closeBtn").addEventListener("click",closeModal);
-});
+}
+document.getElementById("helpBtn").addEventListener("click",showHelp);
 
 /* ── KAFELEK TYGODNIÓWKI ──────────────────────────────────────────── */
 function refreshWeektile(){
@@ -1157,6 +1162,11 @@ loadGame();
 renderStatic();
 refreshWeektile();
 if(game.status!=="playing") openFinishedModal(400);
+else if(!localStorage.getItem(HELP_KEY)){
+  setTimeout(function(){
+    if(!document.getElementById("scrim").classList.contains("open")) showHelp();
+  },650);
+}
 </script>
 </body>
 </html>
