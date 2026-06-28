@@ -57,7 +57,7 @@ header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
 .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
 .row{display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--line);
   border-radius:13px;padding:11px 12px;transition:border-color .15s,background .15s,transform .12s}
-.row[draggable="true"]{cursor:grab;touch-action:none}
+.row.can-drag{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .row.dragging{opacity:.55;transform:scale(.98);cursor:grabbing}
 .row.drop-target{border-color:var(--gold);background:var(--surface2)}
 .row.sel{border-color:var(--gold);background:var(--surface2)}
@@ -263,6 +263,7 @@ var dragTo=-1;
 var dragMoved=false;
 var dragStartX=0;
 var dragStartY=0;
+var suppressClick=false;
 
 var DEMO=false;
 var DEMO_META={
@@ -320,7 +321,7 @@ function renderList(){
   var mask=lastMask();
   order.forEach(function(name,i){
     var li=document.createElement("li");li.className="row";li.dataset.index=i;
-    if(!locked)li.setAttribute("draggable","true");
+    if(!locked)li.className+=" can-drag";
     if(selIdx===i)li.className+=" sel";
     if(mask&&mask[i])li.className+=" fixed";
     var fixed=!!(mask&&mask[i]);
@@ -332,7 +333,11 @@ function renderList(){
     }else if(fixed){ html+='<div class="tick">✓</div>'; }
     li.innerHTML=html;
     if(!locked){
-      li.querySelector(".name").addEventListener("click",function(){if(!dragMoved)pick(i);});
+      li.addEventListener("click",function(e){
+        if(e.target.closest(".arrows"))return;
+        if(suppressClick||dragMoved)return;
+        pick(i);
+      });
       attachDrag(li,i);
     }
     ul.appendChild(li);
@@ -353,10 +358,17 @@ function reorder(from,to){
   selIdx=-1;persist();renderList();
 }
 function dragOverIndex(x,y){
-  var el=document.elementFromPoint(x,y);
-  var row=el&&el.closest?el.closest("#list .row"):null;
-  if(!row)return -1;
-  return +row.dataset.index;
+  var rows=[].slice.call(document.querySelectorAll("#list .row"));
+  if(!rows.length)return -1;
+  for(var r=0;r<rows.length;r++){
+    var rect=rows[r].getBoundingClientRect();
+    if(y>=rect.top&&y<=rect.bottom)return +rows[r].dataset.index;
+  }
+  var first=rows[0].getBoundingClientRect();
+  var last=rows[rows.length-1].getBoundingClientRect();
+  if(y<first.top)return 0;
+  if(y>last.bottom)return rows.length-1;
+  return -1;
 }
 function markDropTarget(i){
   document.querySelectorAll(".row.drop-target").forEach(function(el){el.classList.remove("drop-target");});
@@ -364,22 +376,16 @@ function markDropTarget(i){
   if(row)row.classList.add("drop-target");
 }
 function attachDrag(li,i){
-  li.addEventListener("dragstart",function(e){
-    dragFrom=i;dragTo=i;dragMoved=true;li.classList.add("dragging");
-    if(e.dataTransfer){e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i));}
-  });
-  li.addEventListener("dragover",function(e){e.preventDefault();dragTo=i;markDropTarget(i);});
-  li.addEventListener("drop",function(e){e.preventDefault();reorder(dragFrom,i);clearDragClasses();dragFrom=-1;});
-  li.addEventListener("dragend",function(){clearDragClasses();dragFrom=-1;setTimeout(function(){dragMoved=false;},0);});
   li.addEventListener("pointerdown",function(e){
+    if(e.button!=null&&e.button!==0)return;
     if(e.target.closest(".arrows"))return;
     dragFrom=i;dragTo=i;dragMoved=false;dragStartX=e.clientX;dragStartY=e.clientY;
-    li.setPointerCapture&&li.setPointerCapture(e.pointerId);
+    try{li.setPointerCapture&&li.setPointerCapture(e.pointerId);}catch(err){}
   });
   li.addEventListener("pointermove",function(e){
     if(dragFrom!==i)return;
     var dist=Math.abs(e.clientX-dragStartX)+Math.abs(e.clientY-dragStartY);
-    if(!dragMoved&&dist>8){dragMoved=true;li.classList.add("dragging");}
+    if(!dragMoved&&dist>6){dragMoved=true;li.classList.add("dragging");}
     if(dragMoved){
       e.preventDefault();
       var target=dragOverIndex(e.clientX,e.clientY);
@@ -387,12 +393,22 @@ function attachDrag(li,i){
     }
   });
   li.addEventListener("pointerup",function(e){
-    if(dragFrom===i&&dragMoved){reorder(dragFrom,dragTo);}
+    if(dragFrom===i&&dragMoved){
+      e.preventDefault();
+      suppressClick=true;
+      reorder(dragFrom,dragTo);
+      setTimeout(function(){suppressClick=false;dragMoved=false;},180);
+    }else{
+      setTimeout(function(){dragMoved=false;},0);
+    }
     try{li.releasePointerCapture&&li.releasePointerCapture(e.pointerId);}catch(err){}
-    clearDragClasses();dragFrom=-1;setTimeout(function(){dragMoved=false;},0);
+    clearDragClasses();dragFrom=-1;
   });
-  li.addEventListener("pointercancel",function(){clearDragClasses();dragFrom=-1;dragMoved=false;});
+  li.addEventListener("pointercancel",function(){
+    clearDragClasses();dragFrom=-1;dragMoved=false;setTimeout(function(){suppressClick=false;},80);
+  });
 }
+
 
 function pick(i){
   if(status!=="playing")return;
