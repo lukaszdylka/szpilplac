@@ -12,9 +12,11 @@
 :root{
   --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;
   --line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--miss:#b9b09a;
+  --cbcorrect:#1a6fc4;--cbmiss:#6f7480;
 }
 [data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--miss:#b9b09a;}
 [data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--miss:#5a5448;}
+[data-cb=on]{--correct:var(--cbcorrect);--miss:var(--cbmiss);}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
@@ -101,13 +103,23 @@ header{width:100%;padding:14px 2px 10px}
 .result.show{display:block}
 .result h2{font-family:"Oswald";text-transform:uppercase;font-size:20px;margin:0 0 4px;color:var(--ink);letter-spacing:.04em}
 .result .sub{font-size:13px;color:var(--ink2);margin-bottom:12px}
-.result .src{font-size:11px;color:var(--ink2);margin-top:10px}
+.result .src{display:none}
 .share{margin-top:14px;width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--green);
   color:var(--green);font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:14px;background:transparent}
 [data-theme=dark] .share{border-color:var(--gold);color:var(--gold)}
 .foot{margin-top:auto;padding-top:22px;text-align:center}
 .foot a{color:var(--green);font-weight:700;text-decoration:none;font-size:13px}
 [data-theme=dark] .foot a{color:var(--gold)}
+
+/* HINT + SETTINGS */
+.hintbar{align-items:center;justify-content:center;gap:9px;margin:12px 0 8px;min-height:32px;text-align:center}
+.hint-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;border:1.5px solid var(--gold);color:var(--gold);background:transparent;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.hint-btn:hover{background:var(--surface2)}.hint-btn[disabled]{opacity:.45;cursor:default}
+.hint-msg{font-size:13px;color:var(--ink2);font-weight:700;line-height:1.35}.hint-msg b{color:var(--gold)}
+.row.hinted{border-color:var(--gold);background:var(--surface2)}
+.hinttag{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 7px;white-space:nowrap}
+.settings-body{display:flex;flex-direction:column;gap:0;margin-top:4px}.sett-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.sett-row:last-child{border-bottom:none}.sett-label{font-size:14px;color:var(--ink);font-weight:700}.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.35}.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2);flex:none}.seg button{font-size:11px;font-weight:800;padding:6px 10px;color:var(--ink2);white-space:nowrap}.seg button.on{background:var(--green);color:#fff}[data-theme=dark] .seg button.on{background:var(--gold);color:#161310}
+[data-anim=off] *{transition:none!important;animation:none!important}[data-anim=off] .drag-ghost{transform:none!important}
 
 /* MODAL + TOAST */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}
@@ -139,6 +151,9 @@ header{width:100%;padding:14px 2px 10px}
         <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
         </button>
+        <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 4.01 8.51 1.25h6.98l-.89 2.76 1.21.51 1.32-2.59 4.94 4.94-2.59 1.32.51 1.21 2.76-.89v6.98l-2.76-.89-.51 1.21 2.59 1.32-4.94 4.94-1.32-2.59-1.21.51.89 2.76H8.51l.89-2.76-1.21-.51-1.32 2.59-4.94-4.94 2.59-1.32-.51-1.21-2.76.89V8.51l2.76.89.51-1.21-2.59-1.32 4.94-4.94 1.32 2.59z"/><circle cx="12" cy="12" r="4.4"/></svg>
+        </button>
       </div>
     </div>
     <div class="brand">
@@ -160,6 +175,10 @@ header{width:100%;padding:14px 2px 10px}
   </div>
 
   <ul class="list" id="list"></ul>
+  <div class="hintbar" id="hintBar" style="display:none">
+    <button class="hint-btn" id="hintBtn">Pokaż podpowiedź</button>
+    <div class="hint-msg" id="hintMsg"></div>
+  </div>
   <div class="notice" id="notice">Ładowanie zagadki…</div>
 
   <div class="attempts" id="attempts" style="display:none"></div>
@@ -183,6 +202,17 @@ header{width:100%;padding:14px 2px 10px}
     <div id="howBody"></div>
   </div>
 </div>
+<div class="scrim" id="settScrim">
+  <div class="modal">
+    <button class="x" id="settClose">✕</button>
+    <h2 id="settTitle">Ustawienia</h2>
+    <div class="settings-body">
+      <div class="sett-row"><div><div class="sett-label" id="animLabel">Animacje</div><div class="sett-sub" id="animSub">Ruch kafelków i krótkie efekty.</div></div><div class="seg"><button id="animOn">ON</button><button id="animOff">OFF</button></div></div>
+      <div class="sett-row"><div><div class="sett-label" id="soundLabel">Dźwięki</div><div class="sett-sub" id="soundSub">Ciche kliknięcia i sygnały po próbie.</div></div><div class="seg"><button id="soundOn">ON</button><button id="soundOff">OFF</button></div></div>
+      <div class="sett-row"><div><div class="sett-label" id="cbLabel">Kolory dla daltonistów</div><div class="sett-sub" id="cbSub">Alternatywne kolory jak w Słōwku i Kłōdce.</div></div><div class="seg"><button id="cbOn">ON</button><button id="cbOff">OFF</button></div></div>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="config.js"></script>
@@ -201,7 +231,7 @@ function loadConfig(){
 }
 var TEST_PASSWORD="starzik";
 var MAX_TRIES=4;
-var LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme";
+var LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme", ANIM_KEY="zorta_anim", SOUND_KEY="zorta_sound", CB_KEY="zorta_cb";
 
 var IS_TESTER=(function(){try{return new URLSearchParams(location.search).get("test")===TEST_PASSWORD;}catch(e){return false;}})();
 
@@ -241,16 +271,16 @@ var S={
     triesLab:"prób",win:"Poukładane!",lose:"Nie tym razem",
     winSub:["Perfekcyjnie!","Brawo!","Idealnie!","Ekstra!"],loseSub:"Tak wyglądała właściwa kolejność:",
     correctOrder:"Właściwa kolejność:",share:"Podziel się wynikiem",copied:"Skopiowano do schowka",
-    howT:"Jak grać",how:"Co tydzień dostajesz pięć rzeczy ze Śląska i jedno kryterium — uszereguj je we właściwej kolejności (strzałka pokazuje od czego do czego).<br><br>Stuknij jeden kafelek, potem drugi — zamienią się miejscami. Strzałkami ▲▼ przesuniesz po jednym. Masz 4 próby. Po każdej zielone pozycje są na właściwym miejscu.<br><br>Strzałkami ‹ › u góry cofniesz się do wcześniejszych tygodni.",
-    wk:"Tydzień",today:"ten tydzień",tester:"tryb testera",load:"Ładowanie…",
-    err:"Nie udało się wczytać zagadki. Spróbuj odświeżyć."},
+    howT:"Jak grać",how:"Ułóż pięć śląskich rzeczy we właściwej kolejności.<br><br>Przeciągnij kafelek i puść go w nowym miejscu. Możesz też stuknąć jeden kafelek, potem drugi, żeby zamienić je miejscami. Strzałki ▲▼ przesuwają kafelek o jedno miejsce.<br><br>Po każdej próbie zielone pozycje zostają trafione. Masz 4 próby. Po dwóch próbach możesz użyć jednej podpowiedzi — gra pokaże jeden element i jego właściwe miejsce.<br><br>Dane są orientacyjne i pochodzą z publicznie dostępnych informacji.",
+    wk:"Tydzień",today:"ten tydzień",tester:"tryb testera",load:"Ładowanie…",cat:"Kategoria",sortBy:"Ułóż według",
+    err:"Nie udało się wczytać zagadki. Spróbuj odświeżyć.",settings:"Ustawienia",on:"Wł.",off:"Wył.",anim:"Animacje",animSub:"Ruch kafelków i krótkie efekty.",sound:"Dźwięki",soundSub:"Ciche kliknięcia i sygnały po próbie.",cb:"Kolory dla daltonistów",cbSub:"Alternatywne kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokaż podpowiedź",hintText:"Podpowiedź: <b>{name}</b> powinno być na miejscu <b>{pos}</b>.",hintPlace:"miejsce {pos}",hintErr:"Nie udało się pobrać podpowiedzi.",sharePrompt:"Ułożysz lepiej?"},
   sl:{tag:"Co tydziyń jedna ślōnsko zagodka — poukłŏdej",check:"Wejrzij",
     triesLab:"prōb",win:"Poukłŏdane!",lose:"Niy tym razym",
     winSub:["Perfekt!","Brawo!","Idealnie!","Ekstra!"],loseSub:"Tak szła dobro kolejność:",
     correctOrder:"Dobro kolejność:",share:"Podziel sie wynikym",copied:"Skopiowane",
-    howT:"Jak grać",how:"Co tydziyń dostŏwosz piyńć rzeczy ze Ślōnska i jedno kryterium — poukłŏdej je po porządku (strzałka pokazuje ôd czego do czego).<br><br>Klyknij jedyn kafelek, potym drugi — zamiyniōm sie miyjscami. Strzałkami ▲▼ przesuniesz po jednym. Mŏsz 4 prōby.<br><br>Strzałkami ‹ › na wiyrchu cŏfniesz sie do wcześniyjszych tydni.",
-    wk:"Tydziyń",today:"tyn tydziyń",tester:"tryb testera",load:"Ładowanie…",
-    err:"Niy szło wczytać zagodki. Sprōbuj ôdświyżyć."}
+    howT:"Jak grać",how:"Poukłŏdej piyńć ślōnskich rzeczy po dobrym porządku.<br><br>Przeciōngnij kafelek i puść go w nowym miyjscu. Możesz tyż klyknōńć jedyn kafelek, potym drugi, coby je zamiynić. Strzałki ▲▼ przesuwajōm kafelek o jedno miyjsce.<br><br>Po kożdej prōbie zielōne pozycyje sōm trefiōne. Mŏsz 4 prōby. Po dwóch prōbach możesz użyć jednej podpowiedzi — szpil pokaże jedyn elymynt i jego dobre miyjsce.<br><br>Dane sōm orientacyjne i z publicznie dostympnych informacyji.",
+    wk:"Tydziyń",today:"tyn tydziyń",tester:"tryb testera",load:"Ładowanie…",cat:"Kategoryjo",sortBy:"Poukłŏdej wedle",
+    err:"Niy szło wczytać zagodki. Sprōbuj ôdświyżyć.",settings:"Sztelōnki",on:"Wł.",off:"Wył.",anim:"Animacyje",animSub:"Ruch kafelkōw i krōtkie efekty.",sound:"Głos",soundSub:"Ciche klikniyncia i sygnały po prōbie.",cb:"Kolory dlŏ daltonistōw",cbSub:"Inaksze kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokoż podpowiydź",hintText:"Podpowiydź: <b>{name}</b> mŏ być na miyjscu <b>{pos}</b>.",hintPlace:"miyjsce {pos}",hintErr:"Niy szło pobrać podpowiydzi.",sharePrompt:"Poukłŏdosz lepij?"}
 };
 var lang=(store.get(LANG_KEY)==="szl"||store.get(LANG_KEY)==="SL")?"sl":"pl";
 function L(){return S[lang];}
@@ -267,6 +297,12 @@ var DIR={
   "położenie: zachód–wschód":{a:"od najdalej na zachód → na wschód",         d:"od najdalej na wschód → na zachód"}
 };
 function dirText(kryt,kier){var m=DIR[kryt]||{a:"od najmniejszej wartości → do największej",d:"od największej → do najmniejszej"};return kier==="rosnaco"?m.a:m.d;}
+function setPuzzleHeader(m){
+  $("eyebrow").textContent=(L().cat+": "+m.kategoria).toUpperCase();
+  $("crit").textContent=L().sortBy+": "+m.kryterium.charAt(0).toLowerCase()+m.kryterium.slice(1);
+  $("dirText").textContent=dirText(m.kryterium,m.kierunek);
+  $("dirArrow").textContent=(m.kierunek==="rosnaco")?"↓":"↑";
+}
 
 /* ── STAN PER TYDZIEŃ ───────────────────────────────────────────────── */
 function wkKey(w){return "zorta_d"+w;}
@@ -284,7 +320,8 @@ function sanitizeState(st,pozycje){
   var stStatus=(st.status==="won"||st.status==="lost")?st.status:"playing";
   if(stStatus==="playing"&&h.length>=MAX_TRIES)return null;
   if(h.length>MAX_TRIES)h=h.slice(0,MAX_TRIES);
-  return {order:st.order.slice(),history:h,status:stStatus};
+  var hd=(st.hintData&&st.hintData.name&&st.hintData.pos)?{name:st.hintData.name,pos:st.hintData.pos}:null;
+  return {order:st.order.slice(),history:h,status:stStatus,hintData:hd};
 }
 
 var meta=null;      // dane z zorta_day
@@ -294,6 +331,7 @@ var status="playing";
 var selIdx=-1;      // wybrany kafelek (do zamiany dwoma stuknięciami)
 var revealMap=null; // {nazwa:wartosc} po zakończeniu
 var revealOrder=null;
+var hintData=null;
 var dragFrom=-1;
 var dragTo=-1;
 var dragMoved=false;
@@ -326,13 +364,10 @@ function demoLoadWeek(w){
   $("banner").style.display="block";
   updateWeekNav();
   meta=DEMO_META;
-  $("eyebrow").textContent=meta.kategoria.toUpperCase();
-  $("crit").textContent=meta.kryterium.charAt(0).toUpperCase()+meta.kryterium.slice(1);
-  $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
-  $("dirArrow").textContent=(meta.kierunek==="rosnaco")?"↓":"↑";
+  setPuzzleHeader(meta);
   var st=sanitizeState(loadState(w),meta.pozycje);
-  if(st){order=st.order;guessHistory=st.history;status=st.status;}
-  else{order=meta.pozycje.slice();guessHistory=[];status="playing";clearState(w);}
+  if(st){order=st.order;guessHistory=st.history;status=st.status;hintData=st.hintData||null;}
+  else{order=meta.pozycje.slice();guessHistory=[];status="playing";hintData=null;clearState(w);}
   renderList();renderAttempts();
   if(status==="playing"){$("checkBtn").style.display="block";$("checkBtn").disabled=false;}
   else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;showResult(status==="won");}
@@ -363,8 +398,10 @@ function renderList(){
     if(!locked)li.className+=" can-drag";
     if(selIdx===i)li.className+=" sel";
     if(mask&&mask[i])li.className+=" fixed";
+    if(status==="playing"&&hintData&&hintData.name===name)li.className+=" hinted";
     var fixed=!!(mask&&mask[i]);
-    var html='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>';
+    var hintTag=(status==="playing"&&hintData&&hintData.name===name)?'<span class="hinttag">'+L().hintPlace.replace("{pos}",hintData.pos)+'</span>':'';
+    var html='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>'+hintTag;
     if(!locked){
       html+='<div class="arrows">'
         +'<button data-up="'+i+'" '+(i===0?'disabled':'')+'>▲</button>'
@@ -417,7 +454,7 @@ function reorder(from,to){
   if(from<0||to<0||from===to||from>=order.length||to>=order.length)return;
   var item=order.splice(from,1)[0];
   order.splice(to,0,item);
-  selIdx=-1;persist();renderList();
+  selIdx=-1;persist();playSound("drop");renderList();
 }
 function dragOverIndex(x,y){
   var rows=[].slice.call(document.querySelectorAll("#list .row"));
@@ -476,14 +513,14 @@ function pick(i){
   if(status!=="playing")return;
   if(selIdx===-1){selIdx=i;}
   else if(selIdx===i){selIdx=-1;}
-  else{var t=order[selIdx];order[selIdx]=order[i];order[i]=t;selIdx=-1;persist();}
+  else{var t=order[selIdx];order[selIdx]=order[i];order[i]=t;selIdx=-1;persist();playSound("move");}
   renderList();
 }
 function move(i,dir){
   var j=i+dir;if(j<0||j>=order.length)return;
-  var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();renderList();
+  var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();playSound("move");renderList();
 }
-function persist(){saveState(currentWeek,{order:order,history:guessHistory,status:status});}
+function persist(){saveState(currentWeek,{order:order,history:guessHistory,status:status,hintData:hintData});}
 
 function renderAttempts(){
   var box=$("attempts");box.innerHTML="";box.style.display=(status==="playing")?"flex":"none";
@@ -491,6 +528,7 @@ function renderAttempts(){
   for(var i=0;i<MAX_TRIES;i++){var d=document.createElement("span");d.className="dot"+(i<used?" used":"");box.appendChild(d);}
   var lab=document.createElement("span");lab.className="lab";
   lab.textContent=Math.max(0,MAX_TRIES-guessHistory.length)+" "+L().triesLab;box.appendChild(lab);
+  renderHint();
 }
 
 function fmtVal(v,unit){
@@ -499,6 +537,28 @@ function fmtVal(v,unit){
   if(unit==="km²"){return v+" km²";}
   if(unit==="rok"){return v;}
   return v+(unit?(" "+unit):"");
+}
+
+function formatHintText(h){return L().hintText.replace("{name}",h.name).replace("{pos}",h.pos);}
+function renderHint(){
+  var hb=$("hintBar");if(!hb)return;
+  var btn=$("hintBtn"),msg=$("hintMsg");
+  if(status!=="playing"){hb.style.display="none";return;}
+  if(hintData){hb.style.display="flex";btn.style.display="none";msg.style.display="block";msg.innerHTML=formatHintText(hintData);return;}
+  if(guessHistory.length>=2){hb.style.display="flex";btn.style.display="inline-flex";btn.disabled=false;btn.textContent=L().hintBtn;msg.style.display="none";msg.innerHTML="";}
+  else{hb.style.display="none";}
+}
+function chooseHint(correctOrder){
+  if(!Array.isArray(correctOrder)||!correctOrder.length)return null;
+  for(var i=0;i<correctOrder.length;i++){if(order[i]!==correctOrder[i])return {name:correctOrder[i],pos:i+1};}
+  return {name:correctOrder[0],pos:1};
+}
+function useHint(){
+  if(status!=="playing"||hintData||guessHistory.length<2)return;
+  var btn=$("hintBtn");if(btn)btn.disabled=true;
+  function done(h){if(!h){toast(L().hintErr);renderHint();return;}hintData=h;persist();playSound("hint");renderList();renderHint();}
+  if(DEMO){done(chooseHint(DEMO_ORDER));return;}
+  rpc("zorta_reveal",{p_week:currentWeek}).then(function(rv){done(chooseHint(rv.kolejnosc));}).catch(function(){toast(L().hintErr);renderHint();});
 }
 
 function showResult(won){
@@ -515,7 +575,8 @@ function showResult(won){
     li.innerHTML='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>'+val;
     ul.appendChild(li);
   });
-  $("resSrc").textContent=(meta.zrodlo?("źródło: "+meta.zrodlo):"");
+  // Źródło zostaje w danych/bazie, ale nie pokazujemy go graczowi w podsumowaniu.
+  $("resSrc").textContent="";
 }
 
 /* ── PRÓBA ──────────────────────────────────────────────────────────── */
@@ -523,7 +584,7 @@ function check(){
   if(DEMO){demoCheck();return;}
   if(status!=="playing")return;
   if(guessHistory.length>=MAX_TRIES){guessHistory=[];persist();renderAttempts();}
-  $("checkBtn").disabled=true;
+  $("checkBtn").disabled=true;playSound("check");
   rpc("zorta_guess",{p_week:currentWeek,p_order:order}).then(function(res){
     $("checkBtn").disabled=false;
     if(res&&res.blad){toast("Błąd listy: "+res.blad);return;}
@@ -548,6 +609,7 @@ function check(){
 }
 
 function finishUp(won){
+  playSound(won?"win":"lose");
   renderList();renderAttempts();showResult(won);
   if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
     trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
@@ -559,7 +621,7 @@ function finishUp(won){
 /* ── ŁADOWANIE TYGODNIA ─────────────────────────────────────────────── */
 function loadWeek(w){
   if(DEMO){demoLoadWeek(w);return;}
-  currentWeek=w;selIdx=-1;
+  currentWeek=w;selIdx=-1;hintData=null;
   $("result").classList.remove("show");$("banner").style.display="none";
   $("list").innerHTML="";$("checkBtn").style.display="none";$("attempts").style.display="none";
   updateWeekNav();
@@ -567,14 +629,11 @@ function loadWeek(w){
     hideNotice();
     meta=m;
     $("banner").style.display="block";
-    $("eyebrow").textContent=m.kategoria.toUpperCase();
-    $("crit").textContent=m.kryterium.charAt(0).toUpperCase()+m.kryterium.slice(1);
-    $("dirText").textContent=dirText(m.kryterium,m.kierunek);
-    $("dirArrow").textContent=(m.kierunek==="rosnaco")?"↓":"↑";
+    setPuzzleHeader(m);
     var st=sanitizeState(loadState(w),m.pozycje);
     if(st){
-      order=st.order;guessHistory=st.history;status=st.status;
-    }else{order=m.pozycje.slice();guessHistory=[];status="playing";clearState(w);}
+      order=st.order;guessHistory=st.history;status=st.status;hintData=st.hintData||null;
+    }else{order=m.pozycje.slice();guessHistory=[];status="playing";hintData=null;clearState(w);}
     renderList();renderAttempts();
     if(status==="playing"){
       $("checkBtn").style.display="block";$("checkBtn").disabled=false;
@@ -598,14 +657,45 @@ function updateWeekNav(){
 
 /* ── SHARE ──────────────────────────────────────────────────────────── */
 function buildShare(){
-  var head="Zorta · "+L().wk.toLowerCase()+" "+(currentWeek+1)+" · "+(status==="won"?guessHistory.length:"X")+"/"+MAX_TRIES;
+  var head="Zorta #"+(currentWeek+1);
+  var score=(status==="won"?guessHistory.length:"X")+"/"+MAX_TRIES;
   var grid=guessHistory.map(function(m){return m.map(function(b){return b?"🟩":"⬜";}).join("");}).join("\n");
-  return head+"\n"+grid+"\nszpilplac.familock.pl";
+  return head+"\n"+score+"\n\n"+grid+"\n\n"+L().sharePrompt;
+}
+function copyText(txt){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(txt);
+  }
+  return new Promise(function(resolve,reject){
+    try{
+      var ta=document.createElement("textarea");
+      ta.value=txt;
+      ta.setAttribute("readonly","");
+      ta.style.position="fixed";
+      ta.style.left="-9999px";
+      ta.style.top="0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok=document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok?resolve():reject(new Error("copy"));
+    }catch(e){reject(e);}
+  });
 }
 function share(){
   var txt=buildShare();
-  if(navigator.share){navigator.share({text:txt}).catch(function(){});return;}
-  navigator.clipboard.writeText(txt).then(function(){toast(L().copied);}).catch(function(){toast(txt);});
+  copyText(txt).then(function(){
+    toast(L().copied);
+    var b=$("shareBtn");
+    if(b){
+      var old=b.textContent;
+      b.textContent=L().copied;
+      setTimeout(function(){b.textContent=old||L().share;},1300);
+    }
+  }).catch(function(){
+    toast(txt);
+  });
 }
 
 /* ── UI: motyw / język / pomoc / nawigacja ──────────────────────────── */
@@ -613,16 +703,46 @@ var ICO={
   sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
   moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
 };
+function setBtn(id,on){var el=$(id);if(el)el.className=on?"on":"";}
+function valOr(k,def){var v=store.get(k);return v==null||v===""?def:v;}
+function applySettings(){
+  var anim=valOr(ANIM_KEY,"on"), sound=valOr(SOUND_KEY,"off"), cb=valOr(CB_KEY,"off");
+  document.documentElement.setAttribute("data-anim",anim);
+  document.documentElement.setAttribute("data-sound",sound);
+  document.documentElement.setAttribute("data-cb",cb);
+  setBtn("animOn",anim==="on");setBtn("animOff",anim==="off");
+  setBtn("soundOn",sound==="on");setBtn("soundOff",sound==="off");
+  setBtn("cbOn",cb==="on");setBtn("cbOff",cb==="off");
+}
+function updateSettingsLabels(){
+  var ids={settTitle:"settings",animLabel:"anim",animSub:"animSub",soundLabel:"sound",soundSub:"soundSub",cbLabel:"cb",cbSub:"cbSub"};
+  Object.keys(ids).forEach(function(id){if($(id))$(id).textContent=L()[ids[id]];});
+  ["animOn","soundOn","cbOn"].forEach(function(id){if($(id))$(id).textContent=L().on;});
+  ["animOff","soundOff","cbOff"].forEach(function(id){if($(id))$(id).textContent=L().off;});
+  if($("hintBtn"))$("hintBtn").textContent=L().hintBtn;
+}
+var audioCtx=null;
+function playSound(type){
+  if(valOr(SOUND_KEY,"off")!=="on")return;
+  try{
+    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    var f={move:220,drop:280,check:360,hint:520,win:660,lose:150}[type]||300;
+    o.type="sine";o.frequency.setValueAtTime(f,audioCtx.currentTime);
+    g.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.045,audioCtx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.11);
+    o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.12);
+  }catch(e){}
+}
 function applyTheme(t){document.documentElement.setAttribute("data-theme",t);store.set(THEME_KEY,t);$("themeBtn").innerHTML=(t==="dark")?ICO.sun:ICO.moon;}
 function applyLang(){
   $("lPl").className=lang==="pl"?"on":"";
   $("lSzl").className=lang==="sl"?"on":"";
   $("tagline").textContent=L().tag;$("checkBtn").textContent=L().check;
   $("shareBtn").textContent=L().share;$("howTitle").textContent=L().howT;$("howBody").innerHTML=L().how;
-  if(meta){ // odśwież teksty zależne od danych
-    $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
-  }
-  updateWeekNav();renderAttempts();
+  if(meta){setPuzzleHeader(meta);} // odśwież teksty zależne od danych
+  updateWeekNav();renderAttempts();updateSettingsLabels();renderHint();
 }
 function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1900);}
 
@@ -632,6 +752,16 @@ $("lSzl").addEventListener("click",function(){lang="sl";store.set(LANG_KEY,"szl"
 $("helpBtn").addEventListener("click",function(){$("helpScrim").classList.add("show");});
 $("helpClose").addEventListener("click",function(){$("helpScrim").classList.remove("show");});
 $("helpScrim").addEventListener("click",function(e){if(e.target===$("helpScrim"))$("helpScrim").classList.remove("show");});
+$("settBtn").addEventListener("click",function(){$("settScrim").classList.add("show");});
+$("settClose").addEventListener("click",function(){$("settScrim").classList.remove("show");});
+$("settScrim").addEventListener("click",function(e){if(e.target===$("settScrim"))$("settScrim").classList.remove("show");});
+$("animOn").addEventListener("click",function(){store.set(ANIM_KEY,"on");applySettings();});
+$("animOff").addEventListener("click",function(){store.set(ANIM_KEY,"off");applySettings();});
+$("soundOn").addEventListener("click",function(){store.set(SOUND_KEY,"on");applySettings();playSound("hint");});
+$("soundOff").addEventListener("click",function(){store.set(SOUND_KEY,"off");applySettings();});
+$("cbOn").addEventListener("click",function(){store.set(CB_KEY,"on");applySettings();});
+$("cbOff").addEventListener("click",function(){store.set(CB_KEY,"off");applySettings();});
+$("hintBtn").addEventListener("click",useHint);
 $("checkBtn").addEventListener("click",check);
 $("shareBtn").addEventListener("click",share);
 $("prevWk").addEventListener("click",function(){if(currentWeek>0)loadWeek(currentWeek-1);});
@@ -639,6 +769,7 @@ $("nextWk").addEventListener("click",function(){if(IS_TESTER||currentWeek<TW)loa
 
 /* ── START ──────────────────────────────────────────────────────────── */
 applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
+applySettings();
 applyLang();
 loadConfig().then(function(){loadWeek(TW);}).catch(function(){startDemo("config");});
 </script>
