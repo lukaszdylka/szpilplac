@@ -279,13 +279,25 @@ function postEventPayload(p){
       "Authorization":"Bearer "+SUPABASE_ANON_KEY,"Prefer":"return=minimal"},
     body:JSON.stringify(p)});
 }
+function eventCorePayload(p){
+  var q={game:p.game,puzzle_no:p.puzzle_no,puzzle_word:p.puzzle_word,won:!!p.won,tries:p.tries,lang:p.lang,mode:p.mode};
+  if(p.errors!==undefined)q.errors=p.errors;
+  return q;
+}
+function okEvent(r){
+  if(r.ok)return true;
+  return r.text().then(function(t){throw new Error("event "+r.status+" "+t);});
+}
 function trackEvent(p){
-  postEventPayload(p).then(function(r){
-    if(!r.ok)throw new Error("event "+r.status);
-  }).catch(function(){
-    /* Starsza baza może jeszcze nie mieć hint_used. Wtedy zapisujemy podstawowy event. */
-    var q={};Object.keys(p).forEach(function(k){if(k!=="hint_used")q[k]=p[k];});
-    postEventPayload(q).catch(function(){});
+  var core=eventCorePayload(p);
+  var ext={};Object.keys(core).forEach(function(k){ext[k]=core[k];});
+  ext.hint_used=!!p.hint_used;
+
+  postEventPayload(ext).then(okEvent).catch(function(err1){
+    /* Jeżeli baza nie ma jeszcze hint_used albo ma starszy CHECK na game, próbujemy minimalny zapis. */
+    postEventPayload(core).then(okEvent).catch(function(err2){
+      console.warn("Zorta event not saved",err1,err2);
+    });
   });
 }
 
@@ -601,13 +613,19 @@ function fmtVal(v,unit){
 }
 
 function formatHintText(h){return L().hintText.replace("{name}",h.name).replace("{pos}",h.pos);}
+function hintWaitText(){
+  if(lang==="sl")return guessHistory.length===1?"Podpowiydź po jeszcze 1 prōbie":"Podpowiydź po 2 prōbach";
+  return guessHistory.length===1?"Podpowiedź po jeszcze 1 próbie":"Podpowiedź po 2 próbach";
+}
 function renderHint(){
   var hb=$("hintBar");if(!hb)return;
   var btn=$("hintBtn"),msg=$("hintMsg");
   if(status!=="playing"){hb.style.display="none";return;}
-  if(hintData){hb.style.display="flex";btn.style.display="none";msg.style.display="block";msg.innerHTML=formatHintText(hintData);return;}
-  if(guessHistory.length>=2){hb.style.display="flex";btn.style.display="inline-flex";btn.disabled=false;btn.textContent=L().hintBtn;msg.style.display="none";msg.innerHTML="";}
-  else{hb.style.display="none";}
+  hb.style.display="flex";
+  if(hintData){btn.style.display="none";msg.style.display="block";msg.innerHTML=formatHintText(hintData);return;}
+  msg.style.display="none";msg.innerHTML="";btn.style.display="inline-flex";
+  if(guessHistory.length>=2){btn.disabled=false;btn.textContent=L().hintBtn;}
+  else{btn.disabled=true;btn.textContent=hintWaitText();}
 }
 function chooseHint(correctOrder){
   if(!Array.isArray(correctOrder)||!correctOrder.length)return null;
@@ -679,7 +697,7 @@ function finishUp(won){
   },650);
   if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
     trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
-      won:won,tries:guessHistory.length,max_tries:MAX_TRIES,lang:lang,hint_used:!!hintData,
+      won:won,tries:guessHistory.length,lang:lang,hint_used:!!hintData,
       mode:IS_TESTER?"tester":"supabase"});
   }
 }
