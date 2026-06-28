@@ -289,7 +289,7 @@ function sanitizeState(st,pozycje){
 
 var meta=null;      // dane z zorta_day
 var order=[];       // bieżąca kolejność nazw (od pozycji 1)
-var history=[];     // tablica masek z prób
+var guessHistory=[]; // tablica masek z prób
 var status="playing";
 var selIdx=-1;      // wybrany kafelek (do zamiany dwoma stuknięciami)
 var revealMap=null; // {nazwa:wartosc} po zakończeniu
@@ -331,8 +331,8 @@ function demoLoadWeek(w){
   $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
   $("dirArrow").textContent=(meta.kierunek==="rosnaco")?"↓":"↑";
   var st=sanitizeState(loadState(w),meta.pozycje);
-  if(st){order=st.order;history=st.history;status=st.status;}
-  else{order=meta.pozycje.slice();history=[];status="playing";clearState(w);}
+  if(st){order=st.order;guessHistory=st.history;status=st.status;}
+  else{order=meta.pozycje.slice();guessHistory=[];status="playing";clearState(w);}
   renderList();renderAttempts();
   if(status==="playing"){$("checkBtn").style.display="block";$("checkBtn").disabled=false;}
   else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;showResult(status==="won");}
@@ -340,10 +340,10 @@ function demoLoadWeek(w){
 function demoCheck(){
   if(status!=="playing")return;
   var mask=order.map(function(name,i){return name===DEMO_ORDER[i];});
-  history.push(mask);
+  guessHistory.push(mask);
   var ok=mask.every(Boolean);
   if(ok){status="won";revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;persist();finishUp(true);}
-  else if(history.length>=MAX_TRIES){status="lost";revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;persist();finishUp(false);}
+  else if(guessHistory.length>=MAX_TRIES){status="lost";revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;persist();finishUp(false);}
   else{persist();renderList();renderAttempts();}
 }
 
@@ -352,7 +352,7 @@ var $=function(id){return document.getElementById(id);};
 function showNotice(html){var n=$("notice");if(!n)return;n.innerHTML=html;n.style.display="block";}
 function hideNotice(){var n=$("notice");if(!n)return;n.style.display="none";}
 
-function lastMask(){return history.length?history[history.length-1]:null;}
+function lastMask(){return guessHistory.length?guessHistory[guessHistory.length-1]:null;}
 
 function renderList(){
   var ul=$("list");ul.innerHTML="";
@@ -483,14 +483,14 @@ function move(i,dir){
   var j=i+dir;if(j<0||j>=order.length)return;
   var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();renderList();
 }
-function persist(){saveState(currentWeek,{order:order,history:history,status:status});}
+function persist(){saveState(currentWeek,{order:order,history:guessHistory,status:status});}
 
 function renderAttempts(){
   var box=$("attempts");box.innerHTML="";box.style.display=(status==="playing")?"flex":"none";
-  var used=Math.min(history.length,MAX_TRIES);
+  var used=Math.min(guessHistory.length,MAX_TRIES);
   for(var i=0;i<MAX_TRIES;i++){var d=document.createElement("span");d.className="dot"+(i<used?" used":"");box.appendChild(d);}
   var lab=document.createElement("span");lab.className="lab";
-  lab.textContent=Math.max(0,MAX_TRIES-history.length)+" "+L().triesLab;box.appendChild(lab);
+  lab.textContent=Math.max(0,MAX_TRIES-guessHistory.length)+" "+L().triesLab;box.appendChild(lab);
 }
 
 function fmtVal(v,unit){
@@ -522,16 +522,16 @@ function showResult(won){
 function check(){
   if(DEMO){demoCheck();return;}
   if(status!=="playing")return;
-  if(history.length>=MAX_TRIES){history=[];persist();renderAttempts();}
+  if(guessHistory.length>=MAX_TRIES){guessHistory=[];persist();renderAttempts();}
   $("checkBtn").disabled=true;
   rpc("zorta_guess",{p_week:currentWeek,p_order:order}).then(function(res){
     $("checkBtn").disabled=false;
     if(res&&res.blad){toast("Błąd listy: "+res.blad);return;}
-    history.push(res.maska);
+    guessHistory.push(res.maska);
     if(res.ok){
       status="won";revealMap=res.wartosci;revealOrder=res.kolejnosc;
       persist();finishUp(true);
-    }else if(history.length>=MAX_TRIES){
+    }else if(guessHistory.length>=MAX_TRIES){
       status="lost";persist();
       rpc("zorta_reveal",{p_week:currentWeek}).then(function(rv){
         revealMap=rv.wartosci;revealOrder=rv.kolejnosc;finishUp(false);
@@ -551,7 +551,7 @@ function finishUp(won){
   renderList();renderAttempts();showResult(won);
   if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
     trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
-      won:won,tries:history.length,max_tries:MAX_TRIES,lang:lang,
+      won:won,tries:guessHistory.length,max_tries:MAX_TRIES,lang:lang,
       mode:IS_TESTER?"tester":"supabase"});
   }
 }
@@ -573,8 +573,8 @@ function loadWeek(w){
     $("dirArrow").textContent=(m.kierunek==="rosnaco")?"↓":"↑";
     var st=sanitizeState(loadState(w),m.pozycje);
     if(st){
-      order=st.order;history=st.history;status=st.status;
-    }else{order=m.pozycje.slice();history=[];status="playing";clearState(w);}
+      order=st.order;guessHistory=st.history;status=st.status;
+    }else{order=m.pozycje.slice();guessHistory=[];status="playing";clearState(w);}
     renderList();renderAttempts();
     if(status==="playing"){
       $("checkBtn").style.display="block";$("checkBtn").disabled=false;
@@ -598,8 +598,8 @@ function updateWeekNav(){
 
 /* ── SHARE ──────────────────────────────────────────────────────────── */
 function buildShare(){
-  var head="Zorta · "+L().wk.toLowerCase()+" "+(currentWeek+1)+" · "+(status==="won"?history.length:"X")+"/"+MAX_TRIES;
-  var grid=history.map(function(m){return m.map(function(b){return b?"🟩":"⬜";}).join("");}).join("\n");
+  var head="Zorta · "+L().wk.toLowerCase()+" "+(currentWeek+1)+" · "+(status==="won"?guessHistory.length:"X")+"/"+MAX_TRIES;
+  var grid=guessHistory.map(function(m){return m.map(function(b){return b?"🟩":"⬜";}).join("");}).join("\n");
   return head+"\n"+grid+"\nszpilplac.familock.pl";
 }
 function share(){
