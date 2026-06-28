@@ -119,7 +119,7 @@ header{width:100%;padding:14px 2px 10px}
 .row.hinted{border-color:var(--gold);background:var(--surface2)}
 .hinttag{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 7px;white-space:nowrap}
 
-.stats-body{display:flex;flex-direction:column;gap:14px;margin-top:6px}.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}.stat-card .n{font-family:"Oswald";font-size:25px;line-height:1;color:var(--green)}[data-theme=dark] .stat-card .n{color:var(--gold)}.stat-card .l{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-top:2px}.stat-dist{display:flex;flex-direction:column;gap:5px}.stat-dist-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2)}.stat-dist-i{width:18px;text-align:right;font-weight:800;color:var(--ink)}.stat-dist-bar-wrap{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:20px}.stat-dist-bar{height:100%;background:var(--green);min-width:22px;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:flex-end;padding-right:7px}[data-theme=dark] .stat-dist-bar{background:var(--gold);color:#161310}.stat-note{font-size:12px;line-height:1.45;color:var(--ink2);text-align:center}.stat-clear{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.stat-clear:hover{background:var(--surface);color:var(--ink)}
+.stats-body{display:flex;flex-direction:column;gap:14px;margin-top:6px}.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}.stat-card .n{font-family:"Oswald";font-size:25px;line-height:1;color:var(--green)}[data-theme=dark] .stat-card .n{color:var(--gold)}.stat-card .l{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-top:2px}.stat-dist{display:flex;flex-direction:column;gap:5px}.stat-dist-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2)}.stat-dist-i{width:18px;text-align:right;font-weight:800;color:var(--ink)}.stat-dist-bar-wrap{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:20px}.stat-dist-bar{height:100%;background:var(--green);min-width:22px;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:flex-end;padding-right:7px}[data-theme=dark] .stat-dist-bar{background:var(--gold);color:#161310}.stat-note{font-size:12px;line-height:1.45;color:var(--ink2);text-align:center}.stat-clear,.stat-share{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.stat-share{background:var(--green);border-color:var(--green);color:#fff}.stat-clear:hover,.stat-share:hover{filter:brightness(1.05);background:var(--surface);color:var(--ink)}.stat-share:hover{background:var(--green);color:#fff}
 .settings-body{display:flex;flex-direction:column;gap:0;margin-top:4px}.sett-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.sett-row:last-child{border-bottom:none}.sett-label{font-size:14px;color:var(--ink);font-weight:700}.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.35}.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2);flex:none}.seg button{font-size:11px;font-weight:800;padding:6px 10px;color:var(--ink2);white-space:nowrap}.seg button.on{background:var(--green);color:#fff}[data-theme=dark] .seg button.on{background:var(--gold);color:#161310}
 [data-anim=off] *{transition:none!important;animation:none!important}[data-anim=off] .drag-ghost{transform:none!important}
 
@@ -154,11 +154,11 @@ header{width:100%;padding:14px 2px 10px}
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
         </button>
 
-        <button class="icon-btn" id="statBtn" title="Statystyki" aria-label="Statystyki">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
-        </button>
         <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 4.01 8.51 1.25h6.98l-.89 2.76 1.21.51 1.32-2.59 4.94 4.94-2.59 1.32.51 1.21 2.76-.89v6.98l-2.76-.89-.51 1.21 2.59 1.32-4.94 4.94-1.32-2.59-1.21.51.89 2.76H8.51l.89-2.76-1.21-.51-1.32 2.59-4.94-4.94 2.59-1.32-.51-1.21-2.76.89V8.51l2.76.89.51-1.21-2.59-1.32 4.94-4.94 1.32 2.59z"/><circle cx="12" cy="12" r="4.4"/></svg>
+        </button>
+        <button class="icon-btn" id="statBtn" title="Statystyki" aria-label="Statystyki">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
         </button>
       </div>
     </div>
@@ -376,10 +376,12 @@ function renderStatsModal(){
   if(!m.played){$("statBody").innerHTML='<p class="stat-note">'+s.noStats+'</p>';return;}
   var max=0;Object.keys(m.dist).forEach(function(k){if(m.dist[k]>max)max=m.dist[k];});
   var dist=["1","2","3","4","X"].map(function(k){var v=m.dist[k]||0,w=max?Math.max(8,Math.round(v/max*100)):8;return '<div class="stat-dist-row"><div class="stat-dist-i">'+k+'</div><div class="stat-dist-bar-wrap"><div class="stat-dist-bar" style="width:'+w+'%">'+v+'</div></div></div>';}).join("");
+  var shareHtml=(status!=="playing"&&guessHistory.length)?'<button class="stat-share" id="statShareBtn">'+s.share+'</button>':"";
   $("statBody").innerHTML='<div class="stats-grid">'+
     statCard(m.played,s.played)+statCard(m.wins,s.wins)+statCard(m.winPct,s.winPct)+statCard(m.avg,s.avgTries)+
     statCard(m.streak,s.streak)+statCard(m.best,s.bestStreak)+statCard(m.hints,s.hintsUsed)+
-    '</div><div><h3 style="font-family:Oswald;text-transform:uppercase;font-size:15px;margin:2px 0 8px;color:var(--ink2)">'+s.dist+'</h3><div class="stat-dist">'+dist+'</div></div><p class="stat-note">'+s.statsNote+'</p><button class="stat-clear" id="clearZortaStats">'+s.clearStats+'</button>';
+    '</div><div><h3 style="font-family:Oswald;text-transform:uppercase;font-size:15px;margin:2px 0 8px;color:var(--ink2)">'+s.dist+'</h3><div class="stat-dist">'+dist+'</div></div>'+shareHtml+'<p class="stat-note">'+s.statsNote+'</p><button class="stat-clear" id="clearZortaStats">'+s.clearStats+'</button>';
+  var sb=$("statShareBtn");if(sb)sb.addEventListener("click",function(){share();});
   var c=$("clearZortaStats");if(c)c.addEventListener("click",function(){store.set(ZORTA_STATS_KEY,JSON.stringify(emptyStats()));renderStatsModal();});
 }
 
@@ -671,6 +673,10 @@ function finishUp(won){
   playSound(won?"win":"lose");
   renderList();renderAttempts();showResult(won);
   recordLocalStats(won);
+  setTimeout(function(){
+    renderStatsModal();
+    $("statScrim").classList.add("show");
+  },650);
   if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
     trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
       won:won,tries:guessHistory.length,max_tries:MAX_TRIES,lang:lang,hint_used:!!hintData,
