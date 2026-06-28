@@ -8,424 +8,68 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <style>
-:root,
-[data-theme=light]{
-  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
-  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
-  --green:#2f4a39;--gold:#bf8a3a;--red:#b84040;
-  --c0:#3f8a5a;--c1:#bf8a3a;--c2:#5a7ab8;--c3:#9a5a3a;
-  --tag-won-bg:#d4eddf;--tag-won-ink:#1e6b3f;
-  --tag-lost-bg:#f4d9d9;--tag-lost-ink:#8a2020;
-}
-[data-theme=dark]{
-  --bg:#161310;--surface:#262018;--surface2:#2e2820;
-  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
-  --green:#4a7a56;--gold:#d4a04a;--red:#d4776d;
-  --c0:#4a9a6a;--c1:#c49050;--c2:#6f8fd0;--c3:#b97755;
-  --tag-won-bg:#1f3a2a;--tag-won-ink:#9ee0b5;
-  --tag-lost-bg:#3e2320;--tag-lost-ink:#efa397;
-}
-*{box-sizing:border-box;transition:background-color .18s,color .18s,border-color .18s}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
-  font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-body{display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
-h1,h2,h3{font-family:"Oswald";text-transform:uppercase;letter-spacing:.02em;margin:0}
-a{color:var(--green);font-weight:600;text-decoration:none}
-a:hover{text-decoration:underline}
-button{font-family:inherit;cursor:pointer;border:none;color:inherit}
-
-/* login */
-#login{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;gap:14px;width:100%;max-width:320px}
-#login h1{font-size:28px;color:var(--ink)}
-#login input{width:100%;padding:12px 14px;border-radius:9px;border:1px solid var(--line);
-  background:var(--surface);font-size:15px;font-family:inherit;color:var(--ink)}
-#login input:focus{outline:3px solid var(--gold);outline-offset:2px}
-#login button{width:100%;padding:12px;border-radius:9px;background:var(--green);
-  color:#fff;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
-#login button:hover{filter:brightness(1.08)}
-.theme-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  width:auto;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
-.theme-btn:hover{background:var(--surface);color:var(--ink)}
-#login .theme-btn{align-self:flex-end;width:auto;padding:6px 12px;background:var(--surface2);
-  color:var(--ink2);font-size:12px;letter-spacing:0;text-transform:none}
-.err{color:var(--red);font-size:13px;display:none}
-
-/* dashboard */
-#dash{display:none;width:100%;max-width:860px;padding-top:20px}
-header{width:100%;max-width:860px;padding-top:20px;display:flex;
-  align-items:center;justify-content:space-between;margin-bottom:24px}
-header h1{font-size:30px}
-.hdr-right{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2)}
-.logout{padding:6px 12px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
-.logout:hover{background:var(--surface);color:var(--ink)}
-
-.refresh{padding:7px 14px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--green)}
-.refresh:hover{background:var(--surface)}
-
-/* sekcje */
-.section{margin-bottom:28px}
-.section h2{font-size:18px;color:var(--ink2);margin-bottom:12px;
-  border-bottom:1px solid var(--line);padding-bottom:6px}
-
-/* karty KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.kpi .n{font-family:"Oswald";font-size:32px;color:var(--green);line-height:1}
-.kpi .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-top:3px}
-
-/* tabele */
-.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th{text-align:left;padding:9px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--ink2);border-bottom:1px solid var(--line);font-weight:700;background:var(--surface2)}
-td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--surface2)}
-.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
-.tag-won{background:var(--tag-won-bg);color:var(--tag-won-ink)}
-.tag-lost{background:var(--tag-lost-bg);color:var(--tag-lost-ink)}
-
-/* rozkład prób */
-.dist-row{display:flex;align-items:center;gap:10px;margin:4px 0;font-size:13px}
-.dist-i{width:16px;font-weight:700;color:var(--ink2);text-align:right}
-.dist-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:20px;overflow:hidden}
-.dist-bar{height:100%;background:var(--green);display:flex;align-items:center;
-  padding:0 8px;font-size:11px;font-weight:700;color:#fff;min-width:28px;border-radius:4px}
-.dist-cnt{font-size:12px;color:var(--ink2);width:28px}
-
-/* spinner */
-.spinner{text-align:center;padding:40px;color:var(--ink2);font-size:14px}
-
-/* gra tabs */
-.tabs{display:flex;gap:6px;margin-bottom:16px}
-.tab{padding:7px 16px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}
-.tab.on{background:var(--green);color:#fff;border-color:var(--green)}
+:root,[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--red:#b84040;--tag-won-bg:#d4eddf;--tag-won-ink:#1e6b3f;--tag-lost-bg:#f4d9d9;--tag-lost-ink:#8a2020}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--red:#d4776d;--tag-won-bg:#1f3a2a;--tag-won-ink:#9ee0b5;--tag-lost-bg:#3e2320;--tag-lost-ink:#efa397}
+*{box-sizing:border-box;transition:background-color .18s,color .18s,border-color .18s}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}body{display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}h1,h2,h3{font-family:"Oswald";text-transform:uppercase;letter-spacing:.02em;margin:0}a{color:var(--green);font-weight:600;text-decoration:none}a:hover{text-decoration:underline}button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+#login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:14px;width:100%;max-width:320px}#login h1{font-size:28px;color:var(--ink)}#login input{width:100%;padding:12px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:15px;font-family:inherit;color:var(--ink)}#login input:focus{outline:3px solid var(--gold);outline-offset:2px}#login button.main{width:100%;padding:12px;border-radius:9px;background:var(--green);color:#fff;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase}.theme-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}.theme-btn:hover{background:var(--surface);color:var(--ink)}#login .theme-btn{align-self:flex-end}.err{color:var(--red);font-size:13px;display:none;text-align:center}
+#dash{display:none;width:100%;max-width:960px;padding-top:20px}header{width:100%;max-width:960px;padding-top:20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:14px}header h1{font-size:30px}.hdr-right{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2);flex-wrap:wrap}.logout,.refresh{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}.refresh{color:var(--green)}.logout:hover,.refresh:hover{background:var(--surface)}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}.tab{padding:7px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)}.tab.on{background:var(--green);color:#fff;border-color:var(--green)}.section{margin-bottom:28px}.section h2{font-size:18px;color:var(--ink2);margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:6px}.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}.kpi .n{font-family:"Oswald";font-size:32px;color:var(--green);line-height:1}.kpi .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-top:3px}.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface)}table{width:100%;border-collapse:collapse;font-size:13.5px}th{text-align:left;padding:9px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--line);font-weight:700;background:var(--surface2)}td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink)}tr:last-child td{border-bottom:none}tr:hover td{background:var(--surface2)}.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}.tag-won{background:var(--tag-won-bg);color:var(--tag-won-ink)}.tag-lost{background:var(--tag-lost-bg);color:var(--tag-lost-ink)}.dist-row{display:flex;align-items:center;gap:10px;margin:4px 0;font-size:13px}.dist-i{width:42px;font-weight:700;color:var(--ink2);text-align:right}.dist-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:20px;overflow:hidden}.dist-bar{height:100%;background:var(--green);display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-size:11px;font-weight:700;color:#fff;min-width:28px;border-radius:4px}.dist-cnt{font-size:12px;color:var(--ink2);width:28px}.spinner{text-align:center;padding:40px;color:var(--ink2);font-size:14px}.note{color:var(--ink2);font-size:12px;line-height:1.5;margin:8px 0 0}@media(max-width:650px){header{align-items:flex-start;flex-direction:column}.hdr-right{width:100%}.refresh,.logout,.theme-btn{flex:1;justify-content:center}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login">
   <button class="theme-btn themeBtn" type="button" aria-label="Zmień motyw">☀ Jasny</button>
   <h1>Szpilplac Stats</h1>
   <input type="password" id="pwInput" placeholder="Service role key" autocomplete="current-password">
-  <p class="err" id="loginErr">Nieprawidłowy klucz.</p>
-  <button id="loginBtn">Zaloguj</button>
+  <p class="err" id="loginErr">Nieprawidłowy klucz albo brak połączenia.</p>
+  <button id="loginBtn" class="main">Zaloguj</button>
   <small style="color:var(--ink2);text-align:center">Klucz przechowywany lokalnie w przeglądarce.</small>
 </div>
-
-<!-- DASHBOARD -->
 <div id="dash">
   <header>
-    <div>
-      <a href="index.html" style="font-size:12px;font-weight:600;color:var(--green)">← Szpilplac</a>
-      <h1 style="margin-top:4px">Statystyki</h1>
-    </div>
-    <div class="hdr-right">
-      <button class="theme-btn themeBtn" type="button" aria-label="Zmień motyw">☀ Jasny</button>
-      <button class="refresh" id="refreshBtn">↻ Odśwież</button>
-      <button class="logout" id="logoutBtn">Wyloguj</button>
-    </div>
+    <div><a href="index.html" style="font-size:12px;font-weight:600;color:var(--green)">← Szpilplac</a><h1 style="margin-top:4px">Statystyki</h1></div>
+    <div class="hdr-right"><button class="theme-btn themeBtn" type="button" aria-label="Zmień motyw">☀ Jasny</button><button class="refresh" id="refreshBtn">↻ Odśwież</button><button class="logout" id="logoutBtn">Wyloguj</button></div>
   </header>
-
   <div class="tabs">
     <button class="tab on" data-game="slowko">Słōwko</button>
     <button class="tab" data-game="kodka">Kłōdka</button>
     <button class="tab" data-game="cuzamen">Cuzamen Szpil</button>
+    <button class="tab" data-game="zorta">Zorta</button>
     <button class="tab" data-game="all">Wszystkie</button>
   </div>
-
   <div id="content"><div class="spinner">Ładuję dane…</div></div>
 </div>
-
+<script src="config.js"></script>
 <script>
 "use strict";
-/* ── Konfiguracja ── */
-var SUPABASE_URL = "https://xyivrakegwybwhmmcawq.supabase.co";
-// Ten sam projekt co Słōwko — wpisujesz service_role key przy logowaniu poniżej
-var KEY_LS = "szpilplac_stats_key";
-var THEME_LS = "szpilplac_stats_theme";
-
-/* ── Motyw ── */
-var theme = "light";
-try { theme = localStorage.getItem(THEME_LS) || localStorage.getItem("szpilplac_theme") || "light"; } catch(e) {}
-if(theme!=="dark") theme="light";
-function applyTheme(){
-  document.documentElement.setAttribute("data-theme",theme);
-  document.querySelectorAll(".themeBtn").forEach(function(btn){
-    btn.textContent = theme==="dark" ? "☾ Ciemny" : "☀ Jasny";
-  });
-}
-function toggleTheme(){
-  theme = theme==="dark" ? "light" : "dark";
-  try { localStorage.setItem(THEME_LS,theme); localStorage.setItem("szpilplac_theme",theme); } catch(e) {}
-  applyTheme();
-}
-document.querySelectorAll(".themeBtn").forEach(function(btn){btn.addEventListener("click",toggleTheme);});
-applyTheme();
-
-/* ── Hasło (service_role key) ── */
-var serviceKey = "";
-try { serviceKey = localStorage.getItem(KEY_LS) || ""; } catch(e) {}
-
-var loginDiv = document.getElementById("login");
-var dashDiv  = document.getElementById("dash");
-
-function showDash() { loginDiv.style.display="none"; dashDiv.style.display="block"; loadData(currentGame); }
-function showLogin(){ loginDiv.style.display=""; dashDiv.style.display="none"; }
-
-if(serviceKey) showDash(); else showLogin();
-
-document.getElementById("loginBtn").addEventListener("click", function(){
-  var v = document.getElementById("pwInput").value.trim();
-  if(!v){ document.getElementById("loginErr").style.display="block"; return; }
-  serviceKey = v;
-  try { localStorage.setItem(KEY_LS, v); } catch(e) {}
-  document.getElementById("loginErr").style.display="none";
-  showDash();
-});
-document.getElementById("logoutBtn").addEventListener("click", function(){
-  serviceKey = "";
-  try { localStorage.removeItem(KEY_LS); } catch(e) {}
-  showLogin();
-});
-document.getElementById("pwInput").addEventListener("keydown", function(e){
-  if(e.key==="Enter") document.getElementById("loginBtn").click();
-});
-
-/* ── Fetch helper ── */
-function q(viewOrTable, params){
-  var url = SUPABASE_URL + "/rest/v1/" + viewOrTable + (params ? "?" + params : "");
-  return fetch(url, {
-    headers: { "apikey": serviceKey, "Authorization": "Bearer " + serviceKey }
-  }).then(function(r){
-    if(r.status===401) throw new Error("auth");
-    return r.json();
-  });
-}
-
-/* ── Tabs ── */
-var currentGame = "slowko";
-document.querySelectorAll(".tab").forEach(function(btn){
-  btn.addEventListener("click", function(){
-    document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("on");});
-    btn.classList.add("on");
-    currentGame = btn.dataset.game;
-    loadData(currentGame);
-  });
-});
-document.getElementById("refreshBtn").addEventListener("click", function(){
-  loadData(currentGame);
-});
-
-/* ── Helpers render ── */
-function kpi(n, label){ return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+label+'</div></div>'; }
-function pct(a, b){ return b ? Math.round(a/b*100)+"%" : "–"; }
-function normGame(g){
-  if(g==="klodka"||g==="klodka-weekly"||g==="kodka") return "kodka";
-  return g||"";
-}
-function gameLabel(g){
-  g=normGame(g);
-  if(g==="slowko")return "Słōwko";
-  if(g==="kodka")return "Kłōdka";
-  if(g==="cuzamen")return "Cuzamen";
-  return g||"–";
-}
-function matchesGame(r,game){return game==="all" || normGame(r.game)===game;}
+var FALLBACK_URL="https://xyivrakegwybwhmmcawq.supabase.co";
+var SUPABASE_URL=(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL)||FALLBACK_URL;
+var KEY_LS="szpilplac_stats_key",THEME_LS="szpilplac_stats_theme";
+var theme="light";try{theme=localStorage.getItem(THEME_LS)||localStorage.getItem("szpilplac_theme")||"light";}catch(e){}if(theme!=="dark")theme="light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);document.querySelectorAll(".themeBtn").forEach(function(btn){btn.textContent=theme==="dark"?"☾ Ciemny":"☀ Jasny";});}
+function toggleTheme(){theme=theme==="dark"?"light":"dark";try{localStorage.setItem(THEME_LS,theme);localStorage.setItem("szpilplac_theme",theme);}catch(e){}applyTheme();}
+document.querySelectorAll(".themeBtn").forEach(function(btn){btn.addEventListener("click",toggleTheme);});applyTheme();
+var serviceKey="";try{serviceKey=localStorage.getItem(KEY_LS)||"";}catch(e){}
+var loginDiv=document.getElementById("login"),dashDiv=document.getElementById("dash"),currentGame="slowko";
+function showDash(){loginDiv.style.display="none";dashDiv.style.display="block";loadData(currentGame);}function showLogin(){loginDiv.style.display="";dashDiv.style.display="none";}if(serviceKey)showDash();else showLogin();
+document.getElementById("loginBtn").addEventListener("click",function(){var v=document.getElementById("pwInput").value.trim();if(!v){document.getElementById("loginErr").style.display="block";return;}serviceKey=v;try{localStorage.setItem(KEY_LS,v);}catch(e){}document.getElementById("loginErr").style.display="none";showDash();});
+document.getElementById("logoutBtn").addEventListener("click",function(){serviceKey="";try{localStorage.removeItem(KEY_LS);}catch(e){}showLogin();});
+document.getElementById("pwInput").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("loginBtn").click();});
+function q(path,params){var url=SUPABASE_URL+"/rest/v1/"+path+(params?"?"+params:"");return fetch(url,{headers:{apikey:serviceKey,Authorization:"Bearer "+serviceKey}}).then(function(r){if(r.status===401||r.status===403)throw new Error("auth");if(!r.ok)throw new Error("http "+r.status);return r.json();});}
 function safe(p){return p.catch(function(){return [];});}
-
-function distChart(rows, maxKey, valKey, labelFn){
-  var max = Math.max.apply(null, rows.map(function(r){return +r[valKey]||0;}));
-  return rows.map(function(r){
-    var v = +r[valKey]||0;
-    var w = max ? Math.max(8, Math.round(v/max*100)) : 8;
-    return '<div class="dist-row">'+
-      '<div class="dist-i">'+(labelFn?labelFn(r[maxKey]):r[maxKey])+'</div>'+
-      '<div class="dist-bar-wrap"><div class="dist-bar" style="width:'+w+'%">'+v+'</div></div>'+
-      '<div class="dist-cnt">'+v+'</div></div>';
-  }).join("");
-}
-
-function table(cols, rows, renderRow){
-  if(!rows||!rows.length) return '<p style="color:var(--ink2);padding:14px;font-size:13px">Brak danych.</p>';
-  var head = cols.map(function(c){return'<th>'+c+'</th>';}).join("");
-  var body = rows.map(renderRow).join("");
-  return '<div class="tbl-wrap"><table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>';
-}
-
-/* ── Render overview ── */
-function renderOverview(rows, game){
-  var filtered=(rows||[]).filter(function(r){return matchesGame(r,game);});
-  if(!filtered.length) return '<p style="color:var(--ink2);font-size:13px">Brak rozegranych partii.</p>';
-  var total=filtered.length;
-  var wins=filtered.filter(function(r){return !!r.won;}).length;
-  var winRows=filtered.filter(function(r){return !!r.won && r.tries!==null && r.tries!==undefined;});
-  var avgStr="–";
-  if(game!=="all" && winRows.length){
-    var sum=winRows.reduce(function(a,r){return a+(+r.tries||0);},0);
-    avgStr=(sum/winRows.length).toFixed(1);
-  }
-  return '<div class="kpi-row">'+
-    kpi(total,"Rozegranych")+
-    kpi(wins,"Wygranych")+
-    kpi(pct(wins,total),"% wygranych")+
-    (game!=="all"?kpi(avgStr,"Śr. prób (wygrane)"):"")+
-    '</div>';
-}
-
-/* ── Render dzienny ── */
-function renderDaily(rows, game){
-  var map={};
-  (rows||[]).filter(function(r){return matchesGame(r,game);}).forEach(function(r){
-    var d=new Date(r.created_at).toLocaleDateString("pl-PL",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"});
-    var g=normGame(r.game);
-    var key=d+"|"+g;
-    if(!map[key])map[key]={day:d,game:g,plays:0,wins:0};
-    map[key].plays++; if(r.won)map[key].wins++;
-  });
-  var filtered=Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.day.localeCompare(a.day);});
-  return table(
-    ["Dzień","Gra","Partie","Wygrane","%"],
-    filtered.slice(0,30),
-    function(r){
-      return '<tr><td>'+r.day+'</td><td>'+gameLabel(r.game)+'</td>'+
-        '<td>'+r.plays+'</td><td>'+r.wins+'</td>'+
-        '<td>'+pct(+r.wins,+r.plays)+'</td></tr>';
-    }
-  );
-}
-
-/* ── Render Słōwko ── */
-function renderSlowko(dist, guesses, words){
-  var distHtml = dist&&dist.length
-    ? distChart(dist,"tries","cnt")
-    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';
-
-  var guessHtml = table(
-    ["Słowo","Liczba wpisań"],
-    (guesses||[]).slice(0,20),
-    function(r){return '<tr><td><b>'+r.word+'</b></td><td>'+r.cnt+'</td></tr>';}
-  );
-
-  var wordsHtml = table(
-    ["Słowo dnia","Partie","Wygrane","% wygranych","Śr. prób"],
-    (words||[]).slice(0,20),
-    function(r){
-      return '<tr><td><b>'+r.word+'</b></td><td>'+r.plays+'</td>'+
-        '<td>'+r.wins+'</td><td>'+r.win_pct+'%</td>'+
-        '<td>'+(r.avg_tries||"–")+'</td></tr>';
-    }
-  );
-
-  return '<div class="section"><h2>Rozkład prób (wygrane)</h2>'+distHtml+'</div>'+
-    '<div class="section"><h2>Najczęściej wpisywane słowa (top 20)</h2>'+guessHtml+'</div>'+
-    '<div class="section"><h2>Najtrudniejsze słowa dnia</h2>'+wordsHtml+'</div>';
-}
-
-/* ── Render Kłōdka ── */
-function renderKlodka(log){
-  var rows=(log||[]).filter(function(r){return normGame(r.game)==="kodka";});
-  var wins=rows.filter(function(r){return !!r.won;});
-  var dist=[];
-  for(var i=1;i<=6;i++){
-    dist.push({tries:i,cnt:wins.filter(function(r){return +r.tries===i;}).length});
-  }
-  var distHtml=wins.length
-    ? distChart(dist,"tries","cnt")
-    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak wygranych partii.</p>';
-
-  var modeMap={};
-  rows.forEach(function(r){
-    var m=r.mode||"daily";
-    if(!modeMap[m])modeMap[m]={mode:m,plays:0,wins:0};
-    modeMap[m].plays++; if(r.won)modeMap[m].wins++;
-  });
-  var modeRows=Object.keys(modeMap).map(function(k){return modeMap[k];});
-  var modeHtml=table(
-    ["Tryb","Partie","Wygrane","%"],
-    modeRows,
-    function(r){return '<tr><td>'+(r.mode==="weekly"?"tygodniówka":"codzienna")+'</td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+pct(r.wins,r.plays)+'</td></tr>';}
-  );
-
-  return '<div class="section"><h2>Kłōdka — rozkład prób</h2>'+distHtml+'</div>'+
-         '<div class="section"><h2>Kłōdka — tryby</h2>'+modeHtml+'</div>';
-}
-
-/* ── Render Cuzamen ── */
-function renderCuzamen(dist){
-  var distHtml = dist&&dist.length
-    ? distChart(dist,"errors","cnt",function(v){return v+" błędów";})
-    : '<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';
-  return '<div class="section"><h2>Rozkład błędów</h2>'+distHtml+'</div>';
-}
-
-/* ── Ostatnie partie (log) ── */
-function renderLog(rows, game){
-  var filtered = (rows||[]).filter(function(r){return matchesGame(r,game);});
-  return table(
-    ["Kiedy","Gra","Tryb","#","Słowo","Wynik","Prób","Język"],
-    filtered.slice(0,50),
-    function(r){
-      var dt = new Date(r.created_at).toLocaleString("pl-PL",{timeZone:"Europe/Warsaw",
-        day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
-      var tag = r.won
-        ? '<span class="tag tag-won">wygrana</span>'
-        : '<span class="tag tag-lost">przegrana</span>';
-      return '<tr><td style="white-space:nowrap">'+dt+'</td>'+
-        '<td>'+gameLabel(r.game)+'</td><td>'+(r.mode||"–")+'</td><td>'+r.puzzle_no+'</td>'+
-        '<td>'+(r.puzzle_word||"–")+'</td>'+
-        '<td>'+tag+'</td><td>'+(r.tries||"–")+'</td>'+
-        '<td>'+(r.lang||"–")+'</td></tr>';
-    }
-  );
-}
-
-/* ── Główne ładowanie ── */
-function loadData(game){
-  document.getElementById("content").innerHTML='<div class="spinner">Ładuję dane…</div>';
-
-  var logP       = q("szpilplac_events","select=id,created_at,game,mode,puzzle_no,puzzle_word,won,tries,errors,lang&order=created_at.desc&limit=1000");
-  var distP      = (game==="slowko" || game==="all") ? safe(q("stats_slowko_dist")) : Promise.resolve([]);
-  var guessesP   = (game==="slowko" || game==="all") ? safe(q("stats_slowko_guesses")) : Promise.resolve([]);
-  var wordsP     = (game==="slowko" || game==="all") ? safe(q("stats_slowko_words"))   : Promise.resolve([]);
-  var cuzDistP   = (game==="cuzamen" || game==="all") ? safe(q("stats_cuzamen_dist"))   : Promise.resolve([]);
-
-  Promise.all([logP, distP, guessesP, wordsP, cuzDistP])
-    .then(function(results){
-      var log=results[0];
-      var dist=results[1], guesses=results[2], words=results[3], cuzDist=results[4];
-
-      var html =
-        '<div class="section"><h2>Przegląd</h2>'+renderOverview(log,game)+'</div>'+
-        '<div class="section"><h2>Aktywność dzienna</h2>'+renderDaily(log,game)+'</div>';
-
-      if(game==="slowko" || game==="all")
-        html += renderSlowko(dist,guesses,words);
-      if(game==="kodka" || game==="all")
-        html += renderKlodka(log);
-      if(game==="cuzamen" || game==="all")
-        html += '<div class="section"><h2>Cuzamen Szpil</h2>'+renderCuzamen(cuzDist)+'</div>';
-
-      html += '<div class="section"><h2>Ostatnie partie</h2>'+renderLog(log,game)+'</div>';
-
-      document.getElementById("content").innerHTML = html;
-    })
-    .catch(function(e){
-      if(e.message==="auth"){
-        document.getElementById("content").innerHTML=
-          '<p style="color:var(--red);padding:20px">Nieprawidłowy klucz. <button class="logout" onclick="document.getElementById(\'logoutBtn\').click()">Wyloguj i spróbuj ponownie</button></p>';
-      } else {
-        document.getElementById("content").innerHTML=
-          '<p style="color:var(--red);padding:20px">Błąd połączenia z Supabase. Sprawdź SUPABASE_URL w pliku stats.html.</p>';
-      }
-    });
-}
+document.querySelectorAll(".tab").forEach(function(btn){btn.addEventListener("click",function(){document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("on");});btn.classList.add("on");currentGame=btn.dataset.game;loadData(currentGame);});});
+document.getElementById("refreshBtn").addEventListener("click",function(){loadData(currentGame);});
+function normGame(g){if(g==="klodka"||g==="klodka-weekly"||g==="kodka")return "kodka";return g||"";}function gameLabel(g){g=normGame(g);if(g==="slowko")return "Słōwko";if(g==="kodka")return "Kłōdka";if(g==="cuzamen")return "Cuzamen";if(g==="zorta")return "Zorta";return g||"–";}function matchesGame(r,game){return game==="all"||normGame(r.game)===game;}function kpi(n,l){return'<div class="kpi"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}function pct(a,b){return b?Math.round(a/b*100)+"%":"–";}function num(v){return v==null||v===""?null:+v;}
+function distChart(rows,key,val,labelFn){var max=Math.max.apply(null,rows.map(function(r){return +r[val]||0;}));return rows.map(function(r){var v=+r[val]||0,w=max?Math.max(8,Math.round(v/max*100)):8;return'<div class="dist-row"><div class="dist-i">'+(labelFn?labelFn(r[key]):r[key])+'</div><div class="dist-bar-wrap"><div class="dist-bar" style="width:'+w+'%">'+v+'</div></div><div class="dist-cnt">'+v+'</div></div>';}).join("");}
+function table(cols,rows,renderRow){if(!rows||!rows.length)return'<p style="color:var(--ink2);padding:14px;font-size:13px">Brak danych.</p>';return'<div class="tbl-wrap"><table><thead><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join("")+'</tr></thead><tbody>'+rows.map(renderRow).join("")+'</tbody></table></div>';}
+function renderOverview(rows,game){var f=(rows||[]).filter(function(r){return matchesGame(r,game);});if(!f.length)return'<p style="color:var(--ink2);font-size:13px">Brak rozegranych partii.</p>';var total=f.length,wins=f.filter(function(r){return !!r.won;}).length,wr=f.filter(function(r){return !!r.won&&num(r.tries)!=null;}),avg="–";if(game!=="all"&&wr.length){var sum=wr.reduce(function(a,r){return a+(+r.tries||0);},0);avg=(sum/wr.length).toFixed(1);}return'<div class="kpi-row">'+kpi(total,"Rozegranych")+kpi(wins,"Wygranych")+kpi(pct(wins,total),"% wygranych")+(game!=="all"?kpi(avg,"Śr. prób") : "")+'</div>';}
+function renderDaily(rows,game){var map={};(rows||[]).filter(function(r){return matchesGame(r,game);}).forEach(function(r){var d=new Date(r.created_at).toLocaleDateString("pl-PL",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"});var g=normGame(r.game),key=d+"|"+g;if(!map[key])map[key]={day:d,game:g,plays:0,wins:0};map[key].plays++;if(r.won)map[key].wins++;});var out=Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.day.localeCompare(a.day);});return table(["Dzień","Gra","Partie","Wygrane","%"],out.slice(0,30),function(r){return'<tr><td>'+r.day+'</td><td>'+gameLabel(r.game)+'</td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+pct(r.wins,r.plays)+'</td></tr>';});}
+function renderSlowko(dist,guesses,words){var distHtml=dist&&dist.length?distChart(dist,"tries","cnt"):'<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';var guessHtml=table(["Słowo","Liczba wpisań"],(guesses||[]).slice(0,20),function(r){return'<tr><td><b>'+r.word+'</b></td><td>'+r.cnt+'</td></tr>';});var wordsHtml=table(["Słowo dnia","Partie","Wygrane","% wygranych","Śr. prób"],(words||[]).slice(0,20),function(r){return'<tr><td><b>'+r.word+'</b></td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+r.win_pct+'%</td><td>'+(r.avg_tries||"–")+'</td></tr>';});return'<div class="section"><h2>Rozkład prób (wygrane)</h2>'+distHtml+'</div><div class="section"><h2>Najczęściej wpisywane słowa</h2>'+guessHtml+'</div><div class="section"><h2>Najtrudniejsze słowa dnia</h2>'+wordsHtml+'</div>';}
+function renderKlodka(log){var rows=(log||[]).filter(function(r){return normGame(r.game)==="kodka";}),wins=rows.filter(function(r){return !!r.won;}),dist=[];for(var i=1;i<=6;i++)dist.push({tries:i,cnt:wins.filter(function(r){return +r.tries===i;}).length});var distHtml=wins.length?distChart(dist,"tries","cnt"):'<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak wygranych partii.</p>';var modes={};rows.forEach(function(r){var m=r.mode||"daily";if(!modes[m])modes[m]={mode:m,plays:0,wins:0};modes[m].plays++;if(r.won)modes[m].wins++;});return'<div class="section"><h2>Kłōdka — rozkład prób</h2>'+distHtml+'</div><div class="section"><h2>Kłōdka — tryby</h2>'+table(["Tryb","Partie","Wygrane","%"],Object.keys(modes).map(function(k){return modes[k];}),function(r){return'<tr><td>'+(r.mode==="weekly"?"tygodniówka":"codzienna")+'</td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+pct(r.wins,r.plays)+'</td></tr>';})+'</div>';}
+function renderCuzamen(dist){var html=dist&&dist.length?distChart(dist,"errors","cnt",function(v){return v+" bł.";}):'<p style="color:var(--ink2);font-size:13px;padding:4px 0">Brak danych.</p>';return'<div class="section"><h2>Rozkład błędów</h2>'+html+'</div>';}
+function renderZorta(log){var rows=(log||[]).filter(function(r){return normGame(r.game)==="zorta";}),wins=rows.filter(function(r){return !!r.won;}),dist=[];for(var i=1;i<=4;i++)dist.push({tries:String(i),cnt:wins.filter(function(r){return +r.tries===i;}).length});dist.push({tries:"X",cnt:rows.filter(function(r){return !r.won;}).length});var hintKnown=rows.some(function(r){return Object.prototype.hasOwnProperty.call(r,"hint_used");});var hints=hintKnown?rows.filter(function(r){return r.hint_used===true;}).length:"–";var byWeek={};rows.forEach(function(r){var k=r.puzzle_no||"–";if(!byWeek[k])byWeek[k]={week:k,cat:r.puzzle_word||"–",plays:0,wins:0,hints:0,triesSum:0,triesCnt:0};byWeek[k].plays++;if(r.won){byWeek[k].wins++;if(num(r.tries)!=null){byWeek[k].triesSum+=+r.tries;byWeek[k].triesCnt++;}}if(r.hint_used===true)byWeek[k].hints++;});var weekRows=Object.keys(byWeek).map(function(k){var r=byWeek[k];r.avg=r.triesCnt?(r.triesSum/r.triesCnt).toFixed(1):"–";return r;}).sort(function(a,b){return (+b.week||0)-(+a.week||0);});var kpis='<div class="kpi-row">'+kpi(hints,"Użyte podpowiedzi")+kpi(rows.length?dist.find(function(x){return x.tries==='X';}).cnt:"0","Przegrane")+'</div>';return'<div class="section"><h2>Zorta — podpowiedzi</h2>'+kpis+'<p class="note">Licznik podpowiedzi działa po dodaniu kolumny <code>hint_used</code> w Supabase i po podmianie nowego zorta.html.</p></div><div class="section"><h2>Zorta — rozkład prób</h2>'+distChart(dist,"tries","cnt")+'</div><div class="section"><h2>Zorta — tygodnie</h2>'+table(["Tydzień","Kategoria","Partie","Wygrane","%","Śr. prób","Podp."],weekRows.slice(0,52),function(r){return'<tr><td>#'+r.week+'</td><td>'+r.cat+'</td><td>'+r.plays+'</td><td>'+r.wins+'</td><td>'+pct(r.wins,r.plays)+'</td><td>'+r.avg+'</td><td>'+(hintKnown?r.hints:"–")+'</td></tr>';})+'</div>';}
+function renderLog(rows,game){var f=(rows||[]).filter(function(r){return matchesGame(r,game);});return table(["Kiedy","Gra","Tryb","#","Hasło/temat","Wynik","Prób","Podp.","Język"],f.slice(0,60),function(r){var dt=new Date(r.created_at).toLocaleString("pl-PL",{timeZone:"Europe/Warsaw",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});var tag=r.won?'<span class="tag tag-won">wygrana</span>':'<span class="tag tag-lost">przegrana</span>';var h=Object.prototype.hasOwnProperty.call(r,"hint_used")?(r.hint_used?"tak":"nie"):"–";return'<tr><td style="white-space:nowrap">'+dt+'</td><td>'+gameLabel(r.game)+'</td><td>'+(r.mode||"–")+'</td><td>'+(r.puzzle_no||"–")+'</td><td>'+(r.puzzle_word||"–")+'</td><td>'+tag+'</td><td>'+(r.tries||"–")+'</td><td>'+h+'</td><td>'+(r.lang||"–")+'</td></tr>';});}
+function loadData(game){document.getElementById("content").innerHTML='<div class="spinner">Ładuję dane…</div>';var logP=q("szpilplac_events","select=*&order=created_at.desc&limit=2000");var distP=(game==="slowko"||game==="all")?safe(q("stats_slowko_dist")):Promise.resolve([]);var guessesP=(game==="slowko"||game==="all")?safe(q("stats_slowko_guesses")):Promise.resolve([]);var wordsP=(game==="slowko"||game==="all")?safe(q("stats_slowko_words")):Promise.resolve([]);var cuzDistP=(game==="cuzamen"||game==="all")?safe(q("stats_cuzamen_dist")):Promise.resolve([]);Promise.all([logP,distP,guessesP,wordsP,cuzDistP]).then(function(res){var log=res[0]||[],dist=res[1],guesses=res[2],words=res[3],cuzDist=res[4];var html='<div class="section"><h2>Przegląd</h2>'+renderOverview(log,game)+'</div><div class="section"><h2>Aktywność dzienna</h2>'+renderDaily(log,game)+'</div>';if(game==="slowko"||game==="all")html+=renderSlowko(dist,guesses,words);if(game==="kodka"||game==="all")html+=renderKlodka(log);if(game==="cuzamen"||game==="all")html+='<div class="section"><h2>Cuzamen Szpil</h2>'+renderCuzamen(cuzDist)+'</div>';if(game==="zorta"||game==="all")html+=renderZorta(log);html+='<div class="section"><h2>Ostatnie partie</h2>'+renderLog(log,game)+'</div>';document.getElementById("content").innerHTML=html;}).catch(function(e){if(e.message==="auth"){document.getElementById("content").innerHTML='<p style="color:var(--red);padding:20px">Nieprawidłowy klucz. <button class="logout" onclick="document.getElementById(\'logoutBtn\').click()">Wyloguj i spróbuj ponownie</button></p>';}else{document.getElementById("content").innerHTML='<p style="color:var(--red);padding:20px">Błąd połączenia z Supabase. Sprawdź config.js albo SUPABASE_URL.</p>';}});}
 </script>
 </body>
 </html>

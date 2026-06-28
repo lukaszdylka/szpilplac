@@ -118,6 +118,8 @@ header{width:100%;padding:14px 2px 10px}
 .hint-msg{font-size:13px;color:var(--ink2);font-weight:700;line-height:1.35}.hint-msg b{color:var(--gold)}
 .row.hinted{border-color:var(--gold);background:var(--surface2)}
 .hinttag{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 7px;white-space:nowrap}
+
+.stats-body{display:flex;flex-direction:column;gap:14px;margin-top:6px}.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}.stat-card .n{font-family:"Oswald";font-size:25px;line-height:1;color:var(--green)}[data-theme=dark] .stat-card .n{color:var(--gold)}.stat-card .l{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-top:2px}.stat-dist{display:flex;flex-direction:column;gap:5px}.stat-dist-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2)}.stat-dist-i{width:18px;text-align:right;font-weight:800;color:var(--ink)}.stat-dist-bar-wrap{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:20px}.stat-dist-bar{height:100%;background:var(--green);min-width:22px;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:flex-end;padding-right:7px}[data-theme=dark] .stat-dist-bar{background:var(--gold);color:#161310}.stat-note{font-size:12px;line-height:1.45;color:var(--ink2);text-align:center}.stat-clear{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.stat-clear:hover{background:var(--surface);color:var(--ink)}
 .settings-body{display:flex;flex-direction:column;gap:0;margin-top:4px}.sett-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.sett-row:last-child{border-bottom:none}.sett-label{font-size:14px;color:var(--ink);font-weight:700}.sett-sub{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.35}.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2);flex:none}.seg button{font-size:11px;font-weight:800;padding:6px 10px;color:var(--ink2);white-space:nowrap}.seg button.on{background:var(--green);color:#fff}[data-theme=dark] .seg button.on{background:var(--gold);color:#161310}
 [data-anim=off] *{transition:none!important;animation:none!important}[data-anim=off] .drag-ghost{transform:none!important}
 
@@ -150,6 +152,10 @@ header{width:100%;padding:14px 2px 10px}
         <button class="icon-btn" id="themeBtn" title="Motyw" aria-label="Zmień motyw"></button>
         <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
+        </button>
+
+        <button class="icon-btn" id="statBtn" title="Statystyki" aria-label="Statystyki">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="9" width="3" height="6" rx=".8"/><rect x="6.5" y="5" width="3" height="10" rx=".8"/><rect x="12" y="2" width="3" height="13" rx=".8"/></svg>
         </button>
         <button class="icon-btn" id="settBtn" title="Ustawienia" aria-label="Ustawienia">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 4.01 8.51 1.25h6.98l-.89 2.76 1.21.51 1.32-2.59 4.94 4.94-2.59 1.32.51 1.21 2.76-.89v6.98l-2.76-.89-.51 1.21 2.59 1.32-4.94 4.94-1.32-2.59-1.21.51.89 2.76H8.51l.89-2.76-1.21-.51-1.32 2.59-4.94-4.94 2.59-1.32-.51-1.21-2.76.89V8.51l2.76.89.51-1.21-2.59-1.32 4.94-4.94 1.32 2.59z"/><circle cx="12" cy="12" r="4.4"/></svg>
@@ -213,6 +219,14 @@ header{width:100%;padding:14px 2px 10px}
     </div>
   </div>
 </div>
+
+<div class="scrim" id="statScrim">
+  <div class="modal">
+    <button class="x" id="statClose">✕</button>
+    <h2 id="statTitle">Statystyki</h2>
+    <div class="stats-body" id="statBody"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="config.js"></script>
@@ -232,6 +246,7 @@ function loadConfig(){
 var TEST_PASSWORD="starzik";
 var MAX_TRIES=4;
 var LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme", ANIM_KEY="zorta_anim", SOUND_KEY="zorta_sound", CB_KEY="zorta_cb";
+var ZORTA_STATS_KEY="zorta_stats_v1";
 
 var IS_TESTER=(function(){try{return new URLSearchParams(location.search).get("test")===TEST_PASSWORD;}catch(e){return false;}})();
 
@@ -258,11 +273,20 @@ function rpc(fn,args){
       });
     });
 }
-function trackEvent(p){
-  fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
+function postEventPayload(p){
+  return fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
     headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,
       "Authorization":"Bearer "+SUPABASE_ANON_KEY,"Prefer":"return=minimal"},
-    body:JSON.stringify(p)}).catch(function(){});
+    body:JSON.stringify(p)});
+}
+function trackEvent(p){
+  postEventPayload(p).then(function(r){
+    if(!r.ok)throw new Error("event "+r.status);
+  }).catch(function(){
+    /* Starsza baza może jeszcze nie mieć hint_used. Wtedy zapisujemy podstawowy event. */
+    var q={};Object.keys(p).forEach(function(k){if(k!=="hint_used")q[k]=p[k];});
+    postEventPayload(q).catch(function(){});
+  });
 }
 
 /* ── NAPISY ─────────────────────────────────────────────────────────── */
@@ -273,14 +297,14 @@ var S={
     correctOrder:"Właściwa kolejność:",share:"Podziel się wynikiem",copied:"Skopiowano do schowka",
     howT:"Jak grać",how:"Ułóż pięć śląskich rzeczy we właściwej kolejności.<br><br>Przeciągnij kafelek i puść go w nowym miejscu. Możesz też stuknąć jeden kafelek, potem drugi, żeby zamienić je miejscami. Strzałki ▲▼ przesuwają kafelek o jedno miejsce.<br><br>Po każdej próbie zielone pozycje zostają trafione. Masz 4 próby. Po dwóch próbach możesz użyć jednej podpowiedzi — gra pokaże jeden element i jego właściwe miejsce.<br><br>Dane są orientacyjne i pochodzą z publicznie dostępnych informacji.",
     wk:"Tydzień",today:"ten tydzień",tester:"tryb testera",load:"Ładowanie…",cat:"Kategoria",sortBy:"Ułóż według",
-    err:"Nie udało się wczytać zagadki. Spróbuj odświeżyć.",settings:"Ustawienia",on:"Wł.",off:"Wył.",anim:"Animacje",animSub:"Ruch kafelków i krótkie efekty.",sound:"Dźwięki",soundSub:"Ciche kliknięcia i sygnały po próbie.",cb:"Kolory dla daltonistów",cbSub:"Alternatywne kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokaż podpowiedź",hintText:"Podpowiedź: <b>{name}</b> powinno być na miejscu <b>{pos}</b>.",hintPlace:"miejsce {pos}",hintErr:"Nie udało się pobrać podpowiedzi.",sharePrompt:"Ułożysz lepiej?"},
+    err:"Nie udało się wczytać zagadki. Spróbuj odświeżyć.",settings:"Ustawienia",on:"Wł.",off:"Wył.",anim:"Animacje",animSub:"Ruch kafelków i krótkie efekty.",sound:"Dźwięki",soundSub:"Ciche kliknięcia i sygnały po próbie.",cb:"Kolory dla daltonistów",cbSub:"Alternatywne kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokaż podpowiedź",hintText:"Podpowiedź: <b>{name}</b> powinno być na miejscu <b>{pos}</b>.",hintPlace:"miejsce {pos}",hintErr:"Nie udało się pobrać podpowiedzi.",stats:"Statystyki",played:"Rozegrane",wins:"Wygrane",winPct:"Skuteczność",streak:"Seria",bestStreak:"Najlepsza seria",avgTries:"Śr. prób",hintsUsed:"Podpowiedzi",dist:"Rozkład prób",noStats:"Nie masz jeszcze statystyk Zorty.",clearStats:"Wyczyść statystyki Zorty",statsNote:"Statystyki są zapisane lokalnie w tej przeglądarce.",sharePrompt:"Ułożysz lepiej?"},
   sl:{tag:"Co tydziyń jedna ślōnsko zagodka — poukłŏdej",check:"Wejrzij",
     triesLab:"prōb",win:"Poukłŏdane!",lose:"Niy tym razym",
     winSub:["Perfekt!","Brawo!","Idealnie!","Ekstra!"],loseSub:"Tak szła dobro kolejność:",
     correctOrder:"Dobro kolejność:",share:"Podziel sie wynikym",copied:"Skopiowane",
     howT:"Jak grać",how:"Poukłŏdej piyńć ślōnskich rzeczy po dobrym porządku.<br><br>Przeciōngnij kafelek i puść go w nowym miyjscu. Możesz tyż klyknōńć jedyn kafelek, potym drugi, coby je zamiynić. Strzałki ▲▼ przesuwajōm kafelek o jedno miyjsce.<br><br>Po kożdej prōbie zielōne pozycyje sōm trefiōne. Mŏsz 4 prōby. Po dwóch prōbach możesz użyć jednej podpowiedzi — szpil pokaże jedyn elymynt i jego dobre miyjsce.<br><br>Dane sōm orientacyjne i z publicznie dostympnych informacyji.",
     wk:"Tydziyń",today:"tyn tydziyń",tester:"tryb testera",load:"Ładowanie…",cat:"Kategoryjo",sortBy:"Poukłŏdej wedle",
-    err:"Niy szło wczytać zagodki. Sprōbuj ôdświyżyć.",settings:"Sztelōnki",on:"Wł.",off:"Wył.",anim:"Animacyje",animSub:"Ruch kafelkōw i krōtkie efekty.",sound:"Głos",soundSub:"Ciche klikniyncia i sygnały po prōbie.",cb:"Kolory dlŏ daltonistōw",cbSub:"Inaksze kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokoż podpowiydź",hintText:"Podpowiydź: <b>{name}</b> mŏ być na miyjscu <b>{pos}</b>.",hintPlace:"miyjsce {pos}",hintErr:"Niy szło pobrać podpowiydzi.",sharePrompt:"Poukłŏdosz lepij?"}
+    err:"Niy szło wczytać zagodki. Sprōbuj ôdświyżyć.",settings:"Sztelōnki",on:"Wł.",off:"Wył.",anim:"Animacyje",animSub:"Ruch kafelkōw i krōtkie efekty.",sound:"Głos",soundSub:"Ciche klikniyncia i sygnały po prōbie.",cb:"Kolory dlŏ daltonistōw",cbSub:"Inaksze kolory jak w Słōwku i Kłōdce.",hintBtn:"Pokoż podpowiydź",hintText:"Podpowiydź: <b>{name}</b> mŏ być na miyjscu <b>{pos}</b>.",hintPlace:"miyjsce {pos}",hintErr:"Niy szło pobrać podpowiydzi.",stats:"Statystyki",played:"Rozegrane",wins:"Wygrane",winPct:"Skuteczność",streak:"Seryjo",bestStreak:"Nojlepszo seryjo",avgTries:"Strz. prōb",hintsUsed:"Podpowiydzi",dist:"Rozkład prōb",noStats:"Niy mosz jeszcze statystyk Zorty.",clearStats:"Wyczyść statystyki Zorty",statsNote:"Statystyki sōm spamiyntane lokalnie w tyj przeglōndarce.",sharePrompt:"Poukłŏdosz lepij?"}
 };
 var lang=(store.get(LANG_KEY)==="szl"||store.get(LANG_KEY)==="SL")?"sl":"pl";
 function L(){return S[lang];}
@@ -322,6 +346,41 @@ function sanitizeState(st,pozycje){
   if(h.length>MAX_TRIES)h=h.slice(0,MAX_TRIES);
   var hd=(st.hintData&&st.hintData.name&&st.hintData.pos)?{name:st.hintData.name,pos:st.hintData.pos}:null;
   return {order:st.order.slice(),history:h,status:stStatus,hintData:hd};
+}
+
+function loadJSON(k){try{return JSON.parse(store.get(k)||"null");}catch(e){return null;}}
+function saveJSON(k,v){store.set(k,JSON.stringify(v));}
+function emptyStats(){return {version:1,weeks:{}};}
+function getZortaStats(){var s=loadJSON(ZORTA_STATS_KEY);return s&&s.weeks?s:emptyStats();}
+function recalcZortaStats(st){
+  var keys=Object.keys(st.weeks||{}).map(function(k){return +k;}).filter(function(n){return !isNaN(n);}).sort(function(a,b){return a-b;});
+  var played=keys.length,wins=0,hints=0,dist={"1":0,"2":0,"3":0,"4":0,"X":0};
+  keys.forEach(function(k){var r=st.weeks[k]||{};if(r.won)wins++;if(r.hintUsed)hints++;var d=r.won?String(r.tries||"X"):"X";if(!dist[d])dist[d]=0;dist[d]++;});
+  var streak=0,best=0,run=0,last=null;
+  keys.forEach(function(k){var r=st.weeks[k]||{};if(r.won && (last===null || k===last+1)){run++;}else if(r.won){run=1;}else{run=0;}if(run>best)best=run;last=k;});
+  if(keys.length){var latest=keys[keys.length-1],k=latest;while(st.weeks[k]&&st.weeks[k].won){streak++;k--;}}
+  var avg="–";if(wins){var sum=0,c=0;keys.forEach(function(k){var r=st.weeks[k]||{};if(r.won&&r.tries){sum+=+r.tries;c++;}});avg=c?(sum/c).toFixed(1):"–";}
+  return {played:played,wins:wins,winPct:played?Math.round(wins/played*100)+"%":"–",streak:streak,best:best,avg:avg,hints:hints,dist:dist};
+}
+function recordLocalStats(won){
+  if(DEMO)return;
+  if(IS_TESTER&&currentWeek>TW)return;
+  var st=getZortaStats(),wk=String(currentWeek+1);
+  if(st.weeks[wk])return;
+  st.weeks[wk]={won:!!won,tries:won?guessHistory.length:null,hintUsed:!!hintData,at:new Date().toISOString(),category:meta?meta.kategoria:""};
+  saveJSON(ZORTA_STATS_KEY,st);
+}
+function statCard(n,l){return '<div class="stat-card"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+function renderStatsModal(){
+  var st=getZortaStats(),m=recalcZortaStats(st),s=L();
+  if(!m.played){$("statBody").innerHTML='<p class="stat-note">'+s.noStats+'</p>';return;}
+  var max=0;Object.keys(m.dist).forEach(function(k){if(m.dist[k]>max)max=m.dist[k];});
+  var dist=["1","2","3","4","X"].map(function(k){var v=m.dist[k]||0,w=max?Math.max(8,Math.round(v/max*100)):8;return '<div class="stat-dist-row"><div class="stat-dist-i">'+k+'</div><div class="stat-dist-bar-wrap"><div class="stat-dist-bar" style="width:'+w+'%">'+v+'</div></div></div>';}).join("");
+  $("statBody").innerHTML='<div class="stats-grid">'+
+    statCard(m.played,s.played)+statCard(m.wins,s.wins)+statCard(m.winPct,s.winPct)+statCard(m.avg,s.avgTries)+
+    statCard(m.streak,s.streak)+statCard(m.best,s.bestStreak)+statCard(m.hints,s.hintsUsed)+
+    '</div><div><h3 style="font-family:Oswald;text-transform:uppercase;font-size:15px;margin:2px 0 8px;color:var(--ink2)">'+s.dist+'</h3><div class="stat-dist">'+dist+'</div></div><p class="stat-note">'+s.statsNote+'</p><button class="stat-clear" id="clearZortaStats">'+s.clearStats+'</button>';
+  var c=$("clearZortaStats");if(c)c.addEventListener("click",function(){store.set(ZORTA_STATS_KEY,JSON.stringify(emptyStats()));renderStatsModal();});
 }
 
 var meta=null;      // dane z zorta_day
@@ -370,7 +429,7 @@ function demoLoadWeek(w){
   else{order=meta.pozycje.slice();guessHistory=[];status="playing";hintData=null;clearState(w);}
   renderList();renderAttempts();
   if(status==="playing"){$("checkBtn").style.display="block";$("checkBtn").disabled=false;}
-  else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;showResult(status==="won");}
+  else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;recordLocalStats(status==="won");showResult(status==="won");}
 }
 function demoCheck(){
   if(status!=="playing")return;
@@ -611,9 +670,10 @@ function check(){
 function finishUp(won){
   playSound(won?"win":"lose");
   renderList();renderAttempts();showResult(won);
+  recordLocalStats(won);
   if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
     trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
-      won:won,tries:guessHistory.length,max_tries:MAX_TRIES,lang:lang,
+      won:won,tries:guessHistory.length,max_tries:MAX_TRIES,lang:lang,hint_used:!!hintData,
       mode:IS_TESTER?"tester":"supabase"});
   }
 }
@@ -638,7 +698,8 @@ function loadWeek(w){
     if(status==="playing"){
       $("checkBtn").style.display="block";$("checkBtn").disabled=false;
     }else{
-      // odtwórz ujawnienie
+      // odtwórz ujawnienie i dopisz lokalne statystyki, jeśli użytkownik grał przed dodaniem statystyk
+      recordLocalStats(status==="won");
       if(status==="won"){
         rpc("zorta_reveal",{p_week:w}).then(function(rv){revealMap=rv.wartosci;revealOrder=rv.kolejnosc;showResult(true);}).catch(function(){showResult(true);});
       }else{
@@ -715,7 +776,7 @@ function applySettings(){
   setBtn("cbOn",cb==="on");setBtn("cbOff",cb==="off");
 }
 function updateSettingsLabels(){
-  var ids={settTitle:"settings",animLabel:"anim",animSub:"animSub",soundLabel:"sound",soundSub:"soundSub",cbLabel:"cb",cbSub:"cbSub"};
+  var ids={settTitle:"settings",statTitle:"stats",animLabel:"anim",animSub:"animSub",soundLabel:"sound",soundSub:"soundSub",cbLabel:"cb",cbSub:"cbSub"};
   Object.keys(ids).forEach(function(id){if($(id))$(id).textContent=L()[ids[id]];});
   ["animOn","soundOn","cbOn"].forEach(function(id){if($(id))$(id).textContent=L().on;});
   ["animOff","soundOff","cbOff"].forEach(function(id){if($(id))$(id).textContent=L().off;});
@@ -752,6 +813,10 @@ $("lSzl").addEventListener("click",function(){lang="sl";store.set(LANG_KEY,"szl"
 $("helpBtn").addEventListener("click",function(){$("helpScrim").classList.add("show");});
 $("helpClose").addEventListener("click",function(){$("helpScrim").classList.remove("show");});
 $("helpScrim").addEventListener("click",function(e){if(e.target===$("helpScrim"))$("helpScrim").classList.remove("show");});
+
+$("statBtn").addEventListener("click",function(){renderStatsModal();$("statScrim").classList.add("show");});
+$("statClose").addEventListener("click",function(){$("statScrim").classList.remove("show");});
+$("statScrim").addEventListener("click",function(e){if(e.target===$("statScrim"))$("statScrim").classList.remove("show");});
 $("settBtn").addEventListener("click",function(){$("settScrim").classList.add("show");});
 $("settClose").addEventListener("click",function(){$("settScrim").classList.remove("show");});
 $("settScrim").addEventListener("click",function(e){if(e.target===$("settScrim"))$("settScrim").classList.remove("show");});
