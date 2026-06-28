@@ -88,6 +88,25 @@ footer a:hover{text-decoration:underline}
   background:var(--surface2);color:var(--ink2);font-size:11px;font-weight:700;line-height:1.2}
 .footer-social a:hover{background:var(--surface);color:var(--green);text-decoration:none}
 .buycoffee{margin-top:10px}
+
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.48);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.scrim.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;max-width:430px;width:100%;max-height:88vh;overflow:auto;padding:20px;box-shadow:0 24px 48px -18px rgba(0,0,0,.55);position:relative}
+.modal-close{position:absolute;top:10px;right:12px;width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--surface);color:var(--ink)}
+.modal h2{font-family:"Oswald";font-size:24px;text-transform:uppercase;letter-spacing:.03em;margin:0 36px 12px 0;color:var(--ink)}
+.help-body{font-size:13px;line-height:1.55;color:var(--ink2)}
+.help-body p{margin:0 0 12px}
+.help-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.help-section h3{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 8px;color:var(--ink)}
+.help-game{padding:9px 10px;border:1px solid var(--line);background:var(--surface2);border-radius:10px;margin:7px 0}
+.help-game b{font-family:"Oswald";font-size:15px;text-transform:uppercase;color:var(--ink);letter-spacing:.02em}
+.link-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.link-grid a{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--green);font-size:12px;font-weight:800;text-decoration:none}
+.link-grid a:hover{background:var(--surface);text-decoration:none}
+.creator-card{padding:11px 12px;border-radius:12px;background:var(--surface2);border:1px dashed var(--line);color:var(--ink2)}
+.creator-card b{color:var(--ink)}
+
 </style>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://szpilplac.familock.pl/">
@@ -116,6 +135,7 @@ footer a:hover{text-decoration:underline}
         <button id="lPl" class="on">PL</button>
         <button id="lSzl">ŚL</button>
       </div>
+      <button class="icon-btn" id="helpBtn" title="O Szpilplacu" aria-label="O Szpilplacu"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg></button>
       <button class="icon-btn" id="themeBtn" title="Zmień motyw"></button>
     </div>
   </div>
@@ -140,17 +160,25 @@ footer a:hover{text-decoration:underline}
 
 <footer>
   <div class="footer-sources"><a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a></div>
-  <div class="footer-sources">
-    Słowniki śląskie: <a href="https://bonclok.pl/slowniczek-wyrazow-slaskich/" target="_blank" rel="noopener">bonclok.pl</a>
-    · <a href="https://slunski-chachor.com" target="_blank" rel="noopener">slunski-chachor.com</a>
-    · <a href="https://www.slownikslaski.pl" target="_blank" rel="noopener">slownikslaski.pl</a>
-  </div>
   <div class="footer-social" aria-label="Familock w social mediach">
     <a href="https://www.facebook.com/escaperoomfamilock" target="_blank" rel="noopener">Fanpage</a>
     <a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener">Instagram</a>
     <a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener">Wspólnota Familoka</a>
   </div>
+  <div class="buycoffee">
+    <a href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener">
+      <img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width:97px;height:25px" alt="Postaw kawę na buycoffee.to">
+    </a>
+  </div>
 </footer>
+
+<div class="scrim" id="helpScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <button class="modal-close" id="helpClose" type="button" aria-label="Zamknij">×</button>
+    <h2 id="helpTitle">O Szpilplacu</h2>
+    <div class="help-body" id="helpBody"></div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -196,6 +224,13 @@ var S={
       {id:"cuzamen",ico:ICO.conn,name:"Cuzamen Szpil",desc:"Znojdź sztyry grupy po sztyry słowa."}
     ]}
 };
+
+var HELP={
+  pl:{title:"O Szpilplacu",body:'<p><b>Szpilplac</b> to familockowy plac z krótkimi grami słownymi i logicznymi. Możesz wpaść na chwilę codziennie, rozruszać głowę i poczuć klimat Śląska przed wizytą u Starzika.</p><div class="help-section"><h3>Gry</h3><div class="help-game"><b>Słōwko</b><br>Zgadnij śląskie słowo dnia w kilku próbach.</div><div class="help-game"><b>Kłōdka</b><br>Rozszyfruj codzienny 4-cyfrowy kod.</div><div class="help-game"><b>Raja</b><br>Ułóż pięć śląskich rzeczy we właściwej kolejności. Gra w przygotowaniu.</div><div class="help-game"><b>Cuzamen Szpil</b><br>Znajdź cztery grupy po cztery pasujące słowa. Gra w przygotowaniu.</div></div><div class="help-section"><h3>Słowniki i inspiracje</h3><p>Przy śląskich słowach korzystamy z ogólnodostępnych słowników i źródeł językowych.</p><div class="link-grid"><a href="https://bonclok.pl/slowniczek-wyrazow-slaskich/" target="_blank" rel="noopener">bonclok.pl</a><a href="https://slunski-chachor.com" target="_blank" rel="noopener">slunski-chachor.com</a><a href="https://www.slownikslaski.pl" target="_blank" rel="noopener">slownikslaski.pl</a></div></div><div class="help-section"><h3>Twórca</h3><div class="creator-card"><b>Łukasz Dyłka</b> — twórca Familocka i Szpilplacu, autor familockowych gier, zagadek i projektu escape roomu Starzik.</div><div class="link-grid"><a href="https://dylka.pl" target="_blank" rel="noopener">dylka.pl</a><a href="https://familock.pl" target="_blank" rel="noopener">familock.pl</a></div></div>'},
+  szl:{title:"Ô Szpilplacu",body:'<p><b>Szpilplac</b> to familockowy plac ze krōtkimi szpilami i zagadkami. Idzie wleźć na chwila, poruszać gowōm i poczuć ślōnski klimat przed wizytōm u Starzika.</p><div class="help-section"><h3>Szpile</h3><div class="help-game"><b>Słōwko</b><br>Zgodnij ślōnskie słowo dnia.</div><div class="help-game"><b>Kłōdka</b><br>Rozszyfruj codziynny 4-cyfrowy kod.</div><div class="help-game"><b>Raja</b><br>Poukłŏdej piyńć ślōnskich rzeczy po porządku. Szpil je jeszcze rychtowany.</div><div class="help-game"><b>Cuzamen Szpil</b><br>Znojdź sztyry grupy po sztyry pasujōnce słowa. Szpil je jeszcze rychtowany.</div></div><div class="help-section"><h3>Słowniki i inspiracyje</h3><p>Przi ślōnskich słowach korzystōmy z dostympnych słownikōw i źrōdeł.</p><div class="link-grid"><a href="https://bonclok.pl/slowniczek-wyrazow-slaskich/" target="_blank" rel="noopener">bonclok.pl</a><a href="https://slunski-chachor.com" target="_blank" rel="noopener">slunski-chachor.com</a><a href="https://www.slownikslaski.pl" target="_blank" rel="noopener">slownikslaski.pl</a></div></div><div class="help-section"><h3>Twōrca</h3><div class="creator-card"><b>Łukasz Dyłka</b> — twōrca Familocka i Szpilplacu, autor familockowych szpilōw, zagadek i projektu escape roomu Starzik.</div><div class="link-grid"><a href="https://dylka.pl" target="_blank" rel="noopener">dylka.pl</a><a href="https://familock.pl" target="_blank" rel="noopener">familock.pl</a></div></div>'}
+};
+function renderHelp(){var h=HELP[lang]||HELP.pl;document.getElementById("helpTitle").textContent=h.title;document.getElementById("helpBody").innerHTML=h.body;}
+
 function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}return Math.floor((md(n)-md(s))/86400000);}
 var DAY=daysSince(2026,6,23);
 function parseStored(k){try{return JSON.parse(store.get(k)||"null");}catch(e){return null;}}
@@ -238,8 +273,14 @@ function render(){
   document.getElementById("er-desc").textContent=s.erDesc;
   document.getElementById("game-name").textContent=s.gameName;
   document.getElementById("game-desc").innerHTML=s.gameDesc;
+  renderHelp();
 }
 function refreshHome(){render();}
+
+document.getElementById("helpBtn").addEventListener("click",function(){renderHelp();document.getElementById("helpScrim").classList.add("open");});
+document.getElementById("helpClose").addEventListener("click",function(){document.getElementById("helpScrim").classList.remove("open");});
+document.getElementById("helpScrim").addEventListener("click",function(e){if(e.target===this)this.classList.remove("open");});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")document.getElementById("helpScrim").classList.remove("open");});
 document.getElementById("lPl").addEventListener("click",function(){lang="pl";store.set(LK,lang);refreshHome();});
 document.getElementById("lSzl").addEventListener("click",function(){lang="szl";store.set(LK,lang);refreshHome();});
 refreshHome();
