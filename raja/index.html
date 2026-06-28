@@ -112,7 +112,7 @@ header{width:100%;padding:14px 2px 10px}
 [data-theme=dark] .foot a{color:var(--gold)}
 
 /* HINT + SETTINGS */
-.hintbar{align-items:center;justify-content:center;gap:9px;margin:12px 0 8px;min-height:32px;text-align:center}
+.hintbar{align-items:center;justify-content:center;gap:9px;margin:2px 0 12px;min-height:32px;text-align:center}
 .hint-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;border:1.5px solid var(--gold);color:var(--gold);background:transparent;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .hint-btn:hover{background:var(--surface2)}.hint-btn[disabled]{opacity:.45;cursor:default}
 .hint-msg{font-size:13px;color:var(--ink2);font-weight:700;line-height:1.35}.hint-msg b{color:var(--gold)}
@@ -180,11 +180,11 @@ header{width:100%;padding:14px 2px 10px}
     <div class="dir"><span class="arrow" id="dirArrow">↓</span><span id="dirText">—</span></div>
   </div>
 
-  <ul class="list" id="list"></ul>
   <div class="hintbar" id="hintBar" style="display:none">
     <button class="hint-btn" id="hintBtn">Pokaż podpowiedź</button>
     <div class="hint-msg" id="hintMsg"></div>
   </div>
+  <ul class="list" id="list"></ul>
   <div class="notice" id="notice">Ładowanie zagadki…</div>
 
   <div class="attempts" id="attempts" style="display:none"></div>
