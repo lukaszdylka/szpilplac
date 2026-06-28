@@ -24,14 +24,22 @@ a{color:inherit;text-decoration:none}
 .wrap{max-width:520px;margin:0 auto;padding:0 16px 48px;display:flex;flex-direction:column;min-height:100vh}
 
 /* HEADER */
-header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
-.brand{flex:1;min-width:0}
+header{width:100%;padding:14px 2px 10px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.back{font-size:12px;font-weight:600;color:var(--green);display:inline-flex;align-items:center;gap:4px}
+.back:hover{text-decoration:underline}
+.controls{display:flex;gap:5px;align-items:center}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.icon-btn svg{display:block;flex:none}
+.brand{margin-top:4px}
 .brand h1{font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.08em;
-  font-size:26px;margin:0;line-height:1}
+  font-size:28px;margin:0;line-height:1}
 .brand p{margin:3px 0 0;font-size:12px;color:var(--ink2);letter-spacing:.02em}
-.iconbtn{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);
-  background:var(--surface);display:grid;place-items:center;font-size:16px;color:var(--ink)}
-.iconbtn:active{transform:translateY(1px)}
 
 /* WEEK NAV */
 .weeknav{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 14px}
@@ -56,10 +64,13 @@ header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
 /* LIST */
 .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
 .row{display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--line);
-  border-radius:13px;padding:11px 12px;transition:border-color .15s,background .15s,transform .12s}
+  border-radius:13px;padding:11px 12px;transition:border-color .15s,background .15s,transform .12s,opacity .12s}
 .row.can-drag{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-.row.dragging{opacity:.55;transform:scale(.98);cursor:grabbing}
-.row.drop-target{border-color:var(--gold);background:var(--surface2)}
+.row.drag-source{opacity:.25;transform:scale(.985)}
+.row.drop-target{border-color:var(--gold);background:var(--surface2);box-shadow:0 0 0 2px rgba(191,138,58,.18) inset}
+.drag-ghost{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;width:300px;
+  box-shadow:0 18px 36px -18px rgba(0,0,0,.65);transform:rotate(-1deg) scale(1.03);
+  opacity:.96;background:var(--surface)!important;border-color:var(--gold)!important}
 .row.sel{border-color:var(--gold);background:var(--surface2)}
 .row.fixed{border-color:var(--correct)}
 .row.fixed .rank{background:var(--correct);color:#fff;border-color:var(--correct)}
@@ -117,14 +128,23 @@ header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
 <body>
 <div class="wrap">
   <header>
-    <a class="iconbtn" href="index.html" title="Szpilplac">←</a>
+    <div class="topbar">
+      <a class="back" href="index.html">← Szpilplac</a>
+      <div class="controls">
+        <div class="lang-tog" role="group" aria-label="Język">
+          <button id="lPl" class="on">PL</button>
+          <button id="lSzl">ŚL</button>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Motyw" aria-label="Zmień motyw"></button>
+        <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
+        </button>
+      </div>
+    </div>
     <div class="brand">
       <h1>Zorta</h1>
       <p id="tagline">Co tydzień jedna śląska zagadka — poukładaj</p>
     </div>
-    <button class="iconbtn" id="langBtn" title="Język">PL</button>
-    <button class="iconbtn" id="themeBtn" title="Motyw">☾</button>
-    <button class="iconbtn" id="helpBtn" title="Jak grać">?</button>
   </header>
 
   <div class="weeknav">
@@ -200,7 +220,13 @@ function rpc(fn,args){
   return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
     headers:{"Content-Type":"application/json","Accept":"application/json",
       "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
-    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
+    body:JSON.stringify(args||{})}).then(function(r){
+      return r.text().then(function(t){
+        var data=null;try{data=t?JSON.parse(t):null;}catch(e){data=t;}
+        if(!r.ok){var msg=(data&&(data.message||data.details||data.hint||data.code))||t||r.status;throw new Error(fn+" "+r.status+" "+msg);}
+        return data;
+      });
+    });
 }
 function trackEvent(p){
   fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
@@ -246,6 +272,20 @@ function dirText(kryt,kier){var m=DIR[kryt]||{a:"od najmniejszej wartości → d
 function wkKey(w){return "zorta_d"+w;}
 function loadState(w){try{return JSON.parse(store.get(wkKey(w))||"null");}catch(e){return null;}}
 function saveState(w,s){store.set(wkKey(w),JSON.stringify(s));}
+function clearState(w){try{store.set(wkKey(w),"");}catch(e){}}
+function sameMembers(a,b){
+  if(!Array.isArray(a)||!Array.isArray(b)||a.length!==b.length)return false;
+  return a.slice().sort().join("\u0001")===b.slice().sort().join("\u0001");
+}
+function sanitizeState(st,pozycje){
+  if(!st||!Array.isArray(st.order)||!sameMembers(st.order,pozycje))return null;
+  var h=Array.isArray(st.history)?st.history:[];
+  h=h.filter(function(m){return Array.isArray(m)&&m.length===pozycje.length;});
+  var stStatus=(st.status==="won"||st.status==="lost")?st.status:"playing";
+  if(stStatus==="playing"&&h.length>=MAX_TRIES)return null;
+  if(h.length>MAX_TRIES)h=h.slice(0,MAX_TRIES);
+  return {order:st.order.slice(),history:h,status:stStatus};
+}
 
 var meta=null;      // dane z zorta_day
 var order=[];       // bieżąca kolejność nazw (od pozycji 1)
@@ -259,6 +299,9 @@ var dragTo=-1;
 var dragMoved=false;
 var dragStartX=0;
 var dragStartY=0;
+var dragOffsetX=0;
+var dragOffsetY=0;
+var dragGhost=null;
 var suppressClick=false;
 
 var DEMO=false;
@@ -287,9 +330,9 @@ function demoLoadWeek(w){
   $("crit").textContent=meta.kryterium.charAt(0).toUpperCase()+meta.kryterium.slice(1);
   $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
   $("dirArrow").textContent=(meta.kierunek==="rosnaco")?"↓":"↑";
-  var st=loadState(w);
-  if(st&&st.order&&st.order.length===meta.pozycje.length){order=st.order.slice();history=st.history||[];status=st.status||"playing";}
-  else{order=meta.pozycje.slice();history=[];status="playing";}
+  var st=sanitizeState(loadState(w),meta.pozycje);
+  if(st){order=st.order;history=st.history;status=st.status;}
+  else{order=meta.pozycje.slice();history=[];status="playing";clearState(w);}
   renderList();renderAttempts();
   if(status==="playing"){$("checkBtn").style.display="block";$("checkBtn").disabled=false;}
   else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;showResult(status==="won");}
@@ -342,10 +385,33 @@ function renderList(){
   ul.querySelectorAll("[data-down]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();move(+b.dataset.down,1);});});
 }
 
+function removeDragGhost(){
+  if(dragGhost&&dragGhost.parentNode)dragGhost.parentNode.removeChild(dragGhost);
+  dragGhost=null;
+}
 function clearDragClasses(){
-  document.querySelectorAll(".row.dragging,.row.drop-target").forEach(function(el){
-    el.classList.remove("dragging","drop-target");
+  document.querySelectorAll(".row.drag-source,.row.drop-target").forEach(function(el){
+    el.classList.remove("drag-source","drop-target");
   });
+  removeDragGhost();
+}
+function makeDragGhost(li,e){
+  removeDragGhost();
+  var rect=li.getBoundingClientRect();
+  dragOffsetX=e.clientX-rect.left;
+  dragOffsetY=e.clientY-rect.top;
+  dragGhost=li.cloneNode(true);
+  dragGhost.className="row drag-ghost";
+  dragGhost.style.width=rect.width+"px";
+  dragGhost.style.height=rect.height+"px";
+  document.body.appendChild(dragGhost);
+  positionDragGhost(e);
+  li.classList.add("drag-source");
+}
+function positionDragGhost(e){
+  if(!dragGhost)return;
+  dragGhost.style.left=(e.clientX-dragOffsetX)+"px";
+  dragGhost.style.top=(e.clientY-dragOffsetY)+"px";
 }
 function reorder(from,to){
   if(from<0||to<0||from===to||from>=order.length||to>=order.length)return;
@@ -381,9 +447,10 @@ function attachDrag(li,i){
   li.addEventListener("pointermove",function(e){
     if(dragFrom!==i)return;
     var dist=Math.abs(e.clientX-dragStartX)+Math.abs(e.clientY-dragStartY);
-    if(!dragMoved&&dist>6){dragMoved=true;li.classList.add("dragging");}
+    if(!dragMoved&&dist>7){dragMoved=true;makeDragGhost(li,e);}
     if(dragMoved){
       e.preventDefault();
+      positionDragGhost(e);
       var target=dragOverIndex(e.clientX,e.clientY);
       if(target>=0){dragTo=target;markDropTarget(target);}
     }
@@ -405,7 +472,6 @@ function attachDrag(li,i){
   });
 }
 
-
 function pick(i){
   if(status!=="playing")return;
   if(selIdx===-1){selIdx=i;}
@@ -421,9 +487,10 @@ function persist(){saveState(currentWeek,{order:order,history:history,status:sta
 
 function renderAttempts(){
   var box=$("attempts");box.innerHTML="";box.style.display=(status==="playing")?"flex":"none";
-  for(var i=0;i<MAX_TRIES;i++){var d=document.createElement("span");d.className="dot"+(i<history.length?" used":"");box.appendChild(d);}
+  var used=Math.min(history.length,MAX_TRIES);
+  for(var i=0;i<MAX_TRIES;i++){var d=document.createElement("span");d.className="dot"+(i<used?" used":"");box.appendChild(d);}
   var lab=document.createElement("span");lab.className="lab";
-  lab.textContent=(MAX_TRIES-history.length)+" "+L().triesLab;box.appendChild(lab);
+  lab.textContent=Math.max(0,MAX_TRIES-history.length)+" "+L().triesLab;box.appendChild(lab);
 }
 
 function fmtVal(v,unit){
@@ -455,10 +522,11 @@ function showResult(won){
 function check(){
   if(DEMO){demoCheck();return;}
   if(status!=="playing")return;
+  if(history.length>=MAX_TRIES){history=[];persist();renderAttempts();}
   $("checkBtn").disabled=true;
   rpc("zorta_guess",{p_week:currentWeek,p_order:order}).then(function(res){
     $("checkBtn").disabled=false;
-    if(res.blad){toast(L().err);return;}
+    if(res&&res.blad){toast("Błąd listy: "+res.blad);return;}
     history.push(res.maska);
     if(res.ok){
       status="won";revealMap=res.wartosci;revealOrder=res.kolejnosc;
@@ -471,7 +539,12 @@ function check(){
     }else{
       persist();renderList();renderAttempts();
     }
-  }).catch(function(){$("checkBtn").disabled=false;toast(L().err);});
+  }).catch(function(err){
+    $("checkBtn").disabled=false;
+    console.warn("Zorta guess error",err);
+    showNotice("<b>Błąd sprawdzania</b><br>Dane tygodnia się wczytały, ale funkcja <code>zorta_guess</code> w Supabase zwróciła błąd. Najczęściej pomaga ponowne wgranie końcówki <code>zorta.sql</code> z funkcjami RPC.");
+    toast("Błąd sprawdzania. Zobacz konsolę.");
+  });
 }
 
 function finishUp(won){
@@ -498,10 +571,10 @@ function loadWeek(w){
     $("crit").textContent=m.kryterium.charAt(0).toUpperCase()+m.kryterium.slice(1);
     $("dirText").textContent=dirText(m.kryterium,m.kierunek);
     $("dirArrow").textContent=(m.kierunek==="rosnaco")?"↓":"↑";
-    var st=loadState(w);
-    if(st&&st.order&&st.order.length===m.pozycje.length){
-      order=st.order.slice();history=st.history||[];status=st.status||"playing";
-    }else{order=m.pozycje.slice();history=[];status="playing";}
+    var st=sanitizeState(loadState(w),m.pozycje);
+    if(st){
+      order=st.order;history=st.history;status=st.status;
+    }else{order=m.pozycje.slice();history=[];status="playing";clearState(w);}
     renderList();renderAttempts();
     if(status==="playing"){
       $("checkBtn").style.display="block";$("checkBtn").disabled=false;
@@ -536,9 +609,14 @@ function share(){
 }
 
 /* ── UI: motyw / język / pomoc / nawigacja ──────────────────────────── */
-function applyTheme(t){document.documentElement.setAttribute("data-theme",t);store.set(THEME_KEY,t);$("themeBtn").textContent=(t==="dark")?"☀":"☾";}
+var ICO={
+  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1=".5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1=".5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+};
+function applyTheme(t){document.documentElement.setAttribute("data-theme",t);store.set(THEME_KEY,t);$("themeBtn").innerHTML=(t==="dark")?ICO.sun:ICO.moon;}
 function applyLang(){
-  $("langBtn").textContent=(lang==="sl")?"ŚL":"PL";
+  $("lPl").className=lang==="pl"?"on":"";
+  $("lSzl").className=lang==="sl"?"on":"";
   $("tagline").textContent=L().tag;$("checkBtn").textContent=L().check;
   $("shareBtn").textContent=L().share;$("howTitle").textContent=L().howT;$("howBody").innerHTML=L().how;
   if(meta){ // odśwież teksty zależne od danych
@@ -549,8 +627,8 @@ function applyLang(){
 function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1900);}
 
 $("themeBtn").addEventListener("click",function(){applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");});
-$("langBtn").addEventListener("click",function(){lang=(lang==="pl")?"sl":"pl";store.set(LANG_KEY,lang==="sl"?"szl":"pl");applyLang();
-  if(meta&&status!=="playing"){showResult(status==="won");}});
+$("lPl").addEventListener("click",function(){lang="pl";store.set(LANG_KEY,"pl");applyLang();if(meta&&status!=="playing"){showResult(status==="won");}});
+$("lSzl").addEventListener("click",function(){lang="sl";store.set(LANG_KEY,"szl");applyLang();if(meta&&status!=="playing"){showResult(status==="won");}});
 $("helpBtn").addEventListener("click",function(){$("helpScrim").classList.add("show");});
 $("helpClose").addEventListener("click",function(){$("helpScrim").classList.remove("show");});
 $("helpScrim").addEventListener("click",function(e){if(e.target===$("helpScrim"))$("helpScrim").classList.remove("show");});
