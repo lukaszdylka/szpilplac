@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Zorta · Szpilplac · Familock</title>
+<meta name="description" content="Co tydzień jedna śląska zagadka — poukładaj pięć rzeczy we właściwej kolejności. Gra od Familocka Starzik.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;
+  --line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--miss:#b9b09a;
+}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--miss:#b9b09a;}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--miss:#5a5448;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 48px;display:flex;flex-direction:column;min-height:100vh}
+
+/* HEADER */
+header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
+.brand{flex:1;min-width:0}
+.brand h1{font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  font-size:26px;margin:0;line-height:1}
+.brand p{margin:3px 0 0;font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.iconbtn{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);
+  background:var(--surface);display:grid;place-items:center;font-size:16px;color:var(--ink)}
+.iconbtn:active{transform:translateY(1px)}
+
+/* WEEK NAV */
+.weeknav{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 14px}
+.weeknav button{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--line);
+  background:var(--surface);font-size:18px;color:var(--ink);line-height:1}
+.weeknav button[disabled]{opacity:.32;cursor:default}
+.weeknav .wk{font-family:"Oswald";font-size:15px;letter-spacing:.04em;color:var(--ink);
+  text-align:center;min-width:150px}
+.weeknav .wk small{display:block;font-family:"Inter";font-weight:600;font-size:11px;color:var(--ink2);letter-spacing:0}
+
+/* BANNER */
+.banner{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;
+  padding:16px 16px 14px;margin-bottom:16px;position:relative;overflow:hidden}
+.banner .eyebrow{font-family:"Oswald";font-weight:500;text-transform:uppercase;letter-spacing:.16em;
+  font-size:11px;color:var(--gold)}
+.banner .crit{font-family:"Oswald";font-weight:700;font-size:19px;margin:3px 0 10px;color:var(--ink);line-height:1.1}
+.dir{display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:10px;
+  padding:9px 12px;font-size:13px;color:var(--ink);line-height:1.3}
+.dir .arrow{font-family:"Oswald";color:var(--green);font-size:20px;flex:none}
+[data-theme=dark] .dir .arrow{color:var(--gold)}
+
+/* LIST */
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.row{display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--line);
+  border-radius:13px;padding:11px 12px;transition:border-color .15s,background .15s,transform .12s}
+.row[draggable="true"]{cursor:grab;touch-action:none}
+.row.dragging{opacity:.55;transform:scale(.98);cursor:grabbing}
+.row.drop-target{border-color:var(--gold);background:var(--surface2)}
+.row.sel{border-color:var(--gold);background:var(--surface2)}
+.row.fixed{border-color:var(--correct)}
+.row.fixed .rank{background:var(--correct);color:#fff;border-color:var(--correct)}
+.rank{font-family:"Oswald";font-weight:700;font-size:16px;width:30px;height:30px;flex:none;
+  border:1.5px solid var(--line);border-radius:8px;display:grid;place-items:center;color:var(--ink2)}
+.name{flex:1;min-width:0;font-weight:600;font-size:15px;line-height:1.2}
+.val{font-family:"Oswald";font-weight:500;font-size:13px;color:var(--green);margin-left:6px;white-space:nowrap}
+[data-theme=dark] .val{color:var(--gold)}
+.arrows{display:flex;flex-direction:column;gap:2px;flex:none}
+.arrows button{width:30px;height:18px;border:1.5px solid var(--line);border-radius:6px;
+  background:var(--surface2);font-size:11px;line-height:1;color:var(--ink);display:grid;place-items:center}
+.arrows button[disabled]{opacity:.3;cursor:default}
+.tick{flex:none;width:20px;text-align:center;color:var(--correct);font-weight:800;font-size:16px}
+
+/* ATTEMPTS + ACTION */
+.attempts{display:flex;align-items:center;justify-content:center;gap:7px;margin:16px 0 12px}
+.attempts .dot{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--line);background:transparent}
+.attempts .dot.used{background:var(--miss);border-color:var(--miss)}
+.attempts .lab{font-size:12px;color:var(--ink2);margin-left:4px}
+.cta-check{width:100%;padding:14px;border-radius:13px;background:var(--green);color:#fbf7ee;
+  font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:16px}
+.cta-check:active{transform:translateY(1px)}
+.cta-check[disabled]{opacity:.5;cursor:default}
+[data-theme=dark] .cta-check{color:#161310}
+
+/* RESULT */
+.result{margin-top:18px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px;display:none}
+.result.show{display:block}
+.result h2{font-family:"Oswald";text-transform:uppercase;font-size:20px;margin:0 0 4px;color:var(--ink);letter-spacing:.04em}
+.result .sub{font-size:13px;color:var(--ink2);margin-bottom:12px}
+.result .src{font-size:11px;color:var(--ink2);margin-top:10px}
+.share{margin-top:14px;width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--green);
+  color:var(--green);font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:14px;background:transparent}
+[data-theme=dark] .share{border-color:var(--gold);color:var(--gold)}
+.foot{margin-top:auto;padding-top:22px;text-align:center}
+.foot a{color:var(--green);font-weight:700;text-decoration:none;font-size:13px}
+[data-theme=dark] .foot a{color:var(--gold)}
+
+/* MODAL + TOAST */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}
+.scrim.show{display:flex}
+.modal{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:22px;max-width:420px;width:100%}
+.modal h2{font-family:"Oswald";text-transform:uppercase;font-size:20px;margin:0 0 12px;color:var(--ink);letter-spacing:.04em}
+.modal p{font-size:14px;line-height:1.5;color:var(--ink);margin:0 0 10px}
+.modal .x{float:right;font-size:20px;color:var(--ink2);margin-top:-4px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.25s;z-index:40}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notice{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;margin:0 0 14px;font-size:13px;line-height:1.45;color:var(--ink2);text-align:center}
+.notice b{font-family:"Oswald";text-transform:uppercase;letter-spacing:.04em;color:var(--ink);font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="iconbtn" href="index.html" title="Szpilplac">←</a>
+    <div class="brand">
+      <h1>Zorta</h1>
+      <p id="tagline">Co tydzień jedna śląska zagadka — poukładaj</p>
+    </div>
+    <button class="iconbtn" id="langBtn" title="Język">PL</button>
+    <button class="iconbtn" id="themeBtn" title="Motyw">☾</button>
+    <button class="iconbtn" id="helpBtn" title="Jak grać">?</button>
+  </header>
+
+  <div class="weeknav">
+    <button id="prevWk" title="Poprzedni tydzień">‹</button>
+    <div class="wk" id="wkLabel">Tydzień —<small></small></div>
+    <button id="nextWk" title="Następny tydzień">›</button>
+  </div>
+
+  <div class="banner" id="banner" style="display:none">
+    <div class="eyebrow" id="eyebrow">—</div>
+    <div class="crit" id="crit">—</div>
+    <div class="dir"><span class="arrow" id="dirArrow">↓</span><span id="dirText">—</span></div>
+  </div>
+
+  <ul class="list" id="list"></ul>
+  <div class="notice" id="notice">Ładowanie zagadki…</div>
+
+  <div class="attempts" id="attempts" style="display:none"></div>
+  <button class="cta-check" id="checkBtn" style="display:none">Sprawdź</button>
+
+  <div class="result" id="result">
+    <h2 id="resTitle">—</h2>
+    <div class="sub" id="resSub"></div>
+    <ul class="list" id="resList"></ul>
+    <div class="src" id="resSrc"></div>
+    <button class="share" id="shareBtn">Podziel się wynikiem</button>
+  </div>
+
+  <div class="foot"><a href="https://familock.pl" target="_blank" rel="noopener" id="ctaLink">Chcesz więcej? Przyjdź do Starzika →</a></div>
+</div>
+
+<div class="scrim" id="helpScrim">
+  <div class="modal">
+    <button class="x" id="helpClose">✕</button>
+    <h2 id="howTitle">Jak grać</h2>
+    <div id="howBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── STORE (z fallbackiem jak w Słōwku) ─────────────────────────────── */
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
+/* ── KONFIGURACJA ───────────────────────────────────────────────────── */
+var SUPABASE_URL=null;
+var SUPABASE_ANON_KEY=null;
+function loadConfig(){
+  return fetch("slowko.html",{cache:"no-store"}).then(function(r){return r.text();}).then(function(t){
+    var u=t.match(/var\s+SUPABASE_URL\s*=\s*"([^"]+)"/);
+    var k=t.match(/var\s+SUPABASE_ANON_KEY\s*=\s*"([^"]+)"/);
+    if(!u||!k)throw new Error("config");
+    SUPABASE_URL=u[1];SUPABASE_ANON_KEY=k[1];
+  });
+}
+var TEST_PASSWORD="starzik";
+var MAX_TRIES=4;
+var LANG_KEY="familock_lang", THEME_KEY="szpilplac_theme";
+
+var IS_TESTER=(function(){try{return new URLSearchParams(location.search).get("test")===TEST_PASSWORD;}catch(e){return false;}})();
+
+/* ── NUMERACJA TYGODNIA (epoka 2026-06-23, czas Polski) ─────────────── */
+function warsawDay(d){
+  var p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d),o={};
+  p.forEach(function(x){if(x.type!=="literal")o[x.type]=Number(x.value);});
+  return Date.UTC(o.year,o.month-1,o.day);
+}
+function todayWeek(){return Math.max(0,Math.floor((warsawDay(new Date())-Date.UTC(2026,5,23))/86400000/7));}
+var TW=todayWeek();
+var currentWeek=TW;
+
+/* ── RPC + STATY ────────────────────────────────────────────────────── */
+function rpc(fn,args){
+  return fetch(SUPABASE_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json",
+      "apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},
+    body:JSON.stringify(args||{})}).then(function(r){if(!r.ok)throw new Error(fn+" "+r.status);return r.json();});
+}
+function trackEvent(p){
+  fetch(SUPABASE_URL+"/rest/v1/szpilplac_events",{method:"POST",
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,
+      "Authorization":"Bearer "+SUPABASE_ANON_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify(p)}).catch(function(){});
+}
+
+/* ── NAPISY ─────────────────────────────────────────────────────────── */
+var S={
+  pl:{tag:"Co tydzień jedna śląska zagadka — poukładaj",check:"Sprawdź",
+    triesLab:"prób",win:"Poukładane!",lose:"Nie tym razem",
+    winSub:["Perfekcyjnie!","Brawo!","Idealnie!","Ekstra!"],loseSub:"Tak wyglądała właściwa kolejność:",
+    correctOrder:"Właściwa kolejność:",share:"Podziel się wynikiem",copied:"Skopiowano do schowka",
+    howT:"Jak grać",how:"Co tydzień dostajesz pięć rzeczy ze Śląska i jedno kryterium — uszereguj je we właściwej kolejności (strzałka pokazuje od czego do czego).<br><br>Stuknij jeden kafelek, potem drugi — zamienią się miejscami. Strzałkami ▲▼ przesuniesz po jednym. Masz 4 próby. Po każdej zielone pozycje są na właściwym miejscu.<br><br>Strzałkami ‹ › u góry cofniesz się do wcześniejszych tygodni.",
+    wk:"Tydzień",today:"ten tydzień",tester:"tryb testera",load:"Ładowanie…",
+    err:"Nie udało się wczytać zagadki. Spróbuj odświeżyć."},
+  sl:{tag:"Co tydziyń jedna ślōnsko zagodka — poukłŏdej",check:"Wejrzij",
+    triesLab:"prōb",win:"Poukłŏdane!",lose:"Niy tym razym",
+    winSub:["Perfekt!","Brawo!","Idealnie!","Ekstra!"],loseSub:"Tak szła dobro kolejność:",
+    correctOrder:"Dobro kolejność:",share:"Podziel sie wynikym",copied:"Skopiowane",
+    howT:"Jak grać",how:"Co tydziyń dostŏwosz piyńć rzeczy ze Ślōnska i jedno kryterium — poukłŏdej je po porządku (strzałka pokazuje ôd czego do czego).<br><br>Klyknij jedyn kafelek, potym drugi — zamiyniōm sie miyjscami. Strzałkami ▲▼ przesuniesz po jednym. Mŏsz 4 prōby.<br><br>Strzałkami ‹ › na wiyrchu cŏfniesz sie do wcześniyjszych tydni.",
+    wk:"Tydziyń",today:"tyn tydziyń",tester:"tryb testera",load:"Ładowanie…",
+    err:"Niy szło wczytać zagodki. Sprōbuj ôdświyżyć."}
+};
+var lang=(store.get(LANG_KEY)==="szl"||store.get(LANG_KEY)==="SL")?"sl":"pl";
+function L(){return S[lang];}
+
+/* Etykiety kierunku per kryterium (rosnaco = wg rosnącej wartości) */
+var DIR={
+  "liczba mieszkańców":      {a:"od najmniej ludnego → do najludniejszego", d:"od najludniejszego → do najmniej ludnego"},
+  "powierzchnia miasta":     {a:"od najmniejszego → do największego",       d:"od największego → do najmniejszego"},
+  "rok nadania praw miejskich":{a:"od najstarszych praw → do najnowszych",   d:"od najnowszych praw → do najstarszych"},
+  "rok wydarzenia":          {a:"od najdawniejszego → do najnowszego",       d:"od najnowszego → do najdawniejszego"},
+  "rok urodzenia":           {a:"od najstarszego → do najmłodszego",         d:"od najmłodszego → do najstarszego"},
+  "rok założenia klubu":     {a:"od najstarszego klubu → do najmłodszego",   d:"od najmłodszego klubu → do najstarszego"},
+  "położenie: północ–południe":{a:"od najdalej na południe → na północ",     d:"od najdalej na północ → na południe"},
+  "położenie: zachód–wschód":{a:"od najdalej na zachód → na wschód",         d:"od najdalej na wschód → na zachód"}
+};
+function dirText(kryt,kier){var m=DIR[kryt]||{a:"od najmniejszej wartości → do największej",d:"od największej → do najmniejszej"};return kier==="rosnaco"?m.a:m.d;}
+
+/* ── STAN PER TYDZIEŃ ───────────────────────────────────────────────── */
+function wkKey(w){return "zorta_d"+w;}
+function loadState(w){try{return JSON.parse(store.get(wkKey(w))||"null");}catch(e){return null;}}
+function saveState(w,s){store.set(wkKey(w),JSON.stringify(s));}
+
+var meta=null;      // dane z zorta_day
+var order=[];       // bieżąca kolejność nazw (od pozycji 1)
+var history=[];     // tablica masek z prób
+var status="playing";
+var selIdx=-1;      // wybrany kafelek (do zamiany dwoma stuknięciami)
+var revealMap=null; // {nazwa:wartosc} po zakończeniu
+var revealOrder=null;
+var dragFrom=-1;
+var dragTo=-1;
+var dragMoved=false;
+var dragStartX=0;
+var dragStartY=0;
+
+var DEMO=false;
+var DEMO_META={
+  kategoria:"miasta",
+  kryterium:"liczba mieszkańców",
+  kierunek:"rosnaco",
+  jednostka:"os.",
+  zrodlo:"tryb podglądu lokalnego",
+  pozycje:["Chorzów","Katowice","Świętochłowice","Gliwice","Bytom"]
+};
+var DEMO_VALUES={"Świętochłowice":49000,"Chorzów":103000,"Bytom":153000,"Gliwice":171000,"Katowice":280000};
+var DEMO_ORDER=["Świętochłowice","Chorzów","Bytom","Gliwice","Katowice"];
+function startDemo(reason){
+  DEMO=true;
+  showNotice("<b>Tryb podglądu</b><br>Nie widzę Supabase albo pliku <code>slowko.html</code>, więc pokazuję testową zagadkę. Po wrzuceniu na serwer obok <code>slowko.html</code> gra pobierze prawdziwe dane.");
+  loadWeek(TW);
+}
+function demoLoadWeek(w){
+  currentWeek=w;selIdx=-1;revealMap=null;revealOrder=null;
+  $("result").classList.remove("show");
+  $("banner").style.display="block";
+  updateWeekNav();
+  meta=DEMO_META;
+  $("eyebrow").textContent=meta.kategoria.toUpperCase();
+  $("crit").textContent=meta.kryterium.charAt(0).toUpperCase()+meta.kryterium.slice(1);
+  $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
+  $("dirArrow").textContent=(meta.kierunek==="rosnaco")?"↓":"↑";
+  var st=loadState(w);
+  if(st&&st.order&&st.order.length===meta.pozycje.length){order=st.order.slice();history=st.history||[];status=st.status||"playing";}
+  else{order=meta.pozycje.slice();history=[];status="playing";}
+  renderList();renderAttempts();
+  if(status==="playing"){$("checkBtn").style.display="block";$("checkBtn").disabled=false;}
+  else{revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;showResult(status==="won");}
+}
+function demoCheck(){
+  if(status!=="playing")return;
+  var mask=order.map(function(name,i){return name===DEMO_ORDER[i];});
+  history.push(mask);
+  var ok=mask.every(Boolean);
+  if(ok){status="won";revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;persist();finishUp(true);}
+  else if(history.length>=MAX_TRIES){status="lost";revealMap=DEMO_VALUES;revealOrder=DEMO_ORDER;persist();finishUp(false);}
+  else{persist();renderList();renderAttempts();}
+}
+
+/* ── RENDER ─────────────────────────────────────────────────────────── */
+var $=function(id){return document.getElementById(id);};
+function showNotice(html){var n=$("notice");if(!n)return;n.innerHTML=html;n.style.display="block";}
+function hideNotice(){var n=$("notice");if(!n)return;n.style.display="none";}
+
+function lastMask(){return history.length?history[history.length-1]:null;}
+
+function renderList(){
+  var ul=$("list");ul.innerHTML="";
+  var locked=(status!=="playing");
+  var mask=lastMask();
+  order.forEach(function(name,i){
+    var li=document.createElement("li");li.className="row";li.dataset.index=i;
+    if(!locked)li.setAttribute("draggable","true");
+    if(selIdx===i)li.className+=" sel";
+    if(mask&&mask[i])li.className+=" fixed";
+    var fixed=!!(mask&&mask[i]);
+    var html='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>';
+    if(!locked){
+      html+='<div class="arrows">'
+        +'<button data-up="'+i+'" '+(i===0?'disabled':'')+'>▲</button>'
+        +'<button data-down="'+i+'" '+(i===order.length-1?'disabled':'')+'>▼</button></div>';
+    }else if(fixed){ html+='<div class="tick">✓</div>'; }
+    li.innerHTML=html;
+    if(!locked){
+      li.querySelector(".name").addEventListener("click",function(){if(!dragMoved)pick(i);});
+      attachDrag(li,i);
+    }
+    ul.appendChild(li);
+  });
+  ul.querySelectorAll("[data-up]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();move(+b.dataset.up,-1);});});
+  ul.querySelectorAll("[data-down]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();move(+b.dataset.down,1);});});
+}
+
+function clearDragClasses(){
+  document.querySelectorAll(".row.dragging,.row.drop-target").forEach(function(el){
+    el.classList.remove("dragging","drop-target");
+  });
+}
+function reorder(from,to){
+  if(from<0||to<0||from===to||from>=order.length||to>=order.length)return;
+  var item=order.splice(from,1)[0];
+  order.splice(to,0,item);
+  selIdx=-1;persist();renderList();
+}
+function dragOverIndex(x,y){
+  var el=document.elementFromPoint(x,y);
+  var row=el&&el.closest?el.closest("#list .row"):null;
+  if(!row)return -1;
+  return +row.dataset.index;
+}
+function markDropTarget(i){
+  document.querySelectorAll(".row.drop-target").forEach(function(el){el.classList.remove("drop-target");});
+  var row=document.querySelector('#list .row[data-index="'+i+'"]');
+  if(row)row.classList.add("drop-target");
+}
+function attachDrag(li,i){
+  li.addEventListener("dragstart",function(e){
+    dragFrom=i;dragTo=i;dragMoved=true;li.classList.add("dragging");
+    if(e.dataTransfer){e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i));}
+  });
+  li.addEventListener("dragover",function(e){e.preventDefault();dragTo=i;markDropTarget(i);});
+  li.addEventListener("drop",function(e){e.preventDefault();reorder(dragFrom,i);clearDragClasses();dragFrom=-1;});
+  li.addEventListener("dragend",function(){clearDragClasses();dragFrom=-1;setTimeout(function(){dragMoved=false;},0);});
+  li.addEventListener("pointerdown",function(e){
+    if(e.target.closest(".arrows"))return;
+    dragFrom=i;dragTo=i;dragMoved=false;dragStartX=e.clientX;dragStartY=e.clientY;
+    li.setPointerCapture&&li.setPointerCapture(e.pointerId);
+  });
+  li.addEventListener("pointermove",function(e){
+    if(dragFrom!==i)return;
+    var dist=Math.abs(e.clientX-dragStartX)+Math.abs(e.clientY-dragStartY);
+    if(!dragMoved&&dist>8){dragMoved=true;li.classList.add("dragging");}
+    if(dragMoved){
+      e.preventDefault();
+      var target=dragOverIndex(e.clientX,e.clientY);
+      if(target>=0){dragTo=target;markDropTarget(target);}
+    }
+  });
+  li.addEventListener("pointerup",function(e){
+    if(dragFrom===i&&dragMoved){reorder(dragFrom,dragTo);}
+    try{li.releasePointerCapture&&li.releasePointerCapture(e.pointerId);}catch(err){}
+    clearDragClasses();dragFrom=-1;setTimeout(function(){dragMoved=false;},0);
+  });
+  li.addEventListener("pointercancel",function(){clearDragClasses();dragFrom=-1;dragMoved=false;});
+}
+
+function pick(i){
+  if(status!=="playing")return;
+  if(selIdx===-1){selIdx=i;}
+  else if(selIdx===i){selIdx=-1;}
+  else{var t=order[selIdx];order[selIdx]=order[i];order[i]=t;selIdx=-1;persist();}
+  renderList();
+}
+function move(i,dir){
+  var j=i+dir;if(j<0||j>=order.length)return;
+  var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();renderList();
+}
+function persist(){saveState(currentWeek,{order:order,history:history,status:status});}
+
+function renderAttempts(){
+  var box=$("attempts");box.innerHTML="";box.style.display=(status==="playing")?"flex":"none";
+  for(var i=0;i<MAX_TRIES;i++){var d=document.createElement("span");d.className="dot"+(i<history.length?" used":"");box.appendChild(d);}
+  var lab=document.createElement("span");lab.className="lab";
+  lab.textContent=(MAX_TRIES-history.length)+" "+L().triesLab;box.appendChild(lab);
+}
+
+function fmtVal(v,unit){
+  if(unit==="os."){return Number(v).toLocaleString("pl-PL")+" os.";}
+  if(unit==="°N"||unit==="°E"){return Number(v).toFixed(3).replace(".",",")+" "+unit;}
+  if(unit==="km²"){return v+" km²";}
+  if(unit==="rok"){return v;}
+  return v+(unit?(" "+unit):"");
+}
+
+function showResult(won){
+  $("attempts").style.display="none";$("checkBtn").style.display="none";
+  var r=$("result");r.classList.add("show");
+  $("resTitle").textContent=won?L().win:L().lose;
+  $("resSub").textContent=won?L().winSub[Math.floor(Math.random()*L().winSub.length)]:L().loseSub;
+  // lista poprawnej kolejności z wartościami
+  var ul=$("resList");ul.innerHTML="";
+  var corr=revealOrder||order;
+  corr.forEach(function(name,i){
+    var li=document.createElement("li");li.className="row";
+    var val=(revealMap&&revealMap[name]!=null)?'<span class="val">'+fmtVal(revealMap[name],meta.jednostka)+'</span>':'';
+    li.innerHTML='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>'+val;
+    ul.appendChild(li);
+  });
+  $("resSrc").textContent=(meta.zrodlo?("źródło: "+meta.zrodlo):"");
+}
+
+/* ── PRÓBA ──────────────────────────────────────────────────────────── */
+function check(){
+  if(DEMO){demoCheck();return;}
+  if(status!=="playing")return;
+  $("checkBtn").disabled=true;
+  rpc("zorta_guess",{p_week:currentWeek,p_order:order}).then(function(res){
+    $("checkBtn").disabled=false;
+    if(res.blad){toast(L().err);return;}
+    history.push(res.maska);
+    if(res.ok){
+      status="won";revealMap=res.wartosci;revealOrder=res.kolejnosc;
+      persist();finishUp(true);
+    }else if(history.length>=MAX_TRIES){
+      status="lost";persist();
+      rpc("zorta_reveal",{p_week:currentWeek}).then(function(rv){
+        revealMap=rv.wartosci;revealOrder=rv.kolejnosc;finishUp(false);
+      }).catch(function(){finishUp(false);});
+    }else{
+      persist();renderList();renderAttempts();
+    }
+  }).catch(function(){$("checkBtn").disabled=false;toast(L().err);});
+}
+
+function finishUp(won){
+  renderList();renderAttempts();showResult(won);
+  if(!DEMO&&currentWeek<=TW){ // nie loguj „przyszłych" testerskich tygodni
+    trackEvent({game:"zorta",puzzle_no:currentWeek+1,puzzle_word:meta.kategoria,
+      won:won,tries:history.length,max_tries:MAX_TRIES,lang:lang,
+      mode:IS_TESTER?"tester":"supabase"});
+  }
+}
+
+/* ── ŁADOWANIE TYGODNIA ─────────────────────────────────────────────── */
+function loadWeek(w){
+  if(DEMO){demoLoadWeek(w);return;}
+  currentWeek=w;selIdx=-1;
+  $("result").classList.remove("show");$("banner").style.display="none";
+  $("list").innerHTML="";$("checkBtn").style.display="none";$("attempts").style.display="none";
+  updateWeekNav();
+  rpc("zorta_day",{p_week:w}).then(function(m){
+    hideNotice();
+    meta=m;
+    $("banner").style.display="block";
+    $("eyebrow").textContent=m.kategoria.toUpperCase();
+    $("crit").textContent=m.kryterium.charAt(0).toUpperCase()+m.kryterium.slice(1);
+    $("dirText").textContent=dirText(m.kryterium,m.kierunek);
+    $("dirArrow").textContent=(m.kierunek==="rosnaco")?"↓":"↑";
+    var st=loadState(w);
+    if(st&&st.order&&st.order.length===m.pozycje.length){
+      order=st.order.slice();history=st.history||[];status=st.status||"playing";
+    }else{order=m.pozycje.slice();history=[];status="playing";}
+    renderList();renderAttempts();
+    if(status==="playing"){
+      $("checkBtn").style.display="block";$("checkBtn").disabled=false;
+    }else{
+      // odtwórz ujawnienie
+      if(status==="won"){
+        rpc("zorta_reveal",{p_week:w}).then(function(rv){revealMap=rv.wartosci;revealOrder=rv.kolejnosc;showResult(true);}).catch(function(){showResult(true);});
+      }else{
+        rpc("zorta_reveal",{p_week:w}).then(function(rv){revealMap=rv.wartosci;revealOrder=rv.kolejnosc;showResult(false);}).catch(function(){showResult(false);});
+      }
+    }
+  }).catch(function(){showNotice("<b>Nie udało się wczytać zagadki</b><br>Sprawdź, czy w Supabase został wgrany <code>zorta.sql</code> i czy funkcje RPC są dostępne.");toast(L().err);});
+}
+
+function updateWeekNav(){
+  $("prevWk").disabled=(currentWeek<=0);
+  $("nextWk").disabled=(!IS_TESTER && currentWeek>=TW);
+  var tag=(currentWeek===TW)?(" · "+L().today):(IS_TESTER&&currentWeek>TW?(" · "+L().tester):"");
+  $("wkLabel").innerHTML=L().wk+" "+(currentWeek+1)+"<small>"+(tag?tag.replace(" · ",""):"&nbsp;")+"</small>";
+}
+
+/* ── SHARE ──────────────────────────────────────────────────────────── */
+function buildShare(){
+  var head="Zorta · "+L().wk.toLowerCase()+" "+(currentWeek+1)+" · "+(status==="won"?history.length:"X")+"/"+MAX_TRIES;
+  var grid=history.map(function(m){return m.map(function(b){return b?"🟩":"⬜";}).join("");}).join("\n");
+  return head+"\n"+grid+"\nszpilplac.familock.pl";
+}
+function share(){
+  var txt=buildShare();
+  if(navigator.share){navigator.share({text:txt}).catch(function(){});return;}
+  navigator.clipboard.writeText(txt).then(function(){toast(L().copied);}).catch(function(){toast(txt);});
+}
+
+/* ── UI: motyw / język / pomoc / nawigacja ──────────────────────────── */
+function applyTheme(t){document.documentElement.setAttribute("data-theme",t);store.set(THEME_KEY,t);$("themeBtn").textContent=(t==="dark")?"☀":"☾";}
+function applyLang(){
+  $("langBtn").textContent=(lang==="sl")?"ŚL":"PL";
+  $("tagline").textContent=L().tag;$("checkBtn").textContent=L().check;
+  $("shareBtn").textContent=L().share;$("howTitle").textContent=L().howT;$("howBody").innerHTML=L().how;
+  if(meta){ // odśwież teksty zależne od danych
+    $("dirText").textContent=dirText(meta.kryterium,meta.kierunek);
+  }
+  updateWeekNav();renderAttempts();
+}
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1900);}
+
+$("themeBtn").addEventListener("click",function(){applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");});
+$("langBtn").addEventListener("click",function(){lang=(lang==="pl")?"sl":"pl";store.set(LANG_KEY,lang==="sl"?"szl":"pl");applyLang();
+  if(meta&&status!=="playing"){showResult(status==="won");}});
+$("helpBtn").addEventListener("click",function(){$("helpScrim").classList.add("show");});
+$("helpClose").addEventListener("click",function(){$("helpScrim").classList.remove("show");});
+$("helpScrim").addEventListener("click",function(e){if(e.target===$("helpScrim"))$("helpScrim").classList.remove("show");});
+$("checkBtn").addEventListener("click",check);
+$("shareBtn").addEventListener("click",share);
+$("prevWk").addEventListener("click",function(){if(currentWeek>0)loadWeek(currentWeek-1);});
+$("nextWk").addEventListener("click",function(){if(IS_TESTER||currentWeek<TW)loadWeek(currentWeek+1);});
+
+/* ── START ──────────────────────────────────────────────────────────── */
+applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
+applyLang();
+loadConfig().then(function(){loadWeek(TW);}).catch(function(){startDemo("config");});
+</script>
+</body>
+</html>
