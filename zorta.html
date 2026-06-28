@@ -165,6 +165,7 @@ header{display:flex;align-items:center;gap:10px;padding:16px 2px 10px}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
 <script>
 /* ── STORE (z fallbackiem jak w Słōwku) ─────────────────────────────── */
 var store=(function(){var m={},ok=false;
@@ -173,15 +174,10 @@ var store=(function(){var m={},ok=false;
          set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
 
 /* ── KONFIGURACJA ───────────────────────────────────────────────────── */
-var SUPABASE_URL=null;
-var SUPABASE_ANON_KEY=null;
+var SUPABASE_URL=(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL)||"";
+var SUPABASE_ANON_KEY=(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY)||"";
 function loadConfig(){
-  return fetch("slowko.html",{cache:"no-store"}).then(function(r){return r.text();}).then(function(t){
-    var u=t.match(/var\s+SUPABASE_URL\s*=\s*"([^"]+)"/);
-    var k=t.match(/var\s+SUPABASE_ANON_KEY\s*=\s*"([^"]+)"/);
-    if(!u||!k)throw new Error("config");
-    SUPABASE_URL=u[1];SUPABASE_ANON_KEY=k[1];
-  });
+  return (SUPABASE_URL&&SUPABASE_ANON_KEY) ? Promise.resolve() : Promise.reject(new Error("config"));
 }
 var TEST_PASSWORD="starzik";
 var MAX_TRIES=4;
@@ -278,7 +274,7 @@ var DEMO_VALUES={"Świętochłowice":49000,"Chorzów":103000,"Bytom":153000,"Gli
 var DEMO_ORDER=["Świętochłowice","Chorzów","Bytom","Gliwice","Katowice"];
 function startDemo(reason){
   DEMO=true;
-  showNotice("<b>Tryb podglądu</b><br>Nie widzę Supabase albo pliku <code>slowko.html</code>, więc pokazuję testową zagadkę. Po wrzuceniu na serwer obok <code>slowko.html</code> gra pobierze prawdziwe dane.");
+  showNotice("<b>Tryb podglądu</b><br>Nie widzę Supabase albo pliku <code>config.js</code>, więc pokazuję testową zagadkę. Po wrzuceniu na serwer obok <code>config.js</code> gra pobierze prawdziwe dane.");
   loadWeek(TW);
 }
 function demoLoadWeek(w){
