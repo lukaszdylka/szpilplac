@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Konto gracza · Szpilplac · Familock</title>
+<title>Konto gracza DEBUG no-RPC · Szpilplac · Familock</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Testowe konto gracza Szpilplaca Familock.">
 <meta name="robots" content="noindex">
@@ -130,7 +130,7 @@ footer a:hover{text-decoration:underline}
   <div class="topbar">
     <div>
       <div class="site-name">Szpilplac</div>
-      <div class="site-sub" data-i18n="sub">Konto gracza</div>
+      <div class="site-sub" data-i18n="sub">Konto gracza · debug no-RPC</div>
     </div>
     <div class="controls">
       <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
@@ -615,22 +615,7 @@ els.checkLoginBtn.addEventListener('click',async function(){
   var login=els.regLogin.value.trim();
   if(!LOGIN_RE.test(login)){setMsg(t('loginFormat'),'err');return;}
 
-  els.checkLoginBtn.disabled=true;
-  try{
-    setMsg('Sprawdzam dostępność loginu...', '');
-    var r=await withTimeout(
-      sb.rpc('is_login_available',{p_login:login}),
-      20000,
-      'Sprawdzanie loginu trwa zbyt długo. Sprawdź internet, RLS albo konsolę przeglądarki.'
-    );
-    if(r.error){setMsg(t('loginCheckErr')+niceError(r.error),'err');return;}
-    setMsg(r.data===true?t('loginFree'):t('loginTaken'),r.data===true?'ok':'err');
-  }catch(ex){
-    console.error('Szpilplac check login exception:', ex);
-    setMsg(t('loginCheckErr')+niceError(ex),'err');
-  }finally{
-    els.checkLoginBtn.disabled=false;
-  }
+  setMsg('W tej wersji testowej pomijam sprawdzanie loginu przez RPC, bo właśnie to wywołanie u Ciebie wisi. Spróbuj od razu założyć konto. Jeśli login będzie zajęty, Supabase/trigger powinien zwrócić błąd.', '');
 });
 
 els.registerForm.addEventListener('submit',async function(e){
@@ -653,19 +638,7 @@ els.registerForm.addEventListener('submit',async function(e){
   setBusy(els.registerForm,true);
 
   try{
-    setMsg('Sprawdzam login...', '');
-    var avail=await withTimeout(
-      sb.rpc('is_login_available',{p_login:login}),
-      20000,
-      'Sprawdzanie loginu trwa zbyt długo. Sprawdź internet, RLS albo konsolę przeglądarki.'
-    );
-
-    console.log('Szpilplac login availability response:', avail);
-
-    if(avail.error){setMsg(t('loginCheckErr')+niceError(avail.error),'err');return;}
-    if(!avail.data){setMsg(t('loginTaken'),'err');return;}
-
-    setMsg('Tworzę konto i wysyłam mail potwierdzający...', '');
+    setMsg('Tworzę konto i wysyłam mail potwierdzający... Pomijam teraz RPC sprawdzania loginu, bo ono u Ciebie nie odpowiada.', '');
 
     var r=await withTimeout(sb.auth.signUp({
       email:email,
