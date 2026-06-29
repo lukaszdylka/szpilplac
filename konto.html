@@ -460,6 +460,32 @@ var els={
 
 var sb=null;
 
+window.addEventListener('error', function(e){
+  try { setMsg('Błąd JavaScript: ' + (e.message || 'nieznany błąd'), 'err'); } catch(_) {}
+});
+window.addEventListener('unhandledrejection', function(e){
+  try {
+    var reason = e.reason;
+    var msg = reason && reason.message ? reason.message : String(reason || 'nieznany błąd');
+    setMsg('Błąd operacji: ' + msg, 'err');
+  } catch(_) {}
+});
+
+function withTimeout(promise, ms, label){
+  var timer;
+  var timeout = new Promise(function(_, reject){
+    timer = setTimeout(function(){ reject(new Error(label || 'Przekroczono czas oczekiwania.')); }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(function(){ clearTimeout(timer); });
+}
+
+function looksLikeExistingSignupResult(result){
+  var user = result && result.data && result.data.user;
+  if(!user) return false;
+  if(Array.isArray(user.identities) && user.identities.length === 0) return true;
+  return false;
+}
+
 /* ── i18n render ───────────────────────────────────────────── */
 function applyLang(){
   document.documentElement.lang = (lang==='szl') ? 'szl' : 'pl';
@@ -588,15 +614,29 @@ els.checkLoginBtn.addEventListener('click',async function(){
   clearMsg();
   var login=els.regLogin.value.trim();
   if(!LOGIN_RE.test(login)){setMsg(t('loginFormat'),'err');return;}
+
   els.checkLoginBtn.disabled=true;
-  var r=await sb.rpc('is_login_available',{p_login:login});
-  els.checkLoginBtn.disabled=false;
-  if(r.error){setMsg(t('loginCheckErr')+niceError(r.error),'err');return;}
-  setMsg(r.data===true?t('loginFree'):t('loginTaken'),r.data===true?'ok':'err');
+  try{
+    setMsg('Sprawdzam dostępność loginu...', '');
+    var r=await withTimeout(
+      sb.rpc('is_login_available',{p_login:login}),
+      20000,
+      'Sprawdzanie loginu trwa zbyt długo. Sprawdź internet, RLS albo konsolę przeglądarki.'
+    );
+    if(r.error){setMsg(t('loginCheckErr')+niceError(r.error),'err');return;}
+    setMsg(r.data===true?t('loginFree'):t('loginTaken'),r.data===true?'ok':'err');
+  }catch(ex){
+    console.error('Szpilplac check login exception:', ex);
+    setMsg(t('loginCheckErr')+niceError(ex),'err');
+  }finally{
+    els.checkLoginBtn.disabled=false;
+  }
 });
 
 els.registerForm.addEventListener('submit',async function(e){
-  e.preventDefault();clearMsg();
+  e.preventDefault();
+  clearMsg();
+
   var login=els.regLogin.value.trim();
   var email=els.regEmail.value.trim();
   var password=els.regPassword.value;
@@ -608,52 +648,137 @@ els.registerForm.addEventListener('submit',async function(e){
   if(password.length<8){setMsg(t('passShort'),'err');return;}
   if(password!==password2){setMsg(t('passMismatch'),'err');return;}
   if(!terms){setMsg(t('needTerms'),'err');return;}
+  if(!sb){setMsg('Supabase nie jest zainicjalizowany. Sprawdź config.js i konsolę przeglądarki.', 'err');return;}
 
   setBusy(els.registerForm,true);
-  var avail=await sb.rpc('is_login_available',{p_login:login});
-  if(avail.error){setBusy(els.registerForm,false);setMsg(t('loginCheckErr')+niceError(avail.error),'err');return;}
-  if(!avail.data){setBusy(els.registerForm,false);setMsg(t('loginTaken'),'err');return;}
 
-  var r=await sb.auth.signUp({
-    email:email,password:password,
-    options:{
-      emailRedirectTo:getRedirectUrl('?confirmed=1'),
-      data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:marketing}
+  try{
+    setMsg('Sprawdzam login...', '');
+    var avail=await withTimeout(
+      sb.rpc('is_login_available',{p_login:login}),
+      20000,
+      'Sprawdzanie loginu trwa zbyt długo. Sprawdź internet, RLS albo konsolę przeglądarki.'
+    );
+
+    console.log('Szpilplac login availability response:', avail);
+
+    if(avail.error){setMsg(t('loginCheckErr')+niceError(avail.error),'err');return;}
+    if(!avail.data){setMsg(t('loginTaken'),'err');return;}
+
+    setMsg('Tworzę konto i wysyłam mail potwierdzający...', '');
+
+    var r=await withTimeout(sb.auth.signUp({
+      email:email,
+      password:password,
+      options:{
+        emailRedirectTo:getRedirectUrl('?confirmed=1'),
+        data:{
+          login:login,
+          display_name:login,
+          terms_version:TERMS_VERSION,
+          privacy_version:PRIVACY_VERSION,
+          marketing_consent:marketing
+        }
+      }
+    }), 30000, 'Rejestracja trwa zbyt długo. Sprawdź Authentication → Logs w Supabase albo spróbuj ponownie.');
+
+    console.log('Szpilplac signUp response:', r);
+
+    if(r.error){setMsg(t('regErr')+niceError(r.error),'err');return;}
+
+    if(looksLikeExistingSignupResult(r)){
+      setMsg('Ten e-mail wygląda na już zarejestrowany. Supabase ze względów bezpieczeństwa może nie wysyłać wtedy kolejnego maila i nie pokazuje wprost, że konto istnieje. Spróbuj się zalogować albo użyj resetu hasła.', 'err');
+      switchTab('login');
+      els.loginEmail.value=email;
+      return;
     }
-  });
-  setBusy(els.registerForm,false);
-  if(r.error){setMsg(t('regErr')+niceError(r.error),'err');return;}
-  if(r.data.user&&r.data.session){setMsg(t('regOkSession'),'ok');await loadProfile();}
-  else{setMsg(t('regOkConfirm'),'ok');}
+
+    if(r.data && r.data.user && r.data.session){
+      setMsg(t('regOkSession'),'ok');
+      await loadProfile();
+    }else if(r.data && r.data.user){
+      setMsg(t('regOkConfirm'),'ok');
+    }else{
+      setMsg('Nie dostałem jednoznacznej odpowiedzi z Supabase. Sprawdź Authentication → Users oraz Authentication → Logs.', 'err');
+    }
+  }catch(ex){
+    console.error('Szpilplac register exception:', ex);
+    setMsg(t('regErr')+niceError(ex),'err');
+  }finally{
+    setBusy(els.registerForm,false);
+  }
 });
 
 els.loginForm.addEventListener('submit',async function(e){
-  e.preventDefault();clearMsg();setBusy(els.loginForm,true);
-  var r=await sb.auth.signInWithPassword({email:els.loginEmail.value.trim(),password:els.loginPassword.value});
-  setBusy(els.loginForm,false);
-  if(r.error){setMsg(t('loginErr')+niceError(r.error),'err');return;}
-  setMsg(t('loginOk'),'ok');await loadProfile();
+  e.preventDefault();
+  clearMsg();
+  setBusy(els.loginForm,true);
+  try{
+    setMsg('Loguję...', '');
+    var r=await withTimeout(
+      sb.auth.signInWithPassword({email:els.loginEmail.value.trim(),password:els.loginPassword.value}),
+      30000,
+      'Logowanie trwa zbyt długo.'
+    );
+    console.log('Szpilplac signIn response:', r);
+    if(r.error){setMsg(t('loginErr')+niceError(r.error),'err');return;}
+    setMsg(t('loginOk'),'ok');
+    await loadProfile();
+  }catch(ex){
+    console.error('Szpilplac login exception:', ex);
+    setMsg(t('loginErr')+niceError(ex),'err');
+  }finally{
+    setBusy(els.loginForm,false);
+  }
 });
 
 els.resetForm.addEventListener('submit',async function(e){
-  e.preventDefault();clearMsg();setBusy(els.resetForm,true);
-  var r=await sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl('?reset=1')});
-  setBusy(els.resetForm,false);
-  if(r.error){setMsg(t('resetErr')+niceError(r.error),'err');return;}
-  setMsg(t('resetOk'),'ok');
+  e.preventDefault();
+  clearMsg();
+  setBusy(els.resetForm,true);
+  try{
+    setMsg('Wysyłam link resetujący...', '');
+    var r=await withTimeout(
+      sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl('?reset=1')}),
+      30000,
+      'Wysyłka resetu trwa zbyt długo.'
+    );
+    console.log('Szpilplac reset response:', r);
+    if(r.error){setMsg(t('resetErr')+niceError(r.error),'err');return;}
+    setMsg(t('resetOk'),'ok');
+  }catch(ex){
+    console.error('Szpilplac reset exception:', ex);
+    setMsg(t('resetErr')+niceError(ex),'err');
+  }finally{
+    setBusy(els.resetForm,false);
+  }
 });
 
 els.newPasswordForm.addEventListener('submit',async function(e){
-  e.preventDefault();clearMsg();
+  e.preventDefault();
+  clearMsg();
   var password=els.newPassword.value;
   if(password.length<8){setMsg(t('newPassShort'),'err');return;}
+
   setBusy(els.newPasswordForm,true);
-  var r=await sb.auth.updateUser({password:password});
-  setBusy(els.newPasswordForm,false);
-  if(r.error){setMsg(t('newPassErr')+niceError(r.error),'err');return;}
-  els.newPassword.value='';
-  els.newPasswordBox.classList.add('hidden');
-  setMsg(t('newPassOk'),'ok');
+  try{
+    setMsg('Zmieniam hasło...', '');
+    var r=await withTimeout(
+      sb.auth.updateUser({password:password}),
+      30000,
+      'Zmiana hasła trwa zbyt długo.'
+    );
+    console.log('Szpilplac update password response:', r);
+    if(r.error){setMsg(t('newPassErr')+niceError(r.error),'err');return;}
+    els.newPassword.value='';
+    els.newPasswordBox.classList.add('hidden');
+    setMsg(t('newPassOk'),'ok');
+  }catch(ex){
+    console.error('Szpilplac update password exception:', ex);
+    setMsg(t('newPassErr')+niceError(ex),'err');
+  }finally{
+    setBusy(els.newPasswordForm,false);
+  }
 });
 
 els.refreshProfileBtn.addEventListener('click',loadProfile);
