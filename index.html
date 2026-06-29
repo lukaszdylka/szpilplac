@@ -157,12 +157,18 @@ footer a:hover{text-decoration:underline}
     </a>
   </div>
 </main>
+
 <footer>
   <div class="footer-sources"><a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a></div>
   <div class="footer-social" aria-label="Familock w social mediach">
     <a href="https://www.facebook.com/escaperoomfamilock" target="_blank" rel="noopener">Fanpage</a>
     <a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener">Instagram</a>
     <a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener">Wspólnota Familoka</a>
+  </div>
+  <div class="buycoffee">
+    <a href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener">
+      <img src="https://buycoffee.to/static/img/share/share-button-dark.png" style="width:97px;height:25px" alt="Postaw kawę na buycoffee.to">
+    </a>
   </div>
 </footer>
 
@@ -197,7 +203,7 @@ applyTheme();
 var GAME_TILES={
   slowko:{active:true, href:"slowko.html"},
   klodka:{active:true, href:"klodka.html"},
-  zorta:{active:true, href:"raja/"},
+  zorta:{active:false, href:"raja/"},
   cuzamen:{active:false, href:"cuzamen.html"}
 };
 function gameHref(id){var g=GAME_TILES[id];return g&&g.active?g.href:null;}
@@ -225,23 +231,68 @@ var HELP={
 };
 function renderHelp(){var h=HELP[lang]||HELP.pl;document.getElementById("helpTitle").textContent=h.title;document.getElementById("helpBody").innerHTML=h.body;}
 
-function daysSince(y,m,d){var s=new Date(y,m-1,d),n=new Date();function md(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate());}return Math.floor((md(n)-md(s))/86400000);}
-var DAY=daysSince(2026,6,23);
+/* ── Czy dana gra jest już dziś/teraz rozegrana? ─────────────────────
+   Strona główna nie zapisuje własnego stanu — tylko czyta localStorage gier.
+   Każda gra ma trochę inny format, więc sprawdzamy po ID gry, a nie po samym href. */
+function warsawParts(d){
+  var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d),out={};
+  parts.forEach(function(p){if(p.type!=="literal")out[p.type]=Number(p.value);});
+  return out;
+}
+function warsawDayIndex(){
+  var p=warsawParts(new Date());
+  var todayUtc=Date.UTC(p.year,p.month-1,p.day);
+  var epochUtc=Date.UTC(2026,5,23);
+  return Math.floor((todayUtc-epochUtc)/86400000);
+}
+function localDateKey(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function warsawDateKey(){var p=warsawParts(new Date());return p.year+"-"+p.month+"-"+p.day;}
+var DAY_IDX=warsawDayIndex();      // Słōwko: 0,1,2...
+var DAY_NO=DAY_IDX+1;              // Kłōdka: 1,2,3...
+var WEEK_IDX=Math.max(0,Math.floor(DAY_IDX/7)); // Raja/Zorta: 0,1,2...
 function parseStored(k){try{return JSON.parse(store.get(k)||"null");}catch(e){return null;}}
-function isFinishedGame(x){if(!x)return false;if(x.status&&x.status!=="playing")return true;if(x.game&&x.game.status&&x.game.status!=="playing")return true;return false;}
-function playedToday(href){
+function hasFinishedStatus(x){return !!(x&&(x.status==="won"||x.status==="lost"||x.status==="finished"||x.finished===true));}
+function isFinishedGame(x){
+  if(!x)return false;
+  if(hasFinishedStatus(x))return true;
+  if(x.game&&hasFinishedStatus(x.game))return true;
+  return false;
+}
+function hasResult(obj,key){return !!(obj&&obj.results&&obj.results[String(key)]);}
+function playedSlowko(){
+  if(isFinishedGame(parseStored("slowko_d"+DAY_IDX)))return true;
+  var st=parseStored("slowko_v2");
+  return !!(st&&st.stats&&hasResult(st.stats,DAY_IDX));
+}
+function playedKlodka(){
+  if(isFinishedGame(parseStored("klodka_daily_v1_d"+DAY_NO)))return true;
+  if(isFinishedGame(parseStored("klodka_daily_v1_d"+DAY_IDX)))return true; // zgodność ze starszymi testami
+  var cur=parseStored("klodka_daily_v1");
+  if(cur){
+    var curDay=(cur.day!==undefined)?cur.day:(cur.game&&cur.game.idx);
+    if((String(curDay)===String(DAY_NO)||String(curDay)===String(DAY_IDX))&&isFinishedGame(cur))return true;
+  }
+  var hist=parseStored("klodka_daily_v1__hist");
+  return hasResult(hist,DAY_NO);
+}
+function playedCuzamen(){
+  var cg=parseStored("cuzamen_v1");
+  if(!cg)return false;
+  if((cg.date===localDateKey()||cg.date===warsawDateKey())&&cg.finished===true)return true;
+  if((String(cg.day)===String(DAY_IDX)||String(cg.day)===String(DAY_NO))&&isFinishedGame(cg))return true;
+  return false;
+}
+function playedRaja(){
+  if(isFinishedGame(parseStored("zorta_d"+WEEK_IDX)))return true;
+  var zs=parseStored("zorta_stats_v1");
+  return !!(zs&&zs.weeks&&zs.weeks[String(WEEK_IDX+1)]);
+}
+function playedGame(id,href){
   try{
-    if(href==="slowko.html"){return isFinishedGame(parseStored("slowko_d"+DAY));}
-    if(href==="klodka.html"){
-      var kd1=parseStored("klodka_daily_v1_d"+(DAY+1));if(isFinishedGame(kd1))return true;
-      var kd0=parseStored("klodka_daily_v1_d"+DAY);if(isFinishedGame(kd0))return true;
-      var old=parseStored("klodka_daily_v1");if(old&&(old.day===DAY+1||old.day===DAY))return isFinishedGame(old);
-      return false;
-    }
-    if(href==="cuzamen.html"){
-      var cg=parseStored("cuzamen_v1");
-      return !!(cg&&cg.day===DAY&&isFinishedGame(cg));
-    }
+    if(id==="slowko")return playedSlowko();
+    if(id==="klodka")return playedKlodka();
+    if(id==="cuzamen")return playedCuzamen();
+    if(id==="zorta"||id==="raja")return playedRaja();
     return false;
   }catch(e){return false;}
 }
@@ -253,7 +304,7 @@ function render(){
   var wrap=document.getElementById("games");wrap.innerHTML="";
   s.games.forEach(function(g){
     var href=gameHref(g.id);
-    var done=href&&playedToday(href);
+    var done=href&&playedGame(g.id,href);
     var el=document.createElement(href?"a":"div");
     el.className="game-link"+(href?"":" soon");
     if(href)el.href=href;
