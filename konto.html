@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konto gracza · Szpilplac · Familock</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="description" content="Testowe konto gracza Szpilplaca Familock.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+
+<!-- Plik leży w głównym katalogu Szpilplaca, obok config.js -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;
+  --ok:#3f8a5a;--danger:#b5482f;
+  --sh:0 6px 18px -10px rgba(35,32,26,.4);
+}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4);}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5);}
+*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;padding:0 16px 40px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+/* ── Nagłówek (jak w index.html) ───────────────────────────── */
+header{width:100%;max-width:480px;padding-top:20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.site-name{font-family:"Oswald";font-size:clamp(26px,8vw,38px);font-weight:700;
+  letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
+.site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
+.controls{display:flex;gap:6px;align-items:center}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.icon-btn svg{display:block;flex:none}
+
+/* ── Layout ────────────────────────────────────────────────── */
+main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--sh);padding:18px}
+.card h2{font-family:"Oswald";font-size:21px;text-transform:uppercase;letter-spacing:.03em;
+  margin:0 0 6px;color:var(--ink);line-height:1.05}
+.card .intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
+.muted{color:var(--ink2);line-height:1.5}
+.small{font-size:11.5px;color:var(--ink2);line-height:1.45}
+
+/* ── Zakładki (segmentowane, jak lang-tog) ─────────────────── */
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;
+  background:var(--surface2);margin-bottom:16px}
+.tab{flex:1;font-size:12.5px;font-weight:800;padding:8px 6px;border-radius:999px;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.tab.active{background:var(--green);color:#fff}
+
+/* ── Formularze ────────────────────────────────────────────── */
+form{display:grid;gap:12px}
+label.field{display:grid;gap:6px;font-weight:700;color:var(--ink);font-size:13px}
+input[type="email"],input[type="password"],input[type="text"]{
+  width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;
+  background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;outline:none}
+input::placeholder{color:var(--ink2);opacity:.7}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.18)}
+.check{display:flex;align-items:flex-start;gap:9px;line-height:1.4;color:var(--ink2);
+  font-weight:500;font-size:12.5px}
+.check input{margin-top:2px;accent-color:var(--green)}
+
+/* ── Przyciski ─────────────────────────────────────────────── */
+.btn{border-radius:11px;padding:11px 14px;background:var(--green);color:#fff;font-weight:800;
+  font-size:14px;transition:transform .1s,filter .1s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn.secondary:hover{background:var(--surface)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.danger:hover{background:rgba(181,72,47,.1)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none}
+
+/* ── Komunikaty ────────────────────────────────────────────── */
+.msg{margin:0 0 14px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+  background:var(--surface2);color:var(--ink2);line-height:1.5;font-size:13px;white-space:pre-wrap}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
+.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
+
+/* ── Panele zakładek ───────────────────────────────────────── */
+.panel{display:none}
+.panel.active{display:block}
+.hidden{display:none !important}
+
+/* ── Profil ────────────────────────────────────────────────── */
+.profile-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--line);font-size:13px}
+.profile-row:last-of-type{border-bottom:0}
+.profile-row strong{color:var(--ink2);font-weight:700}
+.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.sub-head{font-family:"Oswald";font-size:15px;text-transform:uppercase;letter-spacing:.03em;
+  color:var(--ink);margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.result{padding:10px 0;border-bottom:1px solid var(--line)}
+.result:last-child{border-bottom:0}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface2);
+  border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--ink);
+  font-family:"Oswald";letter-spacing:.02em}
+.result-meta{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:5px}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+  background:var(--surface2);padding:2px 5px;border-radius:6px;word-break:break-all;border:1px solid var(--line)}
+
+footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:11.5px;
+  margin-top:20px;line-height:1.7}
+footer a{color:var(--green);font-weight:600}
+footer a:hover{text-decoration:underline}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <div class="site-name">Szpilplac</div>
+      <div class="site-sub" data-i18n="sub">Konto gracza</div>
+    </div>
+    <div class="controls">
+      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+      </a>
+      <div class="lang-tog" role="group">
+        <button id="lPl" class="on">PL</button>
+        <button id="lSzl">ŚL</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Zmień motyw" aria-label="Zmień motyw"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="globalMsg" class="msg hidden"></div>
+
+  <!-- ── Karta logowania / rejestracji ────────────────────── -->
+  <section class="card" id="authCard">
+    <div class="tabs">
+      <button class="tab active" type="button" data-tab="register" data-i18n="tabRegister">Załóż konto</button>
+      <button class="tab" type="button" data-tab="login" data-i18n="tabLogin">Zaloguj się</button>
+      <button class="tab" type="button" data-tab="reset" data-i18n="tabReset">Reset hasła</button>
+    </div>
+
+    <!-- Rejestracja -->
+    <div id="register" class="panel active">
+      <h2 data-i18n="regTitle">Załóż konto</h2>
+      <p class="intro" data-i18n="regIntro">Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.</p>
+
+      <form id="registerForm">
+        <label class="field">
+          <span data-i18n="loginLabel">Login do rankingu</span>
+          <input id="regLogin" type="text" autocomplete="nickname" data-i18n-ph="loginPh" placeholder="np. Starzik92" required minlength="3" maxlength="24">
+        </label>
+        <div class="small" data-i18n="loginHint">3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
+        <button class="btn secondary" type="button" id="checkLoginBtn" data-i18n="checkLogin">Sprawdź dostępność loginu</button>
+
+        <label class="field">
+          <span data-i18n="email">E-mail</span>
+          <input id="regEmail" type="email" autocomplete="email" data-i18n-ph="emailPh" placeholder="twoj@mail.pl" required>
+        </label>
+
+        <label class="field">
+          <span data-i18n="password">Hasło</span>
+          <input id="regPassword" type="password" autocomplete="new-password" required minlength="8">
+        </label>
+
+        <label class="field">
+          <span data-i18n="password2">Powtórz hasło</span>
+          <input id="regPassword2" type="password" autocomplete="new-password" required minlength="8">
+        </label>
+
+        <label class="check">
+          <input id="regTerms" type="checkbox" required>
+          <span data-i18n="terms">Akceptuję regulamin Szpilplaca i politykę prywatności.</span>
+        </label>
+
+        <label class="check">
+          <input id="regMarketing" type="checkbox">
+          <span data-i18n="marketing">Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span>
+        </label>
+
+        <button class="btn" type="submit" data-i18n="regSubmit">Załóż konto</button>
+      </form>
+    </div>
+
+    <!-- Logowanie -->
+    <div id="login" class="panel">
+      <h2 data-i18n="loginTitle">Zaloguj się</h2>
+      <p class="intro" data-i18n="loginIntro">Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.</p>
+      <form id="loginForm">
+        <label class="field">
+          <span data-i18n="email">E-mail</span>
+          <input id="loginEmail" type="email" autocomplete="email" required>
+        </label>
+        <label class="field">
+          <span data-i18n="password">Hasło</span>
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn" type="submit" data-i18n="loginSubmit">Zaloguj się</button>
+      </form>
+    </div>
+
+    <!-- Reset hasła -->
+    <div id="reset" class="panel">
+      <h2 data-i18n="resetTitle">Reset hasła</h2>
+      <p class="intro" data-i18n="resetIntro">Wpisz e-mail, a Supabase wyśle link do ustawienia nowego hasła.</p>
+      <form id="resetForm">
+        <label class="field">
+          <span data-i18n="email">E-mail</span>
+          <input id="resetEmail" type="email" autocomplete="email" required>
+        </label>
+        <button class="btn" type="submit" data-i18n="resetSubmit">Wyślij link resetujący</button>
+      </form>
+
+      <div id="newPasswordBox" class="hidden" style="margin-top:18px;">
+        <h2 data-i18n="newPassTitle">Ustaw nowe hasło</h2>
+        <form id="newPasswordForm">
+          <label class="field">
+            <span data-i18n="newPass">Nowe hasło</span>
+            <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+          </label>
+          <button class="btn" type="submit" data-i18n="newPassSubmit">Zapisz nowe hasło</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Karta profilu ────────────────────────────────────── -->
+  <section class="card">
+    <h2 data-i18n="profileTitle">Twój profil</h2>
+    <div id="profileEmpty" class="muted" data-i18n="profileEmpty">Nie jesteś zalogowany. Po rejestracji i potwierdzeniu maila zobaczysz tu profil gracza.</div>
+
+    <div id="profileBox" class="hidden">
+      <div class="profile-row"><strong data-i18n="pEmail">E-mail</strong><span id="pEmail"></span></div>
+      <div class="profile-row"><strong data-i18n="pLogin">Login</strong><span id="pLogin"></span></div>
+      <div class="profile-row"><strong data-i18n="pDisplay">Nazwa</strong><span id="pDisplay"></span></div>
+      <div class="profile-row"><strong data-i18n="pRank">Ranga</strong><span id="pRank"></span></div>
+      <div class="profile-row"><strong data-i18n="pRanking">Ranking</strong><span id="pRanking"></span></div>
+      <div class="profile-row"><strong data-i18n="pId">ID</strong><span class="code" id="pId"></span></div>
+
+      <div class="profile-actions">
+        <button type="button" class="btn secondary" id="refreshProfileBtn" data-i18n="refresh">Odśwież profil</button>
+        <button type="button" class="btn danger" id="logoutBtn" data-i18n="logout">Wyloguj</button>
+      </div>
+    </div>
+
+    <div class="sub-head" data-i18n="resultsTitle">Ostatnie wyniki z konta</div>
+    <div id="resultsBox" class="muted" data-i18n="resultsEmpty">Zaloguj się, żeby zobaczyć zapisane wyniki.</div>
+  </section>
+
+  <footer>
+    <p class="muted" data-i18n="footerNote">Ten plik jest testowy. Linki do regulaminu, polityki prywatności i rankingu mogą jeszcze nie istnieć. Ważne jest sprawdzenie rejestracji, maila potwierdzającego, logowania, profilu i RLS.</p>
+  </footer>
+</main>
+
+<script>
+"use strict";
+
+/* ── Wspólny store + motyw + język (jak w index.html) ──────── */
+var LK="familock_lang",TK="szpilplac_theme";
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
+var ICO={
+  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+};
+var THEME_ICONS={light:ICO.sun,dark:ICO.moon};
+var theme=store.get(TK)||"light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);document.getElementById("themeBtn").innerHTML=THEME_ICONS[theme];}
+document.getElementById("themeBtn").addEventListener("click",function(){theme=theme==="light"?"dark":"light";store.set(TK,theme);applyTheme();});
+applyTheme();
+
+var lang=store.get(LK)||"pl";
+
+/* ── Teksty PL / ŚL ────────────────────────────────────────────
+   UWAGA: śląskie stringi to wersja robocza — sprawdź wg bonclok.pl
+   / slunski-chachor.com i popraw, co trzeba. */
+var T={
+  pl:{
+    sub:"Konto gracza",
+    tabRegister:"Załóż konto", tabLogin:"Zaloguj się", tabReset:"Reset hasła",
+    regTitle:"Załóż konto",
+    regIntro:"Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.",
+    loginLabel:"Login do rankingu", loginPh:"np. Starzik92",
+    loginHint:"3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.",
+    checkLogin:"Sprawdź dostępność loginu",
+    email:"E-mail", emailPh:"twoj@mail.pl", password:"Hasło", password2:"Powtórz hasło",
+    terms:"Akceptuję regulamin Szpilplaca i politykę prywatności.",
+    marketing:"Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.",
+    regSubmit:"Załóż konto",
+    loginTitle:"Zaloguj się",
+    loginIntro:"Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.",
+    loginSubmit:"Zaloguj się",
+    resetTitle:"Reset hasła",
+    resetIntro:"Wpisz e-mail, a Supabase wyśle link do ustawienia nowego hasła.",
+    resetSubmit:"Wyślij link resetujący",
+    newPassTitle:"Ustaw nowe hasło", newPass:"Nowe hasło", newPassSubmit:"Zapisz nowe hasło",
+    profileTitle:"Twój profil",
+    profileEmpty:"Nie jesteś zalogowany. Po rejestracji i potwierdzeniu maila zobaczysz tu profil gracza.",
+    pEmail:"E-mail", pLogin:"Login", pDisplay:"Nazwa", pRank:"Ranga", pRanking:"Ranking", pId:"ID",
+    refresh:"Odśwież profil", logout:"Wyloguj",
+    resultsTitle:"Ostatnie wyniki z konta",
+    resultsEmpty:"Zaloguj się, żeby zobaczyć zapisane wyniki.",
+    footerNote:"Ten plik jest testowy. Linki do regulaminu, polityki prywatności i rankingu mogą jeszcze nie istnieć. Ważne jest sprawdzenie rejestracji, maila potwierdzającego, logowania, profilu i RLS.",
+    // komunikaty
+    noConfig:"Brak konfiguracji Supabase. Upewnij się, że konto.html leży obok config.js i że config.js ustawia window.SZPILPLAC_CONFIG.",
+    noLib:"Nie udało się załadować biblioteki Supabase JS z CDN.",
+    loginFormat:"Login musi mieć 3–24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.",
+    loginFree:"Login jest wolny.",
+    loginTaken:"Ten login jest zajęty albo ma nieprawidłowy format.",
+    loginCheckErr:"Nie udało się sprawdzić loginu: ",
+    passShort:"Hasło musi mieć minimum 8 znaków.",
+    passMismatch:"Hasła nie są takie same.",
+    needTerms:"Musisz zaakceptować regulamin i politykę prywatności.",
+    regErr:"Nie udało się założyć konta: ",
+    regOkSession:"Konto utworzone i jesteś zalogowany. Jeśli masz włączone potwierdzanie e-maila, sprawdź też skrzynkę.",
+    regOkConfirm:"Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.",
+    loginErr:"Nie udało się zalogować: ",
+    loginOk:"Zalogowano.",
+    resetErr:"Nie udało się wysłać resetu hasła: ",
+    resetOk:"Wysłano link do resetu hasła. Sprawdź skrzynkę.",
+    newPassShort:"Nowe hasło musi mieć minimum 8 znaków.",
+    newPassErr:"Nie udało się zmienić hasła: ",
+    newPassOk:"Hasło zmienione. Możesz się zalogować nowym hasłem.",
+    logoutOk:"Wylogowano.",
+    bootReset:"Ustaw nowe hasło po kliknięciu linku z maila.",
+    bootConfirmed:"Jeśli potwierdzenie maila się udało, możesz się zalogować. Jeśli jesteś już zalogowany, profil pojawi się niżej.",
+    recovery:"Ustaw nowe hasło.",
+    profileReadErr:"Błąd odczytu profilu",
+    resultsReadErr:"Błąd odczytu wyników: ",
+    resultsEmptyAcc:"Brak zapisanych wyników na koncie.",
+    won:"wygrana", lost:"porażka", pts:"pkt", triesL:"próby", errorsL:"błędy",
+    visible:"widoczny", hidden:"ukryty", defaultRank:"Bajtel",
+    // niceError
+    errExists:"Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.",
+    errCreds:"Nieprawidłowy e-mail albo hasło.",
+    errUnconfirmed:"Najpierw potwierdź e-mail linkiem z wiadomości.",
+    errDup:"Ten login jest już zajęty.",
+    errLoginChars:"Login ma niedozwolone znaki.",
+    errLoginLen:"Login musi mieć od 3 do 24 znaków.",
+    errUnknown:"Nieznany błąd."
+  },
+  szl:{
+    sub:"Kōnto gracza",
+    tabRegister:"Założ kōnto", tabLogin:"Zaloguj sie", tabReset:"Reset hasła",
+    regTitle:"Założ kōnto",
+    regIntro:"Kōnto je na zorta. Szpil dziŏ tyż bez logowanio, ale z kōntym ôstanie ci spamiyntany wynik, ranking i ranga, choćbyś zmiyniōł przeglōndarka abo wyczyściōł cache.",
+    loginLabel:"Login do rankingu", loginPh:"np. Starzik92",
+    loginHint:"3–24 znaki. Idzie: litery, cyfry, podkryślynie, myślnik i polske znaki.",
+    checkLogin:"Wejrzij, czy login je wolny",
+    email:"E-mail", emailPh:"twoj@mail.pl", password:"Hasło", password2:"Powtōrz hasło",
+    terms:"Przijmuja regulamin Szpilplaca i polityka prywatności.",
+    marketing:"Chca dostŏwać wiadōmości ô Familocku, promocyjach i nowościach. Na zorta.",
+    regSubmit:"Założ kōnto",
+    loginTitle:"Zaloguj sie",
+    loginIntro:"Zaloguj sie e-mailym i hasłym. Login do rankingu widać publicznie, e-maila niy.",
+    loginSubmit:"Zaloguj sie",
+    resetTitle:"Reset hasła",
+    resetIntro:"Wpisz e-mail, a Supabase pośle link do nastawiynio nowego hasła.",
+    resetSubmit:"Poślij link resetujōncy",
+    newPassTitle:"Nastŏw nowe hasło", newPass:"Nowe hasło", newPassSubmit:"Spamiyntej nowe hasło",
+    profileTitle:"Twōj profil",
+    profileEmpty:"Niy ma żeś zalogowany. Po rejestracyji i potwierdzyniu maila uwidzisz tukej profil gracza.",
+    pEmail:"E-mail", pLogin:"Login", pDisplay:"Miano", pRank:"Ranga", pRanking:"Ranking", pId:"ID",
+    refresh:"Ôdświyż profil", logout:"Wyloguj",
+    resultsTitle:"Ôstatnie wyniki z kōnta",
+    resultsEmpty:"Zaloguj sie, coby ôbŏczyć spamiyntane wyniki.",
+    footerNote:"Tyn plik je testowy. Linki do regulaminu, polityki prywatności i rankingu mogōm jeszcze niy istnieć. Ważne je sprawdzynie rejestracyje, maila potwierdzajōncego, logowanio, profilu i RLS.",
+    noConfig:"Brak kōnfiguracyje Supabase. Wejrzij, czy konto.html leży kole config.js i czy config.js nastawiŏ window.SZPILPLAC_CONFIG.",
+    noLib:"Niy szło wczytać biblioteki Supabase JS z CDN.",
+    loginFormat:"Login musi mieć 3–24 znaki i może mieć litery, cyfry, podkryślynie, myślnik i polske znaki.",
+    loginFree:"Login je wolny.",
+    loginTaken:"Tyn login je zajynty abo mŏ zły format.",
+    loginCheckErr:"Niy szło sprawdzić loginu: ",
+    passShort:"Hasło musi mieć minimum 8 znakōw.",
+    passMismatch:"Hasła sōm inksze.",
+    needTerms:"Musisz przijōnć regulamin i polityka prywatności.",
+    regErr:"Niy szło założyć kōnta: ",
+    regOkSession:"Kōnto zrobiōne i jeżeś zalogowany. Jak mŏsz włōnczōne potwierdzanie e-maila, wejrzij tyż do skrzynki.",
+    regOkConfirm:"Kōnto zrobiōne. Wejrzij do maila i kliknij link potwierdzajōncy kōnto.",
+    loginErr:"Niy szło sie zalogować: ",
+    loginOk:"Zalogowano.",
+    resetErr:"Niy szło posłać resetu hasła: ",
+    resetOk:"Posłany link do resetu hasła. Wejrzij do skrzynki.",
+    newPassShort:"Nowe hasło musi mieć minimum 8 znakōw.",
+    newPassErr:"Niy szło zmiynić hasła: ",
+    newPassOk:"Hasło zmiyniōne. Możesz sie zalogować nowym hasłym.",
+    logoutOk:"Wylogowano.",
+    bootReset:"Nastŏw nowe hasło po kliknięciu linku z maila.",
+    bootConfirmed:"Jak potwierdzynie maila sie podarziło, możesz sie zalogować. Jak jeżeś już zalogowany, profil pokŏże sie niżyj.",
+    recovery:"Nastŏw nowe hasło.",
+    profileReadErr:"Błōnd ôdczytu profilu",
+    resultsReadErr:"Błōnd ôdczytu wynikōw: ",
+    resultsEmptyAcc:"Brak spamiyntanych wynikōw na kōncie.",
+    won:"wygrano", lost:"przegrano", pts:"pkt", triesL:"prōby", errorsL:"błyndy",
+    visible:"widoczny", hidden:"skryty", defaultRank:"Bajtel",
+    errExists:"Tyn e-mail mŏ już kōnto. Sprōbuj sie zalogować abo zresetować hasło.",
+    errCreds:"Zły e-mail abo hasło.",
+    errUnconfirmed:"Nojprzōd potwierdź e-mail linkym z wiadōmości.",
+    errDup:"Tyn login je już zajynty.",
+    errLoginChars:"Login mŏ niydozwolōne znaki.",
+    errLoginLen:"Login musi mieć ôd 3 do 24 znakōw.",
+    errUnknown:"Niyznany błōnd."
+  }
+};
+function t(key){return (T[lang]&&T[lang][key]!=null)?T[lang][key]:(T.pl[key]!=null?T.pl[key]:key);}
+
+var LOGIN_RE=/^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
+var TERMS_VERSION='2026-06-29';
+var PRIVACY_VERSION='2026-06-29';
+
+var els={
+  globalMsg:document.getElementById('globalMsg'),
+  registerForm:document.getElementById('registerForm'),
+  loginForm:document.getElementById('loginForm'),
+  resetForm:document.getElementById('resetForm'),
+  newPasswordForm:document.getElementById('newPasswordForm'),
+  newPasswordBox:document.getElementById('newPasswordBox'),
+  regLogin:document.getElementById('regLogin'),
+  regEmail:document.getElementById('regEmail'),
+  regPassword:document.getElementById('regPassword'),
+  regPassword2:document.getElementById('regPassword2'),
+  regTerms:document.getElementById('regTerms'),
+  regMarketing:document.getElementById('regMarketing'),
+  checkLoginBtn:document.getElementById('checkLoginBtn'),
+  loginEmail:document.getElementById('loginEmail'),
+  loginPassword:document.getElementById('loginPassword'),
+  resetEmail:document.getElementById('resetEmail'),
+  newPassword:document.getElementById('newPassword'),
+  profileEmpty:document.getElementById('profileEmpty'),
+  profileBox:document.getElementById('profileBox'),
+  pEmail:document.getElementById('pEmail'),
+  pLogin:document.getElementById('pLogin'),
+  pDisplay:document.getElementById('pDisplay'),
+  pRank:document.getElementById('pRank'),
+  pRanking:document.getElementById('pRanking'),
+  pId:document.getElementById('pId'),
+  resultsBox:document.getElementById('resultsBox'),
+  refreshProfileBtn:document.getElementById('refreshProfileBtn'),
+  logoutBtn:document.getElementById('logoutBtn')
+};
+
+var sb=null;
+
+/* ── i18n render ───────────────────────────────────────────── */
+function applyLang(){
+  document.documentElement.lang = (lang==='szl') ? 'szl' : 'pl';
+  document.getElementById('lPl').className = lang==='pl' ? 'on' : '';
+  document.getElementById('lSzl').className = lang==='szl' ? 'on' : '';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k=el.getAttribute('data-i18n'); if(T[lang][k]!=null) el.textContent=t(k);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    var k=el.getAttribute('data-i18n-ph'); if(T[lang][k]!=null) el.setAttribute('placeholder',t(k));
+  });
+}
+
+function setMsg(text,type){
+  els.globalMsg.textContent=text;
+  els.globalMsg.className='msg'+(type?' '+type:'');
+  els.globalMsg.classList.remove('hidden');
+}
+function clearMsg(){els.globalMsg.textContent='';els.globalMsg.className='msg hidden';}
+
+function niceError(error){
+  if(!error)return t('errUnknown');
+  var msg=error.message||String(error);
+  if(msg.includes('User already registered'))return t('errExists');
+  if(msg.includes('Invalid login credentials'))return t('errCreds');
+  if(msg.includes('Email not confirmed'))return t('errUnconfirmed');
+  if(msg.includes('duplicate key'))return t('errDup');
+  if(msg.includes('profiles_login_format_chk'))return t('errLoginChars');
+  if(msg.includes('profiles_login_length_chk'))return t('errLoginLen');
+  return msg;
+}
+
+function getRedirectUrl(extra){
+  var url=new URL(window.location.href);
+  url.search=extra||'';
+  url.hash='';
+  return url.toString();
+}
+function setBusy(form,busy){form.querySelectorAll('button, input').forEach(function(el){el.disabled=busy;});}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('active',btn.dataset.tab===id);});
+  document.querySelectorAll('.panel').forEach(function(panel){panel.classList.toggle('active',panel.id===id);});
+  clearMsg();
+}
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click',function(){switchTab(btn.dataset.tab);});
+});
+
+function initSupabase(){
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  var url=cfg.SUPABASE_URL, key=cfg.SUPABASE_ANON_KEY;
+  if(!url||!key){setMsg(t('noConfig'),'err');return false;}
+  if(!window.supabase){setMsg(t('noLib'),'err');return false;}
+  sb=window.supabase.createClient(url,key,{
+    auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+  });
+  return true;
+}
+
+async function getSessionUser(){
+  var r=await sb.auth.getUser();
+  if(r.error)return null;
+  return r.data.user||null;
+}
+
+async function loadProfile(){
+  if(!sb)return;
+  var user=await getSessionUser();
+  if(!user){
+    els.profileEmpty.classList.remove('hidden');
+    els.profileBox.classList.add('hidden');
+    els.resultsBox.textContent=t('resultsEmpty');
+    return;
+  }
+  els.profileEmpty.classList.add('hidden');
+  els.profileBox.classList.remove('hidden');
+  els.pEmail.textContent=user.email||'(brak)';
+  els.pId.textContent=user.id;
+
+  var res=await sb.from('profiles')
+    .select('id, login, display_name, rank_name, show_in_ranking, created_at')
+    .eq('id',user.id).single();
+
+  if(res.error){
+    els.pLogin.textContent=t('profileReadErr');
+    els.pDisplay.textContent=niceError(res.error);
+    els.pRank.textContent='-';
+    els.pRanking.textContent='-';
+  }else{
+    var profile=res.data;
+    els.pLogin.textContent=profile.login||'-';
+    els.pDisplay.textContent=profile.display_name||'-';
+    els.pRank.textContent=profile.rank_name||t('defaultRank');
+    els.pRanking.textContent=profile.show_in_ranking?t('visible'):t('hidden');
+  }
+  await loadResults(user.id);
+}
+
+async function loadResults(userId){
+  var res=await sb.from('user_game_results')
+    .select('game, mode, puzzle_no, won, tries, errors, score, finished_at')
+    .eq('user_id',userId)
+    .order('finished_at',{ascending:false})
+    .limit(10);
+
+  if(res.error){els.resultsBox.textContent=t('resultsReadErr')+niceError(res.error);return;}
+  var data=res.data;
+  if(!data||!data.length){els.resultsBox.textContent=t('resultsEmptyAcc');return;}
+
+  els.resultsBox.classList.remove('muted');
+  els.resultsBox.innerHTML=data.map(function(row){
+    var won=row.won?t('won'):t('lost');
+    var when=row.finished_at?new Date(row.finished_at).toLocaleString('pl-PL'):'';
+    return '<div class="result">'
+      +'<span class="pill">'+row.game+' #'+row.puzzle_no+'</span>'
+      +'<div class="result-meta">'+won+', '+row.score+' '+t('pts')
+      +', '+t('triesL')+': '+(row.tries!=null?row.tries:'-')
+      +', '+t('errorsL')+': '+(row.errors!=null?row.errors:'-')+'<br>'+when+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+/* ── Akcje ─────────────────────────────────────────────────── */
+els.checkLoginBtn.addEventListener('click',async function(){
+  clearMsg();
+  var login=els.regLogin.value.trim();
+  if(!LOGIN_RE.test(login)){setMsg(t('loginFormat'),'err');return;}
+  els.checkLoginBtn.disabled=true;
+  var r=await sb.rpc('is_login_available',{p_login:login});
+  els.checkLoginBtn.disabled=false;
+  if(r.error){setMsg(t('loginCheckErr')+niceError(r.error),'err');return;}
+  setMsg(r.data===true?t('loginFree'):t('loginTaken'),r.data===true?'ok':'err');
+});
+
+els.registerForm.addEventListener('submit',async function(e){
+  e.preventDefault();clearMsg();
+  var login=els.regLogin.value.trim();
+  var email=els.regEmail.value.trim();
+  var password=els.regPassword.value;
+  var password2=els.regPassword2.value;
+  var terms=els.regTerms.checked;
+  var marketing=els.regMarketing.checked;
+
+  if(!LOGIN_RE.test(login)){setMsg(t('loginFormat'),'err');return;}
+  if(password.length<8){setMsg(t('passShort'),'err');return;}
+  if(password!==password2){setMsg(t('passMismatch'),'err');return;}
+  if(!terms){setMsg(t('needTerms'),'err');return;}
+
+  setBusy(els.registerForm,true);
+  var avail=await sb.rpc('is_login_available',{p_login:login});
+  if(avail.error){setBusy(els.registerForm,false);setMsg(t('loginCheckErr')+niceError(avail.error),'err');return;}
+  if(!avail.data){setBusy(els.registerForm,false);setMsg(t('loginTaken'),'err');return;}
+
+  var r=await sb.auth.signUp({
+    email:email,password:password,
+    options:{
+      emailRedirectTo:getRedirectUrl('?confirmed=1'),
+      data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:marketing}
+    }
+  });
+  setBusy(els.registerForm,false);
+  if(r.error){setMsg(t('regErr')+niceError(r.error),'err');return;}
+  if(r.data.user&&r.data.session){setMsg(t('regOkSession'),'ok');await loadProfile();}
+  else{setMsg(t('regOkConfirm'),'ok');}
+});
+
+els.loginForm.addEventListener('submit',async function(e){
+  e.preventDefault();clearMsg();setBusy(els.loginForm,true);
+  var r=await sb.auth.signInWithPassword({email:els.loginEmail.value.trim(),password:els.loginPassword.value});
+  setBusy(els.loginForm,false);
+  if(r.error){setMsg(t('loginErr')+niceError(r.error),'err');return;}
+  setMsg(t('loginOk'),'ok');await loadProfile();
+});
+
+els.resetForm.addEventListener('submit',async function(e){
+  e.preventDefault();clearMsg();setBusy(els.resetForm,true);
+  var r=await sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl('?reset=1')});
+  setBusy(els.resetForm,false);
+  if(r.error){setMsg(t('resetErr')+niceError(r.error),'err');return;}
+  setMsg(t('resetOk'),'ok');
+});
+
+els.newPasswordForm.addEventListener('submit',async function(e){
+  e.preventDefault();clearMsg();
+  var password=els.newPassword.value;
+  if(password.length<8){setMsg(t('newPassShort'),'err');return;}
+  setBusy(els.newPasswordForm,true);
+  var r=await sb.auth.updateUser({password:password});
+  setBusy(els.newPasswordForm,false);
+  if(r.error){setMsg(t('newPassErr')+niceError(r.error),'err');return;}
+  els.newPassword.value='';
+  els.newPasswordBox.classList.add('hidden');
+  setMsg(t('newPassOk'),'ok');
+});
+
+els.refreshProfileBtn.addEventListener('click',loadProfile);
+els.logoutBtn.addEventListener('click',async function(){
+  clearMsg();await sb.auth.signOut();setMsg(t('logoutOk'),'ok');await loadProfile();
+});
+
+/* ── Przełącznik języka ────────────────────────────────────── */
+function setLang(l){lang=l;store.set(LK,lang);clearMsg();applyLang();if(sb)loadProfile();}
+document.getElementById('lPl').addEventListener('click',function(){setLang('pl');});
+document.getElementById('lSzl').addEventListener('click',function(){setLang('szl');});
+
+/* ── Boot ──────────────────────────────────────────────────── */
+async function boot(){
+  applyLang();
+  if(!initSupabase())return;
+
+  var params=new URLSearchParams(window.location.search);
+  if(params.has('reset')){
+    switchTab('reset');
+    els.newPasswordBox.classList.remove('hidden');
+    setMsg(t('bootReset'),'ok');
+  }
+  if(params.has('confirmed')){setMsg(t('bootConfirmed'),'ok');}
+
+  sb.auth.onAuthStateChange(async function(event){
+    if(event==='PASSWORD_RECOVERY'){
+      switchTab('reset');
+      els.newPasswordBox.classList.remove('hidden');
+      setMsg(t('recovery'),'ok');
+    }
+    if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'){await loadProfile();}
+  });
+
+  await loadProfile();
+}
+boot();
+</script>
+</body>
+</html>
