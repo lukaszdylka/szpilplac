@@ -335,29 +335,102 @@ async function getSessionUser(){
   return r.data.user||null;
 }
 
+function readStoredAuthSession(){
+  try{
+    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
+    if(!raw)return null;
+
+    var data=JSON.parse(raw);
+
+    // Supabase zwykle zapisuje sesję bezpośrednio,
+    // ale zostawiamy też obsługę wariantu currentSession.
+    var session=data.currentSession || data.session || data;
+
+    if(session && session.user){
+      return session;
+    }
+
+    return null;
+  }catch(e){
+    console.warn("Szpilplac ranking local session parse error:", e);
+    return null;
+  }
+}
+
+function renderStoredSessionImmediately(){
+  var stored=readStoredAuthSession();
+
+  if(stored && stored.user){
+    currentUser=stored.user;
+    currentProfile=null;
+    renderAccountStrip();
+
+    console.log("Szpilplac ranking localStorage session:", {
+      hasStoredSession:true,
+      email:stored.user.email || null,
+      id:stored.user.id || null,
+      storageKey:AUTH_STORAGE_KEY
+    });
+
+    return stored;
+  }
+
+  console.log("Szpilplac ranking localStorage session:", {
+    hasStoredSession:false,
+    storageKey:AUTH_STORAGE_KEY,
+    keys:Object.keys(localStorage).filter(function(k){
+      return k.indexOf("auth")!==-1 || k.indexOf("supabase")!==-1 || k.indexOf("sb-")===0 || k.indexOf("szpilplac-auth")===0;
+    })
+  });
+
+  return null;
+}
+
 async function loadAccount(){
   currentProfile=null;
 
-  var sessionResult = await sb.auth.getSession();
-  var session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
-  var user = session && session.user ? session.user : null;
+  // 1. Najpierw czytamy dokładnie ten localStorage,
+  // który diagnostyka pokazała jako działający.
+  var stored=renderStoredSessionImmediately();
 
-  if(!user){
-    user = await getSessionUser();
+  // 2. Dopiero potem pytamy klienta Supabase.
+  var session=null;
+  try{
+    var sessionResult=await sb.auth.getSession();
+    session=sessionResult && sessionResult.data ? sessionResult.data.session : null;
+  }catch(e){
+    console.warn("Szpilplac ranking getSession error:", e);
   }
 
-  currentUser=user || null;
+  // 3. Jeśli klient Supabase z jakiegoś powodu nie widzi sesji,
+  // ale localStorage ją ma, ustawiamy ją ręcznie w kliencie.
+  if(!session && stored && stored.access_token && stored.refresh_token){
+    try{
+      var setRes=await sb.auth.setSession({
+        access_token: stored.access_token,
+        refresh_token: stored.refresh_token
+      });
+      session=setRes && setRes.data ? setRes.data.session : null;
+      console.log("Szpilplac ranking setSession from localStorage:", {
+        ok:!!session,
+        error:setRes.error ? setRes.error.message : null
+      });
+    }catch(e){
+      console.warn("Szpilplac ranking setSession exception:", e);
+    }
+  }
 
-  // Kluczowa poprawka:
-  // jeśli sesja istnieje, pokazujemy zalogowanie od razu,
-  // zanim dociągniemy profil z tabeli profiles.
-  renderAccountStrip();
+  if(session && session.user){
+    currentUser=session.user;
+    renderAccountStrip();
+  }
 
-  console.log("Szpilplac ranking auth check:", {
-    hasSession: !!session,
-    hasUser: !!currentUser,
-    email: currentUser ? currentUser.email : null,
-    storageKey: AUTH_STORAGE_KEY
+  console.log("Szpilplac ranking auth final:", {
+    hasStoredSession:!!stored,
+    hasSupabaseSession:!!session,
+    hasUser:!!currentUser,
+    email:currentUser ? currentUser.email : null,
+    storageKey:AUTH_STORAGE_KEY
   });
 
   if(!currentUser){
@@ -366,18 +439,24 @@ async function loadAccount(){
     return;
   }
 
-  var res=await sb.from("profiles")
-    .select("id, login, display_name, rank_name, show_in_ranking")
-    .eq("id",currentUser.id)
-    .single();
+  // 4. Profil jest dodatkiem. Brak profilu nie ma już prawa
+  // udawać wylogowania.
+  try{
+    var res=await sb.from("profiles")
+      .select("id, login, display_name, rank_name, show_in_ranking")
+      .eq("id",currentUser.id)
+      .single();
 
-  console.log("Szpilplac ranking profile check:", {
-    error: res.error ? res.error.message : null,
-    profile: res.data || null
-  });
+    console.log("Szpilplac ranking profile final:", {
+      error:res.error ? res.error.message : null,
+      profile:res.data || null
+    });
 
-  if(!res.error){
-    currentProfile=res.data;
+    if(!res.error && res.data){
+      currentProfile=res.data;
+    }
+  }catch(e){
+    console.warn("Szpilplac ranking profile exception:", e);
   }
 
   renderAccountStrip();
@@ -473,15 +552,10 @@ async function boot(){
   applyLang();
   if(!initSupabase())return;
 
-  sb.auth.onAuthStateChange(async function(){
-    await loadAccount();
-    await loadRanking();
-  });
-
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v05");
+console.info("Szpilplac ranking.html v07-localStorage-hardfix");
 boot();
 </script>
 </body>

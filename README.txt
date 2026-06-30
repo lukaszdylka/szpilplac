@@ -1,4 +1,4 @@
-Szpilplac Auth v06 - ranking fix
+Szpilplac Auth v07 hardfix
 
 Wgraj wszystkie pliki naraz:
 - konto.html
@@ -7,15 +7,19 @@ Wgraj wszystkie pliki naraz:
 - auth-diagnostyka.html
 
 Najważniejsza zmiana:
-ranking.html pokazuje aktywną sesję od razu, zanim dociągnie profil gracza.
-Dzięki temu nie powinien zostawać na "Grasz bez konta", jeśli sesja istnieje.
+ranking.html nie polega już tylko na evencie/getSession.
+Najpierw czyta sesję bezpośrednio z localStorage pod kluczem:
+szpilplac-auth-v05
 
-Po wgraniu sprawdź:
-- /konto.html
-- /ranking.html?v=06
-- /auth-diagnostyka.html
+To jest ten sam klucz, który auth-diagnostyka pokazała jako aktywny.
 
-W konsoli powinno być:
-- Szpilplac konto.html v06
-- Szpilplac ranking.html v05
-- Szpilplac auth-widget.js v05
+Po wgraniu:
+1. /konto.html?v=07
+2. zaloguj się
+3. /auth-diagnostyka.html - ma pokazać Sesja v05 true
+4. /ranking.html?v=07
+
+W konsoli rankingu powinno być:
+Szpilplac ranking.html v07-localStorage-hardfix
+Szpilplac ranking localStorage session: hasStoredSession true
+Szpilplac ranking auth final: hasUser true
