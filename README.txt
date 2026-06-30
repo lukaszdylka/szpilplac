@@ -1,22 +1,31 @@
-Szpilplac v09 - profil i lokalizacja
+Szpilplac v10 - rangi
 
 Kolejność:
-1. Uruchom w Supabase SQL Editor plik:
-   supabase-profiles-location-v09.sql
+1. Uruchom w Supabase SQL Editor:
+   supabase-rangi-v10.sql
 
-2. Wgraj na stronę:
+2. Wgraj pliki:
    konto.html
    ranking.html
    auth-widget.js
    auth-diagnostyka.html
 
-Zmiany:
-- ranking: przy zalogowanym graczu przycisk "Mój profil" zamiast "Załóż konto"
-- krótsze, czystsze komunikaty
-- lepsza ikona domku do index.html
-- konto: opcjonalne województwo i miejscowość
-- profil: możliwość zmiany województwa i miejscowości
+Rangi zwykłe:
+Gorol -> Bajtel -> Karlus -> Chop -> Grubiorz -> Hajer -> Przodowy -> Sztajger
 
-Po wgraniu test:
-- /konto.html?v=09
-- /ranking.html?v=09
+Progi:
+Gorol: 0 pkt
+Bajtel: 100 pkt
+Karlus: 500 pkt
+Chop: 1500 pkt
+Grubiorz: 4000 pkt
+Hajer: 8000 pkt
+Przodowy: 15000 pkt
+Sztajger: 25000 pkt
+
+Ranga specjalna:
+Starzik - ustawiona tylko dla lukaszdylka@protonmail.com przez rank_override.
+
+Po wgraniu:
+- /konto.html?v=10
+- /ranking.html?v=10

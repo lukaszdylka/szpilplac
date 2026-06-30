@@ -164,7 +164,7 @@ footer a:hover{text-decoration:underline}
   <section class="card">
     <h2 data-i18n="howTitle">Jak liczymy?</h2>
     <p class="intro" data-i18n="howText">Punkty za gry i rangi gracza.</p>
-    <div class="small" data-i18n="howSmall">Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.</div>
+    <div class="small" data-i18n="howSmall">Rangi: Gorol, Bajtel, Karlus, Chop, Grubiorz, Hajer, Przodowy, Sztajger.</div>
   </section>
 </main>
 
@@ -212,7 +212,7 @@ var T={
     createAccount:"Załóż konto",
     howTitle:"Jak liczymy?",
     howText:"Punkty za gry i rangi gracza.",
-    howSmall:"Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.",
+    howSmall:"Rangi: Gorol, Bajtel, Karlus, Chop, Grubiorz, Hajer, Przodowy, Sztajger.",
     footerHome:"Szpilplac", footerAccount:"Konto", footerFamilock:"Familock",
     loading:"Ładuję ranking...",
     emptyTitle:"Ranking jest jeszcze pusty",
@@ -244,7 +244,7 @@ var T={
     createAccount:"Założ kōnto",
     howTitle:"Jak liczymy?",
     howText:"Punkty za szpile i rangi gracza.",
-    howSmall:"Planowane rangi: Bajtel, Karlus, Kamrat, Majster, Starzik.",
+    howSmall:"Rangi: Gorol, Bajtel, Karlus, Chop, Grubiorz, Hajer, Przodowy, Sztajger.",
     footerHome:"Szpilplac", footerAccount:"Kōnto", footerFamilock:"Familock",
     loading:"Ładuja ranking...",
     emptyTitle:"Ranking je jeszcze pusty",
@@ -466,7 +466,7 @@ async function loadAccount(){
 function renderAccountStrip(){
   if(currentProfile){
     var login=currentProfile.login||currentProfile.display_name||"gracz";
-    var rank=currentProfile.rank_name||"Bajtel";
+    var rank=currentProfile.rank_name||"Gorol";
     els.accountName.textContent=t("loggedAs").replace("{login}",login);
     els.accountMeta.textContent=t("loggedMeta").replace("{rank}",rank);
     els.accountBtn.textContent=t("profileBtn");
@@ -521,7 +521,7 @@ function renderRanking(rows){
     var login=row.login||row.display_name||"gracz";
     var isMe=myLogin && String(login).toLowerCase()===myLogin;
     var last=row.last_play ? new Date(row.last_play).toLocaleString("pl-PL") : t("noDate");
-    var rank=row.rank_name||"Bajtel";
+    var rank=row.rank_name||"Gorol";
     var points=Number(row.points)||0;
     var games=Number(row.games_played)||0;
     var wins=Number(row.wins)||0;
@@ -559,7 +559,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v09");
+console.info("Szpilplac ranking.html v10");
 boot();
 </script>
 </body>

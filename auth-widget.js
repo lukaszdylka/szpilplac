@@ -337,7 +337,7 @@
     }
 
     const login = STATE.profile.login || STATE.profile.display_name || "gracz";
-    const rank = STATE.profile.rank_name || "Bajtel";
+    const rank = STATE.profile.rank_name || "Gorol";
     const visible = STATE.profile.show_in_ranking === false ? " · " + t("hidden") : "";
 
     container.innerHTML = `
@@ -616,7 +616,7 @@
     setLanguage
   };
 
-  console.info("Szpilplac auth-widget.js v09");
+  console.info("Szpilplac auth-widget.js v10");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {

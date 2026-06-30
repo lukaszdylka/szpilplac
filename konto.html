@@ -142,11 +142,12 @@ footer a{color:var(--green);font-weight:800}
     <p class="hello" id="helloTitle">Cześć!</p>
     <p class="intro" id="profileIntro">Twój profil gracza.</p>
     <div class="profile-summary">
-      <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Bajtel</div></div>
+      <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Gorol</div></div>
       <div class="stat"><div class="label">Punkty</div><div class="value" id="sumPoints">0</div></div>
       <div class="stat"><div class="label">Gry</div><div class="value" id="sumGames">0</div></div>
       <div class="stat"><div class="label">Wygrane</div><div class="value" id="sumWins">0</div></div>
     </div>
+    <div class="small" style="margin:2px 0 10px;">Ścieżka rang: Gorol → Bajtel → Karlus → Chop → Grubiorz → Hajer → Przodowy → Sztajger.</div>
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
     <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
     <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
@@ -176,7 +177,7 @@ footer a{color:var(--green);font-weight:800}
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v09");
+console.info("Szpilplac konto.html v10");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = "2026-06-29";
@@ -330,7 +331,7 @@ function showLoggedInShell(user){
   els.profileIntro.textContent="Sesja jest aktywna. Dociągam profil gracza...";
   els.pLogin.textContent="—";
   els.pRanking.textContent="—";
-  els.sumRank.textContent="Bajtel";
+  els.sumRank.textContent="Gorol";
   els.toggleRankingBtn.disabled=true;
 }
 
@@ -398,7 +399,7 @@ async function loadProfile(){
     els.helloTitle.textContent="Cześć, "+login+"!";
     els.profileIntro.textContent="Twój profil gracza.";
     els.pLogin.textContent=profile.login||"-";
-    els.sumRank.textContent=profile.rank_name||"Bajtel";
+    els.sumRank.textContent=profile.rank_name||"Gorol";
     els.pRanking.textContent=profile.show_in_ranking?"widoczny":"ukryty";
     els.pVoivodeship.textContent=profile.voivodeship||"—";
     els.pCity.textContent=profile.city||"—";
