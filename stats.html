@@ -25,7 +25,7 @@ header{padding-top:20px}
 .site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
 .controls{display:flex;gap:7px}
 .icon-btn{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}.icon-btn:disabled{opacity:.45;cursor:wait}
 main{display:flex;flex-direction:column;gap:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:18px}
 h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 12px;line-height:1.05}h3{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.03em;margin:18px 0 9px;line-height:1.05}
@@ -63,6 +63,9 @@ footer a{color:var(--green);font-weight:800}
       <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
         <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.4 10 3l7 6.4"/><path d="M5 8.6V17h10V8.6"/><path d="M8 17v-5h4v5"/></svg>
       </a>
+      <button class="icon-btn" id="refreshBtn" type="button" title="Odśwież statystyki" aria-label="Odśwież statystyki">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 9a7 7 0 1 0-2 5"/><path d="M17 3v6h-6"/></svg>
+      </button>
       <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
     </div>
   </div>
@@ -81,12 +84,12 @@ footer a{color:var(--green);font-weight:800}
   </section>
 
   <section class="card hidden" id="oldNumbersCard">
-    <h2>Obecne statystyki gry</h2>
+    <h2>Obecne statystyki gier</h2>
     <div id="oldNumbers"></div>
   </section>
 
   <section class="card hidden" id="eventsCard">
-    <h2>Anonimowe eventy</h2>
+    <h2>Anonimowe zdarzenia</h2>
     <div id="eventsOverview" style="margin-bottom:12px;"></div>
     <div id="eventsByGame" style="margin-bottom:12px;"></div>
     <div id="eventsDaily"></div>
@@ -136,7 +139,7 @@ footer a{color:var(--green);font-weight:800}
 
 <script>
 "use strict";
-console.info("Szpilplac stats.html v12");
+console.info("Szpilplac stats.html v14-pl-refresh");
 
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
@@ -169,6 +172,15 @@ var theme=localStorage.getItem("szpilplac_theme")||"light";
 function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
 document.getElementById("themeBtn").onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();};
 applyTheme();
+
+var refreshBtn=document.getElementById("refreshBtn");
+var isRefreshing=false;
+if(refreshBtn){
+  refreshBtn.addEventListener("click",function(){
+    if(isRefreshing)return;
+    loadStats(true);
+  });
+}
 
 function setMsg(text,type){
   els.msg.textContent=text;
@@ -254,24 +266,136 @@ function renderOverview(row){
 }
 
 function titleize(key){
+  var k=String(key||"").toLowerCase();
   var map={
+    // ogólne
+    id:"ID",
+    day:"Dzień",
+    date:"Data",
+    created_at:"Utworzono",
+    updated_at:"Aktualizacja",
+    finished_at:"Zakończono",
+    last_event:"Ostatni event",
+    last_play:"Ostatnia gra",
+    last_day:"Ostatni dzień",
+    last_win:"Ostatnia wygrana",
+
+    // konta
     registered_players:"Zarejestrowani",
     visible_players:"Widoczni w rankingu",
     players_with_voivodeship:"Z województwem",
     players_with_city:"Z miejscowością",
-    total_results:"Wyniki",
     players_with_results:"Gracze z wynikami",
-    total_wins:"Wygrane",
-    total_points:"Punkty",
     active_today:"Aktywni dziś",
     active_7d:"Aktywni 7 dni",
     active_30d:"Aktywni 30 dni",
-    total_events:"Eventy",
+    login:"Login",
+    display_name:"Nazwa",
+    rank_name:"Ranga",
+    show_in_ranking:"Ranking",
+    voivodeship:"Województwo",
+    city:"Miejscowość",
+    games_played:"Gry",
+    points:"Punkty",
+
+    // wyniki
+    game:"Gra",
+    mode:"Tryb",
+    puzzle_no:"Numer",
+    puzzle_word:"Słowo",
+    word:"Słowo",
+    won:"Wygrana",
+    wins:"Wygrane",
+    total_wins:"Wygrane",
+    win_rate:"Skuteczność",
+    wpct:"% wygranych",
+    tries:"Próby",
+    guess_no:"Próba",
+    guesses:"Zgadywania",
+    errors:"Błędy",
+    score:"Wynik",
+    total_score:"Punkty razem",
+    total_points:"Punkty razem",
+    results:"Wyniki",
+    total_results:"Wyniki kont",
+    played:"Rozegrane",
+    total_played:"Rozegrane razem",
+    players:"Gracze",
+
+    // eventy
+    event:"Event",
+    event_type:"Typ eventu",
+    action:"Akcja",
+    total_events:"Eventy razem",
+    events:"Eventy",
     events_today:"Eventy dziś",
     events_7d:"Eventy 7 dni",
-    events_30d:"Eventy 30 dni"
+    events_30d:"Eventy 30 dni",
+    today:"Dziś",
+    last_7d:"Ostatnie 7 dni",
+    last_30d:"Ostatnie 30 dni",
+
+    // stare widoki
+    total:"Razem",
+    count:"Liczba",
+    cnt:"Liczba",
+    amount:"Liczba",
+    daily:"Dziennie",
+    distribution:"Rozkład",
+    dist:"Rozkład",
+    avg_tries:"Śr. prób",
+    average_tries:"Śr. prób",
+    avg_score:"Śr. wynik",
+    max_streak:"Najlepsza seria",
+    streak:"Seria",
+    hint:"Podpowiedź",
+    hints:"Podpowiedzi",
+    used_hint:"Użyto podpowiedzi",
+    lang:"Język",
+    language:"Język",
+    category:"Kategoria",
+    max_tries:"Limit prób",
+    device:"Urządzenie",
+    source:"Źródło",
+    path:"Ścieżka",
+    page:"Strona",
+    referrer:"Źródło wejścia"
   };
-  return map[key] || String(key).replace(/_/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});
+  if(map[k])return map[k];
+
+  return String(key)
+    .replace(/^stats[_\s-]*/i,"")
+    .replace(/_/g," ")
+    .replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
+function gameName(v){
+  var k=String(v||"").toLowerCase();
+  var map={
+    slowko:"Słōwko",
+    klodka:"Kłōdka",
+    zorta:"Raja",
+    raja:"Raja",
+    cuzamen:"Cuzamen"
+  };
+  return map[k]||v;
+}
+function valueForColumn(key, value){
+  var k=String(key||"").toLowerCase();
+  if(k==="game")return gameName(value);
+  if(k==="show_in_ranking")return value?"tak":"nie";
+  if(k==="won"||k==="last_win"||k==="used_hint")return value?"tak":"nie";
+  if(k==="mode"){
+    var m=String(value||"").toLowerCase();
+    if(m==="daily")return "dzienny";
+    if(m==="tester")return "testowy";
+    return value;
+  }
+  if(k==="lang"||k==="language"){
+    if(value==="pl")return "polski";
+    if(value==="szl")return "śląski";
+    return value;
+  }
+  return value;
 }
 function fmtVal(v){
   if(v==null||v==="")return "—";
@@ -291,7 +415,7 @@ function table(rows, cols, empty){
     rows.map(function(r){
       return '<tr>'+cols.map(function(c){
         var v=typeof c.value==="function"?c.value(r):r[c.key];
-        return '<td>'+esc(fmtVal(v))+'</td>';
+        return '<td>'+esc(fmtVal(valueForColumn(c.key||c.label,v)))+'</td>';
       }).join("")+'</tr>';
     }).join("")+
     '</tbody></table></div>';
@@ -324,7 +448,7 @@ function legacyBlock(title, rows){
   return html+table(rows,null,"Brak danych.");
 }
 
-async function loadStats(){
+async function loadStats(manualRefresh){
   if(!initSupabase())return;
 
   var session=await getSession();
@@ -335,7 +459,21 @@ async function loadStats(){
   }
 
   try{
-    setMsg("Ładuję statystyki...");
+    isRefreshing=true;
+    if(refreshBtn)refreshBtn.disabled=true;
+
+    [
+      els.oldNumbersCard,
+      els.eventsCard,
+      els.overviewCard,
+      els.ranksCard,
+      els.locationCard,
+      els.gamesCard,
+      els.dailyCard,
+      els.playersCard
+    ].forEach(function(card){ if(card)card.classList.add("hidden"); });
+
+    setMsg(manualRefresh ? "Odświeżam statystyki..." : "Ładuję statystyki...");
 
     var overview=await selectView("stats_admin_overview");
     if(!overview.length){
@@ -438,10 +576,13 @@ async function loadStats(){
     show(els.playersCard);
   }catch(err){
     setMsg("Nie udało się pobrać statystyk:\n"+err.message,"err");
+  }finally{
+    isRefreshing=false;
+    if(refreshBtn)refreshBtn.disabled=false;
   }
 }
 
-loadStats();
+loadStats(false);
 </script>
 </body>
 </html>
