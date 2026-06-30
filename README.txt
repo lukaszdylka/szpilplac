@@ -1,4 +1,4 @@
-Szpilplac Auth v07 hardfix
+Szpilplac Auth v08 login fix
 
 Wgraj wszystkie pliki naraz:
 - konto.html
@@ -6,20 +6,12 @@ Wgraj wszystkie pliki naraz:
 - auth-widget.js
 - auth-diagnostyka.html
 
-Najważniejsza zmiana:
-ranking.html nie polega już tylko na evencie/getSession.
-Najpierw czyta sesję bezpośrednio z localStorage pod kluczem:
-szpilplac-auth-v05
-
-To jest ten sam klucz, który auth-diagnostyka pokazała jako aktywny.
+Najważniejsza poprawka:
+konto.html po evencie SIGNED_IN natychmiast pokazuje profil.
+Jeśli signInWithPassword() nie zwróci odpowiedzi, ale sesja już istnieje,
+strona traktuje logowanie jako udane, a nie jako błąd timeoutu.
 
 Po wgraniu:
-1. /konto.html?v=07
-2. zaloguj się
-3. /auth-diagnostyka.html - ma pokazać Sesja v05 true
-4. /ranking.html?v=07
-
-W konsoli rankingu powinno być:
-Szpilplac ranking.html v07-localStorage-hardfix
-Szpilplac ranking localStorage session: hasStoredSession true
-Szpilplac ranking auth final: hasUser true
+1. /auth-diagnostyka.html -> Wyczyść lokalne sesje auth
+2. /konto.html?v=08 -> zaloguj się
+3. /ranking.html?v=08

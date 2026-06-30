@@ -10,105 +10,71 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
-
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root{
-  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
-  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
-  --green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;
-  --sh:0 6px 18px -10px rgba(35,32,26,.4);
-}
-[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5);}
-*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
-html,body{margin:0;min-height:100%}
-body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
-  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
-  align-items:center;padding:0 16px 40px;min-height:100vh}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
 a{color:inherit;text-decoration:none}
-:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
-
-header{width:100%;max-width:480px;padding-top:20px}
+header,main,footer{width:100%;max-width:520px}
+header{padding-top:20px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.site-name{font-family:"Oswald";font-size:clamp(26px,8vw,38px);font-weight:700;letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
+.site-name{font-family:"Oswald";font-size:clamp(30px,9vw,44px);font-weight:700;text-transform:uppercase;line-height:1}
 .site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
-.controls{display:flex;gap:6px;align-items:center}
-.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-.icon-btn:hover{background:var(--surface);color:var(--ink)}
-.icon-btn svg{display:block;flex:none}
-
-main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:18px}
-.card h2{font-family:"Oswald";font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:var(--ink);line-height:1.05}
-.intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
-.muted{color:var(--ink2);line-height:1.5}
-.small{font-size:11.5px;color:var(--ink2);line-height:1.45}
-
-.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);margin-bottom:16px}
-.tab{flex:1;font-size:12.5px;font-weight:800;padding:8px 6px;border-radius:999px;color:var(--ink2);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.controls{display:flex;gap:6px}
+.icon-btn{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+main{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:20px}
+h2{font-family:"Oswald";font-size:23px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 8px;line-height:1.05}
+.intro{font-size:13px;color:var(--ink2);line-height:1.5;margin:0 0 16px}
+.small{font-size:12px;color:var(--ink2);line-height:1.45}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);margin-bottom:18px}
+.tab{flex:1;font-size:12.5px;font-weight:800;padding:9px 6px;border-radius:999px;color:var(--ink2);text-transform:uppercase}
 .tab.active{background:var(--green);color:#fff}
-
-form{display:grid;gap:12px}
-label.field{display:grid;gap:6px;font-weight:700;color:var(--ink);font-size:13px}
-input[type="email"],input[type="password"],input[type="text"]{
-  width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;
-  background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;outline:none}
-input::placeholder{color:var(--ink2);opacity:.7}
-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.18)}
-.check{display:flex;align-items:flex-start;gap:9px;line-height:1.4;color:var(--ink2);font-weight:500;font-size:12.5px}
-.check input{margin-top:2px;accent-color:var(--green)}
-
-.btn{border-radius:11px;padding:11px 14px;background:var(--green);color:#fff;font-weight:800;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
-.btn:hover{filter:brightness(1.06)}
+.panel{display:none}.panel.active{display:block}.hidden{display:none!important}
+form{display:grid;gap:13px}
+label.field{display:grid;gap:7px;font-weight:800;font-size:13px}
+input[type=email],input[type=password],input[type=text]{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#e8eef9;color:#000;font:inherit;font-size:15px;outline:none}
+[data-theme=dark] input[type=email],[data-theme=dark] input[type=password],[data-theme=dark] input[type=text]{background:#e8eef9;color:#000}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.2)}
+.check{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink2);line-height:1.4}
+.check input{margin-top:3px;accent-color:var(--green)}
+.btn{border-radius:12px;padding:12px 15px;background:var(--green);color:#fff;font-weight:900;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
 .btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
-.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
 .btn.gold{background:var(--gold);color:#20170d}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-
-.msg{margin:0;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--surface2);color:var(--ink2);line-height:1.5;font-size:13px;white-space:pre-wrap}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
 .msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
 .msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
-.panel{display:none}
-.panel.active{display:block}
-.hidden{display:none !important}
-
-.hello{font-family:"Oswald";font-size:30px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05;margin:0}
-.profile-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.hello{font-family:"Oswald";font-size:31px;text-transform:uppercase;margin:0 0 6px;line-height:1.05}
+.profile-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
 .stat{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:800}
-.stat .value{font-family:"Oswald";font-size:23px;line-height:1.1;margin-top:4px;color:var(--ink)}
+.stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900}
+.stat .value{font-family:"Oswald";font-size:24px;line-height:1.1;margin-top:4px}
 .profile-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
-.profile-row:last-of-type{border-bottom:0}
-.profile-row strong{color:var(--ink2);font-weight:700}
-.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.sub-head{font-family:"Oswald";font-size:15px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink);margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.profile-row strong{color:var(--ink2)}
+.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.sub-head{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
 .result{padding:10px 0;border-bottom:1px solid var(--line)}
-.result:last-child{border-bottom:0}
-.pill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--ink);font-family:"Oswald";letter-spacing:.02em}
+.pill{display:inline-flex;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:800;font-family:"Oswald"}
 .result-meta{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:5px}
 .recovery-box{border:1px solid var(--gold);background:rgba(191,138,58,.1);border-radius:12px;padding:12px;margin-bottom:14px;color:var(--ink2);font-size:12.5px;line-height:1.5}
-
-footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
-footer a{color:var(--green);font-weight:600}
-@media(max-width:420px){.profile-summary{grid-template-columns:1fr}}
+footer{text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
+footer a{color:var(--green);font-weight:800}
+@media(max-width:420px){.profile-summary{grid-template-columns:1fr}.profile-row{grid-template-columns:1fr;gap:2px}}
 </style>
 </head>
-
 <body>
 <header>
   <div class="topbar">
-    <div>
-      <div class="site-name">Szpilplac</div>
-      <div class="site-sub">Konto gracza</div>
-    </div>
+    <div><div class="site-name">Szpilplac</div><div class="site-sub">Konto gracza</div></div>
     <div class="controls">
-      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
-      </a>
-      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw"></button>
+      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">⌂</a>
+      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
     </div>
   </div>
 </header>
@@ -117,9 +83,7 @@ footer a{color:var(--green);font-weight:600}
   <div id="globalMsg" class="msg hidden"></div>
 
   <section class="card" id="authCard">
-    <div id="recoveryNotice" class="recovery-box hidden">
-      Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej. Po zapisaniu hasła konto zostanie normalnie zalogowane.
-    </div>
+    <div id="recoveryNotice" class="recovery-box hidden">Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej.</div>
 
     <div class="tabs" id="tabs">
       <button class="tab active" type="button" data-tab="register">Załóż konto</button>
@@ -130,39 +94,14 @@ footer a{color:var(--green);font-weight:600}
     <div id="register" class="panel active">
       <h2>Załóż konto</h2>
       <p class="intro">Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.</p>
-
       <form id="registerForm">
-        <label class="field">
-          <span>Login do rankingu</span>
-          <input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24">
-        </label>
+        <label class="field">Login do rankingu<input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24"></label>
         <div class="small">3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
-
-        <label class="field">
-          <span>E-mail</span>
-          <input id="regEmail" type="email" autocomplete="email" placeholder="twoj@mail.pl" required>
-        </label>
-
-        <label class="field">
-          <span>Hasło</span>
-          <input id="regPassword" type="password" autocomplete="new-password" required minlength="8">
-        </label>
-
-        <label class="field">
-          <span>Powtórz hasło</span>
-          <input id="regPassword2" type="password" autocomplete="new-password" required minlength="8">
-        </label>
-
-        <label class="check">
-          <input id="regTerms" type="checkbox" required>
-          <span>Akceptuję regulamin Szpilplaca i politykę prywatności.</span>
-        </label>
-
-        <label class="check">
-          <input id="regMarketing" type="checkbox">
-          <span>Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span>
-        </label>
-
+        <label class="field">E-mail<input id="regEmail" type="email" autocomplete="email" placeholder="twoj@mail.pl" required></label>
+        <label class="field">Hasło<input id="regPassword" type="password" autocomplete="new-password" required minlength="8"></label>
+        <label class="field">Powtórz hasło<input id="regPassword2" type="password" autocomplete="new-password" required minlength="8"></label>
+        <label class="check"><input id="regTerms" type="checkbox" required><span>Akceptuję regulamin Szpilplaca i politykę prywatności.</span></label>
+        <label class="check"><input id="regMarketing" type="checkbox"><span>Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span></label>
         <button class="btn" type="submit">Załóż konto</button>
       </form>
     </div>
@@ -171,45 +110,25 @@ footer a{color:var(--green);font-weight:600}
       <h2>Zaloguj się</h2>
       <p class="intro">Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.</p>
       <form id="loginForm">
-        <label class="field">
-          <span>E-mail</span>
-          <input id="loginEmail" type="email" autocomplete="email" required>
-        </label>
-        <label class="field">
-          <span>Hasło</span>
-          <input id="loginPassword" type="password" autocomplete="current-password" required>
-        </label>
+        <label class="field">E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
+        <label class="field">Hasło<input id="loginPassword" type="password" autocomplete="current-password" required></label>
         <button class="btn" type="submit">Zaloguj się</button>
       </form>
-      <p class="small" style="margin-top:12px;">
-        Jeśli logowanie wariuje po testach:
-        <button type="button" id="clearAuthBtn" style="font:inherit;font-weight:800;text-decoration:underline;color:var(--green);padding:0;">wyczyść lokalną sesję</button>.
-      </p>
+      <p class="small" style="margin-top:12px;">Jeśli logowanie wariuje po testach: <button type="button" id="clearAuthBtn" style="font:inherit;font-weight:900;text-decoration:underline;color:var(--green);padding:0;">wyczyść lokalną sesję</button>.</p>
     </div>
 
     <div id="reset" class="panel">
       <h2 id="resetTitle">Reset hasła</h2>
       <p class="intro" id="resetIntro">Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.</p>
-
       <form id="resetForm">
-        <label class="field">
-          <span>E-mail</span>
-          <input id="resetEmail" type="email" autocomplete="email" required>
-        </label>
+        <label class="field">E-mail<input id="resetEmail" type="email" autocomplete="email" required></label>
         <button class="btn" type="submit">Wyślij link resetujący</button>
       </form>
-
       <div id="newPasswordBox" class="hidden" style="margin-top:18px;">
         <h2>Ustaw nowe hasło</h2>
         <form id="newPasswordForm">
-          <label class="field">
-            <span>Nowe hasło</span>
-            <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
-          </label>
-          <label class="field">
-            <span>Powtórz nowe hasło</span>
-            <input id="newPassword2" type="password" autocomplete="new-password" minlength="8" required>
-          </label>
+          <label class="field">Nowe hasło<input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+          <label class="field">Powtórz nowe hasło<input id="newPassword2" type="password" autocomplete="new-password" minlength="8" required></label>
           <button class="btn" type="submit">Zapisz nowe hasło</button>
         </form>
       </div>
@@ -218,31 +137,16 @@ footer a{color:var(--green);font-weight:600}
 
   <section class="card hidden" id="profileCard">
     <p class="hello" id="helloTitle">Cześć!</p>
-    <p class="intro">To Twoje konto gracza w Szpilplacu.</p>
-
+    <p class="intro" id="profileIntro">To Twoje konto gracza w Szpilplacu.</p>
     <div class="profile-summary">
-      <div class="stat">
-        <div class="label">Ranga</div>
-        <div class="value" id="sumRank">Bajtel</div>
-      </div>
-      <div class="stat">
-        <div class="label">Punkty</div>
-        <div class="value" id="sumPoints">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Gry</div>
-        <div class="value" id="sumGames">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Wygrane</div>
-        <div class="value" id="sumWins">0</div>
-      </div>
+      <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Bajtel</div></div>
+      <div class="stat"><div class="label">Punkty</div><div class="value" id="sumPoints">0</div></div>
+      <div class="stat"><div class="label">Gry</div><div class="value" id="sumGames">0</div></div>
+      <div class="stat"><div class="label">Wygrane</div><div class="value" id="sumWins">0</div></div>
     </div>
-
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
     <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
     <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
-
     <div class="profile-actions">
       <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
       <a class="btn gold" href="ranking.html">Ranking</a>
@@ -250,602 +154,475 @@ footer a{color:var(--green);font-weight:600}
       <a class="btn secondary" id="deleteRequestBtn" href="mailto:kontakt@familock.pl?subject=Usuni%C4%99cie%20konta%20Szpilplac">Poproś o usunięcie konta</a>
       <button type="button" class="btn danger" id="logoutBtn">Wyloguj</button>
     </div>
-
     <div class="sub-head">Ostatnie wyniki z konta</div>
     <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
   </section>
 
-  <footer>
-    <p>
-      <a href="index.html">Szpilplac</a>
-      ·
-      <a href="ranking.html">Ranking</a>
-      ·
-      <a href="https://familock.pl" rel="noopener">Familock</a>
-    </p>
-  </footer>
+  <footer><p><a href="index.html">Szpilplac</a> · <a href="ranking.html">Ranking</a> · <a href="auth-diagnostyka.html">Diagnostyka</a> · <a href="https://familock.pl" rel="noopener">Familock</a></p></footer>
 </main>
 
 <script>
 "use strict";
+console.info("Szpilplac konto.html v08");
 
+var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = "2026-06-29";
 var PRIVACY_VERSION = "2026-06-29";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
-var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var sb = null;
 var recoveryMode = false;
 var currentUser = null;
 var currentProfile = null;
-var initialUrl = new URL(window.location.href);
 
 var els = {
-  globalMsg: document.getElementById("globalMsg"),
-  authCard: document.getElementById("authCard"),
-  profileCard: document.getElementById("profileCard"),
-  tabs: document.getElementById("tabs"),
-  recoveryNotice: document.getElementById("recoveryNotice"),
-
-  registerForm: document.getElementById("registerForm"),
-  loginForm: document.getElementById("loginForm"),
-  resetForm: document.getElementById("resetForm"),
-  newPasswordForm: document.getElementById("newPasswordForm"),
-  newPasswordBox: document.getElementById("newPasswordBox"),
-
-  regLogin: document.getElementById("regLogin"),
-  regEmail: document.getElementById("regEmail"),
-  regPassword: document.getElementById("regPassword"),
-  regPassword2: document.getElementById("regPassword2"),
-  regTerms: document.getElementById("regTerms"),
-  regMarketing: document.getElementById("regMarketing"),
-
-  loginEmail: document.getElementById("loginEmail"),
-  loginPassword: document.getElementById("loginPassword"),
-  resetEmail: document.getElementById("resetEmail"),
-  newPassword: document.getElementById("newPassword"),
-  newPassword2: document.getElementById("newPassword2"),
-
-  resetTitle: document.getElementById("resetTitle"),
-  resetIntro: document.getElementById("resetIntro"),
-
-  helloTitle: document.getElementById("helloTitle"),
-  sumRank: document.getElementById("sumRank"),
-  sumPoints: document.getElementById("sumPoints"),
-  sumGames: document.getElementById("sumGames"),
-  sumWins: document.getElementById("sumWins"),
-  pEmail: document.getElementById("pEmail"),
-  pLogin: document.getElementById("pLogin"),
-  pRanking: document.getElementById("pRanking"),
-  resultsBox: document.getElementById("resultsBox"),
-  toggleRankingBtn: document.getElementById("toggleRankingBtn"),
-  deleteRequestBtn: document.getElementById("deleteRequestBtn"),
-  logoutBtn: document.getElementById("logoutBtn")
+  globalMsg:document.getElementById("globalMsg"),
+  authCard:document.getElementById("authCard"),
+  profileCard:document.getElementById("profileCard"),
+  tabs:document.getElementById("tabs"),
+  recoveryNotice:document.getElementById("recoveryNotice"),
+  registerForm:document.getElementById("registerForm"),
+  loginForm:document.getElementById("loginForm"),
+  resetForm:document.getElementById("resetForm"),
+  newPasswordForm:document.getElementById("newPasswordForm"),
+  newPasswordBox:document.getElementById("newPasswordBox"),
+  regLogin:document.getElementById("regLogin"),
+  regEmail:document.getElementById("regEmail"),
+  regPassword:document.getElementById("regPassword"),
+  regPassword2:document.getElementById("regPassword2"),
+  regTerms:document.getElementById("regTerms"),
+  regMarketing:document.getElementById("regMarketing"),
+  loginEmail:document.getElementById("loginEmail"),
+  loginPassword:document.getElementById("loginPassword"),
+  resetEmail:document.getElementById("resetEmail"),
+  newPassword:document.getElementById("newPassword"),
+  newPassword2:document.getElementById("newPassword2"),
+  resetTitle:document.getElementById("resetTitle"),
+  resetIntro:document.getElementById("resetIntro"),
+  helloTitle:document.getElementById("helloTitle"),
+  profileIntro:document.getElementById("profileIntro"),
+  sumRank:document.getElementById("sumRank"),
+  sumPoints:document.getElementById("sumPoints"),
+  sumGames:document.getElementById("sumGames"),
+  sumWins:document.getElementById("sumWins"),
+  pEmail:document.getElementById("pEmail"),
+  pLogin:document.getElementById("pLogin"),
+  pRanking:document.getElementById("pRanking"),
+  resultsBox:document.getElementById("resultsBox"),
+  toggleRankingBtn:document.getElementById("toggleRankingBtn"),
+  deleteRequestBtn:document.getElementById("deleteRequestBtn"),
+  logoutBtn:document.getElementById("logoutBtn")
 };
 
-function setMsg(text, type) {
-  els.globalMsg.textContent = text;
-  els.globalMsg.className = "msg" + (type ? " " + type : "");
-  els.globalMsg.classList.remove("hidden");
-}
-function clearMsg() {
-  els.globalMsg.textContent = "";
-  els.globalMsg.className = "msg hidden";
-}
-function setBusy(form, busy) {
-  form.querySelectorAll("button,input").forEach(function (el) { el.disabled = busy; });
-}
-function withTimeout(promise, ms, label) {
-  return Promise.race([
-    promise,
-    new Promise(function (_, reject) {
-      setTimeout(function () { reject(new Error(label || "timeout")); }, ms);
-    })
-  ]);
-}
-function niceError(error) {
-  if (!error) return "Nieznany błąd.";
-  var msg = error.message || String(error);
-  if (msg.includes("User already registered")) return "Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.";
-  if (msg.includes("Invalid login credentials")) return "Nieprawidłowy e-mail albo hasło.";
-  if (msg.includes("Email not confirmed")) return "Najpierw potwierdź e-mail linkiem z wiadomości.";
-  if (msg.includes("duplicate key")) return "Ten login jest już zajęty.";
-  if (msg.includes("profiles_login_format_chk")) return "Login ma niedozwolone znaki.";
-  if (msg.includes("profiles_login_length_chk")) return "Login musi mieć od 3 do 24 znaków.";
-  if (msg.includes("timeout")) return "Operacja trwa zbyt długo. Spróbuj ponownie za chwilę.";
-  if (msg.includes("Auth session missing")) return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
-  return msg;
-}
-function getRedirectUrl(extra) {
-  var url = new URL(window.location.href);
-  url.search = extra || "";
-  url.hash = "";
-  return url.toString();
-}
-function cleanUrl() {
-  history.replaceState({}, document.title, window.location.pathname);
-}
-function escapeHtml(value) {
-  return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
-  });
-}
-
 var theme = localStorage.getItem("szpilplac_theme") || "light";
-function applyTheme() {
-  document.documentElement.setAttribute("data-theme", theme);
-  document.getElementById("themeBtn").innerHTML = theme === "dark"
-    ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
-    : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/></svg>';
-}
-document.getElementById("themeBtn").addEventListener("click", function () {
-  theme = theme === "light" ? "dark" : "light";
-  localStorage.setItem("szpilplac_theme", theme);
-  applyTheme();
-});
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
+document.getElementById("themeBtn").onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();};
 applyTheme();
 
-function switchTab(id) {
-  document.querySelectorAll(".tab").forEach(function (btn) {
-    btn.classList.toggle("active", btn.dataset.tab === id);
+function setMsg(text,type){els.globalMsg.textContent=text;els.globalMsg.className="msg"+(type?" "+type:"");els.globalMsg.classList.remove("hidden");}
+function clearMsg(){els.globalMsg.textContent="";els.globalMsg.className="msg hidden";}
+function setBusy(form,busy){form.querySelectorAll("button,input").forEach(function(el){el.disabled=busy;});}
+function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+function withTimeout(promise,ms,label){return Promise.race([promise,new Promise(function(_,reject){setTimeout(function(){reject(new Error(label||"timeout"));},ms);})]);}
+function niceError(error){
+  if(!error)return "Nieznany błąd.";
+  var msg=error.message||String(error);
+  if(msg.includes("User already registered"))return "Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.";
+  if(msg.includes("Invalid login credentials"))return "Nieprawidłowy e-mail albo hasło.";
+  if(msg.includes("Email not confirmed"))return "Najpierw potwierdź e-mail linkiem z wiadomości.";
+  if(msg.includes("duplicate key"))return "Ten login jest już zajęty.";
+  if(msg.includes("timeout"))return "Operacja trwa zbyt długo, ale sprawdzam jeszcze, czy sesja już powstała.";
+  if(msg.includes("Auth session missing"))return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
+  return msg;
+}
+function escapeHtml(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+function getRedirectUrl(extra){var url=new URL(window.location.href);url.search=extra||"";url.hash="";return url.toString();}
+function cleanUrl(){history.replaceState({},document.title,window.location.pathname);}
+
+function initSupabase(){
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak konfiguracji Supabase.", "err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano biblioteki Supabase JS.", "err");return false;}
+  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
   });
-  document.querySelectorAll(".panel").forEach(function (panel) {
-    panel.classList.toggle("active", panel.id === id);
-  });
+  return true;
+}
+
+function switchTab(id){
+  document.querySelectorAll(".tab").forEach(function(btn){btn.classList.toggle("active",btn.dataset.tab===id);});
+  document.querySelectorAll(".panel").forEach(function(panel){panel.classList.toggle("active",panel.id===id);});
   clearMsg();
 }
-document.querySelectorAll(".tab").forEach(function (btn) {
-  btn.addEventListener("click", function () { switchTab(btn.dataset.tab); });
-});
+document.querySelectorAll(".tab").forEach(function(btn){btn.onclick=function(){switchTab(btn.dataset.tab);};});
 
-function enterRecoveryMode(message) {
-  recoveryMode = true;
+function showLoggedOut(){
+  if(recoveryMode)return;
+  currentUser=null;currentProfile=null;
+  els.authCard.classList.remove("hidden");
+  els.profileCard.classList.add("hidden");
+}
+function showLoggedInShell(user){
+  currentUser=user||currentUser;
+  els.authCard.classList.add("hidden");
+  els.profileCard.classList.remove("hidden");
+  els.pEmail.textContent=currentUser&&currentUser.email?currentUser.email:"-";
+  els.helloTitle.textContent="Cześć!";
+  els.profileIntro.textContent="Sesja jest aktywna. Dociągam profil gracza...";
+  els.pLogin.textContent="—";
+  els.pRanking.textContent="—";
+  els.sumRank.textContent="Bajtel";
+  els.toggleRankingBtn.disabled=true;
+}
+
+async function getSession(){
+  try{
+    var r=await sb.auth.getSession();
+    if(r&&r.data&&r.data.session)return r.data.session;
+  }catch(e){console.warn("getSession error",e);}
+  return null;
+}
+function getStoredSession(){
+  try{
+    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
+    if(!raw)return null;
+    var data=JSON.parse(raw);
+    return data.currentSession||data.session||data;
+  }catch(e){return null;}
+}
+async function getBestSession(){
+  var s=await getSession();
+  if(s&&s.user)return s;
+  var stored=getStoredSession();
+  if(stored&&stored.user&&stored.access_token&&stored.refresh_token){
+    try{
+      var setRes=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
+      if(setRes&&setRes.data&&setRes.data.session)return setRes.data.session;
+    }catch(e){console.warn("setSession from localStorage error",e);}
+    return stored;
+  }
+  return null;
+}
+async function waitForSession(ms){
+  var started=Date.now();
+  while(Date.now()-started<ms){
+    var s=await getBestSession();
+    if(s&&s.user)return s;
+    await sleep(250);
+  }
+  return null;
+}
+
+async function loadProfile(){
+  if(!sb||recoveryMode)return;
+
+  var session=await getBestSession();
+  if(!session||!session.user){showLoggedOut();return;}
+
+  showLoggedInShell(session.user);
+
+  var profile=null;
+  try{
+    var res=await withTimeout(
+      sb.from("profiles").select("id, login, display_name, rank_name, show_in_ranking").eq("id",session.user.id).single(),
+      9000,
+      "profile_timeout"
+    );
+    if(!res.error&&res.data)profile=res.data;
+  }catch(e){
+    console.warn("profile load error",e);
+  }
+
+  if(profile){
+    currentProfile=profile;
+    var login=profile.login||profile.display_name||"graczu";
+    els.helloTitle.textContent="Cześć, "+login+"!";
+    els.profileIntro.textContent="To Twoje konto gracza w Szpilplacu.";
+    els.pLogin.textContent=profile.login||"-";
+    els.sumRank.textContent=profile.rank_name||"Bajtel";
+    els.pRanking.textContent=profile.show_in_ranking?"widoczny":"ukryty";
+    els.toggleRankingBtn.disabled=false;
+    els.toggleRankingBtn.textContent=profile.show_in_ranking?"Ukryj mnie z rankingu":"Pokaż mnie w rankingu";
+
+    var mailSubject=encodeURIComponent("Usunięcie konta Szpilplac");
+    var mailBody=encodeURIComponent("Proszę o usunięcie mojego konta Szpilplac.\n\nLogin: "+(profile.login||"-")+"\nE-mail: "+(session.user.email||"-")+"\n\nRozumiem, że po usunięciu konta zniknie profil, zgody i zapisane wyniki.");
+    els.deleteRequestBtn.href="mailto:kontakt@familock.pl?subject="+mailSubject+"&body="+mailBody;
+  }else{
+    els.profileIntro.textContent="Sesja jest aktywna, ale nie udało się odczytać profilu. Możesz przejść do rankingu lub odświeżyć stronę.";
+  }
+
+  await loadResults(session.user.id);
+}
+
+async function loadResults(userId){
+  try{
+    var res=await withTimeout(
+      sb.from("user_game_results").select("game, mode, puzzle_no, won, tries, errors, score, finished_at").eq("user_id",userId).order("finished_at",{ascending:false}).limit(20),
+      9000,
+      "results_timeout"
+    );
+
+    if(res.error){els.resultsBox.textContent="Błąd odczytu wyników: "+res.error.message;return;}
+
+    var data=res.data||[];
+    var games=data.length;
+    var wins=data.filter(function(r){return r.won;}).length;
+    var points=data.reduce(function(sum,r){return sum+(Number(r.score)||0);},0);
+    els.sumGames.textContent=String(games);
+    els.sumWins.textContent=String(wins);
+    els.sumPoints.textContent=String(points);
+
+    if(!data.length){els.resultsBox.textContent="Brak zapisanych wyników na koncie.";return;}
+
+    els.resultsBox.innerHTML=data.slice(0,10).map(function(row){
+      var won=row.won?"wygrana":"porażka";
+      var when=row.finished_at?new Date(row.finished_at).toLocaleString("pl-PL"):"";
+      return '<div class="result"><span class="pill">'+escapeHtml(row.game)+' #'+escapeHtml(row.puzzle_no)+'</span><div class="result-meta">'+won+', '+escapeHtml(row.score)+' pkt, próby: '+(row.tries!=null?escapeHtml(row.tries):'-')+', błędy: '+(row.errors!=null?escapeHtml(row.errors):'-')+'<br>'+escapeHtml(when)+'</div></div>';
+    }).join("");
+  }catch(e){
+    els.resultsBox.textContent="Nie udało się odczytać wyników. Sesja konta nadal jest aktywna.";
+  }
+}
+
+function enterRecoveryMode(message){
+  recoveryMode=true;
   els.authCard.classList.remove("hidden");
   els.profileCard.classList.add("hidden");
   els.recoveryNotice.classList.remove("hidden");
   els.tabs.classList.add("hidden");
   els.resetForm.classList.add("hidden");
   els.newPasswordBox.classList.remove("hidden");
-  els.resetTitle.textContent = "Ustaw nowe hasło";
-  els.resetIntro.textContent = "Wpisz nowe hasło i zapisz zmianę. Po udanej zmianie zostaniesz zalogowany.";
+  els.resetTitle.textContent="Ustaw nowe hasło";
+  els.resetIntro.textContent="Wpisz nowe hasło i zapisz zmianę.";
   switchTab("reset");
-  if (message) setMsg(message, "ok");
+  if(message)setMsg(message,"ok");
 }
-
-function exitRecoveryMode() {
-  recoveryMode = false;
+function exitRecoveryMode(){
+  recoveryMode=false;
   els.recoveryNotice.classList.add("hidden");
   els.tabs.classList.remove("hidden");
   els.resetForm.classList.remove("hidden");
   els.newPasswordBox.classList.add("hidden");
-  els.resetTitle.textContent = "Reset hasła";
-  els.resetIntro.textContent = "Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.";
+  els.resetTitle.textContent="Reset hasła";
+  els.resetIntro.textContent="Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.";
 }
 
-function showLoggedOut() {
-  if (recoveryMode) return;
-  currentUser = null;
-  currentProfile = null;
-  els.authCard.classList.remove("hidden");
-  els.profileCard.classList.add("hidden");
-}
-function showLoggedIn() {
-  if (recoveryMode) return;
-  els.authCard.classList.add("hidden");
-  els.profileCard.classList.remove("hidden");
-}
-
-function initSupabase() {
-  var cfg = window.SZPILPLAC_CONFIG || {};
-  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
-    setMsg("Brak konfiguracji Supabase. Upewnij się, że konto.html leży obok config.js.", "err");
-    return false;
+document.addEventListener("click",function(e){
+  if(e.target&&e.target.id==="clearAuthBtn"){
+    try{
+      Object.keys(localStorage).forEach(function(key){
+        if(key.indexOf("auth")!==-1||key.indexOf("supabase")!==-1||key.indexOf("sb-")===0||key.indexOf("szpilplac-auth")===0)localStorage.removeItem(key);
+      });
+    }catch(err){}
+    setMsg("Wyczyszczono lokalne sesje. Teraz zaloguj się ponownie.", "ok");
   }
-  if (!window.supabase) {
-    setMsg("Nie udało się załadować biblioteki Supabase JS.", "err");
-    return false;
-  }
-  sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
-    auth: {
-      storageKey: AUTH_STORAGE_KEY,
-      detectSessionInUrl: true,
-      persistSession: true,
-      autoRefreshToken: true
-    }
-  });
-  return true;
-}
+});
 
-async function getSessionUser() {
-  var s = await sb.auth.getSession();
-  if (s && s.data && s.data.session && s.data.session.user) {
-    return s.data.session.user;
-  }
-
-  var r = await sb.auth.getUser();
-  if (r.error) return null;
-  return r.data.user || null;
-}
-
-async function getCurrentSession() {
-  var s = await sb.auth.getSession();
-  return s && s.data ? s.data.session : null;
-}
-
-async function waitForSession(ms) {
-  var started = Date.now();
-  while (Date.now() - started < ms) {
-    var session = await getCurrentSession();
-    if (session && session.user) return session;
-    await new Promise(function (resolve) { setTimeout(resolve, 250); });
-  }
-  return null;
-}
-
-async function loadProfile() {
-  if (!sb) return;
-  if (recoveryMode) return;
-
-  var user = await getSessionUser();
-  currentUser = user;
-
-  if (!user) {
-    showLoggedOut();
-    return;
-  }
-
-  showLoggedIn();
-  els.pEmail.textContent = user.email || "-";
-
-  var res = await sb.from("profiles")
-    .select("id, login, display_name, rank_name, show_in_ranking")
-    .eq("id", user.id)
-    .single();
-
-  if (res.error) {
-    currentProfile = null;
-    els.helloTitle.textContent = "Błąd odczytu profilu";
-    els.pLogin.textContent = "-";
-    els.sumRank.textContent = "-";
-    els.pRanking.textContent = "-";
-    els.toggleRankingBtn.disabled = true;
-  } else {
-    var profile = res.data;
-    currentProfile = profile;
-    var login = profile.login || profile.display_name || "graczu";
-    els.helloTitle.textContent = "Cześć, " + login + "!";
-    els.pLogin.textContent = profile.login || "-";
-    els.sumRank.textContent = profile.rank_name || "Bajtel";
-    els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
-    els.toggleRankingBtn.disabled = false;
-    els.toggleRankingBtn.textContent = profile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
-
-    var mailSubject = encodeURIComponent("Usunięcie konta Szpilplac");
-    var mailBody = encodeURIComponent(
-      "Proszę o usunięcie mojego konta Szpilplac.\n\n" +
-      "Login: " + (profile.login || "-") + "\n" +
-      "E-mail: " + (user.email || "-") + "\n\n" +
-      "Rozumiem, że po usunięciu konta zniknie profil, zgody i zapisane wyniki."
-    );
-    els.deleteRequestBtn.href = "mailto:kontakt@familock.pl?subject=" + mailSubject + "&body=" + mailBody;
-  }
-
-  await loadResults(user.id);
-}
-
-async function loadResults(userId) {
-  var res = await sb.from("user_game_results")
-    .select("game, mode, puzzle_no, won, tries, errors, score, finished_at")
-    .eq("user_id", userId)
-    .order("finished_at", {ascending:false})
-    .limit(20);
-
-  if (res.error) {
-    els.resultsBox.textContent = "Błąd odczytu wyników: " + niceError(res.error);
-    return;
-  }
-
-  var data = res.data || [];
-  var games = data.length;
-  var wins = data.filter(function (r) { return r.won; }).length;
-  var points = data.reduce(function (sum, r) { return sum + (Number(r.score) || 0); }, 0);
-
-  els.sumGames.textContent = String(games);
-  els.sumWins.textContent = String(wins);
-  els.sumPoints.textContent = String(points);
-
-  if (!data.length) {
-    els.resultsBox.textContent = "Brak zapisanych wyników na koncie.";
-    return;
-  }
-
-  els.resultsBox.innerHTML = data.slice(0,10).map(function (row) {
-    var won = row.won ? "wygrana" : "porażka";
-    var when = row.finished_at ? new Date(row.finished_at).toLocaleString("pl-PL") : "";
-    return '<div class="result">'
-      + '<span class="pill">' + escapeHtml(row.game) + ' #' + escapeHtml(row.puzzle_no) + '</span>'
-      + '<div class="result-meta">' + won + ', ' + escapeHtml(row.score) + ' pkt'
-      + ', próby: ' + (row.tries != null ? escapeHtml(row.tries) : '-')
-      + ', błędy: ' + (row.errors != null ? escapeHtml(row.errors) : '-') + '<br>' + escapeHtml(when) + '</div>'
-      + '</div>';
-  }).join("");
-}
-
-els.registerForm.addEventListener("submit", async function (e) {
+els.loginForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
+  setBusy(els.loginForm,true);
+  setMsg("Loguję...");
 
-  var login = els.regLogin.value.trim();
-  var email = els.regEmail.value.trim();
-  var password = els.regPassword.value;
-  var password2 = els.regPassword2.value;
-  var terms = els.regTerms.checked;
-  var marketing = els.regMarketing.checked;
+  var email=els.loginEmail.value.trim();
+  var password=els.loginPassword.value;
 
-  if (!LOGIN_RE.test(login)) { setMsg("Login musi mieć 3-24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.", "err"); return; }
-  if (password.length < 8) { setMsg("Hasło musi mieć minimum 8 znaków.", "err"); return; }
-  if (password !== password2) { setMsg("Hasła nie są takie same.", "err"); return; }
-  if (!terms) { setMsg("Musisz zaakceptować regulamin i politykę prywatności.", "err"); return; }
+  try{
+    var r=await withTimeout(sb.auth.signInWithPassword({email:email,password:password}),14000,"timeout");
+    if(r.error)throw r.error;
 
-  try {
-    setBusy(els.registerForm, true);
-    setMsg("Tworzę konto i wysyłam mail potwierdzający...");
-
-    var r = await withTimeout(sb.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        emailRedirectTo: getRedirectUrl("?confirmed=1"),
-        data: {
-          login: login,
-          display_name: login,
-          terms_version: TERMS_VERSION,
-          privacy_version: PRIVACY_VERSION,
-          marketing_consent: marketing
-        }
-      }
-    }), 25000, "timeout");
-
-    if (r.error) { setMsg("Nie udało się założyć konta: " + niceError(r.error), "err"); return; }
-
-    if (r.data && r.data.user && r.data.session) {
-      setMsg("Konto utworzone i jesteś zalogowany.", "ok");
+    var session=r.data&&r.data.session?r.data.session:await waitForSession(4000);
+    if(session&&session.user){
+      showLoggedInShell(session.user);
+      setMsg("Zalogowano.", "ok");
       await loadProfile();
-    } else {
-      setMsg("Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.", "ok");
-      switchTab("login");
-    }
-  } catch (err) {
-    setMsg("Nie udało się założyć konta: " + niceError(err), "err");
-  } finally {
-    setBusy(els.registerForm, false);
-  }
-});
-
-document.addEventListener("click", function (e) {
-  if (e.target && e.target.id === "clearAuthBtn") {
-    clearLocalAuthSessions();
-    setMsg("Wyczyszczono lokalne sesje logowania w tej przeglądarce. Teraz zaloguj się ponownie.", "ok");
-  }
-});
-
-els.loginForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  clearMsg();
-
-  try {
-    setBusy(els.loginForm, true);
-    setMsg("Loguję...");
-
-    var r = await withTimeout(sb.auth.signInWithPassword({
-      email: els.loginEmail.value.trim(),
-      password: els.loginPassword.value
-    }), 25000, "timeout");
-
-    if (r.error) { setMsg("Nie udało się zalogować: " + niceError(r.error), "err"); return; }
-
-    exitRecoveryMode();
-    setMsg("Zalogowano.", "ok");
-    await loadProfile();
-  } catch (err) {
-    setMsg("Nie udało się zalogować: " + niceError(err), "err");
-  } finally {
-    setBusy(els.loginForm, false);
-  }
-});
-
-els.resetForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  clearMsg();
-
-  try {
-    setBusy(els.resetForm, true);
-    setMsg("Wysyłam link do resetu hasła...");
-
-    var r = await withTimeout(sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(), {
-      redirectTo: getRedirectUrl("?reset=1")
-    }), 25000, "timeout");
-
-    if (r.error) { setMsg("Nie udało się wysłać resetu hasła: " + niceError(r.error), "err"); return; }
-
-    setMsg("Wysłano link do resetu hasła. Sprawdź skrzynkę i kliknij najnowszy link.", "ok");
-  } catch (err) {
-    setMsg("Nie udało się wysłać resetu hasła: " + niceError(err), "err");
-  } finally {
-    setBusy(els.resetForm, false);
-  }
-});
-
-els.newPasswordForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  clearMsg();
-
-  var password = els.newPassword.value;
-  var password2 = els.newPassword2.value;
-
-  if (password.length < 8) { setMsg("Nowe hasło musi mieć minimum 8 znaków.", "err"); return; }
-  if (password !== password2) { setMsg("Nowe hasła nie są takie same.", "err"); return; }
-
-  try {
-    setBusy(els.newPasswordForm, true);
-    setMsg("Zapisuję nowe hasło...");
-
-    var sessionBefore = await waitForSession(5000);
-    var email = sessionBefore && sessionBefore.user ? sessionBefore.user.email : "";
-
-    var r = await withTimeout(sb.auth.updateUser({password: password}), 25000, "timeout");
-
-    if (r.error) { setMsg("Nie udało się zmienić hasła: " + niceError(r.error), "err"); return; }
-
-    els.newPassword.value = "";
-    els.newPassword2.value = "";
-
-    // Po recovery robimy zwykłe logowanie nowym hasłem,
-    // żeby konto.html, ranking.html i gry dostały normalną trwałą sesję.
-    if (email) {
-      var loginAgain = await withTimeout(sb.auth.signInWithPassword({
-        email: email,
-        password: password
-      }), 25000, "timeout");
-
-      if (loginAgain.error) {
-        exitRecoveryMode();
-        cleanUrl();
-        switchTab("login");
-        els.loginEmail.value = email;
-        setMsg("Hasło zmienione. Zaloguj się teraz nowym hasłem.", "ok");
-        return;
-      }
-    }
-
-    exitRecoveryMode();
-    cleanUrl();
-    setMsg("Hasło zmienione i jesteś zalogowany.", "ok");
-    await loadProfile();
-  } catch (err) {
-    setMsg("Nie udało się zmienić hasła: " + niceError(err), "err");
-  } finally {
-    setBusy(els.newPasswordForm, false);
-  }
-});
-
-els.toggleRankingBtn.addEventListener("click", async function () {
-  clearMsg();
-
-  if (!currentUser || !currentProfile) {
-    setMsg("Najpierw zaloguj się na konto.", "err");
-    return;
-  }
-
-  var next = !currentProfile.show_in_ranking;
-
-  try {
-    els.toggleRankingBtn.disabled = true;
-
-    var res = await withTimeout(
-      sb.from("profiles")
-        .update({ show_in_ranking: next })
-        .eq("id", currentUser.id)
-        .select("id, login, display_name, rank_name, show_in_ranking")
-        .single(),
-      25000,
-      "timeout"
-    );
-
-    if (res.error) {
-      setMsg("Nie udało się zmienić widoczności rankingu: " + niceError(res.error), "err");
       return;
     }
 
-    currentProfile = res.data;
-    els.pRanking.textContent = currentProfile.show_in_ranking ? "widoczny" : "ukryty";
-    els.toggleRankingBtn.textContent = currentProfile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
-    setMsg(currentProfile.show_in_ranking ? "Profil będzie widoczny w rankingu." : "Profil został ukryty z rankingu.", "ok");
-  } catch (err) {
-    setMsg("Nie udało się zmienić widoczności rankingu: " + niceError(err), "err");
-  } finally {
-    els.toggleRankingBtn.disabled = false;
+    throw new Error("Brak sesji po zalogowaniu.");
+  }catch(err){
+    // Kluczowa poprawka: jeżeli event SIGNED_IN lub localStorage już utworzył sesję,
+    // nie pokazujemy błędu timeoutu, tylko przełączamy konto na profil.
+    var session=await waitForSession(5000);
+    if(session&&session.user){
+      showLoggedInShell(session.user);
+      setMsg("Zalogowano. Odpowiedź Supabase była wolna, ale sesja jest aktywna.", "ok");
+      await loadProfile();
+      return;
+    }
+
+    setMsg("Nie udało się zalogować: "+niceError(err), "err");
+  }finally{
+    setBusy(els.loginForm,false);
   }
 });
 
-els.logoutBtn.addEventListener("click", async function () {
+els.registerForm.addEventListener("submit",async function(e){
+  e.preventDefault();
+  clearMsg();
+  var login=els.regLogin.value.trim();
+  var email=els.regEmail.value.trim();
+  var password=els.regPassword.value;
+  var password2=els.regPassword2.value;
+  if(!LOGIN_RE.test(login)){setMsg("Login musi mieć 3-24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.","err");return;}
+  if(password.length<8){setMsg("Hasło musi mieć minimum 8 znaków.","err");return;}
+  if(password!==password2){setMsg("Hasła nie są takie same.","err");return;}
+  if(!els.regTerms.checked){setMsg("Musisz zaakceptować regulamin i politykę prywatności.","err");return;}
+
+  try{
+    setBusy(els.registerForm,true);
+    setMsg("Tworzę konto i wysyłam mail potwierdzający...");
+    var r=await withTimeout(sb.auth.signUp({
+      email:email,
+      password:password,
+      options:{
+        emailRedirectTo:getRedirectUrl("?confirmed=1"),
+        data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:els.regMarketing.checked}
+      }
+    }),18000,"timeout");
+
+    if(r.error)throw r.error;
+
+    if(r.data&&r.data.session&&r.data.session.user){
+      showLoggedInShell(r.data.session.user);
+      setMsg("Konto utworzone i jesteś zalogowany.","ok");
+      await loadProfile();
+    }else{
+      setMsg("Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.","ok");
+      switchTab("login");
+    }
+  }catch(err){
+    var session=await waitForSession(3000);
+    if(session&&session.user){
+      showLoggedInShell(session.user);
+      setMsg("Konto jest aktywne. Odpowiedź Supabase była wolna, ale sesja działa.","ok");
+      await loadProfile();
+      return;
+    }
+    setMsg("Nie udało się założyć konta: "+niceError(err),"err");
+  }finally{
+    setBusy(els.registerForm,false);
+  }
+});
+
+els.resetForm.addEventListener("submit",async function(e){
+  e.preventDefault();
+  clearMsg();
+  try{
+    setBusy(els.resetForm,true);
+    setMsg("Wysyłam link do resetu hasła...");
+    var r=await withTimeout(sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl("?reset=1")}),18000,"timeout");
+    if(r.error)throw r.error;
+    setMsg("Wysłano link do resetu hasła. Sprawdź skrzynkę i kliknij najnowszy link.","ok");
+  }catch(err){
+    setMsg("Nie udało się wysłać resetu hasła: "+niceError(err),"err");
+  }finally{
+    setBusy(els.resetForm,false);
+  }
+});
+
+els.newPasswordForm.addEventListener("submit",async function(e){
+  e.preventDefault();
+  clearMsg();
+  var password=els.newPassword.value;
+  var password2=els.newPassword2.value;
+  if(password.length<8){setMsg("Nowe hasło musi mieć minimum 8 znaków.","err");return;}
+  if(password!==password2){setMsg("Nowe hasła nie są takie same.","err");return;}
+
+  try{
+    setBusy(els.newPasswordForm,true);
+    setMsg("Zapisuję nowe hasło...");
+    var sessionBefore=await waitForSession(5000);
+    var email=sessionBefore&&sessionBefore.user?sessionBefore.user.email:"";
+    var r=await withTimeout(sb.auth.updateUser({password:password}),18000,"timeout");
+    if(r.error)throw r.error;
+
+    if(email){
+      try{await withTimeout(sb.auth.signInWithPassword({email:email,password:password}),12000,"timeout");}catch(e){}
+    }
+
+    els.newPassword.value="";
+    els.newPassword2.value="";
+    exitRecoveryMode();
+    cleanUrl();
+    setMsg("Hasło zmienione. Konto jest zalogowane.","ok");
+    await loadProfile();
+  }catch(err){
+    setMsg("Nie udało się zmienić hasła: "+niceError(err),"err");
+  }finally{
+    setBusy(els.newPasswordForm,false);
+  }
+});
+
+els.toggleRankingBtn.addEventListener("click",async function(){
+  clearMsg();
+  if(!currentUser||!currentProfile){setMsg("Najpierw zaloguj się na konto.","err");return;}
+  var next=!currentProfile.show_in_ranking;
+  try{
+    els.toggleRankingBtn.disabled=true;
+    var res=await withTimeout(sb.from("profiles").update({show_in_ranking:next}).eq("id",currentUser.id).select("id, login, display_name, rank_name, show_in_ranking").single(),12000,"timeout");
+    if(res.error)throw res.error;
+    currentProfile=res.data;
+    els.pRanking.textContent=currentProfile.show_in_ranking?"widoczny":"ukryty";
+    els.toggleRankingBtn.textContent=currentProfile.show_in_ranking?"Ukryj mnie z rankingu":"Pokaż mnie w rankingu";
+    setMsg(currentProfile.show_in_ranking?"Profil będzie widoczny w rankingu.":"Profil został ukryty z rankingu.","ok");
+  }catch(err){
+    setMsg("Nie udało się zmienić widoczności rankingu: "+niceError(err),"err");
+  }finally{
+    els.toggleRankingBtn.disabled=false;
+  }
+});
+
+els.logoutBtn.addEventListener("click",async function(){
   clearMsg();
   await sb.auth.signOut();
-  setMsg("Wylogowano.", "ok");
+  try{localStorage.removeItem(AUTH_STORAGE_KEY);}catch(e){}
   showLoggedOut();
+  setMsg("Wylogowano.","ok");
   switchTab("login");
 });
 
-async function boot() {
-  if (!initSupabase()) return;
+async function boot(){
+  if(!initSupabase())return;
 
-  var params = new URLSearchParams(window.location.search);
-  var hash = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+  var params=new URLSearchParams(window.location.search);
+  var hash=new URLSearchParams((window.location.hash||"").replace(/^#/,""));
 
-  if (params.has("reset") || params.get("type") === "recovery" || hash.get("type") === "recovery") {
-    enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
-    waitForSession(5000).then(function (session) {
-      if (!session) {
-        setMsg("Nie widzę aktywnej sesji resetowania. Kliknij najnowszy link z maila resetującego albo wyślij reset jeszcze raz.", "err");
-      }
-    });
-  }
-
-  sb.auth.onAuthStateChange(async function (event) {
+  sb.auth.onAuthStateChange(function(event, session){
     console.log("Szpilplac auth event:", event);
-
-    if (event === "PASSWORD_RECOVERY") {
+    if(event==="PASSWORD_RECOVERY"){
       enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
       return;
     }
-
-    if (event === "SIGNED_IN") {
-      if (recoveryMode) return;
-      await loadProfile();
+    if(event==="SIGNED_IN" && session && session.user){
+      showLoggedInShell(session.user);
+      loadProfile();
       return;
     }
-
-    if (event === "SIGNED_OUT") {
-      if (recoveryMode) return;
-      showLoggedOut();
+    if(event==="SIGNED_OUT"){
+      if(!recoveryMode)showLoggedOut();
       return;
     }
-
-    if (event === "USER_UPDATED") {
-      if (recoveryMode) return;
-      await loadProfile();
+    if(event==="USER_UPDATED"){
+      loadProfile();
     }
   });
 
-  if (params.has("confirmed")) {
-    setMsg("Jeśli potwierdzenie maila się udało, możesz się zalogować.", "ok");
+  if(params.has("reset")||params.get("type")==="recovery"||hash.get("type")==="recovery"){
+    enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
+    waitForSession(5000).then(function(session){
+      if(!session)setMsg("Nie widzę aktywnej sesji resetowania. Kliknij najnowszy link z maila resetującego albo wyślij reset jeszcze raz.","err");
+    });
+    return;
+  }
+
+  if(params.has("confirmed")){
+    setMsg("Jeśli potwierdzenie maila się udało, możesz się zalogować.","ok");
     switchTab("login");
   }
 
-  await new Promise(function (resolve) { setTimeout(resolve, 700); });
-
-  if (!recoveryMode) {
-    await loadProfile();
-  }
+  await sleep(300);
+  await loadProfile();
 }
-
-console.info("Szpilplac konto.html v07");
-
-function clearLocalAuthSessions() {
-  try {
-    Object.keys(localStorage).forEach(function (key) {
-      if (
-        key.indexOf("auth") !== -1 ||
-        key.indexOf("supabase") !== -1 ||
-        key.indexOf("sb-") === 0 ||
-        key.indexOf("szpilplac-auth") === 0
-      ) {
-        localStorage.removeItem(key);
-      }
-    });
-  } catch (e) {}
-}
-
-window.SZPILPLAC_CLEAR_AUTH = clearLocalAuthSessions;
 boot();
 </script>
 </body>
