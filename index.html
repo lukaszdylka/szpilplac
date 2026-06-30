@@ -203,7 +203,7 @@ applyTheme();
 var GAME_TILES={
   slowko:{active:true, href:"slowko.html"},
   klodka:{active:true, href:"klodka.html"},
-  zorta:{active:true, href:"raja/"},
+  zorta:{active:false, href:"raja/"},
   cuzamen:{active:false, href:"cuzamen.html"}
 };
 function gameHref(id){var g=GAME_TILES[id];return g&&g.active?g.href:null;}
@@ -265,27 +265,38 @@ function playedSlowko(){
   return !!(st&&st.stats&&hasResult(st.stats,DAY_IDX));
 }
 function playedKlodka(){
+  // Kłōdka numeruje dni od 1, a Słōwko od 0.
+  // Wcześniej index sprawdzał też DAY_IDX, czyli w praktyce mógł uznać wczorajszą Kłōdkę za dzisiejszą.
   if(isFinishedGame(parseStored("klodka_daily_v1_d"+DAY_NO)))return true;
-  if(isFinishedGame(parseStored("klodka_daily_v1_d"+DAY_IDX)))return true; // zgodność ze starszymi testami
+
   var cur=parseStored("klodka_daily_v1");
   if(cur){
     var curDay=(cur.day!==undefined)?cur.day:(cur.game&&cur.game.idx);
-    if((String(curDay)===String(DAY_NO)||String(curDay)===String(DAY_IDX))&&isFinishedGame(cur))return true;
+    if(String(curDay)===String(DAY_NO)&&isFinishedGame(cur))return true;
   }
+
   var hist=parseStored("klodka_daily_v1__hist");
   return hasResult(hist,DAY_NO);
+}
+function sameTodayDate(x){
+  if(!x)return false;
+  var a=String(x), b=String(localDateKey()), c=String(warsawDateKey());
+  return a===b || a===c;
 }
 function playedCuzamen(){
   var cg=parseStored("cuzamen_v1");
   if(!cg)return false;
-  if((cg.date===localDateKey()||cg.date===warsawDateKey())&&cg.finished===true)return true;
-  if((String(cg.day)===String(DAY_IDX)||String(cg.day)===String(DAY_NO))&&isFinishedGame(cg))return true;
-  return false;
+  // Cuzamen zapisuje wynik po dacie, nie po numerze dnia.
+  // Nie sprawdzamy już samego numeru dnia, bo mógł dawać fałszywe „Zagrane”.
+  return !!(sameTodayDate(cg.date)&&cg.finished===true);
 }
 function playedRaja(){
-  if(isFinishedGame(parseStored("zorta_d"+WEEK_IDX)))return true;
+  var st=parseStored("zorta_d"+WEEK_IDX);
+  if(isFinishedGame(st))return true;
+
   var zs=parseStored("zorta_stats_v1");
-  return !!(zs&&zs.weeks&&zs.weeks[String(WEEK_IDX+1)]);
+  var r=zs&&zs.weeks&&zs.weeks[String(WEEK_IDX+1)];
+  return !!(r&&(r.won===true||r.won===false));
 }
 function playedGame(id,href){
   try{
@@ -333,6 +344,7 @@ window.addEventListener("pageshow",refreshHome);
 document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshHome();});
 window.addEventListener("focus",refreshHome);
 </script>
+<script src="player_location.js"></script>
 <script src="coffee.js"></script>
 </body>
 </html>
