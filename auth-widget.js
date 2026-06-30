@@ -616,7 +616,7 @@
     setLanguage
   };
 
-  console.info("Szpilplac auth-widget.js v10");
+  console.info("Szpilplac auth-widget.js v13");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {
