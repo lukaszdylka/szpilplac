@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking · Szpilplac · Familock</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="description" content="Ranking graczy Szpilplaca Familock.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;
+  --ok:#3f8a5a;--danger:#b5482f;
+  --sh:0 6px 18px -10px rgba(35,32,26,.4);
+}
+[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4);}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5);}
+*{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;padding:0 16px 40px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+header{width:100%;max-width:560px;padding-top:20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.site-name{font-family:"Oswald";font-size:clamp(26px,8vw,38px);font-weight:700;
+  letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
+.site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
+.controls{display:flex;gap:6px;align-items:center}
+.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
+.lang-tog button.on{background:var(--green);color:#fff}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.icon-btn svg{display:block;flex:none}
+
+main{width:100%;max-width:560px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--sh);padding:18px}
+.card h2{font-family:"Oswald";font-size:21px;text-transform:uppercase;letter-spacing:.03em;
+  margin:0 0 6px;color:var(--ink);line-height:1.05}
+.card .intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
+.muted{color:var(--ink2);line-height:1.5}
+.small{font-size:11.5px;color:var(--ink2);line-height:1.45}
+
+.btn{border-radius:11px;padding:10px 13px;background:var(--green);color:#fff;font-weight:800;
+  font-size:13px;transition:transform .1s,filter .1s;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#20170d}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none}
+
+.msg{margin:0;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+  background:var(--surface2);color:var(--ink2);line-height:1.5;font-size:13px;white-space:pre-wrap}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
+.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
+.hidden{display:none !important}
+
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;
+  background:var(--surface2);margin:0 0 14px}
+.tab{flex:1;font-size:12.5px;font-weight:800;padding:8px 6px;border-radius:999px;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.tab.active{background:var(--green);color:#fff}
+
+.account-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.account-name{font-family:"Oswald";font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+.account-meta{font-size:12px;color:var(--ink2);line-height:1.45}
+
+.rank-list{display:flex;flex-direction:column;gap:8px}
+.rank-row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;
+  border:1px solid var(--line);background:var(--surface2);border-radius:13px;padding:10px}
+.place{font-family:"Oswald";font-size:20px;color:var(--green);text-align:center}
+.player{min-width:0}
+.login{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-name{font-size:11px;color:var(--ink2);font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.points{text-align:right}
+.points strong{font-family:"Oswald";font-size:22px;color:var(--ink);line-height:1}
+.points span{display:block;font-size:11px;color:var(--ink2);font-weight:700;text-transform:uppercase;margin-top:2px}
+.details{grid-column:2 / 4;font-size:11.5px;color:var(--ink2);line-height:1.4;border-top:1px solid var(--line);padding-top:8px;margin-top:2px}
+
+.rank-row.me{border-color:var(--gold);box-shadow:0 0 0 2px rgba(191,138,58,.18)}
+.empty{text-align:center;padding:18px 10px;color:var(--ink2);line-height:1.5}
+.empty strong{display:block;color:var(--ink);font-family:"Oswald";font-size:18px;text-transform:uppercase;margin-bottom:4px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+footer{width:100%;max-width:560px;text-align:center;color:var(--ink2);font-size:11.5px;
+  margin-top:20px;line-height:1.7}
+footer a{color:var(--green);font-weight:600}
+footer a:hover{text-decoration:underline}
+
+@media(max-width:430px){
+  .rank-row{grid-template-columns:34px 1fr auto;padding:9px;gap:8px}
+  .place{font-size:18px}
+  .login{font-size:15px}
+  .points strong{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <div class="site-name">Szpilplac</div>
+      <div class="site-sub" data-i18n="sub">Ranking graczy</div>
+    </div>
+    <div class="controls">
+      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+      </a>
+      <div class="lang-tog" role="group">
+        <button id="lPl" class="on" type="button">PL</button>
+        <button id="lSzl" type="button">ŚL</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="globalMsg" class="msg hidden"></div>
+
+  <section class="card">
+    <div class="account-strip">
+      <div>
+        <div class="account-name" id="accountName" data-i18n="guestTitle">Grasz bez konta</div>
+        <div class="account-meta" id="accountMeta" data-i18n="guestMeta">Konto pozwoli zapisać wynik w rankingu po zmianie przeglądarki.</div>
+      </div>
+      <a class="btn secondary" href="konto.html" id="accountBtn" data-i18n="accountBtn">Konto gracza</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="title">Ranking</h2>
+    <p class="intro" data-i18n="intro">Tu pojawią się wyniki graczy z kontem. Gra bez logowania nadal działa normalnie, ale nie zapisuje wyniku w chmurze.</p>
+
+    <div class="tabs">
+      <button class="tab active" type="button" data-ranking="weekly" data-i18n="tabWeekly">Tydzień</button>
+      <button class="tab" type="button" data-ranking="all" data-i18n="tabAll">Ogółem</button>
+    </div>
+
+    <div id="rankingList" class="rank-list"></div>
+
+    <div class="actions">
+      <button class="btn secondary" type="button" id="refreshBtn" data-i18n="refresh">Odśwież ranking</button>
+      <a class="btn gold" href="konto.html" data-i18n="createAccount">Załóż konto</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="howTitle">Jak liczymy?</h2>
+    <p class="intro" data-i18n="howText">Na razie ranking czeka na podpięcie wyników z gier. Docelowo punkty będą zależeć od gry, liczby prób, błędów, podpowiedzi i serii dni.</p>
+    <div class="small" data-i18n="howSmall">Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.</div>
+  </section>
+</main>
+
+<footer>
+  <p>
+    <a href="index.html" data-i18n="footerHome">Szpilplac</a>
+    ·
+    <a href="konto.html" data-i18n="footerAccount">Konto</a>
+    ·
+    <a href="https://familock.pl" rel="noopener" data-i18n="footerFamilock">Familock</a>
+  </p>
+</footer>
+
+<script>
+"use strict";
+
+var LK="familock_lang",TK="szpilplac_theme";
+var store=(function(){var m={},ok=false;
+  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
+  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
+         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+
+var ICO={
+  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+};
+var THEME_ICONS={light:ICO.sun,dark:ICO.moon};
+var theme=store.get(TK)||"light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);document.getElementById("themeBtn").innerHTML=THEME_ICONS[theme];}
+document.getElementById("themeBtn").addEventListener("click",function(){theme=theme==="light"?"dark":"light";store.set(TK,theme);applyTheme();});
+applyTheme();
+
+var lang=store.get(LK)||"pl";
+var T={
+  pl:{
+    sub:"Ranking graczy",
+    guestTitle:"Grasz bez konta",
+    guestMeta:"Konto pozwoli zapisać wynik w rankingu po zmianie przeglądarki.",
+    accountBtn:"Konto gracza",
+    title:"Ranking",
+    intro:"Tu pojawią się wyniki graczy z kontem. Gra bez logowania nadal działa normalnie, ale nie zapisuje wyniku w chmurze.",
+    tabWeekly:"Tydzień",
+    tabAll:"Ogółem",
+    refresh:"Odśwież ranking",
+    createAccount:"Załóż konto",
+    howTitle:"Jak liczymy?",
+    howText:"Na razie ranking czeka na podpięcie wyników z gier. Docelowo punkty będą zależeć od gry, liczby prób, błędów, podpowiedzi i serii dni.",
+    howSmall:"Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.",
+    footerHome:"Szpilplac", footerAccount:"Konto", footerFamilock:"Familock",
+    loading:"Ładuję ranking...",
+    emptyTitle:"Ranking jest jeszcze pusty",
+    emptyText:"Gdy podłączymy zapis wyników z gier, pojawią się tutaj gracze, punkty i rangi.",
+    errConfig:"Brak konfiguracji Supabase. Upewnij się, że ranking.html leży obok config.js.",
+    errLib:"Nie udało się załadować biblioteki Supabase JS.",
+    errRanking:"Nie udało się pobrać rankingu: ",
+    loggedAs:"Zalogowany jako {login}",
+    loggedMeta:"Ranga: {rank}. Twoje wyniki zapiszą się po podpięciu gier do konta.",
+    points:"pkt",
+    games:"gier",
+    wins:"wygranych",
+    last:"ostatnio",
+    noDate:"brak daty",
+    weeklyName:"ranking tygodniowy",
+    allName:"ranking ogólny",
+    you:"Ty"
+  },
+  szl:{
+    sub:"Ranking graczy",
+    guestTitle:"Szpilosz bez kōnta",
+    guestMeta:"Kōnto pozwoli spamiyntać wynik w rankingu po zmiynie przeglōndarki.",
+    accountBtn:"Kōnto gracza",
+    title:"Ranking",
+    intro:"Tukej bydōm wyniki graczy z kōntym. Szpil bez logowanio dali dziŏ normalnie, ale niy spamiyntuje wyniku w chmurze.",
+    tabWeekly:"Tydziyń",
+    tabAll:"Razym",
+    refresh:"Ôdświyż ranking",
+    createAccount:"Założ kōnto",
+    howTitle:"Jak liczymy?",
+    howText:"Na razie ranking czekŏ na podpiyncie wynikōw ze szpilōw. Docelowo punkty bydōm zależeć ôd szpilu, liczby prōb, błyndōw, podpowiydzi i seryje dni.",
+    howSmall:"Planowane rangi: Bajtel, Karlus, Kamrat, Majster, Starzik.",
+    footerHome:"Szpilplac", footerAccount:"Kōnto", footerFamilock:"Familock",
+    loading:"Ładuja ranking...",
+    emptyTitle:"Ranking je jeszcze pusty",
+    emptyText:"Jak podepniymy spamiyntowanie wynikōw ze szpilōw, pokŏżōm sie tukej gracze, punkty i rangi.",
+    errConfig:"Brak kōnfiguracyje Supabase. Wejrzij, czy ranking.html leży kole config.js.",
+    errLib:"Niy szło wczytać biblioteki Supabase JS.",
+    errRanking:"Niy szło pobrać rankingu: ",
+    loggedAs:"Zalogowany jako {login}",
+    loggedMeta:"Ranga: {rank}. Twoje wyniki spamiyntajōm sie po podpiynciu szpilōw do kōnta.",
+    points:"pkt",
+    games:"szpilōw",
+    wins:"wygranych",
+    last:"ôstatnio",
+    noDate:"brak daty",
+    weeklyName:"ranking tydniowy",
+    allName:"ranking ôgōlny",
+    you:"Ty"
+  }
+};
+function t(key){return (T[lang]&&T[lang][key]!=null)?T[lang][key]:(T.pl[key]!=null?T.pl[key]:key);}
+
+var sb=null;
+var currentRanking="weekly";
+var currentProfile=null;
+
+var els={
+  globalMsg:document.getElementById("globalMsg"),
+  accountName:document.getElementById("accountName"),
+  accountMeta:document.getElementById("accountMeta"),
+  accountBtn:document.getElementById("accountBtn"),
+  rankingList:document.getElementById("rankingList"),
+  refreshBtn:document.getElementById("refreshBtn")
+};
+
+function applyLang(){
+  document.documentElement.lang=(lang==="szl")?"szl":"pl";
+  document.getElementById("lPl").className=lang==="pl"?"on":"";
+  document.getElementById("lSzl").className=lang==="szl"?"on":"";
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var k=el.getAttribute("data-i18n");
+    if(T[lang][k]!=null)el.textContent=t(k);
+  });
+  renderAccountStrip();
+  loadRanking();
+}
+function setLang(l){lang=l;store.set(LK,lang);applyLang();}
+document.getElementById("lPl").addEventListener("click",function(){setLang("pl");});
+document.getElementById("lSzl").addEventListener("click",function(){setLang("szl");});
+
+function setMsg(text,type){
+  els.globalMsg.textContent=text;
+  els.globalMsg.className="msg"+(type?" "+type:"");
+  els.globalMsg.classList.remove("hidden");
+}
+function clearMsg(){
+  els.globalMsg.textContent="";
+  els.globalMsg.className="msg hidden";
+}
+function escapeHtml(v){
+  return String(v==null?"":v).replace(/[&<>"']/g,function(ch){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+  });
+}
+function niceError(error){
+  if(!error)return "Nieznany błąd.";
+  return error.message||String(error);
+}
+
+function initSupabase(){
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  var url=cfg.SUPABASE_URL, key=cfg.SUPABASE_ANON_KEY;
+  if(!url||!key){setMsg(t("errConfig"),"err");return false;}
+  if(!window.supabase){setMsg(t("errLib"),"err");return false;}
+  sb=window.supabase.createClient(url,key,{
+    auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+  });
+  return true;
+}
+
+async function getSessionUser(){
+  var r=await sb.auth.getUser();
+  if(r.error)return null;
+  return r.data.user||null;
+}
+
+async function loadAccount(){
+  currentProfile=null;
+  var user=await getSessionUser();
+  if(!user){
+    renderAccountStrip();
+    return;
+  }
+
+  var res=await sb.from("profiles")
+    .select("id, login, display_name, rank_name, show_in_ranking")
+    .eq("id",user.id)
+    .single();
+
+  if(!res.error){
+    currentProfile=res.data;
+  }
+
+  renderAccountStrip();
+}
+
+function renderAccountStrip(){
+  if(currentProfile){
+    var login=currentProfile.login||currentProfile.display_name||"gracz";
+    var rank=currentProfile.rank_name||"Bajtel";
+    els.accountName.textContent=t("loggedAs").replace("{login}",login);
+    els.accountMeta.textContent=t("loggedMeta").replace("{rank}",rank);
+    els.accountBtn.textContent=t("accountBtn");
+  }else{
+    els.accountName.textContent=t("guestTitle");
+    els.accountMeta.textContent=t("guestMeta");
+    els.accountBtn.textContent=t("accountBtn");
+  }
+}
+
+async function loadRanking(){
+  if(!sb)return;
+
+  clearMsg();
+  els.rankingList.innerHTML='<div class="empty">'+escapeHtml(t("loading"))+'</div>';
+
+  var view=currentRanking==="weekly" ? "ranking_weekly" : "ranking_all_time";
+
+  var res=await sb.from(view)
+    .select("login, display_name, rank_name, games_played, wins, points, last_play")
+    .order("points",{ascending:false})
+    .order("wins",{ascending:false})
+    .limit(100);
+
+  if(res.error){
+    els.rankingList.innerHTML="";
+    setMsg(t("errRanking")+niceError(res.error),"err");
+    return;
+  }
+
+  renderRanking(res.data||[]);
+}
+
+function renderRanking(rows){
+  if(!rows.length){
+    els.rankingList.innerHTML =
+      '<div class="empty"><strong>'+escapeHtml(t("emptyTitle"))+'</strong>'
+      +escapeHtml(t("emptyText"))+'</div>';
+    return;
+  }
+
+  var myLogin=currentProfile&&currentProfile.login ? currentProfile.login.toLowerCase() : null;
+
+  els.rankingList.innerHTML = rows.map(function(row,idx){
+    var login=row.login||row.display_name||"gracz";
+    var isMe=myLogin && String(login).toLowerCase()===myLogin;
+    var last=row.last_play ? new Date(row.last_play).toLocaleString("pl-PL") : t("noDate");
+    var rank=row.rank_name||"Bajtel";
+    var points=Number(row.points)||0;
+    var games=Number(row.games_played)||0;
+    var wins=Number(row.wins)||0;
+
+    return '<div class="rank-row '+(isMe?'me':'')+'">'
+      +'<div class="place">'+(idx+1)+'</div>'
+      +'<div class="player">'
+        +'<div class="login">'+escapeHtml(login)+(isMe?' · '+escapeHtml(t("you")):'')+'</div>'
+        +'<div class="rank-name">'+escapeHtml(rank)+'</div>'
+      +'</div>'
+      +'<div class="points"><strong>'+escapeHtml(points)+'</strong><span>'+escapeHtml(t("points"))+'</span></div>'
+      +'<div class="details">'
+        +escapeHtml(games)+' '+escapeHtml(t("games"))+' · '
+        +escapeHtml(wins)+' '+escapeHtml(t("wins"))+' · '
+        +escapeHtml(t("last"))+': '+escapeHtml(last)
+      +'</div>'
+    +'</div>';
+  }).join("");
+}
+
+document.querySelectorAll(".tab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    currentRanking=btn.dataset.ranking;
+    document.querySelectorAll(".tab").forEach(function(b){b.classList.toggle("active",b===btn);});
+    loadRanking();
+  });
+});
+
+els.refreshBtn.addEventListener("click",function(){loadAccount().then(loadRanking);});
+
+async function boot(){
+  applyLang();
+  if(!initSupabase())return;
+
+  sb.auth.onAuthStateChange(async function(){
+    await loadAccount();
+    await loadRanking();
+  });
+
+  await loadAccount();
+  await loadRanking();
+}
+boot();
+</script>
+</body>
+</html>
