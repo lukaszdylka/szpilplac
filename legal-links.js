@@ -1,7 +1,7 @@
 /*
-  Szpilplac Legal Links v18b
-  --------------------------
-  Dodaje linki: Regulamin, Prywatność, Cookies, Mailing.
+  Szpilplac Legal Links v21
+  -------------------------
+  Dodaje publiczne linki prawne do stopki.
 */
 
 (function(){
