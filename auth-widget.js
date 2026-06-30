@@ -394,6 +394,12 @@
       }
     }
 
+    console.log("Szpilplac auth-widget check:", {
+      hasUser: !!STATE.user,
+      email: STATE.user ? STATE.user.email : null,
+      hasProfile: !!STATE.profile
+    });
+
     STATE.ready = true;
     renderWidget();
     notifyListeners();
@@ -610,7 +616,7 @@
     setLanguage
   };
 
-  console.info("Szpilplac auth-widget.js v04");
+  console.info("Szpilplac auth-widget.js v05");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {

@@ -337,9 +337,30 @@ async function getSessionUser(){
 
 async function loadAccount(){
   currentProfile=null;
-  var user=await getSessionUser();
-  currentUser=user;
+
+  var sessionResult = await sb.auth.getSession();
+  var session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
+  var user = session && session.user ? session.user : null;
+
   if(!user){
+    user = await getSessionUser();
+  }
+
+  currentUser=user || null;
+
+  // Kluczowa poprawka:
+  // jeśli sesja istnieje, pokazujemy zalogowanie od razu,
+  // zanim dociągniemy profil z tabeli profiles.
+  renderAccountStrip();
+
+  console.log("Szpilplac ranking auth check:", {
+    hasSession: !!session,
+    hasUser: !!currentUser,
+    email: currentUser ? currentUser.email : null,
+    storageKey: AUTH_STORAGE_KEY
+  });
+
+  if(!currentUser){
     currentProfile=null;
     renderAccountStrip();
     return;
@@ -347,8 +368,13 @@ async function loadAccount(){
 
   var res=await sb.from("profiles")
     .select("id, login, display_name, rank_name, show_in_ranking")
-    .eq("id",user.id)
+    .eq("id",currentUser.id)
     .single();
+
+  console.log("Szpilplac ranking profile check:", {
+    error: res.error ? res.error.message : null,
+    profile: res.data || null
+  });
 
   if(!res.error){
     currentProfile=res.data;
@@ -366,7 +392,7 @@ function renderAccountStrip(){
     els.accountBtn.textContent=t("accountBtn");
   }else if(currentUser){
     els.accountName.textContent=t("loggedAs").replace("{login}",currentUser.email||"konto");
-    els.accountMeta.textContent="Sesja jest aktywna, ale nie udało się odczytać profilu gracza.";
+    els.accountMeta.textContent="Sesja jest aktywna. Dociągam profil gracza...";
     els.accountBtn.textContent=t("accountBtn");
   }else{
     els.accountName.textContent=t("guestTitle");
@@ -455,7 +481,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v04");
+console.info("Szpilplac ranking.html v05");
 boot();
 </script>
 </body>

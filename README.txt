@@ -1,4 +1,4 @@
-Szpilplac Auth v05
+Szpilplac Auth v06 - ranking fix
 
 Wgraj wszystkie pliki naraz:
 - konto.html
@@ -6,14 +6,16 @@ Wgraj wszystkie pliki naraz:
 - auth-widget.js
 - auth-diagnostyka.html
 
-Po wgraniu:
-1. Wejdź na /auth-diagnostyka.html
-2. Kliknij "Wyczyść lokalne sesje auth"
-3. Wejdź na /konto.html i zaloguj się
-4. Wejdź na /ranking.html
-5. Sesja powinna trwać do kliknięcia "Wyloguj".
+Najważniejsza zmiana:
+ranking.html pokazuje aktywną sesję od razu, zanim dociągnie profil gracza.
+Dzięki temu nie powinien zostawać na "Grasz bez konta", jeśli sesja istnieje.
 
-W konsoli powinny być wersje:
-- Szpilplac konto.html v05
-- Szpilplac ranking.html v04
-- Szpilplac auth-widget.js v04
+Po wgraniu sprawdź:
+- /konto.html
+- /ranking.html?v=06
+- /auth-diagnostyka.html
+
+W konsoli powinno być:
+- Szpilplac konto.html v06
+- Szpilplac ranking.html v05
+- Szpilplac auth-widget.js v05
