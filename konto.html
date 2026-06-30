@@ -266,6 +266,7 @@ footer a{color:var(--green);font-weight:600}
 var TERMS_VERSION = "2026-06-29";
 var PRIVACY_VERSION = "2026-06-29";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
+var AUTH_STORAGE_KEY = "szpilplac-auth-v1";
 var sb = null;
 var recoveryMode = false;
 var initialUrl = new URL(window.location.href);
@@ -433,6 +434,8 @@ function initSupabase() {
   }
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
     auth: {
+      storageKey: AUTH_STORAGE_KEY,
+      flowType: "pkce",
       detectSessionInUrl: true,
       persistSession: true,
       autoRefreshToken: true
@@ -442,9 +445,29 @@ function initSupabase() {
 }
 
 async function getSessionUser() {
+  var s = await sb.auth.getSession();
+  if (s && s.data && s.data.session && s.data.session.user) {
+    return s.data.session.user;
+  }
+
   var r = await sb.auth.getUser();
   if (r.error) return null;
   return r.data.user || null;
+}
+
+async function getCurrentSession() {
+  var s = await sb.auth.getSession();
+  return s && s.data ? s.data.session : null;
+}
+
+async function waitForSession(ms) {
+  var started = Date.now();
+  while (Date.now() - started < ms) {
+    var session = await getCurrentSession();
+    if (session && session.user) return session;
+    await new Promise(function (resolve) { setTimeout(resolve, 250); });
+  }
+  return null;
 }
 
 async function loadProfile() {
@@ -632,15 +655,37 @@ els.newPasswordForm.addEventListener("submit", async function (e) {
     setBusy(els.newPasswordForm, true);
     setMsg("Zapisuję nowe hasło...");
 
+    var sessionBefore = await waitForSession(5000);
+    var email = sessionBefore && sessionBefore.user ? sessionBefore.user.email : "";
+
     var r = await withTimeout(sb.auth.updateUser({password: password}), 25000, "timeout");
 
     if (r.error) { setMsg("Nie udało się zmienić hasła: " + niceError(r.error), "err"); return; }
 
     els.newPassword.value = "";
     els.newPassword2.value = "";
+
+    // Po recovery robimy zwykłe logowanie nowym hasłem,
+    // żeby konto.html, ranking.html i gry dostały normalną trwałą sesję.
+    if (email) {
+      var loginAgain = await withTimeout(sb.auth.signInWithPassword({
+        email: email,
+        password: password
+      }), 25000, "timeout");
+
+      if (loginAgain.error) {
+        exitRecoveryMode();
+        cleanUrl();
+        switchTab("login");
+        els.loginEmail.value = email;
+        setMsg("Hasło zmienione. Zaloguj się teraz nowym hasłem.", "ok");
+        return;
+      }
+    }
+
     exitRecoveryMode();
     cleanUrl();
-    setMsg("Hasło zmienione. Konto jest zalogowane.", "ok");
+    setMsg("Hasło zmienione i jesteś zalogowany.", "ok");
     await loadProfile();
   } catch (err) {
     setMsg("Nie udało się zmienić hasła: " + niceError(err), "err");
@@ -665,6 +710,11 @@ async function boot() {
 
   if (params.has("reset") || params.get("type") === "recovery" || hash.get("type") === "recovery") {
     enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
+    waitForSession(5000).then(function (session) {
+      if (!session) {
+        setMsg("Nie widzę aktywnej sesji resetowania. Kliknij najnowszy link z maila resetującego albo wyślij reset jeszcze raz.", "err");
+      }
+    });
   }
 
   sb.auth.onAuthStateChange(async function (event) {
