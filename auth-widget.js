@@ -42,7 +42,8 @@
 
   const STORE_KEYS = {
     lang: "familock_lang",
-    theme: "szpilplac_theme"
+    theme: "szpilplac_theme",
+    auth: "szpilplac-auth-v05"
   };
 
   const TEXT = {
@@ -302,7 +303,7 @@
       return;
     }
 
-    if (!STATE.user || !STATE.profile) {
+    if (!STATE.user) {
       container.innerHTML = `
         <div class="szp-auth-widget">
           <div class="szp-auth-widget__main">
@@ -311,6 +312,23 @@
           </div>
           <div class="szp-auth-widget__actions">
             <a class="szp-auth-widget__btn gold" href="${escapeHtml(urlTo("konto.html"))}">${escapeHtml(t("guestCta"))}</a>
+            <a class="szp-auth-widget__btn" href="${escapeHtml(urlTo("ranking.html"))}">${escapeHtml(t("ranking"))}</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (!STATE.profile) {
+      const email = STATE.user.email || "konto";
+      container.innerHTML = `
+        <div class="szp-auth-widget">
+          <div class="szp-auth-widget__main">
+            <div class="szp-auth-widget__title">${escapeHtml(t("loggedPrefix"))}: ${escapeHtml(email)}</div>
+            <div class="szp-auth-widget__meta">Sesja aktywna, problem z odczytem profilu.</div>
+          </div>
+          <div class="szp-auth-widget__actions">
+            <a class="szp-auth-widget__btn primary" href="${escapeHtml(urlTo("konto.html"))}">${escapeHtml(t("account"))}</a>
             <a class="szp-auth-widget__btn" href="${escapeHtml(urlTo("ranking.html"))}">${escapeHtml(t("ranking"))}</a>
           </div>
         </div>
@@ -402,7 +420,8 @@
 
     STATE.client = window.supabase.createClient(url, key, {
       auth: {
-        detectSessionInUrl: true,
+        storageKey: STORE_KEYS.auth,
+        detectSessionInUrl: false,
         persistSession: true,
         autoRefreshToken: true
       }
@@ -591,7 +610,7 @@
     setLanguage
   };
 
-  console.info("Szpilplac auth-widget.js v03");
+  console.info("Szpilplac auth-widget.js v04");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {

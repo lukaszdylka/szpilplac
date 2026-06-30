@@ -181,6 +181,10 @@ footer a{color:var(--green);font-weight:600}
         </label>
         <button class="btn" type="submit">Zaloguj się</button>
       </form>
+      <p class="small" style="margin-top:12px;">
+        Jeśli logowanie wariuje po testach:
+        <button type="button" id="clearAuthBtn" style="font:inherit;font-weight:800;text-decoration:underline;color:var(--green);padding:0;">wyczyść lokalną sesję</button>.
+      </p>
     </div>
 
     <div id="reset" class="panel">
@@ -268,6 +272,7 @@ footer a{color:var(--green);font-weight:600}
 var TERMS_VERSION = "2026-06-29";
 var PRIVACY_VERSION = "2026-06-29";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
+var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var sb = null;
 var recoveryMode = false;
 var currentUser = null;
@@ -441,6 +446,7 @@ function initSupabase() {
   }
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
     auth: {
+      storageKey: AUTH_STORAGE_KEY,
       detectSessionInUrl: true,
       persistSession: true,
       autoRefreshToken: true
@@ -612,6 +618,13 @@ els.registerForm.addEventListener("submit", async function (e) {
     setMsg("Nie udało się założyć konta: " + niceError(err), "err");
   } finally {
     setBusy(els.registerForm, false);
+  }
+});
+
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.id === "clearAuthBtn") {
+    clearLocalAuthSessions();
+    setMsg("Wyczyszczono lokalne sesje logowania w tej przeglądarce. Teraz zaloguj się ponownie.", "ok");
   }
 });
 
@@ -815,7 +828,24 @@ async function boot() {
   }
 }
 
-console.info("Szpilplac konto.html v04");
+console.info("Szpilplac konto.html v05");
+
+function clearLocalAuthSessions() {
+  try {
+    Object.keys(localStorage).forEach(function (key) {
+      if (
+        key.indexOf("auth") !== -1 ||
+        key.indexOf("supabase") !== -1 ||
+        key.indexOf("sb-") === 0 ||
+        key.indexOf("szpilplac-auth") === 0
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (e) {}
+}
+
+window.SZPILPLAC_CLEAR_AUTH = clearLocalAuthSessions;
 boot();
 </script>
 </body>

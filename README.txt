@@ -1,15 +1,19 @@
-Szpilplac - pakiet konta i rankingu
+Szpilplac Auth v05
 
-Wgraj pliki do katalogu strony:
+Wgraj wszystkie pliki naraz:
 - konto.html
 - ranking.html
 - auth-widget.js
-
-Wgraj wszystkie trzy naraz, żeby nie mieszać wersji.
+- auth-diagnostyka.html
 
 Po wgraniu:
-1. Otwórz /konto.html
-2. Zrób Ctrl+F5
-3. Zaloguj się
+1. Wejdź na /auth-diagnostyka.html
+2. Kliknij "Wyczyść lokalne sesje auth"
+3. Wejdź na /konto.html i zaloguj się
 4. Wejdź na /ranking.html
-5. Sesja powinna zostać aktywna do kliknięcia Wyloguj.
+5. Sesja powinna trwać do kliknięcia "Wyloguj".
+
+W konsoli powinny być wersje:
+- Szpilplac konto.html v05
+- Szpilplac ranking.html v04
+- Szpilplac auth-widget.js v04

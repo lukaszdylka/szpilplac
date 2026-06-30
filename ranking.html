@@ -266,8 +266,10 @@ var T={
 };
 function t(key){return (T[lang]&&T[lang][key]!=null)?T[lang][key]:(T.pl[key]!=null?T.pl[key]:key);}
 
+var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
 var currentRanking="weekly";
+var currentUser=null;
 var currentProfile=null;
 
 var els={
@@ -319,7 +321,7 @@ function initSupabase(){
   if(!url||!key){setMsg(t("errConfig"),"err");return false;}
   if(!window.supabase){setMsg(t("errLib"),"err");return false;}
   sb=window.supabase.createClient(url,key,{
-    auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+    auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
   });
   return true;
 }
@@ -336,7 +338,9 @@ async function getSessionUser(){
 async function loadAccount(){
   currentProfile=null;
   var user=await getSessionUser();
+  currentUser=user;
   if(!user){
+    currentProfile=null;
     renderAccountStrip();
     return;
   }
@@ -359,6 +363,10 @@ function renderAccountStrip(){
     var rank=currentProfile.rank_name||"Bajtel";
     els.accountName.textContent=t("loggedAs").replace("{login}",login);
     els.accountMeta.textContent=t("loggedMeta").replace("{rank}",rank);
+    els.accountBtn.textContent=t("accountBtn");
+  }else if(currentUser){
+    els.accountName.textContent=t("loggedAs").replace("{login}",currentUser.email||"konto");
+    els.accountMeta.textContent="Sesja jest aktywna, ale nie udało się odczytać profilu gracza.";
     els.accountBtn.textContent=t("accountBtn");
   }else{
     els.accountName.textContent=t("guestTitle");
@@ -447,7 +455,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v03");
+console.info("Szpilplac ranking.html v04");
 boot();
 </script>
 </body>

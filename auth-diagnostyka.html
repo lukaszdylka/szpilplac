@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostyka logowania · Szpilplac</title>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:system-ui,sans-serif;background:#f0e8d4;color:#23201a;padding:20px;max-width:900px;margin:auto}
+button{padding:10px 14px;border-radius:10px;border:1px solid #c9bfa6;background:#fbf7ee;font-weight:700;cursor:pointer;margin:4px}
+pre{background:#fbf7ee;border:1px solid #c9bfa6;border-radius:12px;padding:14px;white-space:pre-wrap;word-break:break-word}
+.ok{color:#2f7a45;font-weight:700}.bad{color:#b5482f;font-weight:700}
+</style>
+</head>
+<body>
+<h1>Diagnostyka logowania Szpilplac</h1>
+<p>Ta strona nie pokazuje haseł ani tokenów. Pokazuje tylko, czy przeglądarka widzi sesję.</p>
+<p>
+<a href="konto.html">konto.html</a> · <a href="ranking.html">ranking.html</a>
+</p>
+<button id="check">Sprawdź sesję</button>
+<button id="clear">Wyczyść lokalne sesje auth</button>
+<pre id="out">Kliknij „Sprawdź sesję”.</pre>
+<script>
+const STORAGE="szpilplac-auth-v05";
+function safeKeys(){
+  try {
+    return Object.keys(localStorage).filter(k =>
+      k.includes("auth") || k.includes("supabase") || k.startsWith("sb-") || k.startsWith("szpilplac-auth")
+    );
+  } catch(e) { return ["localStorage niedostępny: "+e.message]; }
+}
+function scrubSession(s){
+  if(!s) return null;
+  return {
+    hasSession: true,
+    expires_at: s.expires_at || null,
+    expires_in: s.expires_in || null,
+    user: s.user ? {
+      id: s.user.id,
+      email: s.user.email,
+      role: s.user.role,
+      aud: s.user.aud
+    } : null
+  };
+}
+async function run(){
+  const cfg=window.SZPILPLAC_CONFIG||{};
+  const lines=[];
+  lines.push("URL: "+location.href);
+  lines.push("Origin: "+location.origin);
+  lines.push("Supabase URL: "+(cfg.SUPABASE_URL||"BRAK"));
+  lines.push("Storage key v05: "+STORAGE);
+  lines.push("");
+  lines.push("Klucze localStorage auth:");
+  lines.push(JSON.stringify(safeKeys(), null, 2));
+  lines.push("");
+
+  if(!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){
+    lines.push("BRAK biblioteki Supabase albo config.js.");
+    document.getElementById("out").textContent=lines.join("\n");
+    return;
+  }
+
+  const clientV05=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{storageKey:STORAGE,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
+  });
+  const clientDefault=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
+  });
+  const clientV1=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{storageKey:"szpilplac-auth-v1",detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
+  });
+
+  const s05=await clientV05.auth.getSession();
+  const sd=await clientDefault.auth.getSession();
+  const s1=await clientV1.auth.getSession();
+
+  lines.push("Sesja v05:");
+  lines.push(JSON.stringify(scrubSession(s05.data.session), null, 2));
+  lines.push("");
+  lines.push("Sesja domyślna Supabase:");
+  lines.push(JSON.stringify(scrubSession(sd.data.session), null, 2));
+  lines.push("");
+  lines.push("Sesja stara v1:");
+  lines.push(JSON.stringify(scrubSession(s1.data.session), null, 2));
+  lines.push("");
+
+  if(s05.data.session && s05.data.session.user){
+    const prof=await clientV05.from("profiles").select("id, login, rank_name, show_in_ranking").eq("id", s05.data.session.user.id).single();
+    lines.push("Profil v05:");
+    lines.push(JSON.stringify({error: prof.error ? prof.error.message : null, data: prof.data}, null, 2));
+  }
+
+  document.getElementById("out").textContent=lines.join("\n");
+}
+document.getElementById("check").onclick=run;
+document.getElementById("clear").onclick=function(){
+  safeKeys().forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+  document.getElementById("out").textContent="Wyczyszczono lokalne klucze auth. Teraz wejdź na konto.html i zaloguj się ponownie.";
+};
+run();
+</script>
+</body>
+</html>
