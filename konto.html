@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Konto gracza · Szpilplac · Familock</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Konto gracza Szpilplaca Familock. Zapis wyników, ranking i rangi.">
+<meta name="description" content="Konto gracza Szpilplaca Familock.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,12 +18,10 @@
 :root{
   --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
   --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
-  --green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;
-  --ok:#3f8a5a;--danger:#b5482f;
+  --green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;
   --sh:0 6px 18px -10px rgba(35,32,26,.4);
 }
-[data-theme=light]{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--correct:#3f8a5a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4);}
-[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--correct:#4a9a6a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5);}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5);}
 *{box-sizing:border-box;transition:background-color .2s,color .2s,border-color .2s}
 html,body{margin:0;min-height:100%}
 body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);
@@ -35,31 +33,22 @@ a{color:inherit;text-decoration:none}
 
 header{width:100%;max-width:480px;padding-top:20px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.site-name{font-family:"Oswald";font-size:clamp(26px,8vw,38px);font-weight:700;
-  letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
+.site-name{font-family:"Oswald";font-size:clamp(26px,8vw,38px);font-weight:700;letter-spacing:.01em;text-transform:uppercase;color:var(--ink);line-height:1}
 .site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
 .controls{display:flex;gap:6px;align-items:center}
-.lang-tog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
-.lang-tog button{font-size:11px;font-weight:700;padding:5px 10px;color:var(--ink2)}
-.lang-tog button.on{background:var(--green);color:#fff}
-.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
-  background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.icon-btn{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
 .icon-btn svg{display:block;flex:none}
 
 main{width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  box-shadow:var(--sh);padding:18px}
-.card h2{font-family:"Oswald";font-size:21px;text-transform:uppercase;letter-spacing:.03em;
-  margin:0 0 6px;color:var(--ink);line-height:1.05}
-.card .intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:18px}
+.card h2{font-family:"Oswald";font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:var(--ink);line-height:1.05}
+.intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
 .muted{color:var(--ink2);line-height:1.5}
 .small{font-size:11.5px;color:var(--ink2);line-height:1.45}
 
-.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;
-  background:var(--surface2);margin-bottom:16px}
-.tab{flex:1;font-size:12.5px;font-weight:800;padding:8px 6px;border-radius:999px;color:var(--ink2);
-  text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);margin-bottom:16px}
+.tab{flex:1;font-size:12.5px;font-weight:800;padding:8px 6px;border-radius:999px;color:var(--ink2);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
 .tab.active{background:var(--green);color:#fff}
 
 form{display:grid;gap:12px}
@@ -69,63 +58,42 @@ input[type="email"],input[type="password"],input[type="text"]{
   background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;outline:none}
 input::placeholder{color:var(--ink2);opacity:.7}
 input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.18)}
-.check{display:flex;align-items:flex-start;gap:9px;line-height:1.4;color:var(--ink2);
-  font-weight:500;font-size:12.5px}
+.check{display:flex;align-items:flex-start;gap:9px;line-height:1.4;color:var(--ink2);font-weight:500;font-size:12.5px}
 .check input{margin-top:2px;accent-color:var(--green)}
 
-.btn{border-radius:11px;padding:11px 14px;background:var(--green);color:#fff;font-weight:800;
-  font-size:14px;transition:transform .1s,filter .1s;text-align:center}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn{border-radius:11px;padding:11px 14px;background:var(--green);color:#fff;font-weight:800;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{filter:brightness(1.06)}
 .btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
-.btn.secondary:hover{background:var(--surface)}
 .btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
-.btn.danger:hover{background:rgba(181,72,47,.1)}
 .btn.gold{background:var(--gold);color:#20170d}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-.msg{margin:0;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
-  background:var(--surface2);color:var(--ink2);line-height:1.5;font-size:13px;white-space:pre-wrap}
+.msg{margin:0;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--surface2);color:var(--ink2);line-height:1.5;font-size:13px;white-space:pre-wrap}
 .msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
 .msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
-
 .panel{display:none}
 .panel.active{display:block}
 .hidden{display:none !important}
 
-.hero-profile{display:flex;flex-direction:column;gap:12px}
 .hello{font-family:"Oswald";font-size:30px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05;margin:0}
-.profile-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.profile-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .stat{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:800}
 .stat .value{font-family:"Oswald";font-size:23px;line-height:1.1;margin-top:4px;color:var(--ink)}
-.profile-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;
-  border-bottom:1px solid var(--line);font-size:13px}
+.profile-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
 .profile-row:last-of-type{border-bottom:0}
 .profile-row strong{color:var(--ink2);font-weight:700}
 .profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.sub-head{font-family:"Oswald";font-size:15px;text-transform:uppercase;letter-spacing:.03em;
-  color:var(--ink);margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.sub-head{font-family:"Oswald";font-size:15px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink);margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
 .result{padding:10px 0;border-bottom:1px solid var(--line)}
 .result:last-child{border-bottom:0}
-.pill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface2);
-  border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--ink);
-  font-family:"Oswald";letter-spacing:.02em}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--ink);font-family:"Oswald";letter-spacing:.02em}
 .result-meta{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:5px}
-.account-note{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:12px}
-.settings-box{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-.settings-box h3{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 8px;color:var(--ink)}
-.settings-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.warning-note{font-size:12px;color:var(--ink2);line-height:1.5;margin:8px 0 0}
+.recovery-box{border:1px solid var(--gold);background:rgba(191,138,58,.1);border-radius:12px;padding:12px;margin-bottom:14px;color:var(--ink2);font-size:12.5px;line-height:1.5}
 
-footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:11.5px;
-  margin-top:20px;line-height:1.7}
+footer{width:100%;max-width:480px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
 footer a{color:var(--green);font-weight:600}
-footer a:hover{text-decoration:underline}
-
-@media(max-width:420px){
-  .profile-summary{grid-template-columns:1fr}
-}
-@media(prefers-reduced-motion:reduce){*{transition:none !important}}
+@media(max-width:420px){.profile-summary{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -134,16 +102,12 @@ footer a:hover{text-decoration:underline}
   <div class="topbar">
     <div>
       <div class="site-name">Szpilplac</div>
-      <div class="site-sub" data-i18n="sub">Konto gracza</div>
+      <div class="site-sub">Konto gracza</div>
     </div>
     <div class="controls">
       <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
       </a>
-      <div class="lang-tog" role="group">
-        <button id="lPl" class="on" type="button">PL</button>
-        <button id="lSzl" type="button">ŚL</button>
-      </div>
       <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw"></button>
     </div>
   </div>
@@ -153,154 +117,145 @@ footer a:hover{text-decoration:underline}
   <div id="globalMsg" class="msg hidden"></div>
 
   <section class="card" id="authCard">
-    <div class="tabs">
-      <button class="tab active" type="button" data-tab="register" data-i18n="tabRegister">Załóż konto</button>
-      <button class="tab" type="button" data-tab="login" data-i18n="tabLogin">Zaloguj się</button>
-      <button class="tab" type="button" data-tab="reset" data-i18n="tabReset">Reset hasła</button>
+    <div id="recoveryNotice" class="recovery-box hidden">
+      Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej. Po zapisaniu hasła konto zostanie normalnie zalogowane.
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" type="button" data-tab="register">Załóż konto</button>
+      <button class="tab" type="button" data-tab="login">Zaloguj się</button>
+      <button class="tab" type="button" data-tab="reset">Reset hasła</button>
     </div>
 
     <div id="register" class="panel active">
-      <h2 data-i18n="regTitle">Załóż konto</h2>
-      <p class="intro" data-i18n="regIntro">Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.</p>
+      <h2>Załóż konto</h2>
+      <p class="intro">Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.</p>
 
       <form id="registerForm">
         <label class="field">
-          <span data-i18n="loginLabel">Login do rankingu</span>
-          <input id="regLogin" type="text" autocomplete="nickname" data-i18n-ph="loginPh" placeholder="np. Starzik92" required minlength="3" maxlength="24">
+          <span>Login do rankingu</span>
+          <input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24">
         </label>
-        <div class="small" data-i18n="loginHint">3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
+        <div class="small">3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
 
         <label class="field">
-          <span data-i18n="email">E-mail</span>
-          <input id="regEmail" type="email" autocomplete="email" data-i18n-ph="emailPh" placeholder="twoj@mail.pl" required>
+          <span>E-mail</span>
+          <input id="regEmail" type="email" autocomplete="email" placeholder="twoj@mail.pl" required>
         </label>
 
         <label class="field">
-          <span data-i18n="password">Hasło</span>
+          <span>Hasło</span>
           <input id="regPassword" type="password" autocomplete="new-password" required minlength="8">
         </label>
 
         <label class="field">
-          <span data-i18n="password2">Powtórz hasło</span>
+          <span>Powtórz hasło</span>
           <input id="regPassword2" type="password" autocomplete="new-password" required minlength="8">
         </label>
 
         <label class="check">
           <input id="regTerms" type="checkbox" required>
-          <span data-i18n="terms">Akceptuję regulamin Szpilplaca i politykę prywatności.</span>
+          <span>Akceptuję regulamin Szpilplaca i politykę prywatności.</span>
         </label>
 
         <label class="check">
           <input id="regMarketing" type="checkbox">
-          <span data-i18n="marketing">Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span>
+          <span>Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span>
         </label>
 
-        <button class="btn" type="submit" data-i18n="regSubmit">Załóż konto</button>
+        <button class="btn" type="submit">Załóż konto</button>
       </form>
     </div>
 
     <div id="login" class="panel">
-      <h2 data-i18n="loginTitle">Zaloguj się</h2>
-      <p class="intro" data-i18n="loginIntro">Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.</p>
+      <h2>Zaloguj się</h2>
+      <p class="intro">Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.</p>
       <form id="loginForm">
         <label class="field">
-          <span data-i18n="email">E-mail</span>
+          <span>E-mail</span>
           <input id="loginEmail" type="email" autocomplete="email" required>
         </label>
         <label class="field">
-          <span data-i18n="password">Hasło</span>
+          <span>Hasło</span>
           <input id="loginPassword" type="password" autocomplete="current-password" required>
         </label>
-        <button class="btn" type="submit" data-i18n="loginSubmit">Zaloguj się</button>
+        <button class="btn" type="submit">Zaloguj się</button>
       </form>
     </div>
 
     <div id="reset" class="panel">
-      <h2 data-i18n="resetTitle">Reset hasła</h2>
-      <p class="intro" data-i18n="resetIntro">Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.</p>
+      <h2 id="resetTitle">Reset hasła</h2>
+      <p class="intro" id="resetIntro">Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.</p>
+
       <form id="resetForm">
         <label class="field">
-          <span data-i18n="email">E-mail</span>
+          <span>E-mail</span>
           <input id="resetEmail" type="email" autocomplete="email" required>
         </label>
-        <button class="btn" type="submit" data-i18n="resetSubmit">Wyślij link resetujący</button>
+        <button class="btn" type="submit">Wyślij link resetujący</button>
       </form>
 
       <div id="newPasswordBox" class="hidden" style="margin-top:18px;">
-        <h2 data-i18n="newPassTitle">Ustaw nowe hasło</h2>
+        <h2>Ustaw nowe hasło</h2>
         <form id="newPasswordForm">
           <label class="field">
-            <span data-i18n="newPass">Nowe hasło</span>
+            <span>Nowe hasło</span>
             <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
           </label>
-          <button class="btn" type="submit" data-i18n="newPassSubmit">Zapisz nowe hasło</button>
+          <label class="field">
+            <span>Powtórz nowe hasło</span>
+            <input id="newPassword2" type="password" autocomplete="new-password" minlength="8" required>
+          </label>
+          <button class="btn" type="submit">Zapisz nowe hasło</button>
         </form>
       </div>
     </div>
   </section>
 
   <section class="card hidden" id="profileCard">
-    <div class="hero-profile">
-      <div>
-        <p class="hello" id="helloTitle">Cześć!</p>
-        <p class="intro" id="helloIntro">To Twoje konto gracza w Szpilplacu.</p>
+    <p class="hello" id="helloTitle">Cześć!</p>
+    <p class="intro">To Twoje konto gracza w Szpilplacu.</p>
+
+    <div class="profile-summary">
+      <div class="stat">
+        <div class="label">Ranga</div>
+        <div class="value" id="sumRank">Bajtel</div>
       </div>
-
-      <div class="profile-summary">
-        <div class="stat">
-          <div class="label" data-i18n="statRank">Ranga</div>
-          <div class="value" id="sumRank">Bajtel</div>
-        </div>
-        <div class="stat">
-          <div class="label" data-i18n="statPoints">Punkty</div>
-          <div class="value" id="sumPoints">0</div>
-        </div>
-        <div class="stat">
-          <div class="label" data-i18n="statGames">Gry</div>
-          <div class="value" id="sumGames">0</div>
-        </div>
-        <div class="stat">
-          <div class="label" data-i18n="statWins">Wygrane</div>
-          <div class="value" id="sumWins">0</div>
-        </div>
+      <div class="stat">
+        <div class="label">Punkty</div>
+        <div class="value" id="sumPoints">0</div>
       </div>
-
-      <div>
-        <div class="profile-row"><strong data-i18n="pLogin">Login</strong><span id="pLogin"></span></div>
-        <div class="profile-row"><strong data-i18n="pEmail">E-mail</strong><span id="pEmail"></span></div>
-        <div class="profile-row"><strong data-i18n="pRanking">Ranking</strong><span id="pRanking"></span></div>
+      <div class="stat">
+        <div class="label">Gry</div>
+        <div class="value" id="sumGames">0</div>
       </div>
-
-      <div class="profile-actions">
-        <a class="btn secondary" href="index.html" data-i18n="backHome">Wróć do Szpilplaca</a>
-        <a class="btn gold" href="ranking.html" data-i18n="goRanking">Ranking</a>
-        <button type="button" class="btn danger" id="logoutBtn" data-i18n="logout">Wyloguj</button>
-      </div>
-
-      <p class="account-note" data-i18n="accountNote">Konto zapisuje wyniki w chmurze. Sama gra nadal działa także bez logowania.</p>
-
-      <div class="settings-box">
-        <h3 data-i18n="settingsTitle">Ustawienia konta</h3>
-        <p class="warning-note" data-i18n="settingsIntro">Możesz ukryć swój login w rankingu albo poprosić o usunięcie konta.</p>
-        <div class="settings-actions">
-          <button type="button" class="btn secondary" id="toggleRankingBtn" data-i18n="hideRanking">Ukryj mnie z rankingu</button>
-          <button type="button" class="btn danger" id="deleteRequestBtn" data-i18n="deleteRequest">Poproś o usunięcie konta</button>
-        </div>
-        <p class="warning-note" data-i18n="deleteNote">Pełne automatyczne usuwanie konta dodamy osobnym bezpiecznym endpointem. Na razie przycisk przygotowuje zgłoszenie mailowe.</p>
+      <div class="stat">
+        <div class="label">Wygrane</div>
+        <div class="value" id="sumWins">0</div>
       </div>
     </div>
 
-    <div class="sub-head" data-i18n="resultsTitle">Ostatnie wyniki z konta</div>
-    <div id="resultsBox" class="muted" data-i18n="resultsEmptyAcc">Brak zapisanych wyników na koncie.</div>
+    <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
+    <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
+    <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
+
+    <div class="profile-actions">
+      <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
+      <a class="btn gold" href="ranking.html">Ranking</a>
+      <button type="button" class="btn danger" id="logoutBtn">Wyloguj</button>
+    </div>
+
+    <div class="sub-head">Ostatnie wyniki z konta</div>
+    <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
   </section>
 
   <footer>
     <p>
-      <a href="index.html" data-i18n="footerHome">Szpilplac</a>
+      <a href="index.html">Szpilplac</a>
       ·
-      <a href="ranking.html" data-i18n="footerRanking">Ranking</a>
+      <a href="ranking.html">Ranking</a>
       ·
-      <a href="https://familock.pl" rel="noopener" data-i18n="footerFamilock">Familock</a>
+      <a href="https://familock.pl" rel="noopener">Familock</a>
     </p>
   </footer>
 </main>
@@ -308,574 +263,448 @@ footer a:hover{text-decoration:underline}
 <script>
 "use strict";
 
-var LK="familock_lang",TK="szpilplac_theme";
-var store=(function(){var m={},ok=false;
-  try{localStorage.setItem("__t","1");localStorage.removeItem("__t");ok=true;}catch(e){}
-  return{get:function(k){try{return ok?localStorage.getItem(k):(m[k]||null);}catch(e){return m[k]||null;}},
-         set:function(k,v){try{ok?localStorage.setItem(k,v):(m[k]=v);}catch(e){m[k]=v;}}};})();
+var TERMS_VERSION = "2026-06-29";
+var PRIVACY_VERSION = "2026-06-29";
+var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
+var sb = null;
+var recoveryMode = false;
+var initialUrl = new URL(window.location.href);
 
-var ICO={
-  sun:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>',
-  moon:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
-};
-var THEME_ICONS={light:ICO.sun,dark:ICO.moon};
-var theme=store.get(TK)||"light";
-function applyTheme(){document.documentElement.setAttribute("data-theme",theme);document.getElementById("themeBtn").innerHTML=THEME_ICONS[theme];}
-document.getElementById("themeBtn").addEventListener("click",function(){theme=theme==="light"?"dark":"light";store.set(TK,theme);applyTheme();});
-applyTheme();
+var els = {
+  globalMsg: document.getElementById("globalMsg"),
+  authCard: document.getElementById("authCard"),
+  profileCard: document.getElementById("profileCard"),
+  tabs: document.getElementById("tabs"),
+  recoveryNotice: document.getElementById("recoveryNotice"),
 
-var lang=store.get(LK)||"pl";
-var T={
-  pl:{
-    sub:"Konto gracza",
-    tabRegister:"Załóż konto", tabLogin:"Zaloguj się", tabReset:"Reset hasła",
-    regTitle:"Załóż konto",
-    regIntro:"Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.",
-    loginLabel:"Login do rankingu", loginPh:"np. Starzik92",
-    loginHint:"3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.",
-    email:"E-mail", emailPh:"twoj@mail.pl", password:"Hasło", password2:"Powtórz hasło",
-    terms:"Akceptuję regulamin Szpilplaca i politykę prywatności.",
-    marketing:"Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.",
-    regSubmit:"Załóż konto",
-    loginTitle:"Zaloguj się",
-    loginIntro:"Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.",
-    loginSubmit:"Zaloguj się",
-    resetTitle:"Reset hasła",
-    resetIntro:"Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.",
-    resetSubmit:"Wyślij link resetujący",
-    newPassTitle:"Ustaw nowe hasło", newPass:"Nowe hasło", newPassSubmit:"Zapisz nowe hasło",
-    statRank:"Ranga", statPoints:"Punkty", statGames:"Gry", statWins:"Wygrane",
-    pLogin:"Login", pEmail:"E-mail", pRanking:"Ranking",
-    backHome:"Wróć do Szpilplaca", goRanking:"Ranking", logout:"Wyloguj",
-    accountNote:"Konto zapisuje wyniki w chmurze. Sama gra nadal działa także bez logowania.",
-    settingsTitle:"Ustawienia konta",
-    settingsIntro:"Możesz ukryć swój login w rankingu albo poprosić o usunięcie konta.",
-    hideRanking:"Ukryj mnie z rankingu",
-    showRanking:"Pokaż mnie w rankingu",
-    deleteRequest:"Poproś o usunięcie konta",
-    deleteNote:"Pełne automatyczne usuwanie konta dodamy osobnym bezpiecznym endpointem. Na razie przycisk przygotowuje zgłoszenie mailowe.",
-    rankingUpdateStart:"Aktualizuję widoczność w rankingu...",
-    rankingUpdateOk:"Zmieniono widoczność w rankingu.",
-    rankingUpdateErr:"Nie udało się zmienić widoczności w rankingu: ",
-    deleteMailSubject:"Prośba o usunięcie konta Szpilplac",
-    deleteMailBody:"Proszę o usunięcie mojego konta w Szpilplacu. E-mail: {email}. Login: {login}.",
-    resultsTitle:"Ostatnie wyniki z konta",
-    resultsEmptyAcc:"Brak zapisanych wyników na koncie.",
-    footerHome:"Szpilplac", footerRanking:"Ranking", footerFamilock:"Familock",
-    noConfig:"Brak konfiguracji Supabase. Upewnij się, że konto.html leży obok config.js i że config.js ustawia window.SZPILPLAC_CONFIG.",
-    noLib:"Nie udało się załadować biblioteki Supabase JS z CDN.",
-    loginFormat:"Login musi mieć 3-24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.",
-    passShort:"Hasło musi mieć minimum 8 znaków.",
-    passMismatch:"Hasła nie są takie same.",
-    needTerms:"Musisz zaakceptować regulamin i politykę prywatności.",
-    regStart:"Tworzę konto i wysyłam mail potwierdzający...",
-    regErr:"Nie udało się założyć konta: ",
-    regOkSession:"Konto utworzone i jesteś zalogowany.",
-    regOkConfirm:"Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.",
-    loginStart:"Loguję...",
-    loginErr:"Nie udało się zalogować: ",
-    loginOk:"Zalogowano.",
-    resetStart:"Wysyłam link do resetu hasła...",
-    resetErr:"Nie udało się wysłać resetu hasła: ",
-    resetOk:"Wysłano link do resetu hasła. Sprawdź skrzynkę.",
-    newPassShort:"Nowe hasło musi mieć minimum 8 znaków.",
-    newPassErr:"Nie udało się zmienić hasła: ",
-    newPassOk:"Hasło zmienione. Możesz się zalogować nowym hasłem.",
-    logoutOk:"Wylogowano.",
-    bootReset:"Ustaw nowe hasło po kliknięciu linku z maila.",
-    bootConfirmed:"Jeśli potwierdzenie maila się udało, możesz się zalogować.",
-    recovery:"Ustaw nowe hasło.",
-    profileReadErr:"Błąd odczytu profilu",
-    resultsReadErr:"Błąd odczytu wyników: ",
-    won:"wygrana", lost:"porażka", pts:"pkt", triesL:"próby", errorsL:"błędy",
-    visible:"widoczny", hidden:"ukryty", defaultRank:"Bajtel",
-    hello:"Cześć, {login}!", intro:"To Twoje konto gracza w Szpilplacu.",
-    errExists:"Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.",
-    errCreds:"Nieprawidłowy e-mail albo hasło.",
-    errUnconfirmed:"Najpierw potwierdź e-mail linkiem z wiadomości.",
-    errDup:"Ten login jest już zajęty.",
-    errLoginChars:"Login ma niedozwolone znaki.",
-    errLoginLen:"Login musi mieć od 3 do 24 znaków.",
-    errTimeout:"Operacja trwa zbyt długo. Spróbuj ponownie za chwilę.",
-    errUnknown:"Nieznany błąd."
-  },
-  szl:{
-    sub:"Kōnto gracza",
-    tabRegister:"Założ kōnto", tabLogin:"Zaloguj sie", tabReset:"Reset hasła",
-    regTitle:"Założ kōnto",
-    regIntro:"Kōnto je na zorta. Szpil dziŏ tyż bez logowanio, ale z kōntym ôstanie ci spamiyntany wynik, ranking i ranga, choćbyś zmiyniōł przeglōndarka abo wyczyściōł cache.",
-    loginLabel:"Login do rankingu", loginPh:"np. Starzik92",
-    loginHint:"3-24 znaki. Idzie: litery, cyfry, podkryślynie, myślnik i polske znaki.",
-    email:"E-mail", emailPh:"twoj@mail.pl", password:"Hasło", password2:"Powtōrz hasło",
-    terms:"Przijmuja regulamin Szpilplaca i polityka prywatności.",
-    marketing:"Chca dostŏwać wiadōmości ô Familocku, promocyjach i nowościach. Na zorta.",
-    regSubmit:"Założ kōnto",
-    loginTitle:"Zaloguj sie",
-    loginIntro:"Zaloguj sie e-mailym i hasłym. Login do rankingu widać publicznie, e-maila niy.",
-    loginSubmit:"Zaloguj sie",
-    resetTitle:"Reset hasła",
-    resetIntro:"Wpisz e-mail, a poślymy link do nastawiynio nowego hasła.",
-    resetSubmit:"Poślij link resetujōncy",
-    newPassTitle:"Nastŏw nowe hasło", newPass:"Nowe hasło", newPassSubmit:"Spamiyntej nowe hasło",
-    statRank:"Ranga", statPoints:"Punkty", statGames:"Szpile", statWins:"Wygrane",
-    pLogin:"Login", pEmail:"E-mail", pRanking:"Ranking",
-    backHome:"Nazŏd do Szpilplaca", goRanking:"Ranking", logout:"Wyloguj",
-    accountNote:"Kōnto spamiyntuje wyniki w chmurze. Sōm szpil dziŏ tyż bez logowanio.",
-    settingsTitle:"Nasztalowania kōnta",
-    settingsIntro:"Możesz skryć swōj login w rankingu abo poprosić ô skasowanie kōnta.",
-    hideRanking:"Skryj mie z rankingu",
-    showRanking:"Pokŏż mie w rankingu",
-    deleteRequest:"Popros ô skasowanie kōnta",
-    deleteNote:"Pełne autōmatyczne kasowanie kōnta dodōmy ôsobnym bezpiecznym endpointym. Na teroz knefel rychtuje mailowe zgłoszynie.",
-    rankingUpdateStart:"Aktualizuja widoczność w rankingu...",
-    rankingUpdateOk:"Zmiyniōno widoczność w rankingu.",
-    rankingUpdateErr:"Niy szło zmiynić widoczności w rankingu: ",
-    deleteMailSubject:"Prośba o usunięcie konta Szpilplac",
-    deleteMailBody:"Proszę o usunięcie mojego konta w Szpilplacu. E-mail: {email}. Login: {login}.",
-    resultsTitle:"Ôstatnie wyniki z kōnta",
-    resultsEmptyAcc:"Brak spamiyntanych wynikōw na kōncie.",
-    footerHome:"Szpilplac", footerRanking:"Ranking", footerFamilock:"Familock",
-    noConfig:"Brak kōnfiguracyje Supabase. Wejrzij, czy konto.html leży kole config.js i czy config.js nastawiŏ window.SZPILPLAC_CONFIG.",
-    noLib:"Niy szło wczytać biblioteki Supabase JS z CDN.",
-    loginFormat:"Login musi mieć 3-24 znaki i może mieć litery, cyfry, podkryślynie, myślnik i polske znaki.",
-    passShort:"Hasło musi mieć minimum 8 znakōw.",
-    passMismatch:"Hasła sōm inksze.",
-    needTerms:"Musisz przijōnć regulamin i polityka prywatności.",
-    regStart:"Robia kōnto i posyłom mail potwierdzajōncy...",
-    regErr:"Niy szło założyć kōnta: ",
-    regOkSession:"Kōnto zrobiōne i jeżeś zalogowany.",
-    regOkConfirm:"Kōnto zrobiōne. Wejrzij do maila i kliknij link potwierdzajōncy kōnto.",
-    loginStart:"Loguja...",
-    loginErr:"Niy szło sie zalogować: ",
-    loginOk:"Zalogowano.",
-    resetStart:"Posyłom link do resetu hasła...",
-    resetErr:"Niy szło posłać resetu hasła: ",
-    resetOk:"Posłany link do resetu hasła. Wejrzij do skrzynki.",
-    newPassShort:"Nowe hasło musi mieć minimum 8 znakōw.",
-    newPassErr:"Niy szło zmiynić hasła: ",
-    newPassOk:"Hasło zmiyniōne. Możesz sie zalogować nowym hasłym.",
-    logoutOk:"Wylogowano.",
-    bootReset:"Nastŏw nowe hasło po kliknięciu linku z maila.",
-    bootConfirmed:"Jak potwierdzynie maila sie podarziło, możesz sie zalogować.",
-    recovery:"Nastŏw nowe hasło.",
-    profileReadErr:"Błōnd ôdczytu profilu",
-    resultsReadErr:"Błōnd ôdczytu wynikōw: ",
-    won:"wygrano", lost:"przegrano", pts:"pkt", triesL:"prōby", errorsL:"błyndy",
-    visible:"widoczny", hidden:"skryty", defaultRank:"Bajtel",
-    hello:"Cześć, {login}!", intro:"To twoje kōnto gracza w Szpilplacu.",
-    errExists:"Tyn e-mail mŏ już kōnto. Sprōbuj sie zalogować abo zresetować hasło.",
-    errCreds:"Zły e-mail abo hasło.",
-    errUnconfirmed:"Nojprzōd potwierdź e-mail linkym z wiadōmości.",
-    errDup:"Tyn login je już zajynty.",
-    errLoginChars:"Login mŏ niydozwolōne znaki.",
-    errLoginLen:"Login musi mieć ôd 3 do 24 znakōw.",
-    errTimeout:"To trwa za dugo. Sprōbuj za chwila.",
-    errUnknown:"Niyznany błōnd."
-  }
+  registerForm: document.getElementById("registerForm"),
+  loginForm: document.getElementById("loginForm"),
+  resetForm: document.getElementById("resetForm"),
+  newPasswordForm: document.getElementById("newPasswordForm"),
+  newPasswordBox: document.getElementById("newPasswordBox"),
+
+  regLogin: document.getElementById("regLogin"),
+  regEmail: document.getElementById("regEmail"),
+  regPassword: document.getElementById("regPassword"),
+  regPassword2: document.getElementById("regPassword2"),
+  regTerms: document.getElementById("regTerms"),
+  regMarketing: document.getElementById("regMarketing"),
+
+  loginEmail: document.getElementById("loginEmail"),
+  loginPassword: document.getElementById("loginPassword"),
+  resetEmail: document.getElementById("resetEmail"),
+  newPassword: document.getElementById("newPassword"),
+  newPassword2: document.getElementById("newPassword2"),
+
+  resetTitle: document.getElementById("resetTitle"),
+  resetIntro: document.getElementById("resetIntro"),
+
+  helloTitle: document.getElementById("helloTitle"),
+  sumRank: document.getElementById("sumRank"),
+  sumPoints: document.getElementById("sumPoints"),
+  sumGames: document.getElementById("sumGames"),
+  sumWins: document.getElementById("sumWins"),
+  pEmail: document.getElementById("pEmail"),
+  pLogin: document.getElementById("pLogin"),
+  pRanking: document.getElementById("pRanking"),
+  resultsBox: document.getElementById("resultsBox"),
+  logoutBtn: document.getElementById("logoutBtn")
 };
 
-function t(key){return (T[lang]&&T[lang][key]!=null)?T[lang][key]:(T.pl[key]!=null?T.pl[key]:key);}
-var LOGIN_RE=/^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
-var TERMS_VERSION='2026-06-29';
-var PRIVACY_VERSION='2026-06-29';
-var sb=null;
-var currentUser=null;
-var currentProfile=null;
-
-var els={
-  globalMsg:document.getElementById('globalMsg'),
-  authCard:document.getElementById('authCard'),
-  profileCard:document.getElementById('profileCard'),
-  registerForm:document.getElementById('registerForm'),
-  loginForm:document.getElementById('loginForm'),
-  resetForm:document.getElementById('resetForm'),
-  newPasswordForm:document.getElementById('newPasswordForm'),
-  newPasswordBox:document.getElementById('newPasswordBox'),
-  regLogin:document.getElementById('regLogin'),
-  regEmail:document.getElementById('regEmail'),
-  regPassword:document.getElementById('regPassword'),
-  regPassword2:document.getElementById('regPassword2'),
-  regTerms:document.getElementById('regTerms'),
-  regMarketing:document.getElementById('regMarketing'),
-  loginEmail:document.getElementById('loginEmail'),
-  loginPassword:document.getElementById('loginPassword'),
-  resetEmail:document.getElementById('resetEmail'),
-  newPassword:document.getElementById('newPassword'),
-  helloTitle:document.getElementById('helloTitle'),
-  helloIntro:document.getElementById('helloIntro'),
-  sumRank:document.getElementById('sumRank'),
-  sumPoints:document.getElementById('sumPoints'),
-  sumGames:document.getElementById('sumGames'),
-  sumWins:document.getElementById('sumWins'),
-  pEmail:document.getElementById('pEmail'),
-  pLogin:document.getElementById('pLogin'),
-  pRanking:document.getElementById('pRanking'),
-  resultsBox:document.getElementById('resultsBox'),
-  toggleRankingBtn:document.getElementById('toggleRankingBtn'),
-  deleteRequestBtn:document.getElementById('deleteRequestBtn'),
-  logoutBtn:document.getElementById('logoutBtn')
-};
-
-function applyLang(){
-  document.documentElement.lang=(lang==='szl')?'szl':'pl';
-  document.getElementById('lPl').className=lang==='pl'?'on':'';
-  document.getElementById('lSzl').className=lang==='szl'?'on':'';
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-    var k=el.getAttribute('data-i18n'); if(T[lang][k]!=null)el.textContent=t(k);
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-    var k=el.getAttribute('data-i18n-ph'); if(T[lang][k]!=null)el.setAttribute('placeholder',t(k));
-  });
+function setMsg(text, type) {
+  els.globalMsg.textContent = text;
+  els.globalMsg.className = "msg" + (type ? " " + type : "");
+  els.globalMsg.classList.remove("hidden");
 }
-
-function setMsg(text,type){
-  els.globalMsg.textContent=text;
-  els.globalMsg.className='msg'+(type?' '+type:'');
-  els.globalMsg.classList.remove('hidden');
+function clearMsg() {
+  els.globalMsg.textContent = "";
+  els.globalMsg.className = "msg hidden";
 }
-function clearMsg(){els.globalMsg.textContent='';els.globalMsg.className='msg hidden';}
-
-function niceError(error){
-  if(!error)return t('errUnknown');
-  var msg=error.message||String(error);
-  if(msg.includes('User already registered'))return t('errExists');
-  if(msg.includes('Invalid login credentials'))return t('errCreds');
-  if(msg.includes('Email not confirmed'))return t('errUnconfirmed');
-  if(msg.includes('duplicate key'))return t('errDup');
-  if(msg.includes('profiles_login_format_chk'))return t('errLoginChars');
-  if(msg.includes('profiles_login_length_chk'))return t('errLoginLen');
-  if(msg.includes('timeout'))return t('errTimeout');
-  return msg;
+function setBusy(form, busy) {
+  form.querySelectorAll("button,input").forEach(function (el) { el.disabled = busy; });
 }
-
-function getRedirectUrl(extra){
-  var url=new URL(window.location.href);
-  url.search=extra||'';
-  url.hash='';
-  return url.toString();
-}
-
-function setBusy(form,busy){form.querySelectorAll('button,input').forEach(function(el){el.disabled=busy;});}
-
-function withTimeout(promise,ms,label){
+function withTimeout(promise, ms, label) {
   return Promise.race([
     promise,
-    new Promise(function(_,reject){setTimeout(function(){reject(new Error(label||'timeout'));},ms);})
+    new Promise(function (_, reject) {
+      setTimeout(function () { reject(new Error(label || "timeout")); }, ms);
+    })
   ]);
 }
+function niceError(error) {
+  if (!error) return "Nieznany błąd.";
+  var msg = error.message || String(error);
+  if (msg.includes("User already registered")) return "Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.";
+  if (msg.includes("Invalid login credentials")) return "Nieprawidłowy e-mail albo hasło.";
+  if (msg.includes("Email not confirmed")) return "Najpierw potwierdź e-mail linkiem z wiadomości.";
+  if (msg.includes("duplicate key")) return "Ten login jest już zajęty.";
+  if (msg.includes("profiles_login_format_chk")) return "Login ma niedozwolone znaki.";
+  if (msg.includes("profiles_login_length_chk")) return "Login musi mieć od 3 do 24 znaków.";
+  if (msg.includes("timeout")) return "Operacja trwa zbyt długo. Spróbuj ponownie za chwilę.";
+  if (msg.includes("Auth session missing")) return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
+  return msg;
+}
+function getRedirectUrl(extra) {
+  var url = new URL(window.location.href);
+  url.search = extra || "";
+  url.hash = "";
+  return url.toString();
+}
+function cleanUrl() {
+  history.replaceState({}, document.title, window.location.pathname);
+}
+function escapeHtml(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+  });
+}
 
-function switchTab(id){
-  document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('active',btn.dataset.tab===id);});
-  document.querySelectorAll('.panel').forEach(function(panel){panel.classList.toggle('active',panel.id===id);});
+var theme = localStorage.getItem("szpilplac_theme") || "light";
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.getElementById("themeBtn").innerHTML = theme === "dark"
+    ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/></svg>';
+}
+document.getElementById("themeBtn").addEventListener("click", function () {
+  theme = theme === "light" ? "dark" : "light";
+  localStorage.setItem("szpilplac_theme", theme);
+  applyTheme();
+});
+applyTheme();
+
+function switchTab(id) {
+  document.querySelectorAll(".tab").forEach(function (btn) {
+    btn.classList.toggle("active", btn.dataset.tab === id);
+  });
+  document.querySelectorAll(".panel").forEach(function (panel) {
+    panel.classList.toggle("active", panel.id === id);
+  });
   clearMsg();
 }
-document.querySelectorAll('.tab').forEach(function(btn){
-  btn.addEventListener('click',function(){switchTab(btn.dataset.tab);});
+document.querySelectorAll(".tab").forEach(function (btn) {
+  btn.addEventListener("click", function () { switchTab(btn.dataset.tab); });
 });
 
-function initSupabase(){
-  var cfg=window.SZPILPLAC_CONFIG||{};
-  var url=cfg.SUPABASE_URL, key=cfg.SUPABASE_ANON_KEY;
-  if(!url||!key){setMsg(t('noConfig'),'err');return false;}
-  if(!window.supabase){setMsg(t('noLib'),'err');return false;}
-  sb=window.supabase.createClient(url,key,{
-    auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+function enterRecoveryMode(message) {
+  recoveryMode = true;
+  els.authCard.classList.remove("hidden");
+  els.profileCard.classList.add("hidden");
+  els.recoveryNotice.classList.remove("hidden");
+  els.tabs.classList.add("hidden");
+  els.resetForm.classList.add("hidden");
+  els.newPasswordBox.classList.remove("hidden");
+  els.resetTitle.textContent = "Ustaw nowe hasło";
+  els.resetIntro.textContent = "Wpisz nowe hasło i zapisz zmianę. Po udanej zmianie zostaniesz zalogowany.";
+  switchTab("reset");
+  if (message) setMsg(message, "ok");
+}
+
+function exitRecoveryMode() {
+  recoveryMode = false;
+  els.recoveryNotice.classList.add("hidden");
+  els.tabs.classList.remove("hidden");
+  els.resetForm.classList.remove("hidden");
+  els.newPasswordBox.classList.add("hidden");
+  els.resetTitle.textContent = "Reset hasła";
+  els.resetIntro.textContent = "Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.";
+}
+
+function showLoggedOut() {
+  if (recoveryMode) return;
+  els.authCard.classList.remove("hidden");
+  els.profileCard.classList.add("hidden");
+}
+function showLoggedIn() {
+  if (recoveryMode) return;
+  els.authCard.classList.add("hidden");
+  els.profileCard.classList.remove("hidden");
+}
+
+function initSupabase() {
+  var cfg = window.SZPILPLAC_CONFIG || {};
+  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
+    setMsg("Brak konfiguracji Supabase. Upewnij się, że konto.html leży obok config.js.", "err");
+    return false;
+  }
+  if (!window.supabase) {
+    setMsg("Nie udało się załadować biblioteki Supabase JS.", "err");
+    return false;
+  }
+  sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+    auth: {
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true
+    }
   });
   return true;
 }
 
-async function getSessionUser(){
-  var r=await sb.auth.getUser();
-  if(r.error)return null;
-  return r.data.user||null;
+async function getSessionUser() {
+  var r = await sb.auth.getUser();
+  if (r.error) return null;
+  return r.data.user || null;
 }
 
-function showLoggedOut(){
-  currentUser=null;
-  currentProfile=null;
-  els.authCard.classList.remove('hidden');
-  els.profileCard.classList.add('hidden');
-}
+async function loadProfile() {
+  if (!sb) return;
+  if (recoveryMode) return;
 
-function showLoggedIn(){
-  els.authCard.classList.add('hidden');
-  els.profileCard.classList.remove('hidden');
-}
+  var user = await getSessionUser();
+  if (!user) {
+    showLoggedOut();
+    return;
+  }
 
-async function loadProfile(){
-  if(!sb)return;
-  var user=await getSessionUser();
-  if(!user){showLoggedOut();return;}
-
-  currentUser=user;
   showLoggedIn();
+  els.pEmail.textContent = user.email || "-";
 
-  els.pEmail.textContent=user.email||'-';
-
-  var res=await sb.from('profiles')
-    .select('id, login, display_name, rank_name, show_in_ranking')
-    .eq('id',user.id)
+  var res = await sb.from("profiles")
+    .select("id, login, display_name, rank_name, show_in_ranking")
+    .eq("id", user.id)
     .single();
 
-  var profile=null;
-  currentProfile=null;
-  if(res.error){
-    els.helloTitle.textContent=t('profileReadErr');
-    els.helloIntro.textContent=niceError(res.error);
-    els.pLogin.textContent='-';
-    els.sumRank.textContent='-';
-    els.pRanking.textContent='-';
-  }else{
-    profile=res.data;
-    currentProfile=profile;
-    var login=profile.login||profile.display_name||'graczu';
-    els.helloTitle.textContent=t('hello').replace('{login}',login);
-    els.helloIntro.textContent=t('intro');
-    els.pLogin.textContent=profile.login||'-';
-    els.sumRank.textContent=profile.rank_name||t('defaultRank');
-    els.pRanking.textContent=profile.show_in_ranking?t('visible'):t('hidden');
-    els.toggleRankingBtn.textContent=profile.show_in_ranking?t('hideRanking'):t('showRanking');
+  if (res.error) {
+    els.helloTitle.textContent = "Błąd odczytu profilu";
+    els.pLogin.textContent = "-";
+    els.sumRank.textContent = "-";
+    els.pRanking.textContent = "-";
+  } else {
+    var profile = res.data;
+    var login = profile.login || profile.display_name || "graczu";
+    els.helloTitle.textContent = "Cześć, " + login + "!";
+    els.pLogin.textContent = profile.login || "-";
+    els.sumRank.textContent = profile.rank_name || "Bajtel";
+    els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
   }
 
   await loadResults(user.id);
 }
 
-async function loadResults(userId){
-  var res=await sb.from('user_game_results')
-    .select('game, mode, puzzle_no, won, tries, errors, score, finished_at')
-    .eq('user_id',userId)
-    .order('finished_at',{ascending:false})
+async function loadResults(userId) {
+  var res = await sb.from("user_game_results")
+    .select("game, mode, puzzle_no, won, tries, errors, score, finished_at")
+    .eq("user_id", userId)
+    .order("finished_at", {ascending:false})
     .limit(20);
 
-  if(res.error){
-    els.resultsBox.textContent=t('resultsReadErr')+niceError(res.error);
-    els.resultsBox.classList.add('muted');
+  if (res.error) {
+    els.resultsBox.textContent = "Błąd odczytu wyników: " + niceError(res.error);
     return;
   }
 
-  var data=res.data||[];
-  var games=data.length;
-  var wins=data.filter(function(r){return r.won;}).length;
-  var points=data.reduce(function(sum,r){return sum+(Number(r.score)||0);},0);
+  var data = res.data || [];
+  var games = data.length;
+  var wins = data.filter(function (r) { return r.won; }).length;
+  var points = data.reduce(function (sum, r) { return sum + (Number(r.score) || 0); }, 0);
 
-  els.sumGames.textContent=String(games);
-  els.sumWins.textContent=String(wins);
-  els.sumPoints.textContent=String(points);
+  els.sumGames.textContent = String(games);
+  els.sumWins.textContent = String(wins);
+  els.sumPoints.textContent = String(points);
 
-  if(!data.length){
-    els.resultsBox.textContent=t('resultsEmptyAcc');
-    els.resultsBox.classList.add('muted');
+  if (!data.length) {
+    els.resultsBox.textContent = "Brak zapisanych wyników na koncie.";
     return;
   }
 
-  els.resultsBox.classList.remove('muted');
-  els.resultsBox.innerHTML=data.slice(0,10).map(function(row){
-    var won=row.won?t('won'):t('lost');
-    var when=row.finished_at?new Date(row.finished_at).toLocaleString('pl-PL'):'';
+  els.resultsBox.innerHTML = data.slice(0,10).map(function (row) {
+    var won = row.won ? "wygrana" : "porażka";
+    var when = row.finished_at ? new Date(row.finished_at).toLocaleString("pl-PL") : "";
     return '<div class="result">'
-      +'<span class="pill">'+escapeHtml(row.game)+' #'+escapeHtml(row.puzzle_no)+'</span>'
-      +'<div class="result-meta">'+won+', '+escapeHtml(row.score)+' '+t('pts')
-      +', '+t('triesL')+': '+(row.tries!=null?escapeHtml(row.tries):'-')
-      +', '+t('errorsL')+': '+(row.errors!=null?escapeHtml(row.errors):'-')+'<br>'+escapeHtml(when)+'</div>'
-      +'</div>';
-  }).join('');
+      + '<span class="pill">' + escapeHtml(row.game) + ' #' + escapeHtml(row.puzzle_no) + '</span>'
+      + '<div class="result-meta">' + won + ', ' + escapeHtml(row.score) + ' pkt'
+      + ', próby: ' + (row.tries != null ? escapeHtml(row.tries) : '-')
+      + ', błędy: ' + (row.errors != null ? escapeHtml(row.errors) : '-') + '<br>' + escapeHtml(when) + '</div>'
+      + '</div>';
+  }).join("");
 }
 
-function escapeHtml(v){
-  return String(v==null?'':v).replace(/[&<>"']/g,function(ch){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
-  });
-}
-
-els.registerForm.addEventListener('submit',async function(e){
+els.registerForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   clearMsg();
 
-  var login=els.regLogin.value.trim();
-  var email=els.regEmail.value.trim();
-  var password=els.regPassword.value;
-  var password2=els.regPassword2.value;
-  var terms=els.regTerms.checked;
-  var marketing=els.regMarketing.checked;
+  var login = els.regLogin.value.trim();
+  var email = els.regEmail.value.trim();
+  var password = els.regPassword.value;
+  var password2 = els.regPassword2.value;
+  var terms = els.regTerms.checked;
+  var marketing = els.regMarketing.checked;
 
-  if(!LOGIN_RE.test(login)){setMsg(t('loginFormat'),'err');return;}
-  if(password.length<8){setMsg(t('passShort'),'err');return;}
-  if(password!==password2){setMsg(t('passMismatch'),'err');return;}
-  if(!terms){setMsg(t('needTerms'),'err');return;}
+  if (!LOGIN_RE.test(login)) { setMsg("Login musi mieć 3-24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.", "err"); return; }
+  if (password.length < 8) { setMsg("Hasło musi mieć minimum 8 znaków.", "err"); return; }
+  if (password !== password2) { setMsg("Hasła nie są takie same.", "err"); return; }
+  if (!terms) { setMsg("Musisz zaakceptować regulamin i politykę prywatności.", "err"); return; }
 
-  try{
-    setBusy(els.registerForm,true);
-    setMsg(t('regStart'));
+  try {
+    setBusy(els.registerForm, true);
+    setMsg("Tworzę konto i wysyłam mail potwierdzający...");
 
-    var r=await withTimeout(sb.auth.signUp({
-      email:email,
-      password:password,
-      options:{
-        emailRedirectTo:getRedirectUrl('?confirmed=1'),
-        data:{
-          login:login,
-          display_name:login,
-          terms_version:TERMS_VERSION,
-          privacy_version:PRIVACY_VERSION,
-          marketing_consent:marketing
+    var r = await withTimeout(sb.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        emailRedirectTo: getRedirectUrl("?confirmed=1"),
+        data: {
+          login: login,
+          display_name: login,
+          terms_version: TERMS_VERSION,
+          privacy_version: PRIVACY_VERSION,
+          marketing_consent: marketing
         }
       }
-    }),20000,'timeout');
+    }), 25000, "timeout");
 
-    if(r.error){setMsg(t('regErr')+niceError(r.error),'err');return;}
+    if (r.error) { setMsg("Nie udało się założyć konta: " + niceError(r.error), "err"); return; }
 
-    if(r.data&&r.data.user&&r.data.session){
-      setMsg(t('regOkSession'),'ok');
+    if (r.data && r.data.user && r.data.session) {
+      setMsg("Konto utworzone i jesteś zalogowany.", "ok");
       await loadProfile();
-    }else{
-      setMsg(t('regOkConfirm'),'ok');
-      switchTab('login');
+    } else {
+      setMsg("Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.", "ok");
+      switchTab("login");
     }
-  }catch(err){
-    setMsg(t('regErr')+niceError(err),'err');
-  }finally{
-    setBusy(els.registerForm,false);
+  } catch (err) {
+    setMsg("Nie udało się założyć konta: " + niceError(err), "err");
+  } finally {
+    setBusy(els.registerForm, false);
   }
 });
 
-els.loginForm.addEventListener('submit',async function(e){
+els.loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   clearMsg();
 
-  try{
-    setBusy(els.loginForm,true);
-    setMsg(t('loginStart'));
-    var r=await withTimeout(sb.auth.signInWithPassword({
-      email:els.loginEmail.value.trim(),
-      password:els.loginPassword.value
-    }),20000,'timeout');
+  try {
+    setBusy(els.loginForm, true);
+    setMsg("Loguję...");
 
-    if(r.error){setMsg(t('loginErr')+niceError(r.error),'err');return;}
-    setMsg(t('loginOk'),'ok');
+    var r = await withTimeout(sb.auth.signInWithPassword({
+      email: els.loginEmail.value.trim(),
+      password: els.loginPassword.value
+    }), 25000, "timeout");
+
+    if (r.error) { setMsg("Nie udało się zalogować: " + niceError(r.error), "err"); return; }
+
+    exitRecoveryMode();
+    setMsg("Zalogowano.", "ok");
     await loadProfile();
-  }catch(err){
-    setMsg(t('loginErr')+niceError(err),'err');
-  }finally{
-    setBusy(els.loginForm,false);
+  } catch (err) {
+    setMsg("Nie udało się zalogować: " + niceError(err), "err");
+  } finally {
+    setBusy(els.loginForm, false);
   }
 });
 
-els.resetForm.addEventListener('submit',async function(e){
+els.resetForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   clearMsg();
 
-  try{
-    setBusy(els.resetForm,true);
-    setMsg(t('resetStart'));
-    var r=await withTimeout(sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{
-      redirectTo:getRedirectUrl('?reset=1')
-    }),20000,'timeout');
+  try {
+    setBusy(els.resetForm, true);
+    setMsg("Wysyłam link do resetu hasła...");
 
-    if(r.error){setMsg(t('resetErr')+niceError(r.error),'err');return;}
-    setMsg(t('resetOk'),'ok');
-  }catch(err){
-    setMsg(t('resetErr')+niceError(err),'err');
-  }finally{
-    setBusy(els.resetForm,false);
+    var r = await withTimeout(sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(), {
+      redirectTo: getRedirectUrl("?reset=1")
+    }), 25000, "timeout");
+
+    if (r.error) { setMsg("Nie udało się wysłać resetu hasła: " + niceError(r.error), "err"); return; }
+
+    setMsg("Wysłano link do resetu hasła. Sprawdź skrzynkę i kliknij najnowszy link.", "ok");
+  } catch (err) {
+    setMsg("Nie udało się wysłać resetu hasła: " + niceError(err), "err");
+  } finally {
+    setBusy(els.resetForm, false);
   }
 });
 
-els.newPasswordForm.addEventListener('submit',async function(e){
+els.newPasswordForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   clearMsg();
 
-  var password=els.newPassword.value;
-  if(password.length<8){setMsg(t('newPassShort'),'err');return;}
+  var password = els.newPassword.value;
+  var password2 = els.newPassword2.value;
 
-  try{
-    setBusy(els.newPasswordForm,true);
-    var r=await withTimeout(sb.auth.updateUser({password:password}),20000,'timeout');
-    if(r.error){setMsg(t('newPassErr')+niceError(r.error),'err');return;}
-    els.newPassword.value='';
-    els.newPasswordBox.classList.add('hidden');
-    setMsg(t('newPassOk'),'ok');
-  }catch(err){
-    setMsg(t('newPassErr')+niceError(err),'err');
-  }finally{
-    setBusy(els.newPasswordForm,false);
+  if (password.length < 8) { setMsg("Nowe hasło musi mieć minimum 8 znaków.", "err"); return; }
+  if (password !== password2) { setMsg("Nowe hasła nie są takie same.", "err"); return; }
+
+  try {
+    setBusy(els.newPasswordForm, true);
+    setMsg("Zapisuję nowe hasło...");
+
+    var r = await withTimeout(sb.auth.updateUser({password: password}), 25000, "timeout");
+
+    if (r.error) { setMsg("Nie udało się zmienić hasła: " + niceError(r.error), "err"); return; }
+
+    els.newPassword.value = "";
+    els.newPassword2.value = "";
+    exitRecoveryMode();
+    cleanUrl();
+    setMsg("Hasło zmienione. Konto jest zalogowane.", "ok");
+    await loadProfile();
+  } catch (err) {
+    setMsg("Nie udało się zmienić hasła: " + niceError(err), "err");
+  } finally {
+    setBusy(els.newPasswordForm, false);
   }
 });
 
-
-els.toggleRankingBtn.addEventListener('click',async function(){
-  clearMsg();
-  if(!currentUser||!currentProfile)return;
-
-  try{
-    els.toggleRankingBtn.disabled=true;
-    setMsg(t('rankingUpdateStart'));
-    var next=!currentProfile.show_in_ranking;
-    var r=await withTimeout(
-      sb.from('profiles').update({show_in_ranking:next}).eq('id',currentUser.id).select('id, login, display_name, rank_name, show_in_ranking').single(),
-      20000,
-      'timeout'
-    );
-    if(r.error){setMsg(t('rankingUpdateErr')+niceError(r.error),'err');return;}
-    currentProfile=r.data;
-    els.pRanking.textContent=currentProfile.show_in_ranking?t('visible'):t('hidden');
-    els.toggleRankingBtn.textContent=currentProfile.show_in_ranking?t('hideRanking'):t('showRanking');
-    setMsg(t('rankingUpdateOk'),'ok');
-  }catch(err){
-    setMsg(t('rankingUpdateErr')+niceError(err),'err');
-  }finally{
-    els.toggleRankingBtn.disabled=false;
-  }
-});
-
-els.deleteRequestBtn.addEventListener('click',function(){
-  if(!currentUser||!currentProfile)return;
-  var subject=t('deleteMailSubject');
-  var body=t('deleteMailBody')
-    .replace('{email}',currentUser.email||'')
-    .replace('{login}',currentProfile.login||'');
-  window.location.href='mailto:kontakt@familock.pl?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-});
-
-els.logoutBtn.addEventListener('click',async function(){
+els.logoutBtn.addEventListener("click", async function () {
   clearMsg();
   await sb.auth.signOut();
-  setMsg(t('logoutOk'),'ok');
+  setMsg("Wylogowano.", "ok");
   showLoggedOut();
-  switchTab('login');
+  switchTab("login");
 });
 
-function setLang(l){lang=l;store.set(LK,lang);clearMsg();applyLang();if(sb)loadProfile();}
-document.getElementById('lPl').addEventListener('click',function(){setLang('pl');});
-document.getElementById('lSzl').addEventListener('click',function(){setLang('szl');});
+async function boot() {
+  if (!initSupabase()) return;
 
-async function boot(){
-  applyLang();
-  if(!initSupabase())return;
+  var params = new URLSearchParams(window.location.search);
+  var hash = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
 
-  var params=new URLSearchParams(window.location.search);
-  if(params.has('reset')){
-    switchTab('reset');
-    els.newPasswordBox.classList.remove('hidden');
-    setMsg(t('bootReset'),'ok');
-  }
-  if(params.has('confirmed')){
-    setMsg(t('bootConfirmed'),'ok');
-    switchTab('login');
+  if (params.has("reset") || params.get("type") === "recovery" || hash.get("type") === "recovery") {
+    enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
   }
 
-  sb.auth.onAuthStateChange(async function(event){
-    if(event==='PASSWORD_RECOVERY'){
-      switchTab('reset');
-      els.newPasswordBox.classList.remove('hidden');
-      setMsg(t('recovery'),'ok');
+  sb.auth.onAuthStateChange(async function (event) {
+    console.log("Szpilplac auth event:", event);
+
+    if (event === "PASSWORD_RECOVERY") {
+      enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
+      return;
     }
-    if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'){
+
+    if (event === "SIGNED_IN") {
+      if (recoveryMode) return;
+      await loadProfile();
+      return;
+    }
+
+    if (event === "SIGNED_OUT") {
+      if (recoveryMode) return;
+      showLoggedOut();
+      return;
+    }
+
+    if (event === "USER_UPDATED") {
+      if (recoveryMode) return;
       await loadProfile();
     }
   });
 
-  await loadProfile();
+  if (params.has("confirmed")) {
+    setMsg("Jeśli potwierdzenie maila się udało, możesz się zalogować.", "ok");
+    switchTab("login");
+  }
+
+  await new Promise(function (resolve) { setTimeout(resolve, 700); });
+
+  if (!recoveryMode) {
+    await loadProfile();
+  }
 }
+
 boot();
 </script>
 </body>
