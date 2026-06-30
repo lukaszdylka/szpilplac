@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookies i localStorage · Szpilplac · Familock</title>
+<meta name="robots" content="index,follow">
+<meta name="description" content="Informacje o danych zapisywanych w przeglądarce.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<link rel="canonical" href="https://szpilplac.familock.pl/cookies.html">
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--sh:0 6px 18px -10px rgba(35,32,26,.4)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--sh:0 6px 18px -10px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 16px 42px;line-height:1.58}
+a{color:var(--green);font-weight:800;text-decoration:none}
+a:hover{text-decoration:underline}
+header,main,footer{width:100%;max-width:780px}
+header{padding-top:22px;margin-bottom:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--green);font-weight:900}
+.brand{font-family:"Oswald";font-size:clamp(30px,7vw,48px);line-height:.98;text-transform:uppercase;margin-top:14px}
+.sub{font-size:13px;color:var(--ink2);margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:22px;margin:12px 0}
+.notice{background:var(--surface2);border:1px dashed var(--line);border-radius:12px;padding:13px 14px;color:var(--ink2);font-size:13px}
+h1,h2,h3{font-family:"Oswald";text-transform:uppercase;letter-spacing:.03em;line-height:1.06;color:var(--ink)}
+h1{font-size:34px;margin:0 0 8px}
+h2{font-size:23px;margin:28px 0 10px}
+h3{font-size:17px;margin:18px 0 7px}
+p{margin:0 0 12px}
+ul,ol{padding-left:22px;margin:0 0 14px}
+li{margin:5px 0}
+.meta{font-size:12px;color:var(--ink2);margin-bottom:12px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.toc a{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:var(--surface2)}
+.table{overflow:auto;border:1px solid var(--line);border-radius:12px;margin:12px 0 16px}
+table{width:100%;border-collapse:collapse;background:var(--surface2);font-size:13px}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2)}
+tr:last-child td{border-bottom:0}
+footer{text-align:center;color:var(--ink2);font-size:12px;margin-top:18px;line-height:1.8}
+footer nav{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+small{color:var(--ink2)}
+@media(max-width:560px){.card{padding:17px}.table{font-size:12px}th,td{padding:9px 8px}.topbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <a class="back" href="index.html">← Szpilplac</a>
+    <a class="back" href="konto.html">Mój profil</a>
+  </div>
+  <div class="brand">Cookies i localStorage</div>
+  <div class="sub">Informacje o danych zapisywanych w przeglądarce.</div>
+</header>
+<main>
+  <article class="card">
+    <div class="meta">Wersja: 2026-06-30b · Data obowiązywania: 30 czerwca 2026</div>
+    <div class="notice">To jest praktyczna wersja dokumentu dla projektu Szpilplac/Familock. Warto ją traktować jako tekst użytkowy do publikacji, a przy większej skali lub płatnych funkcjach dać jeszcze do szybkiego sprawdzenia prawnikowi.</div>
+    
+<div class="toc">
+  <a href="#co">Co zapisujemy</a>
+  <a href="#po-co">Po co</a>
+  <a href="#lista">Lista danych</a>
+  <a href="#usuniecie">Jak usunąć</a>
+</div>
+
+<h1>Cookies i localStorage</h1>
+
+<h2 id="administrator">Administrator / usługodawca</h2>
+<p>Serwis Szpilplac/Familock prowadzi <b>Łukasz Dyłka, NIP: 6272709230, adres: ul. Cmentarna 5/3, 41-600 Świętochłowice</b>. Kontakt: <a href="mailto:kontakt@familock.pl">kontakt@familock.pl</a>.</p>
+
+
+<h2 id="co">1. Co to jest</h2>
+<p>Szpilplac może zapisywać w przeglądarce użytkownika dane lokalne, takie jak localStorage, sessionStorage lub podobne mechanizmy. Mogą one działać podobnie do cookies, bo pozwalają stronie zapamiętać ustawienia i stan gry.</p>
+<p>Nie używamy tych danych do sprzedaży danych osobowych ani do zewnętrznego śledzenia reklamowego.</p>
+
+<h2 id="po-co">2. Po co zapisujemy dane w przeglądarce</h2>
+<ul>
+<li>żeby zapamiętać stan gry i wynik lokalny,</li>
+<li>żeby nie zgubić postępu po odświeżeniu strony,</li>
+<li>żeby zapamiętać język, motyw, dostępność i ustawienia gry,</li>
+<li>żeby obsłużyć sesję logowania,</li>
+<li>żeby rozróżnić, czy dana gra została już rozegrana na tym urządzeniu,</li>
+<li>żeby poprawiać działanie Szpilplaca na podstawie statystyk.</li>
+</ul>
+
+<h2 id="lista">3. Przykłady danych lokalnych</h2>
+<div class="table"><table>
+<tr><th>Przykład</th><th>Do czego służy</th></tr>
+<tr><td>familock_lang</td><td>zapamiętanie języka: polski / śląski</td></tr>
+<tr><td>szpilplac_theme</td><td>zapamiętanie motywu jasnego lub ciemnego</td></tr>
+<tr><td>slowko_v2, slowko_d*</td><td>lokalny stan i statystyki Słōwka</td></tr>
+<tr><td>klodka_daily_v1*</td><td>lokalny stan Kłōdki</td></tr>
+<tr><td>zorta_d*, zorta_stats_v1</td><td>lokalny stan gry Raja/Zorta</td></tr>
+<tr><td>cuzamen_v1</td><td>lokalny stan Cuzamen Szpil</td></tr>
+<tr><td>szpilplac-auth-v05</td><td>sesja logowania Supabase</td></tr>
+</table></div>
+
+<h2 id="cookies">4. Zewnętrzne strony i linki</h2>
+<p>Szpilplac może zawierać linki do stron zewnętrznych, np. familock.pl, social mediów, systemów rezerwacji lub BuyCoffee. Po przejściu na zewnętrzną stronę mogą obowiązywać zasady cookies i prywatności tego zewnętrznego serwisu.</p>
+
+<h2 id="usuniecie">5. Jak usunąć dane lokalne</h2>
+<p>Użytkownik może usunąć dane lokalne przez ustawienia przeglądarki, np. przez wyczyszczenie danych witryny dla domeny <b>szpilplac.familock.pl</b>.</p>
+<p>Usunięcie danych lokalnych może skasować lokalne wyniki, ustawienia i sesję logowania na danym urządzeniu. Wyniki zapisane na koncie mogą pozostać dostępne po ponownym zalogowaniu.</p>
+
+<h2 id="zgoda">6. Czy można grać bez danych lokalnych</h2>
+<p>Część danych lokalnych jest potrzebna do prawidłowego działania gry. Zablokowanie localStorage lub cookies może spowodować, że gra, konto albo zapamiętywanie wyników nie będą działały poprawnie.</p>
+
+  </article>
+</main>
+<footer>
+  <nav>
+    <a href="regulamin.html">Regulamin</a>
+    <a href="polityka-prywatnosci.html">Polityka prywatności</a>
+    <a href="cookies.html">Cookies i localStorage</a>
+    <a href="mailing.html">Mailing</a>
+  </nav>
+  <div>Szpilplac · Familock · Łukasz Dyłka, NIP 6272709230 · <a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a></div>
+<div>Usługodawca / administrator: Łukasz Dyłka, NIP: 6272709230</div>
+</footer>
+<script>
+try{document.documentElement.setAttribute("data-theme",localStorage.getItem("szpilplac_theme")||"light");}catch(e){}
+</script>
+</body>
+</html>
