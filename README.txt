@@ -1,17 +1,22 @@
-Szpilplac Auth v08 login fix
+Szpilplac v09 - profil i lokalizacja
 
-Wgraj wszystkie pliki naraz:
-- konto.html
-- ranking.html
-- auth-widget.js
-- auth-diagnostyka.html
+Kolejność:
+1. Uruchom w Supabase SQL Editor plik:
+   supabase-profiles-location-v09.sql
 
-Najważniejsza poprawka:
-konto.html po evencie SIGNED_IN natychmiast pokazuje profil.
-Jeśli signInWithPassword() nie zwróci odpowiedzi, ale sesja już istnieje,
-strona traktuje logowanie jako udane, a nie jako błąd timeoutu.
+2. Wgraj na stronę:
+   konto.html
+   ranking.html
+   auth-widget.js
+   auth-diagnostyka.html
 
-Po wgraniu:
-1. /auth-diagnostyka.html -> Wyczyść lokalne sesje auth
-2. /konto.html?v=08 -> zaloguj się
-3. /ranking.html?v=08
+Zmiany:
+- ranking: przy zalogowanym graczu przycisk "Mój profil" zamiast "Załóż konto"
+- krótsze, czystsze komunikaty
+- lepsza ikona domku do index.html
+- konto: opcjonalne województwo i miejscowość
+- profil: możliwość zmiany województwa i miejscowości
+
+Po wgraniu test:
+- /konto.html?v=09
+- /ranking.html?v=09

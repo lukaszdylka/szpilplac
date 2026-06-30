@@ -146,7 +146,7 @@ footer a:hover{text-decoration:underline}
 
   <section class="card">
     <h2 data-i18n="title">Ranking</h2>
-    <p class="intro" data-i18n="intro">Tu pojawią się wyniki graczy z kontem. Gra bez logowania nadal działa normalnie, ale nie zapisuje wyniku w chmurze.</p>
+    <p class="intro" data-i18n="intro">Wyniki graczy Szpilplaca.</p>
 
     <div class="tabs">
       <button class="tab active" type="button" data-ranking="weekly" data-i18n="tabWeekly">Tydzień</button>
@@ -157,13 +157,13 @@ footer a:hover{text-decoration:underline}
 
     <div class="actions">
       <button class="btn secondary" type="button" id="refreshBtn" data-i18n="refresh">Odśwież ranking</button>
-      <a class="btn gold" href="konto.html" data-i18n="createAccount">Załóż konto</a>
+      <a class="btn gold" href="konto.html" id="rankingAccountAction" data-i18n="createAccount">Załóż konto</a>
     </div>
   </section>
 
   <section class="card">
     <h2 data-i18n="howTitle">Jak liczymy?</h2>
-    <p class="intro" data-i18n="howText">Na razie ranking czeka na podpięcie wyników z gier. Docelowo punkty będą zależeć od gry, liczby prób, błędów, podpowiedzi i serii dni.</p>
+    <p class="intro" data-i18n="howText">Punkty za gry i rangi gracza.</p>
     <div class="small" data-i18n="howSmall">Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.</div>
   </section>
 </main>
@@ -203,20 +203,20 @@ var T={
     sub:"Ranking graczy",
     guestTitle:"Grasz bez konta",
     guestMeta:"Konto pozwoli zapisać wynik w rankingu po zmianie przeglądarki.",
-    accountBtn:"Konto gracza",
+    accountBtn:"Konto gracza", profileBtn:"Mój profil",
     title:"Ranking",
-    intro:"Tu pojawią się wyniki graczy z kontem. Gra bez logowania nadal działa normalnie, ale nie zapisuje wyniku w chmurze.",
+    intro:"Wyniki graczy Szpilplaca.",
     tabWeekly:"Tydzień",
     tabAll:"Ogółem",
     refresh:"Odśwież ranking",
     createAccount:"Załóż konto",
     howTitle:"Jak liczymy?",
-    howText:"Na razie ranking czeka na podpięcie wyników z gier. Docelowo punkty będą zależeć od gry, liczby prób, błędów, podpowiedzi i serii dni.",
+    howText:"Punkty za gry i rangi gracza.",
     howSmall:"Rangi planowane: Bajtel, Karlus, Kamrat, Majster, Starzik.",
     footerHome:"Szpilplac", footerAccount:"Konto", footerFamilock:"Familock",
     loading:"Ładuję ranking...",
     emptyTitle:"Ranking jest jeszcze pusty",
-    emptyText:"Gdy podłączymy zapis wyników z gier, pojawią się tutaj gracze, punkty i rangi.",
+    emptyText:"Pierwsze wyniki pojawią się po zapisaniu gry.",
     errConfig:"Brak konfiguracji Supabase. Upewnij się, że ranking.html leży obok config.js.",
     errLib:"Nie udało się załadować biblioteki Supabase JS.",
     errRanking:"Nie udało się pobrać rankingu: ",
@@ -235,20 +235,20 @@ var T={
     sub:"Ranking graczy",
     guestTitle:"Szpilosz bez kōnta",
     guestMeta:"Kōnto pozwoli spamiyntać wynik w rankingu po zmiynie przeglōndarki.",
-    accountBtn:"Kōnto gracza",
+    accountBtn:"Kōnto gracza", profileBtn:"Mōj profil",
     title:"Ranking",
-    intro:"Tukej bydōm wyniki graczy z kōntym. Szpil bez logowanio dali dziŏ normalnie, ale niy spamiyntuje wyniku w chmurze.",
+    intro:"Wyniki graczy Szpilplaca.",
     tabWeekly:"Tydziyń",
     tabAll:"Razym",
     refresh:"Ôdświyż ranking",
     createAccount:"Założ kōnto",
     howTitle:"Jak liczymy?",
-    howText:"Na razie ranking czekŏ na podpiyncie wynikōw ze szpilōw. Docelowo punkty bydōm zależeć ôd szpilu, liczby prōb, błyndōw, podpowiydzi i seryje dni.",
+    howText:"Punkty za szpile i rangi gracza.",
     howSmall:"Planowane rangi: Bajtel, Karlus, Kamrat, Majster, Starzik.",
     footerHome:"Szpilplac", footerAccount:"Kōnto", footerFamilock:"Familock",
     loading:"Ładuja ranking...",
     emptyTitle:"Ranking je jeszcze pusty",
-    emptyText:"Jak podepniymy spamiyntowanie wynikōw ze szpilōw, pokŏżōm sie tukej gracze, punkty i rangi.",
+    emptyText:"Piyrsze wyniki pokŏżōm sie po spamiyntaniu szpilu.",
     errConfig:"Brak kōnfiguracyje Supabase. Wejrzij, czy ranking.html leży kole config.js.",
     errLib:"Niy szło wczytać biblioteki Supabase JS.",
     errRanking:"Niy szło pobrać rankingu: ",
@@ -278,7 +278,8 @@ var els={
   accountMeta:document.getElementById("accountMeta"),
   accountBtn:document.getElementById("accountBtn"),
   rankingList:document.getElementById("rankingList"),
-  refreshBtn:document.getElementById("refreshBtn")
+  refreshBtn:document.getElementById("refreshBtn"),
+  rankingAccountAction:document.getElementById("rankingAccountAction")
 };
 
 function applyLang(){
@@ -468,15 +469,18 @@ function renderAccountStrip(){
     var rank=currentProfile.rank_name||"Bajtel";
     els.accountName.textContent=t("loggedAs").replace("{login}",login);
     els.accountMeta.textContent=t("loggedMeta").replace("{rank}",rank);
-    els.accountBtn.textContent=t("accountBtn");
+    els.accountBtn.textContent=t("profileBtn");
+    if(els.rankingAccountAction)els.rankingAccountAction.textContent=t("profileBtn");
+    if(els.rankingAccountAction)els.rankingAccountAction.textContent=t("profileBtn");
   }else if(currentUser){
     els.accountName.textContent=t("loggedAs").replace("{login}",currentUser.email||"konto");
     els.accountMeta.textContent="Sesja jest aktywna. Dociągam profil gracza...";
-    els.accountBtn.textContent=t("accountBtn");
+    els.accountBtn.textContent=t("profileBtn");
   }else{
     els.accountName.textContent=t("guestTitle");
     els.accountMeta.textContent=t("guestMeta");
     els.accountBtn.textContent=t("accountBtn");
+    if(els.rankingAccountAction)els.rankingAccountAction.textContent=t("createAccount");
   }
 }
 
@@ -555,7 +559,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v08-localStorage-hardfix");
+console.info("Szpilplac ranking.html v09");
 boot();
 </script>
 </body>

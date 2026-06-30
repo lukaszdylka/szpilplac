@@ -50,12 +50,12 @@
     pl: {
       guest: "Grasz bez konta",
       guestCta: "Załóż konto",
-      account: "Konto",
+      account: "Mój profil",
       ranking: "Ranking",
       loggedPrefix: "Zalogowany jako",
       hidden: "ukryty w rankingu",
       loading: "Sprawdzam konto...",
-      saveLogin: "Załóż konto, żeby zapisać wynik w rankingu.",
+      saveLogin: "Zapisz wynik w rankingu.",
       saved: "Wynik zapisany na koncie.",
       notLogged: "Wynik lokalny. Zaloguj się, żeby zapisać go w rankingu.",
       saveError: "Nie udało się zapisać wyniku.",
@@ -65,12 +65,12 @@
     szl: {
       guest: "Szpilosz bez kōnta",
       guestCta: "Założ kōnto",
-      account: "Kōnto",
+      account: "Mōj profil",
       ranking: "Ranking",
       loggedPrefix: "Zalogowany jako",
       hidden: "skryty w rankingu",
       loading: "Sprawdzōm kōnto...",
-      saveLogin: "Założ kōnto, coby spamiyntać wynik w rankingu.",
+      saveLogin: "Spamiyntaj wynik w rankingu.",
       saved: "Wynik spamiyntany na kōncie.",
       notLogged: "Wynik lokalny. Zaloguj sie, coby spamiyntać go w rankingu.",
       saveError: "Niy szło spamiyntać wyniku.",
@@ -616,7 +616,7 @@
     setLanguage
   };
 
-  console.info("Szpilplac auth-widget.js v08");
+  console.info("Szpilplac auth-widget.js v09");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {

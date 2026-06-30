@@ -51,7 +51,7 @@ async function run(){
   lines.push("URL: "+location.href);
   lines.push("Origin: "+location.origin);
   lines.push("Supabase URL: "+(cfg.SUPABASE_URL||"BRAK"));
-  lines.push("Storage key v05: "+STORAGE);
+  lines.push("Storage key v05 / v09: "+STORAGE);
   lines.push("");
   lines.push("Klucze localStorage auth:");
   lines.push(JSON.stringify(safeKeys(), null, 2));

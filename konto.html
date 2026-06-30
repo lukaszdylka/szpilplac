@@ -37,9 +37,9 @@ h2{font-family:"Oswald";font-size:23px;text-transform:uppercase;letter-spacing:.
 .panel{display:none}.panel.active{display:block}.hidden{display:none!important}
 form{display:grid;gap:13px}
 label.field{display:grid;gap:7px;font-weight:800;font-size:13px}
-input[type=email],input[type=password],input[type=text]{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#e8eef9;color:#000;font:inherit;font-size:15px;outline:none}
-[data-theme=dark] input[type=email],[data-theme=dark] input[type=password],[data-theme=dark] input[type=text]{background:#e8eef9;color:#000}
-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.2)}
+input[type=email],input[type=password],input[type=text],select{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#e8eef9;color:#000;font:inherit;font-size:15px;outline:none}
+[data-theme=dark] input[type=email],[data-theme=dark] input[type=password],[data-theme=dark] input[type=text],[data-theme=dark] select{background:#e8eef9;color:#000}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.2)}
 .check{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink2);line-height:1.4}
 .check input{margin-top:3px;accent-color:var(--green)}
 .btn{border-radius:12px;padding:12px 15px;background:var(--green);color:#fff;font-weight:900;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
@@ -73,7 +73,7 @@ footer a{color:var(--green);font-weight:800}
   <div class="topbar">
     <div><div class="site-name">Szpilplac</div><div class="site-sub">Konto gracza</div></div>
     <div class="controls">
-      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">⌂</a>
+      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.4 10 3l7 6.4"/><path d="M5 8.6V17h10V8.6"/><path d="M8 17v-5h4v5"/></svg></a>
       <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
     </div>
   </div>
@@ -93,10 +93,13 @@ footer a{color:var(--green);font-weight:800}
 
     <div id="register" class="panel active">
       <h2>Załóż konto</h2>
-      <p class="intro">Konto jest opcjonalne. Gra działa bez logowania, ale konto pozwoli zapisać wynik, ranking i rangę po zmianie przeglądarki albo wyczyszczeniu cache.</p>
+      <p class="intro">Zapisuj wyniki, ranking i rangę na swoim koncie.</p>
       <form id="registerForm">
         <label class="field">Login do rankingu<input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24"></label>
         <div class="small">3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
+
+        <label class="field">Województwo <span class="small" style="font-weight:600;">opcjonalnie</span><select id="regVoivodeship"><option value="">Nie podaję</option></select></label>
+        <label class="field">Miejscowość <span class="small" style="font-weight:600;">opcjonalnie</span><input id="regCity" type="text" autocomplete="address-level2" placeholder="np. Chorzów" maxlength="80"></label>
         <label class="field">E-mail<input id="regEmail" type="email" autocomplete="email" placeholder="twoj@mail.pl" required></label>
         <label class="field">Hasło<input id="regPassword" type="password" autocomplete="new-password" required minlength="8"></label>
         <label class="field">Powtórz hasło<input id="regPassword2" type="password" autocomplete="new-password" required minlength="8"></label>
@@ -108,13 +111,13 @@ footer a{color:var(--green);font-weight:800}
 
     <div id="login" class="panel">
       <h2>Zaloguj się</h2>
-      <p class="intro">Zaloguj się e-mailem i hasłem. Login rankingowy pokazuje się publicznie, e-mail nie.</p>
+      <p class="intro">Zaloguj się e-mailem i hasłem.</p>
       <form id="loginForm">
         <label class="field">E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
         <label class="field">Hasło<input id="loginPassword" type="password" autocomplete="current-password" required></label>
         <button class="btn" type="submit">Zaloguj się</button>
       </form>
-      <p class="small" style="margin-top:12px;">Jeśli logowanie wariuje po testach: <button type="button" id="clearAuthBtn" style="font:inherit;font-weight:900;text-decoration:underline;color:var(--green);padding:0;">wyczyść lokalną sesję</button>.</p>
+      <p class="small" style="margin-top:12px;"><button type="button" id="clearAuthBtn" style="font:inherit;font-weight:900;text-decoration:underline;color:var(--green);padding:0;">Wyczyść sesję logowania</button></p>
     </div>
 
     <div id="reset" class="panel">
@@ -137,7 +140,7 @@ footer a{color:var(--green);font-weight:800}
 
   <section class="card hidden" id="profileCard">
     <p class="hello" id="helloTitle">Cześć!</p>
-    <p class="intro" id="profileIntro">To Twoje konto gracza w Szpilplacu.</p>
+    <p class="intro" id="profileIntro">Twój profil gracza.</p>
     <div class="profile-summary">
       <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Bajtel</div></div>
       <div class="stat"><div class="label">Punkty</div><div class="value" id="sumPoints">0</div></div>
@@ -147,6 +150,16 @@ footer a{color:var(--green);font-weight:800}
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
     <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
     <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
+
+    <div class="profile-row"><strong>Województwo</strong><span id="pVoivodeship">—</span></div>
+    <div class="profile-row"><strong>Miejscowość</strong><span id="pCity">—</span></div>
+
+    <div class="sub-head">Dane do statystyk</div>
+    <form id="locationForm">
+      <label class="field">Województwo<select id="profileVoivodeship"><option value="">Nie podaję</option></select></label>
+      <label class="field">Miejscowość<input id="profileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>
+      <button class="btn secondary" type="submit">Zapisz dane</button>
+    </form>
     <div class="profile-actions">
       <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
       <a class="btn gold" href="ranking.html">Ranking</a>
@@ -163,12 +176,31 @@ footer a{color:var(--green);font-weight:800}
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v08");
+console.info("Szpilplac konto.html v09");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = "2026-06-29";
 var PRIVACY_VERSION = "2026-06-29";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
+var VOIVODESHIPS = [
+  "dolnośląskie",
+  "kujawsko-pomorskie",
+  "lubelskie",
+  "lubuskie",
+  "łódzkie",
+  "małopolskie",
+  "mazowieckie",
+  "opolskie",
+  "podkarpackie",
+  "podlaskie",
+  "pomorskie",
+  "śląskie",
+  "świętokrzyskie",
+  "warmińsko-mazurskie",
+  "wielkopolskie",
+  "zachodniopomorskie"
+];
+
 var sb = null;
 var recoveryMode = false;
 var currentUser = null;
@@ -191,6 +223,8 @@ var els = {
   regPassword2:document.getElementById("regPassword2"),
   regTerms:document.getElementById("regTerms"),
   regMarketing:document.getElementById("regMarketing"),
+  regVoivodeship:document.getElementById("regVoivodeship"),
+  regCity:document.getElementById("regCity"),
   loginEmail:document.getElementById("loginEmail"),
   loginPassword:document.getElementById("loginPassword"),
   resetEmail:document.getElementById("resetEmail"),
@@ -207,6 +241,11 @@ var els = {
   pEmail:document.getElementById("pEmail"),
   pLogin:document.getElementById("pLogin"),
   pRanking:document.getElementById("pRanking"),
+  pVoivodeship:document.getElementById("pVoivodeship"),
+  pCity:document.getElementById("pCity"),
+  locationForm:document.getElementById("locationForm"),
+  profileVoivodeship:document.getElementById("profileVoivodeship"),
+  profileCity:document.getElementById("profileCity"),
   resultsBox:document.getElementById("resultsBox"),
   toggleRankingBtn:document.getElementById("toggleRankingBtn"),
   deleteRequestBtn:document.getElementById("deleteRequestBtn"),
@@ -254,6 +293,27 @@ function switchTab(id){
   clearMsg();
 }
 document.querySelectorAll(".tab").forEach(function(btn){btn.onclick=function(){switchTab(btn.dataset.tab);};});
+
+function fillVoivodeshipSelect(select){
+  if(!select)return;
+  var current=select.value||"";
+  select.innerHTML='<option value="">Nie podaję</option>'+VOIVODESHIPS.map(function(v){
+    return '<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>';
+  }).join("");
+  select.value=current;
+}
+function cleanCity(value){
+  return String(value||"").trim().replace(/\s+/g," ").slice(0,80);
+}
+function normalizeOptional(value){
+  var v=String(value||"").trim();
+  return v ? v : null;
+}
+function initLocationFields(){
+  fillVoivodeshipSelect(els.regVoivodeship);
+  fillVoivodeshipSelect(els.profileVoivodeship);
+}
+
 
 function showLoggedOut(){
   if(recoveryMode)return;
@@ -323,7 +383,7 @@ async function loadProfile(){
   var profile=null;
   try{
     var res=await withTimeout(
-      sb.from("profiles").select("id, login, display_name, rank_name, show_in_ranking").eq("id",session.user.id).single(),
+      sb.from("profiles").select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city").eq("id",session.user.id).single(),
       9000,
       "profile_timeout"
     );
@@ -336,10 +396,14 @@ async function loadProfile(){
     currentProfile=profile;
     var login=profile.login||profile.display_name||"graczu";
     els.helloTitle.textContent="Cześć, "+login+"!";
-    els.profileIntro.textContent="To Twoje konto gracza w Szpilplacu.";
+    els.profileIntro.textContent="Twój profil gracza.";
     els.pLogin.textContent=profile.login||"-";
     els.sumRank.textContent=profile.rank_name||"Bajtel";
     els.pRanking.textContent=profile.show_in_ranking?"widoczny":"ukryty";
+    els.pVoivodeship.textContent=profile.voivodeship||"—";
+    els.pCity.textContent=profile.city||"—";
+    els.profileVoivodeship.value=profile.voivodeship||"";
+    els.profileCity.value=profile.city||"";
     els.toggleRankingBtn.disabled=false;
     els.toggleRankingBtn.textContent=profile.show_in_ranking?"Ukryj mnie z rankingu":"Pokaż mnie w rankingu";
 
@@ -476,7 +540,7 @@ els.registerForm.addEventListener("submit",async function(e){
       password:password,
       options:{
         emailRedirectTo:getRedirectUrl("?confirmed=1"),
-        data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:els.regMarketing.checked}
+        data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:els.regMarketing.checked,voivodeship:normalizeOptional(els.regVoivodeship.value),city:normalizeOptional(cleanCity(els.regCity.value))}
       }
     }),18000,"timeout");
 
@@ -553,13 +617,51 @@ els.newPasswordForm.addEventListener("submit",async function(e){
   }
 });
 
+
+els.locationForm.addEventListener("submit",async function(e){
+  e.preventDefault();
+  clearMsg();
+
+  if(!currentUser){
+    setMsg("Najpierw zaloguj się na konto.","err");
+    return;
+  }
+
+  var voivodeship=normalizeOptional(els.profileVoivodeship.value);
+  var city=normalizeOptional(cleanCity(els.profileCity.value));
+
+  try{
+    setBusy(els.locationForm,true);
+    var res=await withTimeout(
+      sb.from("profiles")
+        .update({voivodeship:voivodeship,city:city})
+        .eq("id",currentUser.id)
+        .select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city")
+        .single(),
+      12000,
+      "timeout"
+    );
+
+    if(res.error)throw res.error;
+
+    currentProfile=res.data;
+    els.pVoivodeship.textContent=currentProfile.voivodeship||"—";
+    els.pCity.textContent=currentProfile.city||"—";
+    setMsg("Dane zapisane.","ok");
+  }catch(err){
+    setMsg("Nie udało się zapisać danych: "+niceError(err),"err");
+  }finally{
+    setBusy(els.locationForm,false);
+  }
+});
+
 els.toggleRankingBtn.addEventListener("click",async function(){
   clearMsg();
   if(!currentUser||!currentProfile){setMsg("Najpierw zaloguj się na konto.","err");return;}
   var next=!currentProfile.show_in_ranking;
   try{
     els.toggleRankingBtn.disabled=true;
-    var res=await withTimeout(sb.from("profiles").update({show_in_ranking:next}).eq("id",currentUser.id).select("id, login, display_name, rank_name, show_in_ranking").single(),12000,"timeout");
+    var res=await withTimeout(sb.from("profiles").update({show_in_ranking:next}).eq("id",currentUser.id).select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city").single(),12000,"timeout");
     if(res.error)throw res.error;
     currentProfile=res.data;
     els.pRanking.textContent=currentProfile.show_in_ranking?"widoczny":"ukryty";
@@ -583,6 +685,7 @@ els.logoutBtn.addEventListener("click",async function(){
 
 async function boot(){
   if(!initSupabase())return;
+  initLocationFields();
 
   var params=new URLSearchParams(window.location.search);
   var hash=new URLSearchParams((window.location.hash||"").replace(/^#/,""));
