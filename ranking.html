@@ -266,7 +266,6 @@ var T={
 };
 function t(key){return (T[lang]&&T[lang][key]!=null)?T[lang][key]:(T.pl[key]!=null?T.pl[key]:key);}
 
-var AUTH_STORAGE_KEY="szpilplac-auth-v1";
 var sb=null;
 var currentRanking="weekly";
 var currentProfile=null;
@@ -320,7 +319,7 @@ function initSupabase(){
   if(!url||!key){setMsg(t("errConfig"),"err");return false;}
   if(!window.supabase){setMsg(t("errLib"),"err");return false;}
   sb=window.supabase.createClient(url,key,{
-    auth:{storageKey:AUTH_STORAGE_KEY,flowType:"pkce",detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+    auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
   });
   return true;
 }
@@ -448,6 +447,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
+console.info("Szpilplac ranking.html v03");
 boot();
 </script>
 </body>

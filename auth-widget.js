@@ -42,8 +42,7 @@
 
   const STORE_KEYS = {
     lang: "familock_lang",
-    theme: "szpilplac_theme",
-    auth: "szpilplac-auth-v1"
+    theme: "szpilplac_theme"
   };
 
   const TEXT = {
@@ -403,8 +402,6 @@
 
     STATE.client = window.supabase.createClient(url, key, {
       auth: {
-        storageKey: STORE_KEYS.auth,
-        flowType: "pkce",
         detectSessionInUrl: true,
         persistSession: true,
         autoRefreshToken: true
@@ -594,6 +591,7 @@
     setLanguage
   };
 
+  console.info("Szpilplac auth-widget.js v03");
   window.SZPILPLAC_AUTH = api;
 
   document.addEventListener("DOMContentLoaded", function () {

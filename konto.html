@@ -242,6 +242,8 @@ footer a{color:var(--green);font-weight:600}
     <div class="profile-actions">
       <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
       <a class="btn gold" href="ranking.html">Ranking</a>
+      <button type="button" class="btn secondary" id="toggleRankingBtn">Ukryj mnie z rankingu</button>
+      <a class="btn secondary" id="deleteRequestBtn" href="mailto:kontakt@familock.pl?subject=Usuni%C4%99cie%20konta%20Szpilplac">Poproś o usunięcie konta</a>
       <button type="button" class="btn danger" id="logoutBtn">Wyloguj</button>
     </div>
 
@@ -266,9 +268,10 @@ footer a{color:var(--green);font-weight:600}
 var TERMS_VERSION = "2026-06-29";
 var PRIVACY_VERSION = "2026-06-29";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
-var AUTH_STORAGE_KEY = "szpilplac-auth-v1";
 var sb = null;
 var recoveryMode = false;
+var currentUser = null;
+var currentProfile = null;
 var initialUrl = new URL(window.location.href);
 
 var els = {
@@ -309,6 +312,8 @@ var els = {
   pLogin: document.getElementById("pLogin"),
   pRanking: document.getElementById("pRanking"),
   resultsBox: document.getElementById("resultsBox"),
+  toggleRankingBtn: document.getElementById("toggleRankingBtn"),
+  deleteRequestBtn: document.getElementById("deleteRequestBtn"),
   logoutBtn: document.getElementById("logoutBtn")
 };
 
@@ -413,6 +418,8 @@ function exitRecoveryMode() {
 
 function showLoggedOut() {
   if (recoveryMode) return;
+  currentUser = null;
+  currentProfile = null;
   els.authCard.classList.remove("hidden");
   els.profileCard.classList.add("hidden");
 }
@@ -434,8 +441,6 @@ function initSupabase() {
   }
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
     auth: {
-      storageKey: AUTH_STORAGE_KEY,
-      flowType: "pkce",
       detectSessionInUrl: true,
       persistSession: true,
       autoRefreshToken: true
@@ -475,6 +480,8 @@ async function loadProfile() {
   if (recoveryMode) return;
 
   var user = await getSessionUser();
+  currentUser = user;
+
   if (!user) {
     showLoggedOut();
     return;
@@ -489,17 +496,31 @@ async function loadProfile() {
     .single();
 
   if (res.error) {
+    currentProfile = null;
     els.helloTitle.textContent = "Błąd odczytu profilu";
     els.pLogin.textContent = "-";
     els.sumRank.textContent = "-";
     els.pRanking.textContent = "-";
+    els.toggleRankingBtn.disabled = true;
   } else {
     var profile = res.data;
+    currentProfile = profile;
     var login = profile.login || profile.display_name || "graczu";
     els.helloTitle.textContent = "Cześć, " + login + "!";
     els.pLogin.textContent = profile.login || "-";
     els.sumRank.textContent = profile.rank_name || "Bajtel";
     els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
+    els.toggleRankingBtn.disabled = false;
+    els.toggleRankingBtn.textContent = profile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
+
+    var mailSubject = encodeURIComponent("Usunięcie konta Szpilplac");
+    var mailBody = encodeURIComponent(
+      "Proszę o usunięcie mojego konta Szpilplac.\n\n" +
+      "Login: " + (profile.login || "-") + "\n" +
+      "E-mail: " + (user.email || "-") + "\n\n" +
+      "Rozumiem, że po usunięciu konta zniknie profil, zgody i zapisane wyniki."
+    );
+    els.deleteRequestBtn.href = "mailto:kontakt@familock.pl?subject=" + mailSubject + "&body=" + mailBody;
   }
 
   await loadResults(user.id);
@@ -694,6 +715,45 @@ els.newPasswordForm.addEventListener("submit", async function (e) {
   }
 });
 
+els.toggleRankingBtn.addEventListener("click", async function () {
+  clearMsg();
+
+  if (!currentUser || !currentProfile) {
+    setMsg("Najpierw zaloguj się na konto.", "err");
+    return;
+  }
+
+  var next = !currentProfile.show_in_ranking;
+
+  try {
+    els.toggleRankingBtn.disabled = true;
+
+    var res = await withTimeout(
+      sb.from("profiles")
+        .update({ show_in_ranking: next })
+        .eq("id", currentUser.id)
+        .select("id, login, display_name, rank_name, show_in_ranking")
+        .single(),
+      25000,
+      "timeout"
+    );
+
+    if (res.error) {
+      setMsg("Nie udało się zmienić widoczności rankingu: " + niceError(res.error), "err");
+      return;
+    }
+
+    currentProfile = res.data;
+    els.pRanking.textContent = currentProfile.show_in_ranking ? "widoczny" : "ukryty";
+    els.toggleRankingBtn.textContent = currentProfile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
+    setMsg(currentProfile.show_in_ranking ? "Profil będzie widoczny w rankingu." : "Profil został ukryty z rankingu.", "ok");
+  } catch (err) {
+    setMsg("Nie udało się zmienić widoczności rankingu: " + niceError(err), "err");
+  } finally {
+    els.toggleRankingBtn.disabled = false;
+  }
+});
+
 els.logoutBtn.addEventListener("click", async function () {
   clearMsg();
   await sb.auth.signOut();
@@ -755,6 +815,7 @@ async function boot() {
   }
 }
 
+console.info("Szpilplac konto.html v04");
 boot();
 </script>
 </body>
