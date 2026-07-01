@@ -9,72 +9,425 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4)}
-[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5)}
+:root{
+  --bg:#f0e8d4;
+  --surface:#fbf7ee;
+  --surface2:#f3ecda;
+  --ink:#23201a;
+  --ink2:#6a6150;
+  --line:#c9bfa6;
+  --green:#2f4a39;
+  --gold:#bf8a3a;
+  --ok:#3f8a5a;
+  --danger:#b5482f;
+  --shadow:0 10px 28px -18px rgba(35,32,26,.55);
+}
+[data-theme=dark]{
+  --bg:#161310;
+  --surface:#262018;
+  --surface2:#2e2820;
+  --ink:#ede5d0;
+  --ink2:#aaa18d;
+  --line:#3d3629;
+  --green:#4a7a56;
+  --gold:#d4a04a;
+  --ok:#4a9a6a;
+  --danger:#d76a4f;
+  --shadow:0 10px 30px -18px rgba(0,0,0,.7);
+}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100vh;
+  padding:0 16px 40px;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
 a{color:inherit;text-decoration:none}
-header,main,footer{width:100%;max-width:520px}
-header{padding-top:20px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.site-name{font-family:"Oswald";font-size:clamp(30px,9vw,44px);font-weight:700;text-transform:uppercase;line-height:1}
-.site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
-.controls{display:flex;gap:6px}
-.icon-btn{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-main{display:flex;flex-direction:column;gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:20px}
-h2{font-family:"Oswald";font-size:23px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 8px;line-height:1.05}
-.intro{font-size:13px;color:var(--ink2);line-height:1.5;margin:0 0 16px}
-.small{font-size:12px;color:var(--ink2);line-height:1.45}
-.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);margin-bottom:18px}
-.tab{flex:1;font-size:12.5px;font-weight:800;padding:9px 6px;border-radius:999px;color:var(--ink2);text-transform:uppercase}
-.tab.active{background:var(--green);color:#fff}
-.panel{display:none}.panel.active{display:block}.hidden{display:none!important}
-form{display:grid;gap:13px}
-label.field{display:grid;gap:7px;font-weight:800;font-size:13px}
-input[type=email],input[type=password],input[type=text],select{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#e8eef9;color:#000;font:inherit;font-size:15px;outline:none}
-[data-theme=dark] input[type=email],[data-theme=dark] input[type=password],[data-theme=dark] input[type=text],[data-theme=dark] select{background:#e8eef9;color:#000}
-input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,138,58,.2)}
-.check{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink2);line-height:1.4}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
+header,main,footer{width:100%;max-width:980px}
+header{padding-top:18px}
+.topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.site-name{
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:clamp(34px,5vw,48px);
+  line-height:.95;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+}
+.site-sub{
+  margin-top:4px;
+  color:var(--ink2);
+  font-size:12px;
+}
+.controls{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding-top:8px;
+}
+.icon-btn{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  color:var(--ink2);
+}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+main{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:var(--surface);
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+.auth-card{
+  max-width:560px;
+  width:100%;
+  align-self:center;
+}
+h2{
+  margin:0 0 8px;
+  color:var(--ink);
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:24px;
+  line-height:1.04;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+}
+.intro{
+  margin:0 0 16px;
+  color:var(--ink2);
+  font-size:13px;
+  line-height:1.5;
+}
+.small{
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.45;
+}
+.tabs{
+  display:flex;
+  gap:5px;
+  padding:5px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  margin-bottom:18px;
+}
+.tab{
+  flex:1;
+  padding:9px 8px;
+  border-radius:999px;
+  color:var(--ink2);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+}
+.tab.active{
+  background:var(--green);
+  color:#fff;
+}
+.panel{display:none}
+.panel.active{display:block}
+.hidden{display:none!important}
+form{
+  display:grid;
+  gap:13px;
+}
+label.field{
+  display:grid;
+  gap:7px;
+  color:var(--ink);
+  font-size:13px;
+  font-weight:900;
+}
+input[type=email],
+input[type=password],
+input[type=text],
+select{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#e8eef9;
+  color:#000;
+  font:inherit;
+  font-size:15px;
+  outline:none;
+}
+input:focus,select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(191,138,58,.2);
+}
+.check{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  color:var(--ink2);
+  font-size:12.5px;
+  line-height:1.4;
+}
 .check input{margin-top:3px;accent-color:var(--green)}
-.btn{border-radius:12px;padding:12px 15px;background:var(--green);color:#fff;font-weight:900;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
-.btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
-.btn.gold{background:var(--gold);color:#20170d}
-.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
-.btn:disabled{opacity:.55;cursor:not-allowed}
-.msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
-.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
-.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
-.hello{font-family:"Oswald";font-size:31px;text-transform:uppercase;margin:0 0 6px;line-height:1.05}
-.profile-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.stat{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900}
-.stat .value{font-family:"Oswald";font-size:24px;line-height:1.1;margin-top:4px}
-.profile-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.btn{
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:12px;
+  background:var(--green);
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  text-align:center;
+}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn.secondary{
+  border:1px solid var(--line);
+  background:var(--surface2);
+  color:var(--ink);
+}
+.btn.gold{
+  background:var(--gold);
+  color:#20170d;
+}
+.btn.danger{
+  border:1px solid var(--danger);
+  background:transparent;
+  color:var(--danger);
+}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+.msg{
+  display:none;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--surface2);
+  color:var(--ink2);
+  font-size:13px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+.msg.ok{display:block;border-color:var(--ok);background:rgba(63,138,90,.1);color:var(--ok)}
+.msg.err{display:block;border-color:var(--danger);background:rgba(181,72,47,.1);color:var(--danger)}
+.msg.info{display:block}
+.recovery-box{
+  margin-bottom:14px;
+  padding:12px;
+  border:1px solid rgba(191,138,58,.6);
+  border-radius:13px;
+  background:rgba(191,138,58,.10);
+  color:var(--ink2);
+  font-size:12.5px;
+  line-height:1.5;
+}
+.hello{
+  margin:0 0 6px;
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:32px;
+  line-height:1.04;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+}
+.profile-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin:16px 0;
+}
+.stat{
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface2);
+}
+.stat .label{
+  color:var(--ink2);
+  font-size:10.5px;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.stat .value{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  margin-top:5px;
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:24px;
+  line-height:1.05;
+}
+.profile-row{
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr);
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
 .profile-row strong{color:var(--ink2)}
-.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
-.sub-head{font-family:"Oswald";font-size:16px;text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
-.result{padding:10px 0;border-bottom:1px solid var(--line)}
-.pill{display:inline-flex;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:800;font-family:"Oswald"}
-.result-meta{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:5px}
-.recovery-box{border:1px solid var(--gold);background:rgba(191,138,58,.1);border-radius:12px;padding:12px;margin-bottom:14px;color:var(--ink2);font-size:12.5px;line-height:1.5}
-footer{text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
-footer a{color:var(--green);font-weight:800}
-@media(max-width:420px){.profile-summary{grid-template-columns:1fr}.profile-row{grid-template-columns:1fr;gap:2px}}
+.profile-row span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sub-head{
+  margin:20px 0 8px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:16px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+}
+.profile-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+.result{
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.result:last-child{border-bottom:0}
+.pill{
+  display:inline-flex;
+  padding:4px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:11.5px;
+  font-weight:900;
+}
+.result-meta{
+  margin-top:5px;
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.5;
+}
+.site-footer{
+  margin-top:22px;
+  color:var(--ink2);
+  font-size:12px;
+  text-align:center;
+}
+.footer-icons{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.footer-icons a{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  color:var(--green);
+}
+.footer-icons a:hover{background:var(--surface);color:var(--gold);transform:translateY(-1px)}
+.footer-nav{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.footer-nav a{
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(191,138,58,.08);
+  color:var(--ink);
+  font-size:11px;
+  font-weight:900;
+}
+.footer-nav a:hover{background:var(--surface2);color:var(--green)}
+.footer-legal{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:12px;
+  color:var(--ink2);
+  font-size:11px;
+  line-height:1.6;
+  opacity:.84;
+}
+.footer-legal a{
+  color:var(--ink2);
+  font-weight:700;
+}
+.footer-legal a:hover{
+  color:var(--green);
+  text-decoration:underline;
+}
+@media(max-width:760px){
+  header,main,footer{max-width:560px}
+  .profile-summary{grid-template-columns:1fr 1fr}
+}
+@media(max-width:430px){
+  body{padding-left:12px;padding-right:12px}
+  .topbar{align-items:flex-start}
+  .site-name{font-size:34px}
+  .card{padding:18px;border-radius:17px}
+  .tabs{display:grid;grid-template-columns:1fr}
+  .profile-summary{grid-template-columns:1fr}
+  .profile-row{grid-template-columns:1fr;gap:2px}
+  .profile-actions{display:grid;grid-template-columns:1fr}
+  .profile-actions .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
 </style>
 </head>
 <body>
 <header>
   <div class="topbar">
-    <div><div class="site-name">Szpilplac</div><div class="site-sub">Konto gracza</div></div>
+    <div>
+      <div class="site-name">Szpilplac</div>
+      <div class="site-sub">Konto gracza</div>
+    </div>
     <div class="controls">
-      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.4 10 3l7 6.4"/><path d="M5 8.6V17h10V8.6"/><path d="M8 17v-5h4v5"/></svg></a>
-      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
+      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+      </a>
+      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw"></button>
     </div>
   </div>
 </header>
@@ -82,7 +435,7 @@ footer a{color:var(--green);font-weight:800}
 <main>
   <div id="globalMsg" class="msg hidden"></div>
 
-  <section class="card" id="authCard">
+  <section class="card auth-card" id="authCard">
     <div id="recoveryNotice" class="recovery-box hidden">Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej.</div>
 
     <div class="tabs" id="tabs">
@@ -96,8 +449,7 @@ footer a{color:var(--green);font-weight:800}
       <p class="intro">Zapisuj wyniki, ranking i rangę na swoim koncie.</p>
       <form id="registerForm">
         <label class="field">Login do rankingu<input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24"></label>
-        <div class="small">3-24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
-
+        <div class="small">3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
         <label class="field">Województwo <span class="small" style="font-weight:600;">opcjonalnie</span><select id="regVoivodeship"><option value="">Nie podaję</option></select></label>
         <label class="field">Miejscowość <span class="small" style="font-weight:600;">opcjonalnie</span><input id="regCity" type="text" autocomplete="address-level2" placeholder="np. Chorzów" maxlength="80"></label>
         <label class="field">E-mail<input id="regEmail" type="email" autocomplete="email" placeholder="twoj@mail.pl" required></label>
@@ -141,16 +493,17 @@ footer a{color:var(--green);font-weight:800}
   <section class="card hidden" id="profileCard">
     <p class="hello" id="helloTitle">Cześć!</p>
     <p class="intro" id="profileIntro">Twój profil gracza.</p>
+
     <div class="profile-summary">
       <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Gorol</div></div>
       <div class="stat"><div class="label">Punkty</div><div class="value" id="sumPoints">0</div></div>
       <div class="stat"><div class="label">Gry</div><div class="value" id="sumGames">0</div></div>
       <div class="stat"><div class="label">Wygrane</div><div class="value" id="sumWins">0</div></div>
     </div>
+
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
     <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
     <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
-
     <div class="profile-row"><strong>Województwo</strong><span id="pVoivodeship">—</span></div>
     <div class="profile-row"><strong>Miejscowość</strong><span id="pCity">—</span></div>
 
@@ -160,6 +513,7 @@ footer a{color:var(--green);font-weight:800}
       <label class="field">Miejscowość<input id="profileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>
       <button class="btn secondary" type="submit">Zapisz dane</button>
     </form>
+
     <div class="profile-actions">
       <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
       <a class="btn gold" href="ranking.html">Ranking</a>
@@ -167,38 +521,52 @@ footer a{color:var(--green);font-weight:800}
       <a class="btn secondary" id="deleteRequestBtn" href="mailto:kontakt@familock.pl?subject=Usuni%C4%99cie%20konta%20Szpilplac">Poproś o usunięcie konta</a>
       <button type="button" class="btn danger" id="logoutBtn">Wyloguj</button>
     </div>
+
     <div class="sub-head">Ostatnie wyniki z konta</div>
     <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
   </section>
-
-  <footer><p><a href="index.html">Szpilplac</a> · <a href="ranking.html">Ranking</a> · <a href="auth-diagnostyka.html">Diagnostyka</a> · <a href="https://familock.pl" rel="noopener">Familock</a></p></footer>
 </main>
+
+<footer class="site-footer">
+  <div class="footer-icons" aria-label="Familock">
+    <a href="index.html" aria-label="Szpilplac">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+    </a>
+    <a href="ranking.html" aria-label="Ranking">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16h12"/><path d="M6 16V9"/><path d="M10 16V5"/><path d="M14 16v-3"/></svg>
+    </a>
+    <a href="https://familock.pl" rel="noopener" aria-label="Familock">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+    </a>
+  </div>
+
+  <nav class="footer-nav" aria-label="Nawigacja">
+    <a href="index.html">Szpilplac</a>
+    <a href="ranking.html">Ranking</a>
+    <a href="https://familock.pl" rel="noopener">Familock</a>
+  </nav>
+
+  <div class="footer-legal" id="szpKontoLegalFooter">
+    <a href="regulamin.html">Regulamin</a>
+    <span>·</span>
+    <a href="polityka-prywatnosci.html">Prywatność</a>
+    <span>·</span>
+    <a href="cookies.html">Cookies</a>
+    <span>·</span>
+    <a href="mailing.html">Mailing</a>
+  </div>
+</footer>
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v10");
+console.info("Szpilplac konto.html v49 clean-safe");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
-var TERMS_VERSION = "2026-06-29";
-var PRIVACY_VERSION = "2026-06-29";
+var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
+var PRIVACY_VERSION = window.PRIVACY_VERSION || "2026-06-30";
 var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
 var VOIVODESHIPS = [
-  "dolnośląskie",
-  "kujawsko-pomorskie",
-  "lubelskie",
-  "lubuskie",
-  "łódzkie",
-  "małopolskie",
-  "mazowieckie",
-  "opolskie",
-  "podkarpackie",
-  "podlaskie",
-  "pomorskie",
-  "śląskie",
-  "świętokrzyskie",
-  "warmińsko-mazurskie",
-  "wielkopolskie",
-  "zachodniopomorskie"
+  "dolnośląskie","kujawsko-pomorskie","lubelskie","lubuskie","łódzkie","małopolskie","mazowieckie","opolskie","podkarpackie","podlaskie","pomorskie","śląskie","świętokrzyskie","warmińsko-mazurskie","wielkopolskie","zachodniopomorskie"
 ];
 
 var sb = null;
@@ -252,232 +620,318 @@ var els = {
   logoutBtn:document.getElementById("logoutBtn")
 };
 
-var theme = localStorage.getItem("szpilplac_theme") || "light";
-function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
-document.getElementById("themeBtn").onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();};
+function themeIcon(theme){
+  return theme === "light"
+    ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><line x1="8" y1="0.5" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15.5"/><line x1="0.5" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15.5" y2="8"/><line x1="2.57" y1="2.57" x2="3.99" y2="3.99"/><line x1="12.01" y1="12.01" x2="13.43" y2="13.43"/><line x1="13.43" y1="2.57" x2="12.01" y2="3.99"/><line x1="3.99" y1="12.01" x2="2.57" y2="13.43"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5a5.5 5.5 0 01-7.07-7.07A6 6 0 1013.5 10.5z"/></svg>';
+}
+var theme = localStorage.getItem("szpilplac_theme") || "dark";
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",theme);
+  document.getElementById("themeBtn").innerHTML = themeIcon(theme);
+}
+document.getElementById("themeBtn").onclick = function(){
+  theme = theme === "light" ? "dark" : "light";
+  localStorage.setItem("szpilplac_theme",theme);
+  applyTheme();
+};
 applyTheme();
 
-function setMsg(text,type){els.globalMsg.textContent=text;els.globalMsg.className="msg"+(type?" "+type:"");els.globalMsg.classList.remove("hidden");}
-function clearMsg(){els.globalMsg.textContent="";els.globalMsg.className="msg hidden";}
-function setBusy(form,busy){form.querySelectorAll("button,input").forEach(function(el){el.disabled=busy;});}
+function setMsg(text,type){
+  els.globalMsg.textContent = text || "";
+  els.globalMsg.className = "msg" + (text ? " " + (type || "info") : " hidden");
+}
+function clearMsg(){setMsg("");}
+function setBusy(form,busy){
+  if(!form)return;
+  form.querySelectorAll("button,input,select").forEach(function(el){el.disabled=busy;});
+}
 function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
-function withTimeout(promise,ms,label){return Promise.race([promise,new Promise(function(_,reject){setTimeout(function(){reject(new Error(label||"timeout"));},ms);})]);}
+function withTimeout(promise,ms,label){
+  return Promise.race([
+    promise,
+    new Promise(function(_,reject){setTimeout(function(){reject(new Error(label || "timeout"));},ms);})
+  ]);
+}
 function niceError(error){
   if(!error)return "Nieznany błąd.";
-  var msg=error.message||String(error);
-  if(msg.includes("User already registered"))return "Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.";
-  if(msg.includes("Invalid login credentials"))return "Nieprawidłowy e-mail albo hasło.";
-  if(msg.includes("Email not confirmed"))return "Najpierw potwierdź e-mail linkiem z wiadomości.";
-  if(msg.includes("duplicate key"))return "Ten login jest już zajęty.";
-  if(msg.includes("timeout"))return "Operacja trwa zbyt długo, ale sprawdzam jeszcze, czy sesja już powstała.";
-  if(msg.includes("Auth session missing"))return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
+  var msg = error.message || String(error);
+  var low = msg.toLowerCase();
+  if(low.indexOf("user already") !== -1 || low.indexOf("already registered") !== -1)return "Ten e-mail ma już konto. Spróbuj się zalogować albo zresetować hasło.";
+  if(low.indexOf("invalid login credentials") !== -1)return "Nieprawidłowy e-mail albo hasło.";
+  if(low.indexOf("email not confirmed") !== -1 || low.indexOf("not confirmed") !== -1)return "Najpierw potwierdź e-mail linkiem z wiadomości.";
+  if(low.indexOf("duplicate") !== -1 || low.indexOf("unique") !== -1)return "Ten login jest już zajęty.";
+  if(low.indexOf("timeout") !== -1)return "Operacja trwa zbyt długo, ale sprawdzam jeszcze, czy sesja już powstała.";
+  if(low.indexOf("auth session missing") !== -1)return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
   return msg;
 }
-function escapeHtml(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
-function getRedirectUrl(extra){var url=new URL(window.location.href);url.search=extra||"";url.hash="";return url.toString();}
-function cleanUrl(){history.replaceState({},document.title,window.location.pathname);}
+function escapeHtml(v){
+  return String(v == null ? "" : v).replace(/[&<>"']/g,function(ch){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+  });
+}
+function getRedirectUrl(extra){
+  var url = new URL(window.location.href);
+  url.search = extra || "";
+  url.hash = "";
+  return url.toString();
+}
+function cleanUrl(){
+  try{history.replaceState({},document.title,window.location.pathname);}
+  catch(e){}
+}
+function cleanCity(value){
+  return String(value || "").trim().replace(/\s+/g," ").slice(0,80);
+}
+function normalizeOptional(value){
+  var v = String(value || "").trim();
+  return v ? v : null;
+}
 
 function initSupabase(){
-  var cfg=window.SZPILPLAC_CONFIG||{};
-  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak konfiguracji Supabase.", "err");return false;}
-  if(!window.supabase){setMsg("Nie załadowano biblioteki Supabase JS.", "err");return false;}
-  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
-    auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
-  });
+  var cfg = window.SZPILPLAC_CONFIG || {};
+  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){setMsg("Brak konfiguracji Supabase.","err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano biblioteki Supabase JS.","err");return false;}
+
+  if(window.__SZPILPLAC_SUPABASE_CLIENT){
+    sb = window.__SZPILPLAC_SUPABASE_CLIENT;
+  }else{
+    sb = window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+      auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+    });
+    window.__SZPILPLAC_SUPABASE_CLIENT = sb;
+  }
   return true;
 }
 
 function switchTab(id){
-  document.querySelectorAll(".tab").forEach(function(btn){btn.classList.toggle("active",btn.dataset.tab===id);});
-  document.querySelectorAll(".panel").forEach(function(panel){panel.classList.toggle("active",panel.id===id);});
+  document.querySelectorAll(".tab").forEach(function(btn){
+    btn.classList.toggle("active",btn.dataset.tab === id);
+  });
+  document.querySelectorAll(".panel").forEach(function(panel){
+    panel.classList.toggle("active",panel.id === id);
+  });
   clearMsg();
 }
-document.querySelectorAll(".tab").forEach(function(btn){btn.onclick=function(){switchTab(btn.dataset.tab);};});
+document.querySelectorAll(".tab").forEach(function(btn){
+  btn.onclick = function(){switchTab(btn.dataset.tab);};
+});
 
 function fillVoivodeshipSelect(select){
   if(!select)return;
-  var current=select.value||"";
-  select.innerHTML='<option value="">Nie podaję</option>'+VOIVODESHIPS.map(function(v){
+  var current = select.value || "";
+  select.innerHTML = '<option value="">Nie podaję</option>' + VOIVODESHIPS.map(function(v){
     return '<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>';
   }).join("");
-  select.value=current;
-}
-function cleanCity(value){
-  return String(value||"").trim().replace(/\s+/g," ").slice(0,80);
-}
-function normalizeOptional(value){
-  var v=String(value||"").trim();
-  return v ? v : null;
+  select.value = current;
 }
 function initLocationFields(){
   fillVoivodeshipSelect(els.regVoivodeship);
   fillVoivodeshipSelect(els.profileVoivodeship);
 }
-
-
 function showLoggedOut(){
   if(recoveryMode)return;
-  currentUser=null;currentProfile=null;
+  currentUser = null;
+  currentProfile = null;
   els.authCard.classList.remove("hidden");
   els.profileCard.classList.add("hidden");
 }
 function showLoggedInShell(user){
-  currentUser=user||currentUser;
+  currentUser = user || currentUser;
   els.authCard.classList.add("hidden");
   els.profileCard.classList.remove("hidden");
-  els.pEmail.textContent=currentUser&&currentUser.email?currentUser.email:"-";
-  els.helloTitle.textContent="Cześć!";
-  els.profileIntro.textContent="Sesja jest aktywna. Dociągam profil gracza...";
-  els.pLogin.textContent="—";
-  els.pRanking.textContent="—";
-  els.sumRank.textContent="Gorol";
-  els.toggleRankingBtn.disabled=true;
+  els.pEmail.textContent = currentUser && currentUser.email ? currentUser.email : "-";
+  els.helloTitle.textContent = "Cześć!";
+  els.profileIntro.textContent = "Sesja jest aktywna. Dociągam profil gracza...";
+  els.pLogin.textContent = "—";
+  els.pRanking.textContent = "—";
+  els.pVoivodeship.textContent = "—";
+  els.pCity.textContent = "—";
+  els.sumRank.textContent = "Gorol";
+  els.sumPoints.textContent = "0";
+  els.sumGames.textContent = "0";
+  els.sumWins.textContent = "0";
+  els.toggleRankingBtn.disabled = true;
 }
-
 async function getSession(){
   try{
-    var r=await sb.auth.getSession();
-    if(r&&r.data&&r.data.session)return r.data.session;
+    var r = await sb.auth.getSession();
+    if(r && r.data && r.data.session)return r.data.session;
   }catch(e){console.warn("getSession error",e);}
   return null;
 }
 function getStoredSession(){
   try{
-    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
+    var raw = localStorage.getItem(AUTH_STORAGE_KEY);
     if(!raw)return null;
-    var data=JSON.parse(raw);
-    return data.currentSession||data.session||data;
+    var data = JSON.parse(raw);
+    return data.currentSession || data.session || data;
   }catch(e){return null;}
 }
 async function getBestSession(){
-  var s=await getSession();
-  if(s&&s.user)return s;
-  var stored=getStoredSession();
-  if(stored&&stored.user&&stored.access_token&&stored.refresh_token){
+  var s = await getSession();
+  if(s && s.user)return s;
+  var stored = getStoredSession();
+  if(stored && stored.user && stored.access_token && stored.refresh_token){
     try{
-      var setRes=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
-      if(setRes&&setRes.data&&setRes.data.session)return setRes.data.session;
+      var setRes = await sb.auth.setSession({
+        access_token:stored.access_token,
+        refresh_token:stored.refresh_token
+      });
+      if(setRes && setRes.data && setRes.data.session)return setRes.data.session;
     }catch(e){console.warn("setSession from localStorage error",e);}
     return stored;
   }
   return null;
 }
 async function waitForSession(ms){
-  var started=Date.now();
-  while(Date.now()-started<ms){
-    var s=await getBestSession();
-    if(s&&s.user)return s;
+  var started = Date.now();
+  while(Date.now() - started < ms){
+    var s = await getBestSession();
+    if(s && s.user)return s;
     await sleep(250);
   }
   return null;
 }
-
+async function upsertProfileAfterSignup(userId, data){
+  if(!userId)return;
+  try{
+    await sb.from("profiles").upsert({
+      id:userId,
+      login:data.login,
+      display_name:data.login,
+      voivodeship:data.voivodeship,
+      city:data.city,
+      show_in_ranking:true
+    },{onConflict:"id"});
+  }catch(e){
+    console.warn("profile upsert after signup skipped",e);
+  }
+}
 async function loadProfile(){
-  if(!sb||recoveryMode)return;
+  if(!sb || recoveryMode)return;
 
-  var session=await getBestSession();
-  if(!session||!session.user){showLoggedOut();return;}
+  var session = await getBestSession();
+  if(!session || !session.user){showLoggedOut();return;}
 
   showLoggedInShell(session.user);
 
-  var profile=null;
+  var profile = null;
   try{
-    var res=await withTimeout(
-      sb.from("profiles").select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city").eq("id",session.user.id).single(),
+    var res = await withTimeout(
+      sb.from("profiles")
+        .select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city")
+        .eq("id",session.user.id)
+        .single(),
       9000,
       "profile_timeout"
     );
-    if(!res.error&&res.data)profile=res.data;
+    if(!res.error && res.data)profile = res.data;
   }catch(e){
     console.warn("profile load error",e);
   }
 
   if(profile){
-    currentProfile=profile;
-    var login=profile.login||profile.display_name||"graczu";
-    els.helloTitle.textContent="Cześć, "+login+"!";
-    els.profileIntro.textContent="Twój profil gracza.";
-    els.pLogin.textContent=profile.login||"-";
-    els.sumRank.textContent=profile.rank_name||"Gorol";
-    els.pRanking.textContent=profile.show_in_ranking?"widoczny":"ukryty";
-    els.pVoivodeship.textContent=profile.voivodeship||"—";
-    els.pCity.textContent=profile.city||"—";
-    els.profileVoivodeship.value=profile.voivodeship||"";
-    els.profileCity.value=profile.city||"";
-    els.toggleRankingBtn.disabled=false;
-    els.toggleRankingBtn.textContent=profile.show_in_ranking?"Ukryj mnie z rankingu":"Pokaż mnie w rankingu";
+    currentProfile = profile;
+    var login = profile.login || profile.display_name || "graczu";
+    els.helloTitle.textContent = "Cześć, " + login + "!";
+    els.profileIntro.textContent = "Twój profil gracza.";
+    els.pLogin.textContent = profile.login || "-";
+    els.sumRank.textContent = profile.rank_name || "Gorol";
+    els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
+    els.pVoivodeship.textContent = profile.voivodeship || "—";
+    els.pCity.textContent = profile.city || "—";
+    els.profileVoivodeship.value = profile.voivodeship || "";
+    els.profileCity.value = profile.city || "";
+    els.toggleRankingBtn.disabled = false;
+    els.toggleRankingBtn.textContent = profile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
 
-    var mailSubject=encodeURIComponent("Usunięcie konta Szpilplac");
-    var mailBody=encodeURIComponent("Proszę o usunięcie mojego konta Szpilplac.\n\nLogin: "+(profile.login||"-")+"\nE-mail: "+(session.user.email||"-")+"\n\nRozumiem, że po usunięciu konta zniknie profil, zgody i zapisane wyniki.");
-    els.deleteRequestBtn.href="mailto:kontakt@familock.pl?subject="+mailSubject+"&body="+mailBody;
+    var mailSubject = encodeURIComponent("Usunięcie konta Szpilplac");
+    var mailBody = encodeURIComponent("Proszę o usunięcie mojego konta Szpilplac.\n\nLogin: "+(profile.login || "-")+"\nE-mail: "+(session.user.email || "-")+"\n\nRozumiem, że po usunięciu konta zniknie profil, zgody i zapisane wyniki.");
+    els.deleteRequestBtn.href = "mailto:kontakt@familock.pl?subject="+mailSubject+"&body="+mailBody;
   }else{
-    els.profileIntro.textContent="Sesja jest aktywna, ale nie udało się odczytać profilu. Możesz przejść do rankingu lub odświeżyć stronę.";
+    els.profileIntro.textContent = "Sesja jest aktywna, ale nie udało się odczytać profilu. Możesz przejść do rankingu albo odświeżyć stronę.";
   }
 
   await loadResults(session.user.id);
 }
-
+function niceGame(value){
+  var map = {slowko:"Słōwko",klodka:"Kłōdka",zorta:"Raja",raja:"Raja",cuzamen:"Cuzamen"};
+  var raw = String(value || "");
+  return map[raw.toLowerCase()] || raw;
+}
 async function loadResults(userId){
   try{
-    var res=await withTimeout(
-      sb.from("user_game_results").select("game, mode, puzzle_no, won, tries, errors, score, finished_at").eq("user_id",userId).order("finished_at",{ascending:false}).limit(20),
+    var res = await withTimeout(
+      sb.from("user_game_results")
+        .select("game, mode, puzzle_no, won, tries, errors, score, finished_at")
+        .eq("user_id",userId)
+        .order("finished_at",{ascending:false})
+        .limit(200),
       9000,
       "results_timeout"
     );
 
-    if(res.error){els.resultsBox.textContent="Błąd odczytu wyników: "+res.error.message;return;}
+    if(res.error){
+      els.resultsBox.textContent = "Błąd odczytu wyników: " + res.error.message;
+      return;
+    }
 
-    var data=res.data||[];
-    var games=data.length;
-    var wins=data.filter(function(r){return r.won;}).length;
-    var points=data.reduce(function(sum,r){return sum+(Number(r.score)||0);},0);
-    els.sumGames.textContent=String(games);
-    els.sumWins.textContent=String(wins);
-    els.sumPoints.textContent=String(points);
+    var data = res.data || [];
+    var games = data.length;
+    var wins = data.filter(function(r){return r.won;}).length;
+    var points = data.reduce(function(sum,r){return sum + (Number(r.score) || 0);},0);
+    els.sumGames.textContent = String(games);
+    els.sumWins.textContent = String(wins);
+    els.sumPoints.textContent = String(points);
 
-    if(!data.length){els.resultsBox.textContent="Brak zapisanych wyników na koncie.";return;}
+    if(!data.length){
+      els.resultsBox.textContent = "Brak zapisanych wyników na koncie.";
+      return;
+    }
 
-    els.resultsBox.innerHTML=data.slice(0,10).map(function(row){
-      var won=row.won?"wygrana":"porażka";
-      var when=row.finished_at?new Date(row.finished_at).toLocaleString("pl-PL"):"";
-      return '<div class="result"><span class="pill">'+escapeHtml(row.game)+' #'+escapeHtml(row.puzzle_no)+'</span><div class="result-meta">'+won+', '+escapeHtml(row.score)+' pkt, próby: '+(row.tries!=null?escapeHtml(row.tries):'-')+', błędy: '+(row.errors!=null?escapeHtml(row.errors):'-')+'<br>'+escapeHtml(when)+'</div></div>';
+    els.resultsBox.innerHTML = data.slice(0,12).map(function(row){
+      var won = row.won ? "wygrana" : "porażka";
+      var when = row.finished_at ? new Date(row.finished_at).toLocaleString("pl-PL") : "";
+      var puzzle = row.puzzle_no == null ? "" : " #"+escapeHtml(row.puzzle_no);
+      return '<div class="result"><span class="pill">'+escapeHtml(niceGame(row.game))+puzzle+'</span><div class="result-meta">'+
+        escapeHtml(won)+', '+escapeHtml(row.score)+' pkt, próby: '+(row.tries != null ? escapeHtml(row.tries) : "-")+', błędy: '+(row.errors != null ? escapeHtml(row.errors) : "-")+
+        '<br>'+escapeHtml(when)+'</div></div>';
     }).join("");
   }catch(e){
-    els.resultsBox.textContent="Nie udało się odczytać wyników. Sesja konta nadal jest aktywna.";
+    els.resultsBox.textContent = "Nie udało się odczytać wyników. Sesja konta nadal jest aktywna.";
   }
 }
-
 function enterRecoveryMode(message){
-  recoveryMode=true;
+  recoveryMode = true;
   els.authCard.classList.remove("hidden");
   els.profileCard.classList.add("hidden");
   els.recoveryNotice.classList.remove("hidden");
   els.tabs.classList.add("hidden");
   els.resetForm.classList.add("hidden");
   els.newPasswordBox.classList.remove("hidden");
-  els.resetTitle.textContent="Ustaw nowe hasło";
-  els.resetIntro.textContent="Wpisz nowe hasło i zapisz zmianę.";
+  els.resetTitle.textContent = "Ustaw nowe hasło";
+  els.resetIntro.textContent = "Wpisz nowe hasło i zapisz zmianę.";
   switchTab("reset");
   if(message)setMsg(message,"ok");
 }
 function exitRecoveryMode(){
-  recoveryMode=false;
+  recoveryMode = false;
   els.recoveryNotice.classList.add("hidden");
   els.tabs.classList.remove("hidden");
   els.resetForm.classList.remove("hidden");
   els.newPasswordBox.classList.add("hidden");
-  els.resetTitle.textContent="Reset hasła";
-  els.resetIntro.textContent="Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.";
+  els.resetTitle.textContent = "Reset hasła";
+  els.resetIntro.textContent = "Wpisz e-mail, a wyślemy link do ustawienia nowego hasła.";
 }
-
 document.addEventListener("click",function(e){
-  if(e.target&&e.target.id==="clearAuthBtn"){
+  if(e.target && e.target.id === "clearAuthBtn"){
     try{
       Object.keys(localStorage).forEach(function(key){
-        if(key.indexOf("auth")!==-1||key.indexOf("supabase")!==-1||key.indexOf("sb-")===0||key.indexOf("szpilplac-auth")===0)localStorage.removeItem(key);
+        if(key.indexOf("auth") !== -1 || key.indexOf("supabase") !== -1 || key.indexOf("sb-") === 0 || key.indexOf("szpilplac-auth") === 0)localStorage.removeItem(key);
       });
     }catch(err){}
-    setMsg("Wyczyszczono lokalne sesje. Teraz zaloguj się ponownie.", "ok");
+    setMsg("Wyczyszczono lokalne sesje. Teraz zaloguj się ponownie.","ok");
   }
 });
 
@@ -485,36 +939,34 @@ els.loginForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
   setBusy(els.loginForm,true);
-  setMsg("Loguję...");
+  setMsg("Loguję...","info");
 
-  var email=els.loginEmail.value.trim();
-  var password=els.loginPassword.value;
+  var email = els.loginEmail.value.trim();
+  var password = els.loginPassword.value;
 
   try{
-    var r=await withTimeout(sb.auth.signInWithPassword({email:email,password:password}),14000,"timeout");
+    var r = await withTimeout(sb.auth.signInWithPassword({email:email,password:password}),14000,"timeout");
     if(r.error)throw r.error;
 
-    var session=r.data&&r.data.session?r.data.session:await waitForSession(4000);
-    if(session&&session.user){
+    var session = r.data && r.data.session ? r.data.session : await waitForSession(4000);
+    if(session && session.user){
       showLoggedInShell(session.user);
-      setMsg("Zalogowano.", "ok");
+      setMsg("Zalogowano.","ok");
       await loadProfile();
       return;
     }
 
     throw new Error("Brak sesji po zalogowaniu.");
   }catch(err){
-    // Kluczowa poprawka: jeżeli event SIGNED_IN lub localStorage już utworzył sesję,
-    // nie pokazujemy błędu timeoutu, tylko przełączamy konto na profil.
-    var session=await waitForSession(5000);
-    if(session&&session.user){
+    var session = await waitForSession(5000);
+    if(session && session.user){
       showLoggedInShell(session.user);
-      setMsg("Zalogowano. Odpowiedź Supabase była wolna, ale sesja jest aktywna.", "ok");
+      setMsg("Zalogowano. Odpowiedź Supabase była wolna, ale sesja jest aktywna.","ok");
       await loadProfile();
       return;
     }
 
-    setMsg("Nie udało się zalogować: "+niceError(err), "err");
+    setMsg("Nie udało się zalogować: "+niceError(err),"err");
   }finally{
     setBusy(els.loginForm,false);
   }
@@ -523,30 +975,46 @@ els.loginForm.addEventListener("submit",async function(e){
 els.registerForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
-  var login=els.regLogin.value.trim();
-  var email=els.regEmail.value.trim();
-  var password=els.regPassword.value;
-  var password2=els.regPassword2.value;
-  if(!LOGIN_RE.test(login)){setMsg("Login musi mieć 3-24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.","err");return;}
-  if(password.length<8){setMsg("Hasło musi mieć minimum 8 znaków.","err");return;}
-  if(password!==password2){setMsg("Hasła nie są takie same.","err");return;}
+
+  var login = els.regLogin.value.trim();
+  var email = els.regEmail.value.trim();
+  var password = els.regPassword.value;
+  var password2 = els.regPassword2.value;
+  var voivodeship = normalizeOptional(els.regVoivodeship.value);
+  var city = normalizeOptional(cleanCity(els.regCity.value));
+
+  if(!LOGIN_RE.test(login)){setMsg("Login musi mieć 3–24 znaki i może zawierać litery, cyfry, podkreślenie, myślnik oraz polskie znaki.","err");return;}
+  if(password.length < 8){setMsg("Hasło musi mieć minimum 8 znaków.","err");return;}
+  if(password !== password2){setMsg("Hasła nie są takie same.","err");return;}
   if(!els.regTerms.checked){setMsg("Musisz zaakceptować regulamin i politykę prywatności.","err");return;}
 
   try{
     setBusy(els.registerForm,true);
-    setMsg("Tworzę konto i wysyłam mail potwierdzający...");
-    var r=await withTimeout(sb.auth.signUp({
+    setMsg("Tworzę konto i wysyłam mail potwierdzający...","info");
+
+    var metadata = {
+      login:login,
+      display_name:login,
+      terms_version:window.TERMS_VERSION || TERMS_VERSION,
+      privacy_version:window.PRIVACY_VERSION || PRIVACY_VERSION,
+      marketing_consent:!!els.regMarketing.checked,
+      voivodeship:voivodeship,
+      city:city
+    };
+
+    var r = await withTimeout(sb.auth.signUp({
       email:email,
       password:password,
       options:{
         emailRedirectTo:getRedirectUrl("?confirmed=1"),
-        data:{login:login,display_name:login,terms_version:TERMS_VERSION,privacy_version:PRIVACY_VERSION,marketing_consent:els.regMarketing.checked,voivodeship:normalizeOptional(els.regVoivodeship.value),city:normalizeOptional(cleanCity(els.regCity.value))}
+        data:metadata
       }
     }),18000,"timeout");
 
     if(r.error)throw r.error;
 
-    if(r.data&&r.data.session&&r.data.session.user){
+    if(r.data && r.data.session && r.data.session.user){
+      await upsertProfileAfterSignup(r.data.session.user.id,{login:login,voivodeship:voivodeship,city:city});
       showLoggedInShell(r.data.session.user);
       setMsg("Konto utworzone i jesteś zalogowany.","ok");
       await loadProfile();
@@ -555,8 +1023,8 @@ els.registerForm.addEventListener("submit",async function(e){
       switchTab("login");
     }
   }catch(err){
-    var session=await waitForSession(3000);
-    if(session&&session.user){
+    var session = await waitForSession(3000);
+    if(session && session.user){
       showLoggedInShell(session.user);
       setMsg("Konto jest aktywne. Odpowiedź Supabase była wolna, ale sesja działa.","ok");
       await loadProfile();
@@ -571,10 +1039,15 @@ els.registerForm.addEventListener("submit",async function(e){
 els.resetForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
+
   try{
     setBusy(els.resetForm,true);
-    setMsg("Wysyłam link do resetu hasła...");
-    var r=await withTimeout(sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl("?reset=1")}),18000,"timeout");
+    setMsg("Wysyłam link do resetu hasła...","info");
+    var r = await withTimeout(
+      sb.auth.resetPasswordForEmail(els.resetEmail.value.trim(),{redirectTo:getRedirectUrl("?reset=1")}),
+      18000,
+      "timeout"
+    );
     if(r.error)throw r.error;
     setMsg("Wysłano link do resetu hasła. Sprawdź skrzynkę i kliknij najnowszy link.","ok");
   }catch(err){
@@ -587,25 +1060,28 @@ els.resetForm.addEventListener("submit",async function(e){
 els.newPasswordForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
-  var password=els.newPassword.value;
-  var password2=els.newPassword2.value;
-  if(password.length<8){setMsg("Nowe hasło musi mieć minimum 8 znaków.","err");return;}
-  if(password!==password2){setMsg("Nowe hasła nie są takie same.","err");return;}
+
+  var password = els.newPassword.value;
+  var password2 = els.newPassword2.value;
+
+  if(password.length < 8){setMsg("Nowe hasło musi mieć minimum 8 znaków.","err");return;}
+  if(password !== password2){setMsg("Nowe hasła nie są takie same.","err");return;}
 
   try{
     setBusy(els.newPasswordForm,true);
-    setMsg("Zapisuję nowe hasło...");
-    var sessionBefore=await waitForSession(5000);
-    var email=sessionBefore&&sessionBefore.user?sessionBefore.user.email:"";
-    var r=await withTimeout(sb.auth.updateUser({password:password}),18000,"timeout");
+    setMsg("Zapisuję nowe hasło...","info");
+
+    var sessionBefore = await waitForSession(5000);
+    var email = sessionBefore && sessionBefore.user ? sessionBefore.user.email : "";
+    var r = await withTimeout(sb.auth.updateUser({password:password}),18000,"timeout");
     if(r.error)throw r.error;
 
     if(email){
       try{await withTimeout(sb.auth.signInWithPassword({email:email,password:password}),12000,"timeout");}catch(e){}
     }
 
-    els.newPassword.value="";
-    els.newPassword2.value="";
+    els.newPassword.value = "";
+    els.newPassword2.value = "";
     exitRecoveryMode();
     cleanUrl();
     setMsg("Hasło zmienione. Konto jest zalogowane.","ok");
@@ -617,22 +1093,18 @@ els.newPasswordForm.addEventListener("submit",async function(e){
   }
 });
 
-
 els.locationForm.addEventListener("submit",async function(e){
   e.preventDefault();
   clearMsg();
 
-  if(!currentUser){
-    setMsg("Najpierw zaloguj się na konto.","err");
-    return;
-  }
+  if(!currentUser){setMsg("Najpierw zaloguj się na konto.","err");return;}
 
-  var voivodeship=normalizeOptional(els.profileVoivodeship.value);
-  var city=normalizeOptional(cleanCity(els.profileCity.value));
+  var voivodeship = normalizeOptional(els.profileVoivodeship.value);
+  var city = normalizeOptional(cleanCity(els.profileCity.value));
 
   try{
     setBusy(els.locationForm,true);
-    var res=await withTimeout(
+    var res = await withTimeout(
       sb.from("profiles")
         .update({voivodeship:voivodeship,city:city})
         .eq("id",currentUser.id)
@@ -644,9 +1116,9 @@ els.locationForm.addEventListener("submit",async function(e){
 
     if(res.error)throw res.error;
 
-    currentProfile=res.data;
-    els.pVoivodeship.textContent=currentProfile.voivodeship||"—";
-    els.pCity.textContent=currentProfile.city||"—";
+    currentProfile = res.data;
+    els.pVoivodeship.textContent = currentProfile.voivodeship || "—";
+    els.pCity.textContent = currentProfile.city || "—";
     setMsg("Dane zapisane.","ok");
   }catch(err){
     setMsg("Nie udało się zapisać danych: "+niceError(err),"err");
@@ -657,26 +1129,39 @@ els.locationForm.addEventListener("submit",async function(e){
 
 els.toggleRankingBtn.addEventListener("click",async function(){
   clearMsg();
-  if(!currentUser||!currentProfile){setMsg("Najpierw zaloguj się na konto.","err");return;}
-  var next=!currentProfile.show_in_ranking;
+
+  if(!currentUser || !currentProfile){setMsg("Najpierw zaloguj się na konto.","err");return;}
+
+  var next = !currentProfile.show_in_ranking;
+
   try{
-    els.toggleRankingBtn.disabled=true;
-    var res=await withTimeout(sb.from("profiles").update({show_in_ranking:next}).eq("id",currentUser.id).select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city").single(),12000,"timeout");
+    els.toggleRankingBtn.disabled = true;
+    var res = await withTimeout(
+      sb.from("profiles")
+        .update({show_in_ranking:next})
+        .eq("id",currentUser.id)
+        .select("id, login, display_name, rank_name, show_in_ranking, voivodeship, city")
+        .single(),
+      12000,
+      "timeout"
+    );
+
     if(res.error)throw res.error;
-    currentProfile=res.data;
-    els.pRanking.textContent=currentProfile.show_in_ranking?"widoczny":"ukryty";
-    els.toggleRankingBtn.textContent=currentProfile.show_in_ranking?"Ukryj mnie z rankingu":"Pokaż mnie w rankingu";
-    setMsg(currentProfile.show_in_ranking?"Profil będzie widoczny w rankingu.":"Profil został ukryty z rankingu.","ok");
+
+    currentProfile = res.data;
+    els.pRanking.textContent = currentProfile.show_in_ranking ? "widoczny" : "ukryty";
+    els.toggleRankingBtn.textContent = currentProfile.show_in_ranking ? "Ukryj mnie z rankingu" : "Pokaż mnie w rankingu";
+    setMsg(currentProfile.show_in_ranking ? "Profil będzie widoczny w rankingu." : "Profil został ukryty z rankingu.","ok");
   }catch(err){
     setMsg("Nie udało się zmienić widoczności rankingu: "+niceError(err),"err");
   }finally{
-    els.toggleRankingBtn.disabled=false;
+    els.toggleRankingBtn.disabled = false;
   }
 });
 
 els.logoutBtn.addEventListener("click",async function(){
   clearMsg();
-  await sb.auth.signOut();
+  try{await sb.auth.signOut();}catch(e){}
   try{localStorage.removeItem(AUTH_STORAGE_KEY);}catch(e){}
   showLoggedOut();
   setMsg("Wylogowano.","ok");
@@ -687,30 +1172,34 @@ async function boot(){
   if(!initSupabase())return;
   initLocationFields();
 
-  var params=new URLSearchParams(window.location.search);
-  var hash=new URLSearchParams((window.location.hash||"").replace(/^#/,""));
+  var params = new URLSearchParams(window.location.search);
+  var hash = new URLSearchParams((window.location.hash || "").replace(/^#/,""));
 
-  sb.auth.onAuthStateChange(function(event, session){
-    console.log("Szpilplac auth event:", event);
-    if(event==="PASSWORD_RECOVERY"){
+  sb.auth.onAuthStateChange(function(event,session){
+    console.log("Szpilplac auth event:",event);
+
+    if(event === "PASSWORD_RECOVERY"){
       enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
       return;
     }
-    if(event==="SIGNED_IN" && session && session.user){
+
+    if(event === "SIGNED_IN" && session && session.user){
       showLoggedInShell(session.user);
       loadProfile();
       return;
     }
-    if(event==="SIGNED_OUT"){
+
+    if(event === "SIGNED_OUT"){
       if(!recoveryMode)showLoggedOut();
       return;
     }
-    if(event==="USER_UPDATED"){
+
+    if(event === "USER_UPDATED"){
       loadProfile();
     }
   });
 
-  if(params.has("reset")||params.get("type")==="recovery"||hash.get("type")==="recovery"){
+  if(params.has("reset") || params.get("type") === "recovery" || hash.get("type") === "recovery"){
     enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
     waitForSession(5000).then(function(session){
       if(!session)setMsg("Nie widzę aktywnej sesji resetowania. Kliknij najnowszy link z maila resetującego albo wyślij reset jeszcze raz.","err");
@@ -723,17 +1212,19 @@ async function boot(){
     switchTab("login");
   }
 
+  if(params.has("login"))switchTab("login");
+  if(params.has("reset-panel"))switchTab("reset");
+
   await sleep(300);
   await loadProfile();
 }
 boot();
 </script>
-  <script src="konto-legal-bridge.js?v=19"></script>
+<script src="konto-legal-bridge.js?v=19"></script>
 <script src="konto-mailing-bridge.js?v=20"></script>
-  <script src="footer-clean.js?v=23"></script>
-  <script src="game-display-names.js?v=25"></script>
-  <script src="avatar-select.js?v=35"></script>
-  <script src="konto-dashboard.js?v=37"></script>
-  <script src="konto-delete-bridge.js?v=38"></script>
+<script src="game-display-names.js?v=25"></script>
+<script src="avatar-select.js?v=35"></script>
+<script src="konto-dashboard.js?v=37"></script>
+<script src="konto-delete-bridge.js?v=38"></script>
 </body>
 </html>
