@@ -1,18 +1,35 @@
 /*
-  Szpilplac Avatar Select v34
+  Szpilplac Avatar Select v35
   ---------------------------
-  Kompaktowy wybór avatara w nagłówku profilu:
-  po lewej nazwa gracza, po prawej avatar + "Zmień".
+  Czysty avatar obok nazwy gracza:
+  - sam obrazek w kółku
+  - pod spodem Ustaw / Zmień
+  - neutralny szary placeholder, gdy avatar nie jest ustawiony
 */
 
 (function(){
   "use strict";
 
-  var VERSION="v34";
+  var VERSION="v35";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var avatars=[];
-  var currentAvatarId="";
+  var currentAvatarId=null;
+
+  var PLACEHOLDER_SVG =
+    '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Brak avatara">'+
+      '<defs>'+
+        '<linearGradient id="szp-ph-g" x1="0" y1="0" x2="1" y2="1">'+
+          '<stop offset="0" stop-color="#d8d2c2"/>'+
+          '<stop offset="1" stop-color="#8f8878"/>'+
+        '</linearGradient>'+
+      '</defs>'+
+      '<circle cx="50" cy="50" r="50" fill="url(#szp-ph-g)"/>'+
+      '<circle cx="50" cy="50" r="43" fill="none" stroke="#f3ecda" stroke-width="4" opacity=".78"/>'+
+      '<circle cx="50" cy="38" r="16" fill="#f3ecda" opacity=".86"/>'+
+      '<path d="M22 91q6-28 28-28t28 28" fill="#f3ecda" opacity=".86"/>'+
+      '<path d="M25 78q25-12 50 0" fill="none" stroke="#6a6150" stroke-width="2" opacity=".22"/>'+
+    '</svg>';
 
   function css(){
     if(document.getElementById("szpAvatarStyle"))return;
@@ -23,17 +40,13 @@
       .szp-profile-titlebox{min-width:0;flex:1}
       .szp-profile-titlebox .hello{margin-bottom:6px}
       .szp-profile-titlebox .intro{margin-bottom:0}
-      .szp-avatar-card{flex:0 0 auto;margin:0;border:1px solid var(--line,#c9bfa6);background:var(--surface2,#f3ecda);border-radius:14px;padding:8px 9px;min-width:128px;max-width:155px}
-      .szp-avatar-compact{display:flex;align-items:center;gap:8px}
-      .szp-avatar-main{display:flex;align-items:center;gap:7px;min-width:0}
-      .szp-avatar-svg{width:42px;height:42px;border-radius:999px;overflow:hidden;display:grid;place-items:center;background:var(--surface,#fbf7ee);border:1px solid var(--line,#c9bfa6);flex:0 0 auto}
-      .szp-avatar-svg svg{width:100%;height:100%;display:block}
-      .szp-avatar-name{min-width:0;line-height:1.1}
-      .szp-avatar-title{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2,#6a6150);font-weight:900}
-      .szp-avatar-sub{font-family:Oswald,system-ui,sans-serif;font-size:15px;color:var(--ink,#23201a);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:76px}
-      .szp-avatar-change{margin-top:6px;width:100%;border:1px solid var(--line,#c9bfa6);border-radius:999px;background:var(--surface,#fbf7ee);color:var(--ink,#23201a);font:inherit;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;cursor:pointer;white-space:nowrap}
+      .szp-avatar-card{flex:0 0 auto;margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:78px}
+      .szp-avatar-current{width:68px;height:68px;border-radius:999px;overflow:hidden;display:grid;place-items:center;background:var(--surface2,#f3ecda);border:2px solid var(--line,#c9bfa6);box-shadow:0 8px 20px -16px rgba(0,0,0,.65)}
+      .szp-avatar-current.has-avatar{border-color:var(--gold,#bf8a3a)}
+      .szp-avatar-current svg{width:100%;height:100%;display:block}
+      .szp-avatar-change{border:1px solid var(--line,#c9bfa6);border-radius:999px;background:var(--surface2,#f3ecda);color:var(--ink,#23201a);font:inherit;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;cursor:pointer;white-space:nowrap;min-width:62px;text-align:center}
       .szp-avatar-change:hover{filter:brightness(1.04)}
-      .szp-avatar-msg{display:none;margin-top:6px;font-size:11px;color:var(--ink2,#6a6150);line-height:1.25}
+      .szp-avatar-msg{display:none;font-size:10.5px;line-height:1.2;text-align:center;max-width:80px}
       .szp-avatar-msg.ok,.szp-avatar-msg.err{display:block}
       .szp-avatar-msg.ok{color:var(--ok,#3f8a5a)}
       .szp-avatar-msg.err{color:var(--danger,#b5482f)}
@@ -48,25 +61,23 @@
       .szp-avatar-option{border:1px solid var(--line,#c9bfa6);border-radius:14px;background:var(--surface2,#f3ecda);padding:10px 7px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:96px;color:var(--ink,#23201a);cursor:pointer}
       .szp-avatar-option:hover{filter:brightness(1.03)}
       .szp-avatar-option.on{border-color:var(--gold,#bf8a3a);box-shadow:0 0 0 2px rgba(191,138,58,.22);background:var(--surface,#fbf7ee)}
-      .szp-avatar-option .szp-avatar-svg{width:52px;height:52px}
+      .szp-avatar-option-img{width:54px;height:54px;border-radius:999px;overflow:hidden;display:grid;place-items:center;border:1px solid var(--line,#c9bfa6);background:var(--surface,#fbf7ee)}
+      .szp-avatar-option-img svg{width:100%;height:100%;display:block}
       .szp-avatar-option span{font-size:10.5px;font-weight:900;color:var(--ink2,#6a6150);text-transform:uppercase;letter-spacing:.03em;text-align:center;line-height:1.15}
       @media(max-width:520px){
-        .szp-profile-head{align-items:center}
-        .szp-avatar-card{min-width:112px;max-width:128px;padding:7px}
-        .szp-avatar-svg{width:38px;height:38px}
-        .szp-avatar-sub{max-width:62px;font-size:14px}
-        .szp-avatar-change{font-size:9.5px;padding:5px 7px}
+        .szp-profile-head{align-items:flex-start;gap:10px}
+        .szp-avatar-card{min-width:68px}
+        .szp-avatar-current{width:58px;height:58px}
+        .szp-avatar-change{font-size:9.8px;padding:5px 8px;min-width:56px}
         .szp-avatar-list{grid-template-columns:repeat(3,minmax(0,1fr))}
         .szp-avatar-sheet{border-radius:18px;padding:13px}
         .szp-avatar-option{min-height:90px}
-        .szp-avatar-option .szp-avatar-svg{width:46px;height:46px}
+        .szp-avatar-option-img{width:48px;height:48px}
       }
       @media(max-width:370px){
         .szp-profile-head{gap:8px}
-        .szp-avatar-card{min-width:102px}
-        .szp-avatar-main{gap:5px}
-        .szp-avatar-svg{width:34px;height:34px}
-        .szp-avatar-sub{max-width:54px;font-size:13px}
+        .szp-avatar-current{width:52px;height:52px}
+        .szp-avatar-change{font-size:9px;min-width:52px}
         .szp-avatar-list{grid-template-columns:repeat(2,minmax(0,1fr))}
       }
     `;
@@ -85,7 +96,12 @@
   }
 
   function getAvatar(id){
-    return avatars.find(function(a){return a.id===id;}) || avatars[0] || {id:"bajtel",label:"Bajtel",svg:""};
+    if(!id)return null;
+    return avatars.find(function(a){return a.id===id;}) || null;
+  }
+
+  function hasSelectedAvatar(){
+    return !!getAvatar(currentAvatarId);
   }
 
   function setMsg(t,type){
@@ -132,16 +148,8 @@
       card.id="szpAvatarCard";
       card.className="szp-avatar-card";
       card.innerHTML=
-        '<div class="szp-avatar-compact">'+
-          '<div class="szp-avatar-main">'+
-            '<div class="szp-avatar-svg" id="szpAvatarCurrentSvg"></div>'+
-            '<div class="szp-avatar-name">'+
-              '<div class="szp-avatar-title">Avatar</div>'+
-              '<div class="szp-avatar-sub" id="szpAvatarCurrentLabel">...</div>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-        '<button class="szp-avatar-change" id="szpAvatarOpen" type="button">Zmień</button>'+
+        '<button class="szp-avatar-current" id="szpAvatarCurrent" type="button" aria-label="Ustaw avatar"></button>'+
+        '<button class="szp-avatar-change" id="szpAvatarOpen" type="button">Ustaw</button>'+
         '<div class="szp-avatar-msg" id="szpAvatarMsg"></div>';
 
       var head=ensureProfileHeader();
@@ -167,10 +175,12 @@
     }
 
     var open=document.getElementById("szpAvatarOpen");
+    var current=document.getElementById("szpAvatarCurrent");
     var close=document.getElementById("szpAvatarClose");
     var modalEl=document.getElementById("szpAvatarModal");
 
     if(open)open.onclick=openModal;
+    if(current)current.onclick=openModal;
     if(close)close.onclick=closeModal;
     if(modalEl && !modalEl.dataset.bound){
       modalEl.dataset.bound="1";
@@ -249,23 +259,38 @@
   }
 
   function renderCurrent(id){
-    currentAvatarId=id || currentAvatarId;
-    var a=getAvatar(currentAvatarId);
-    var svg=document.getElementById("szpAvatarCurrentSvg");
-    var label=document.getElementById("szpAvatarCurrentLabel");
-    if(svg)svg.innerHTML=cleanSvg(a.svg);
-    if(label)label.textContent=a.label || "Avatar";
+    currentAvatarId=id || null;
+
+    var current=document.getElementById("szpAvatarCurrent");
+    var btn=document.getElementById("szpAvatarOpen");
+    var avatar=getAvatar(currentAvatarId);
+
+    if(!current || !btn)return;
+
+    if(avatar){
+      current.innerHTML=cleanSvg(avatar.svg);
+      current.classList.add("has-avatar");
+      current.setAttribute("aria-label","Zmień avatar");
+      btn.textContent="Zmień";
+    }else{
+      current.innerHTML=PLACEHOLDER_SVG;
+      current.classList.remove("has-avatar");
+      current.setAttribute("aria-label","Ustaw avatar");
+      btn.textContent="Ustaw";
+    }
   }
 
   function renderList(){
     var list=document.getElementById("szpAvatarList");
     if(!list)return;
+
     list.innerHTML=avatars.map(function(a){
       return '<button class="szp-avatar-option '+(a.id===currentAvatarId?'on':'')+'" type="button" data-avatar="'+esc(a.id)+'">'+
-        '<div class="szp-avatar-svg">'+cleanSvg(a.svg)+'</div>'+
+        '<div class="szp-avatar-option-img">'+cleanSvg(a.svg)+'</div>'+
         '<span>'+esc(a.label)+'</span>'+
       '</button>';
     }).join("");
+
     list.querySelectorAll("[data-avatar]").forEach(function(btn){
       btn.addEventListener("click",function(){
         save(btn.getAttribute("data-avatar"));
@@ -274,7 +299,7 @@
   }
 
   function openModal(){
-    if(!avatars.length){setMsg("Brak aktywnych avatarów.","err");return;}
+    if(!avatars.length){setMsg("Brak avatarów.","err");return;}
     renderList();
     document.getElementById("szpAvatarModal").classList.add("on");
   }
@@ -289,6 +314,7 @@
 
     var s=await session();
     if(!s||!s.user){
+      renderCurrent(null);
       setMsg("Zaloguj się.","err");
       return;
     }
@@ -298,38 +324,40 @@
     var c=await client();
     var p=await c.from("profiles").select("avatar_key").eq("id",s.user.id).single();
     if(p.error){
+      renderCurrent(null);
       setMsg("Błąd avatara.","err");
-      currentAvatarId=(avatars[0]&&avatars[0].id)||"bajtel";
-      renderCurrent(currentAvatarId);
       return;
     }
 
-    currentAvatarId=(p.data&&p.data.avatar_key)||((avatars[0]&&avatars[0].id)||"bajtel");
-    renderCurrent(currentAvatarId);
+    var key=(p.data&&p.data.avatar_key)||null;
+    if(!getAvatar(key))key=null;
+
+    renderCurrent(key);
     setMsg("");
   }
 
   async function save(id){
-    var a=getAvatar(id);
+    var avatar=getAvatar(id);
+    if(!avatar)return;
+
     setMsg("Zapisuję...","");
 
     var s=await session();
     if(!s||!s.user){setMsg("Zaloguj się.","err");return;}
 
     var c=await client();
-    var r=await c.from("profiles").update({avatar_key:a.id}).eq("id",s.user.id);
+    var r=await c.from("profiles").update({avatar_key:avatar.id}).eq("id",s.user.id);
     if(r.error){
       console.warn("Avatar save error:",r.error);
       setMsg("Nie zapisano.","err");
       return;
     }
 
-    currentAvatarId=a.id;
-    renderCurrent(a.id);
+    renderCurrent(avatar.id);
     renderList();
     closeModal();
     setMsg("Zapisano.","ok");
-    setTimeout(function(){setMsg("");},1800);
+    setTimeout(function(){setMsg("");},1500);
   }
 
   function boot(){
@@ -342,6 +370,7 @@
         load().catch(function(e){
           console.warn("Avatar select error:",e);
           ensureShell();
+          renderCurrent(null);
           setMsg("Błąd avatarów.","err");
         });
       }
