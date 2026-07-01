@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel admina · Szpilplac</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 16px 42px}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+header,main,footer{width:100%;max-width:1100px}
+header{padding-top:22px;margin-bottom:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{font-family:"Oswald";font-size:clamp(34px,7vw,56px);font-weight:700;text-transform:uppercase;line-height:1}
+.sub{font-size:12.5px;color:var(--ink2);margin-top:4px}
+.controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.icon-btn,.small-btn{border:1px solid var(--line);background:var(--surface2);color:var(--ink2);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:900}
+.icon-btn{width:36px;height:36px}
+.small-btn{min-height:36px;padding:8px 12px;font-size:12px}
+.icon-btn:hover,.small-btn:hover{background:var(--surface);color:var(--ink)}
+main{display:grid;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px}
+.card h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;line-height:1.05;margin:0 0 6px}
+.card .intro{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0 0 14px}
+.msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
+.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
+.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--surface2);border:1px solid var(--line);border-radius:13px;padding:14px;min-height:86px}
+.stat .n{font-family:"Oswald";font-size:32px;line-height:1;color:var(--ink)}
+.stat .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900;margin-top:6px}
+.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.module{display:flex;flex-direction:column;gap:8px;min-height:128px;border:1px solid var(--line);background:var(--surface2);border-radius:14px;padding:14px}
+.module .ico{width:38px;height:38px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--green);font-size:20px}
+.module strong{font-family:"Oswald";font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+.module span{font-size:12.5px;color:var(--ink2);line-height:1.4;flex:1}
+.module:hover{background:var(--surface);transform:translateY(-1px)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin:0 0 14px}
+.tab{border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:8px 11px;font-size:11px;font-weight:900;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em}
+.tab.active{background:var(--green);border-color:var(--green);color:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border-radius:12px;padding:10px 13px;background:var(--green);color:#fff;font-weight:900;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#21170c}
+.btn:hover{filter:brightness(1.05)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;background:var(--surface2);font-size:12.5px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900;background:rgba(0,0,0,.03)}
+tr:last-child td{border-bottom:0}
+.empty{color:var(--ink2);font-size:13px;line-height:1.5;padding:12px;border:1px dashed var(--line);border-radius:12px;background:var(--surface2)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#e8eef9;color:#000;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
+.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;background:var(--surface);border:1px solid var(--line);color:var(--ink2)}
+.badge.ok{border-color:var(--ok);color:var(--ok)}
+.badge.warn{border-color:var(--gold);color:var(--gold)}
+footer{text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
+footer a{color:var(--green);font-weight:900}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.modules{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:520px){body{padding-left:12px;padding-right:12px}.grid,.modules{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.controls{justify-content:flex-start}.card{padding:15px}th,td{padding:8px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <div class="brand">Panel admina</div>
+      <div class="sub">Szpilplac · Familock · jedno miejsce do statystyk, mailingu i podpowiedzi.</div>
+    </div>
+    <div class="controls">
+      <a class="small-btn" href="index.html">Szpilplac</a>
+      <a class="small-btn" href="konto.html">Konto</a>
+      <button class="small-btn" id="refreshBtn" type="button">Odśwież</button>
+      <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="msg" class="msg">Ładuję panel...</div>
+
+  <section class="card hidden" id="guestCard">
+    <h2>Dostęp tylko dla admina</h2>
+    <p class="intro">Zaloguj się kontem admina, żeby zobaczyć panel.</p>
+    <div class="actions">
+      <a class="btn" href="konto.html">Zaloguj się</a>
+      <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
+    </div>
+  </section>
+
+  <section class="card hidden" id="overviewCard">
+    <h2>Przegląd</h2>
+    <p class="intro">Najważniejsze liczby z kont, rankingu i aktywności.</p>
+    <div class="grid" id="overviewGrid"></div>
+  </section>
+
+  <section class="card hidden" id="modulesCard">
+    <h2>Moduły</h2>
+    <p class="intro">Szybkie przejścia do najważniejszych części zaplecza.</p>
+    <div class="modules">
+      <a class="module" href="#stats">
+        <div class="ico">📊</div>
+        <strong>Statystyki</strong>
+        <span>Konta, punkty, gry, aktywność i ostatnie wyniki.</span>
+      </a>
+      <a class="module" href="#mailing">
+        <div class="ico">✉️</div>
+        <strong>Mailing</strong>
+        <span>Osoby ze zgodą, e-maile, BCC i eksport CSV.</span>
+      </a>
+      <a class="module" href="#klodka">
+        <div class="ico">🔐</div>
+        <strong>Kłōdka</strong>
+        <span>Podgląd tabeli tygodniowych podpowiedzi i kodów.</span>
+      </a>
+      <a class="module" href="#hints">
+        <div class="ico">💡</div>
+        <strong>Podpowiedzi</strong>
+        <span>Zdarzenia i dane pomocnicze związane z podpowiedziami.</span>
+      </a>
+      <a class="module" href="stats.html">
+        <div class="ico">🧮</div>
+        <strong>Stare stats</strong>
+        <span>Pełny dotychczasowy panel statystyk.</span>
+      </a>
+      <a class="module" href="mailing-admin.html">
+        <div class="ico">📬</div>
+        <strong>Mailing admin</strong>
+        <span>Osobny panel z listą mailingową v20.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="card hidden" id="stats">
+    <h2>Statystyki kont i gier</h2>
+    <p class="intro">Wyniki zapisane na kontach graczy.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="games" type="button">Gry</button>
+      <button class="tab" data-tab="daily" type="button">30 dni</button>
+      <button class="tab" data-tab="players" type="button">Gracze</button>
+      <button class="tab" data-tab="events" type="button">Eventy</button>
+    </div>
+    <div id="tabGames"></div>
+    <div id="tabDaily" class="hidden"></div>
+    <div id="tabPlayers" class="hidden"></div>
+    <div id="tabEvents" class="hidden"></div>
+  </section>
+
+  <section class="card hidden" id="mailing">
+    <h2>Mailing</h2>
+    <p class="intro">Lista osób, które dobrowolnie zaznaczyły zgodę marketingową.</p>
+    <div class="grid" id="mailingGrid"></div>
+    <div class="actions">
+      <button class="btn secondary" id="copyEmailsBtn" type="button">Kopiuj e-maile</button>
+      <button class="btn secondary" id="copyBccBtn" type="button">Kopiuj BCC</button>
+      <button class="btn gold" id="csvBtn" type="button">Pobierz CSV</button>
+    </div>
+    <textarea id="emailsBox" readonly></textarea>
+    <div id="mailingTable" style="margin-top:12px"></div>
+  </section>
+
+  <section class="two hidden" id="technicalCards">
+    <div class="card" id="klodka">
+      <h2>Kłōdka tygodnia</h2>
+      <p class="intro">Podgląd tabeli <b>klodka_weekly_hints</b>. Edycję zrobimy w kolejnym kroku, po potwierdzeniu układu kolumn.</p>
+      <div id="klodkaHintsBox"></div>
+    </div>
+
+    <div class="card" id="hints">
+      <h2>Podpowiedzi</h2>
+      <p class="intro">Podgląd tabel związanych z podpowiedziami i zdarzeniami.</p>
+      <div id="hintsBox"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a href="index.html">Szpilplac</a> · <a href="ranking.html">Ranking</a> · <a href="stats.html">Stats</a> · <a href="mailing-admin.html">Mailing</a>
+</footer>
+
+<script>
+"use strict";
+console.info("Szpilplac admin.html v26");
+
+var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+var sb=null;
+var contacts=[];
+
+var els={
+  msg:document.getElementById("msg"),
+  guestCard:document.getElementById("guestCard"),
+  overviewCard:document.getElementById("overviewCard"),
+  modulesCard:document.getElementById("modulesCard"),
+  overviewGrid:document.getElementById("overviewGrid"),
+  stats:document.getElementById("stats"),
+  mailing:document.getElementById("mailing"),
+  mailingGrid:document.getElementById("mailingGrid"),
+  mailingTable:document.getElementById("mailingTable"),
+  emailsBox:document.getElementById("emailsBox"),
+  technicalCards:document.getElementById("technicalCards"),
+  klodkaHintsBox:document.getElementById("klodkaHintsBox"),
+  hintsBox:document.getElementById("hintsBox"),
+  tabGames:document.getElementById("tabGames"),
+  tabDaily:document.getElementById("tabDaily"),
+  tabPlayers:document.getElementById("tabPlayers"),
+  tabEvents:document.getElementById("tabEvents")
+};
+
+var theme=localStorage.getItem("szpilplac_theme")||"light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
+document.getElementById("themeBtn").addEventListener("click",function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();});
+applyTheme();
+
+function show(x){if(x)x.classList.remove("hidden");}
+function hide(x){if(x)x.classList.add("hidden");}
+function setMsg(text,type){els.msg.textContent=text;els.msg.className="msg"+(type?" "+type:"");show(els.msg);}
+function hideMsg(){hide(els.msg);}
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+function fmtDate(v){if(!v)return "—";try{return new Date(v).toLocaleString("pl-PL");}catch(e){return String(v);}}
+function fmtDay(v){if(!v)return "—";try{return new Date(v).toLocaleDateString("pl-PL");}catch(e){return String(v);}}
+function csvEscape(v){v=String(v==null?"":v);return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function gameName(v){
+  var k=String(v||"").toLowerCase();
+  var map={slowko:"Słōwko",klodka:"Kłōdka",zorta:"Raja",raja:"Raja",cuzamen:"Cuzamen"};
+  return map[k]||v;
+}
+function titleize(key){
+  var k=String(key||"").toLowerCase();
+  var map={
+    game:"Gra",mode:"Tryb",puzzle_no:"Numer",puzzle_word:"Hasło",won:"Wygrana",wins:"Wygrane",
+    tries:"Próby",errors:"Błędy",score:"Punkty",points:"Punkty",results:"Wyniki",players:"Gracze",
+    login:"Login",display_name:"Nazwa",rank_name:"Ranga",show_in_ranking:"Ranking",voivodeship:"Województwo",
+    city:"Miejscowość",games_played:"Gry",last_play:"Ostatnia gra",created_at:"Utworzono",finished_at:"Zakończono",
+    day:"Dzień",events:"Eventy",last_event:"Ostatni event",today:"Dziś",last_7d:"7 dni",
+    hint:"Podpowiedź",hint_text:"Podpowiedź",week:"Tydzień",week_no:"Tydzień",code:"Kod",visible_hint:"Widoczny trop",
+    console_hint:"Trop z konsoli",active:"Aktywne"
+  };
+  if(map[k])return map[k];
+  return String(key).replace(/_/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
+function valFor(k,v){
+  k=String(k||"").toLowerCase();
+  if(k==="game")return gameName(v);
+  if(k==="won"||k==="show_in_ranking"||k==="active")return v?"tak":"nie";
+  if(k==="mode"){
+    var m=String(v||"").toLowerCase();
+    if(m==="daily")return "dzienny";
+    if(m==="weekly")return "tygodniowy";
+    if(m==="tester")return "testowy";
+  }
+  if(String(v||"").match(/^\d{4}-\d{2}-\d{2}T/))return fmtDate(v);
+  if(String(v||"").match(/^\d{4}-\d{2}-\d{2}$/))return fmtDay(v);
+  return v;
+}
+function table(rows, cols, empty){
+  if(!rows||!rows.length)return '<div class="empty">'+esc(empty||"Brak danych.")+'</div>';
+  if(!cols)cols=Object.keys(rows[0]||{}).map(function(k){return {key:k,label:titleize(k)};});
+  return '<div class="table-wrap"><table><thead><tr>'+
+    cols.map(function(c){return '<th>'+esc(c.label||titleize(c.key))+'</th>';}).join("")+
+    '</tr></thead><tbody>'+
+    rows.map(function(r){
+      return '<tr>'+cols.map(function(c){
+        var raw=typeof c.value==="function"?c.value(r):r[c.key];
+        return '<td>'+esc(valFor(c.key||c.label,raw))+'</td>';
+      }).join("")+'</tr>';
+    }).join("")+
+    '</tbody></table></div>';
+}
+function cards(items){
+  return items.map(function(it){return '<div class="stat"><div class="n">'+esc(it[1]||0)+'</div><div class="l">'+esc(it[0])+'</div></div>';}).join("");
+}
+
+function initSupabase(){
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak config.js albo danych Supabase.","err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano Supabase JS.","err");return false;}
+  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+    auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
+  });
+  return true;
+}
+function getStoredSession(){
+  try{
+    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
+    if(!raw)return null;
+    var data=JSON.parse(raw);
+    return data.currentSession||data.session||data;
+  }catch(e){return null;}
+}
+async function getSession(){
+  var r=await sb.auth.getSession();
+  if(r&&r.data&&r.data.session)return r.data.session;
+  var stored=getStoredSession();
+  if(stored&&stored.user&&stored.access_token&&stored.refresh_token){
+    try{
+      var sr=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
+      if(sr&&sr.data&&sr.data.session)return sr.data.session;
+    }catch(e){}
+  }
+  return null;
+}
+async function selectView(name, limit){
+  var q=sb.from(name).select("*");
+  if(limit)q=q.limit(limit);
+  var r=await q;
+  if(r.error)throw r.error;
+  return r.data||[];
+}
+async function trySelect(name, limit, orderCol){
+  try{
+    var q=sb.from(name).select("*");
+    if(orderCol)q=q.order(orderCol,{ascending:false});
+    if(limit)q=q.limit(limit);
+    var r=await q;
+    if(r.error)throw r.error;
+    return {ok:true,data:r.data||[]};
+  }catch(e){
+    console.warn("Admin table skipped:", name, e.message||e);
+    return {ok:false,data:[],error:e.message||String(e)};
+  }
+}
+async function tryRpc(name,args){
+  try{
+    var r=await sb.rpc(name,args||{});
+    if(r.error)throw r.error;
+    return {ok:true,data:r.data||[]};
+  }catch(e){
+    console.warn("Admin RPC skipped:", name, e.message||e);
+    return {ok:false,data:[],error:e.message||String(e)};
+  }
+}
+
+async function loadOverview(){
+  var overview=await selectView("stats_admin_overview",1);
+  if(!overview.length)throw new Error("Brak dostępu do statystyk.");
+  var row=overview[0];
+  els.overviewGrid.innerHTML=cards([
+    ["Gracze",row.registered_players],
+    ["Widoczni",row.visible_players],
+    ["Wyniki",row.total_results],
+    ["Punkty",row.total_points],
+    ["Wygrane",row.total_wins],
+    ["Aktywni dziś",row.active_today],
+    ["Aktywni 7 dni",row.active_7d],
+    ["Aktywni 30 dni",row.active_30d]
+  ]);
+}
+
+async function loadStatsBlocks(){
+  var games=await selectView("stats_admin_games",100);
+  var daily=await selectView("stats_admin_daily_results",300);
+  var players=await selectView("stats_admin_latest_players",100);
+  var evByGame=await trySelect("stats_admin_events_by_game",100);
+  var evDaily=await trySelect("stats_admin_events_daily",200);
+
+  els.tabGames.innerHTML=table(games,[
+    {key:"game",label:"Gra"},
+    {key:"results",label:"Wyniki"},
+    {key:"wins",label:"Wygrane"},
+    {key:"players",label:"Gracze"},
+    {key:"points",label:"Punkty"},
+    {label:"Ostatnia gra",value:function(r){return fmtDate(r.last_play);}}
+  ],"Brak wyników.");
+
+  els.tabDaily.innerHTML=table(daily,[
+    {label:"Dzień",value:function(r){return fmtDay(r.day);}},
+    {key:"game",label:"Gra"},
+    {key:"results",label:"Wyniki"},
+    {key:"wins",label:"Wygrane"},
+    {key:"players",label:"Gracze"},
+    {key:"points",label:"Punkty"}
+  ],"Brak wyników z ostatnich 30 dni.");
+
+  els.tabPlayers.innerHTML=table(players,[
+    {key:"login",label:"Login"},
+    {key:"rank_name",label:"Ranga"},
+    {key:"games_played",label:"Gry"},
+    {key:"points",label:"Punkty"},
+    {label:"Ostatnia gra",value:function(r){return fmtDate(r.last_play);}},
+    {label:"Utworzono",value:function(r){return fmtDate(r.created_at);}}
+  ],"Brak graczy.");
+
+  var html="";
+  if(evByGame.ok)html+="<h3 style='font-family:Oswald;text-transform:uppercase;font-size:16px'>Według gry</h3>"+table(evByGame.data,null,"Brak eventów.");
+  if(evDaily.ok)html+="<h3 style='font-family:Oswald;text-transform:uppercase;font-size:16px'>Dziennie</h3>"+table(evDaily.data,null,"Brak eventów dziennych.");
+  els.tabEvents.innerHTML=html || '<div class="empty">Brak widoków eventów albo brak danych.</div>';
+}
+
+async function loadMailing(){
+  var r=await tryRpc("szpilplac_admin_mailing_contacts");
+  contacts=r.ok?(r.data||[]):[];
+
+  var slaskie=contacts.filter(function(c){return c.voivodeship==="śląskie";}).length;
+  var cities={};
+  contacts.forEach(function(c){if(c.city)cities[String(c.city).toLowerCase()]=1;});
+
+  els.mailingGrid.innerHTML=cards([
+    ["Zgody mailingowe",contacts.length],
+    ["Śląskie",slaskie],
+    ["Miejscowości",Object.keys(cities).length],
+    ["Ostatnia zgoda",contacts[0]&&contacts[0].marketing_consent_at?fmtDate(contacts[0].marketing_consent_at):"—"]
+  ]);
+
+  els.emailsBox.value=contacts.map(function(c){return c.email;}).filter(Boolean).join(", ");
+
+  els.mailingTable.innerHTML=table(contacts,[
+    {key:"email",label:"E-mail"},
+    {key:"login",label:"Login"},
+    {key:"voivodeship",label:"Województwo"},
+    {key:"city",label:"Miejscowość"},
+    {label:"Data zgody",value:function(r){return fmtDate(r.marketing_consent_at);}}
+  ],"Brak zgód mailingowych.");
+}
+
+async function loadKlodkaHints(){
+  var r=await trySelect("klodka_weekly_hints",80);
+  if(!r.ok){
+    els.klodkaHintsBox.innerHTML='<div class="empty">Nie udało się odczytać klodka_weekly_hints. '+esc(r.error||"")+'</div>';
+    return;
+  }
+  els.klodkaHintsBox.innerHTML=table(r.data,null,"Brak wpisów w klodka_weekly_hints.");
+}
+async function loadHints(){
+  var parts=[];
+  var a=await trySelect("szpilplac_hints",80);
+  if(a.ok&&a.data.length)parts.push("<h3 style='font-family:Oswald;text-transform:uppercase;font-size:16px'>szpilplac_hints</h3>"+table(a.data,null,"Brak danych."));
+  var b=await trySelect("hint_events",80);
+  if(b.ok&&b.data.length)parts.push("<h3 style='font-family:Oswald;text-transform:uppercase;font-size:16px'>hint_events</h3>"+table(b.data,null,"Brak danych."));
+  els.hintsBox.innerHTML=parts.join("") || '<div class="empty">Brak danych w tabelach podpowiedzi albo brak tych tabel.</div>';
+}
+
+document.querySelectorAll(".tab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(function(b){b.classList.toggle("active",b===btn);});
+    ["Games","Daily","Players","Events"].forEach(function(name){hide(els["tab"+name]);});
+    var id="tab"+btn.dataset.tab.charAt(0).toUpperCase()+btn.dataset.tab.slice(1);
+    show(els[id]);
+  });
+});
+
+async function copyText(txt,ok){
+  try{await navigator.clipboard.writeText(txt);setMsg(ok,"ok");}
+  catch(e){els.emailsBox.focus();els.emailsBox.select();setMsg("Nie udało się skopiować automatycznie. Tekst zaznaczony w polu.","err");}
+}
+document.getElementById("copyEmailsBtn").addEventListener("click",function(){copyText(contacts.map(function(c){return c.email;}).filter(Boolean).join(", "),"Skopiowano e-maile.");});
+document.getElementById("copyBccBtn").addEventListener("click",function(){copyText("bcc:"+contacts.map(function(c){return c.email;}).filter(Boolean).join(", "),"Skopiowano BCC.");});
+document.getElementById("csvBtn").addEventListener("click",function(){
+  var header=["email","login","display_name","voivodeship","city","marketing_consent_at","account_created_at"];
+  var lines=[header.join(";")].concat(contacts.map(function(c){return header.map(function(k){return csvEscape(c[k]);}).join(";");}));
+  var blob=new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  a.download="szpilplac-mailing-"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+});
+
+async function loadAdmin(){
+  if(!initSupabase())return;
+  setMsg("Sprawdzam dostęp admina...");
+  var session=await getSession();
+  if(!session||!session.user){
+    setMsg("Nie jesteś zalogowany.","err");
+    show(els.guestCard);
+    return;
+  }
+
+  try{
+    setMsg("Ładuję panel admina...");
+    [
+      loadOverview(),
+      loadStatsBlocks(),
+      loadMailing(),
+      loadKlodkaHints(),
+      loadHints()
+    ].forEach(function(p){p.catch(function(e){console.warn("Admin section error",e);});});
+
+    await loadOverview();
+    await Promise.allSettled([loadStatsBlocks(),loadMailing(),loadKlodkaHints(),loadHints()]);
+
+    hideMsg();
+    show(els.overviewCard);
+    show(els.modulesCard);
+    show(els.stats);
+    show(els.mailing);
+    show(els.technicalCards);
+  }catch(e){
+    setMsg("Brak dostępu do panelu admina albo SQL admina nie został uruchomiony.\n\n"+(e.message||e),"err");
+    show(els.guestCard);
+  }
+}
+
+document.getElementById("refreshBtn").addEventListener("click",function(){loadAdmin();});
+loadAdmin();
+</script>
+</body>
+</html>
