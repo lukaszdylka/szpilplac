@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avatary · Admin · Szpilplac</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 10px 28px -22px rgba(35,32,26,.7)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 10px 28px -22px rgba(0,0,0,.8)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;justify-content:center;padding:0 16px 42px}
+main{width:100%;max-width:1040px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 0 14px}
+.back{font-size:12px;font-weight:900;color:var(--green)}
+h1{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;font-size:clamp(32px,7vw,54px);line-height:.96;margin:8px 0 5px}
+.sub{font-size:13px;color:var(--ink2);line-height:1.45;max-width:720px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn,.icon-btn{border-radius:999px;border:1px solid var(--line);background:var(--surface2);font-weight:900;display:inline-flex;align-items:center;justify-content:center}
+.btn{padding:10px 14px;font-size:12px;gap:7px}
+.icon-btn{width:38px;height:38px}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#21170c}
+.btn.danger{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.08)}
+.btn:hover,.icon-btn:hover{filter:brightness(1.04)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:18px;margin-bottom:14px;overflow:hidden}
+.card h2{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;font-size:22px;line-height:1;margin:0 0 12px}
+.msg{border:1px solid var(--line);border-radius:13px;background:var(--surface2);color:var(--ink2);padding:12px 14px;font-size:13px;line-height:1.45;white-space:pre-wrap}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
+.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
+.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.avatar-item{border:1px solid var(--line);background:var(--surface2);border-radius:15px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:158px}
+.avatar-item.off{opacity:.55}
+.avatar-svg{width:62px;height:62px;border-radius:999px;overflow:hidden;background:var(--surface);display:grid;place-items:center;border:1px solid var(--line)}
+.avatar-svg svg{width:100%;height:100%;display:block}
+.avatar-title{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;font-size:17px;line-height:1.05}
+.avatar-meta{font-size:11px;color:var(--ink2);font-weight:800;line-height:1.35}
+.avatar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.avatar-actions .btn{padding:7px 9px;font-size:10.5px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 120px;gap:10px}
+.field{display:flex;flex-direction:column;gap:5px}
+label{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+input,textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:var(--surface2);color:var(--ink);font:inherit;font-size:13px;padding:10px 11px}
+textarea{min-height:210px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.45}
+.check{display:flex;align-items:center;gap:8px;padding-top:21px;font-size:13px;font-weight:900;color:var(--ink2)}
+.check input{width:auto}
+.editor{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:14px}
+.preview-box{border:1px solid var(--line);background:var(--surface2);border-radius:14px;padding:14px;display:grid;gap:10px;align-content:start}
+.preview-big{width:150px;height:150px;border-radius:999px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin:auto}
+.preview-big svg{width:100%;height:100%;display:block}
+.preview-label{text-align:center;font-family:Oswald,system-ui,sans-serif;font-size:22px;text-transform:uppercase}
+.help{font-size:12px;color:var(--ink2);line-height:1.5}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.editor{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){body{padding-left:12px;padding-right:12px}.top{flex-direction:column}.controls{justify-content:flex-start}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:1fr}.card{padding:15px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div>
+      <a class="back" href="admin.html">← Admin</a>
+      <h1>Avatary</h1>
+      <div class="sub">Dodawanie i edycja avatarów widocznych w panelu konta gracza.</div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="refreshBtn" type="button">Odśwież</button>
+      <button class="btn primary" id="newBtn" type="button">Nowy avatar</button>
+      <button class="icon-btn" id="themeBtn" type="button">◐</button>
+    </div>
+  </div>
+
+  <div id="msg" class="msg">Ładuję avatary...</div>
+
+  <section class="card hidden" id="loginCard">
+    <h2>Dostęp tylko dla admina</h2>
+    <p class="msg">Zaloguj się kontem admina w panelu konta, a potem wróć tutaj.</p>
+    <p><a class="btn primary" href="konto.html">Zaloguj się</a></p>
+  </section>
+
+  <section class="card hidden" id="editorCard">
+    <h2 id="editorTitle">Nowy avatar</h2>
+    <div class="editor">
+      <div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="avatarId">ID</label>
+            <input id="avatarId" placeholder="np. hajer_2">
+          </div>
+          <div class="field">
+            <label for="avatarLabel">Nazwa</label>
+            <input id="avatarLabel" placeholder="np. Hajer">
+          </div>
+          <div class="field">
+            <label for="avatarOrder">Kolejność</label>
+            <input id="avatarOrder" type="number" value="100">
+          </div>
+        </div>
+        <label class="check"><input id="avatarActive" type="checkbox" checked> Aktywny — widoczny dla graczy</label>
+        <div class="field" style="margin-top:10px">
+          <label for="avatarSvg">SVG</label>
+          <textarea id="avatarSvg" placeholder="<svg ...></svg>"></textarea>
+        </div>
+        <div class="controls" style="justify-content:flex-start;margin-top:12px">
+          <button class="btn primary" id="saveBtn" type="button">Zapisz</button>
+          <button class="btn" id="previewBtn" type="button">Podgląd</button>
+          <button class="btn danger" id="cancelBtn" type="button">Anuluj</button>
+        </div>
+      </div>
+      <div class="preview-box">
+        <div class="preview-big" id="previewSvg"></div>
+        <div class="preview-label" id="previewLabel">Avatar</div>
+        <div class="help">
+          ID używaj bez polskich znaków, małymi literami, np. <b>hajer</b>, <b>starzik_2</b>, <b>familok</b>.<br><br>
+          Najlepszy SVG ma <b>viewBox="0 0 100 100"</b> albo podobny kwadratowy format.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="listCard">
+    <h2>Lista avatarów</h2>
+    <div class="grid" id="avatarList"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+console.info("Szpilplac avatar-admin.html v32");
+
+var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+var sb=null;
+var items=[];
+var editingId=null;
+
+var els={
+  msg:document.getElementById("msg"),
+  loginCard:document.getElementById("loginCard"),
+  listCard:document.getElementById("listCard"),
+  editorCard:document.getElementById("editorCard"),
+  avatarList:document.getElementById("avatarList"),
+  editorTitle:document.getElementById("editorTitle"),
+  avatarId:document.getElementById("avatarId"),
+  avatarLabel:document.getElementById("avatarLabel"),
+  avatarOrder:document.getElementById("avatarOrder"),
+  avatarActive:document.getElementById("avatarActive"),
+  avatarSvg:document.getElementById("avatarSvg"),
+  previewSvg:document.getElementById("previewSvg"),
+  previewLabel:document.getElementById("previewLabel")
+};
+
+var theme=localStorage.getItem("szpilplac_theme")||"light";
+function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
+document.getElementById("themeBtn").onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();};
+applyTheme();
+
+function show(el){el&&el.classList.remove("hidden");}
+function hide(el){el&&el.classList.add("hidden");}
+function setMsg(text,type){els.msg.textContent=text;els.msg.className="msg"+(type?" "+type:"");show(els.msg);}
+function hideMsg(){hide(els.msg);}
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+function cleanSvg(svg){
+  svg=String(svg||"");
+  svg=svg.replace(/<script[\s\S]*?<\/script>/gi,"");
+  svg=svg.replace(/\son\w+="[^"]*"/gi,"");
+  svg=svg.replace(/\son\w+='[^']*'/gi,"");
+  svg=svg.replace(/javascript:/gi,"");
+  return svg.trim();
+}
+function slug(v){
+  return String(v||"").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/ł/g,"l")
+    .replace(/[^a-z0-9_-]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    .slice(0,40);
+}
+function initSupabase(){
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak config.js albo danych Supabase.","err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano Supabase JS.","err");return false;}
+  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+  return true;
+}
+function getStoredSession(){
+  try{
+    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
+    if(!raw)return null;
+    var data=JSON.parse(raw);
+    return data.currentSession||data.session||data;
+  }catch(e){return null;}
+}
+async function getSession(){
+  var r=await sb.auth.getSession();
+  if(r&&r.data&&r.data.session)return r.data.session;
+  var stored=getStoredSession();
+  if(stored&&stored.user&&stored.access_token&&stored.refresh_token){
+    try{
+      var sr=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
+      if(sr&&sr.data&&sr.data.session)return sr.data.session;
+    }catch(e){}
+  }
+  return null;
+}
+async function isAdmin(){
+  var r=await sb.rpc("is_szpilplac_admin");
+  if(r.error)throw r.error;
+  return !!r.data;
+}
+function preview(){
+  var svg=cleanSvg(els.avatarSvg.value);
+  els.previewSvg.innerHTML=svg||"";
+  els.previewLabel.textContent=els.avatarLabel.value||"Avatar";
+}
+function clearForm(){
+  editingId=null;
+  els.editorTitle.textContent="Nowy avatar";
+  els.avatarId.disabled=false;
+  els.avatarId.value="";
+  els.avatarLabel.value="";
+  els.avatarOrder.value="100";
+  els.avatarActive.checked=true;
+  els.avatarSvg.value="";
+  preview();
+  show(els.editorCard);
+}
+function editItem(id){
+  var a=items.find(function(x){return x.id===id;});
+  if(!a)return;
+  editingId=id;
+  els.editorTitle.textContent="Edytuj avatar";
+  els.avatarId.disabled=true;
+  els.avatarId.value=a.id;
+  els.avatarLabel.value=a.label||"";
+  els.avatarOrder.value=a.sort_order||100;
+  els.avatarActive.checked=!!a.is_active;
+  els.avatarSvg.value=a.svg||"";
+  preview();
+  show(els.editorCard);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+async function toggleActive(id,next){
+  var r=await sb.from("szpilplac_avatars").update({is_active:!!next,updated_at:new Date().toISOString()}).eq("id",id);
+  if(r.error){setMsg("Nie udało się zmienić aktywności: "+r.error.message,"err");return;}
+  setMsg(next?"Avatar aktywny.":"Avatar wyłączony.","ok");
+  load();
+}
+async function save(){
+  var id=editingId || slug(els.avatarId.value);
+  var label=els.avatarLabel.value.trim();
+  var svg=cleanSvg(els.avatarSvg.value);
+  var sort=parseInt(els.avatarOrder.value||"100",10);
+
+  if(!id){setMsg("Podaj ID avatara.","err");return;}
+  if(!/^[a-z0-9_-]{2,40}$/.test(id)){setMsg("ID może mieć tylko małe litery, cyfry, _ i -.","err");return;}
+  if(!label){setMsg("Podaj nazwę avatara.","err");return;}
+  if(!svg || svg.toLowerCase().indexOf("<svg")===-1){setMsg("Wklej poprawny kod SVG.","err");return;}
+
+  var payload={id:id,label:label,svg:svg,sort_order:isNaN(sort)?100:sort,is_active:!!els.avatarActive.checked,updated_at:new Date().toISOString()};
+  var r=await sb.from("szpilplac_avatars").upsert(payload,{onConflict:"id"});
+  if(r.error){setMsg("Nie udało się zapisać: "+r.error.message,"err");return;}
+
+  setMsg("Avatar zapisany.","ok");
+  hide(els.editorCard);
+  await load();
+}
+function render(){
+  els.avatarList.innerHTML=items.map(function(a){
+    return '<article class="avatar-item '+(!a.is_active?'off':'')+'">'+
+      '<div class="avatar-svg">'+cleanSvg(a.svg)+'</div>'+
+      '<div class="avatar-title">'+esc(a.label)+'</div>'+
+      '<div class="avatar-meta">'+esc(a.id)+' · kolejność '+esc(a.sort_order)+' · '+(a.is_active?'aktywny':'wyłączony')+'</div>'+
+      '<div class="avatar-actions">'+
+        '<button class="btn" data-edit="'+esc(a.id)+'" type="button">Edytuj</button>'+
+        '<button class="btn '+(a.is_active?'danger':'gold')+'" data-toggle="'+esc(a.id)+'" data-next="'+(a.is_active?'0':'1')+'" type="button">'+(a.is_active?'Wyłącz':'Aktywuj')+'</button>'+
+      '</div>'+
+    '</article>';
+  }).join("");
+
+  els.avatarList.querySelectorAll("[data-edit]").forEach(function(b){b.onclick=function(){editItem(b.dataset.edit);};});
+  els.avatarList.querySelectorAll("[data-toggle]").forEach(function(b){b.onclick=function(){toggleActive(b.dataset.toggle,b.dataset.next==="1");};});
+}
+async function load(){
+  setMsg("Ładuję avatary...");
+  var r=await sb.from("szpilplac_avatars").select("*").order("sort_order",{ascending:true}).order("label",{ascending:true});
+  if(r.error){setMsg("Nie udało się pobrać avatarów. Sprawdź SQL v32.\n"+r.error.message,"err");return;}
+  items=(r.data||[]).map(function(a){a.svg=cleanSvg(a.svg);return a;});
+  render();
+  hideMsg();
+  show(els.listCard);
+}
+async function boot(){
+  if(!initSupabase())return;
+  var s=await getSession();
+  if(!s||!s.user){setMsg("Nie jesteś zalogowany.","err");show(els.loginCard);return;}
+  var ok=await isAdmin();
+  if(!ok){setMsg("To konto nie ma uprawnień admina.","err");show(els.loginCard);return;}
+  await load();
+}
+document.getElementById("refreshBtn").onclick=load;
+document.getElementById("newBtn").onclick=clearForm;
+document.getElementById("cancelBtn").onclick=function(){hide(els.editorCard);};
+document.getElementById("previewBtn").onclick=preview;
+document.getElementById("saveBtn").onclick=save;
+els.avatarSvg.addEventListener("input",preview);
+els.avatarLabel.addEventListener("input",preview);
+els.avatarId.addEventListener("input",function(){if(!editingId && !els.avatarLabel.value.trim())els.avatarLabel.value=els.avatarId.value;});
+boot().catch(function(e){setMsg("Błąd panelu avatarów:\n"+(e.message||e),"err");show(els.loginCard);});
+</script>
+</body>
+</html>

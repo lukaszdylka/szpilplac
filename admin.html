@@ -278,6 +278,31 @@ footer a{color:var(--green);font-weight:900}
 
       <article class="tile">
         <div class="tile-top">
+          <div class="ico">👤</div>
+          <div>
+            <h3>Avatary</h3>
+            <p>Dodawanie, edycja i wyłączanie avatarów wybieranych przez graczy.</p>
+          </div>
+        </div>
+        <div class="status-line">
+          <span class="pill ok">Panel admina</span>
+          <span class="pill">SVG</span>
+          <span class="pill">wybór w profilu</span>
+        </div>
+        <details class="quick">
+          <summary>Szybki podgląd</summary>
+          <div class="quick-body">
+            <div class="quick-row"><span>Panel</span><b>avatar-admin.html</b></div>
+            <div class="quick-row"><span>Konto gracza</span><b>avatar-select.js</b></div>
+          </div>
+        </details>
+        <div class="tile-actions">
+          <a class="btn" href="avatar-admin.html">Otwórz avatary</a>
+        </div>
+      </article>
+
+      <article class="tile">
+        <div class="tile-top">
           <div class="ico">🎮</div>
           <div>
             <h3>Gry</h3>
@@ -317,6 +342,7 @@ footer a{color:var(--green);font-weight:900}
       <a class="tech-link" href="mailing-admin.html">Mailing admin</a>
       <a class="tech-link" href="podpowiedzi.html">Podpowiedzi</a>
       <a class="tech-link" href="podpowiedzi_klodka_tygodniowki.html">Kłōdka tygodnia</a>
+      <a class="tech-link" href="avatar-admin.html">Avatary</a>
       <a class="tech-link" href="konto.html">Profil admina</a>
     </div>
   </section>
@@ -328,7 +354,7 @@ footer a{color:var(--green);font-weight:900}
 
 <script>
 "use strict";
-console.info("Szpilplac admin.html v31-links");
+console.info("Szpilplac admin.html v32-avatars");
 
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
