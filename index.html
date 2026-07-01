@@ -138,7 +138,7 @@ main{
     radial-gradient(circle at 14% 20%, rgba(191,138,58,.14), transparent 28%),
     linear-gradient(135deg,var(--surface),var(--surface2));
   box-shadow:var(--shadow);
-  padding:24px;
+  padding:24px 24px 22px;
 }
 .hero::after{
   content:"";
@@ -802,10 +802,6 @@ footer{
     <div class="kicker" id="heroKicker"></div>
     <h1 id="heroTitle"></h1>
     <p id="heroLead"></p>
-    <div class="hero-actions">
-      <a class="btn gold" href="slowko.html" id="heroPlay"></a>
-      <a class="btn secondary" href="ranking.html" id="heroRanking"></a>
-    </div>
   </section>
 
   <div class="layout">
@@ -843,10 +839,10 @@ footer{
 
 <footer>
   <div class="footer-links">
-    <a href="regulamin.html">Regulamin</a>
-    <a href="polityka-prywatnosci.html">Prywatność</a>
-    <a href="cookies.html">Cookies</a>
-    <a href="mailing.html">Mailing</a>
+    <a href="regulamin.html" id="footerTerms">Regulamin</a>
+    <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
+    <a href="cookies.html" id="footerCookies">Cookies</a>
+    <a href="mailing.html" id="footerMailing">Mailing</a>
   </div>
   <div class="footer-social" aria-label="Familock w social mediach">
     <a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a>
@@ -957,6 +953,11 @@ var COPY = {
     heroLead:"Codzienne słowa, kody i układanki w klimacie familoków. Możesz grać bez konta, ale konto zapisuje wyniki, ranking i rangę.",
     play:"Zagraj w Słōwko",
     ranking:"Ranking",
+    weekly:"Tydzień",
+    footerTerms:"Regulamin",
+    footerPrivacy:"Prywatność",
+    footerCookies:"Cookies",
+    footerMailing:"Mailing",
     gamesTitle:"Gry na dziś",
     live:"Dzisiaj",
     done:"Zagrane",
@@ -1041,6 +1042,11 @@ var COPY = {
     heroLead:"Codziynne słowa, kody i ukłŏdanki w klimacie familokōw. Idzie szpilać bez kōnta, ale kōnto spamiyntuje wyniki, ranking i ranga.",
     play:"Szpilej w Słōwko",
     ranking:"Ranking",
+    weekly:"Tydziyń",
+    footerTerms:"Regulamin",
+    footerPrivacy:"Prywatność",
+    footerCookies:"Cookies",
+    footerMailing:"Mailing",
     gamesTitle:"Szpile na dzisiej",
     live:"Dzisiej",
     done:"Zagrane",
@@ -1271,8 +1277,17 @@ async function loadProfile(){
     if(!p.error && p.data)profile = p.data;
   }catch(e){}
   try{
-    var r = await c.from("ranking_all_time").select("user_id,points,games_played,wins").eq("user_id",session.user.id).maybeSingle();
-    if(!r.error && r.data)rankStats = r.data;
+    var r = await c.from("user_game_results")
+      .select("score,won")
+      .eq("user_id",session.user.id);
+
+    if(!r.error && Array.isArray(r.data)){
+      rankStats = {
+        points:r.data.reduce(function(sum,row){return sum + (Number(row.score) || 0);},0),
+        games_played:r.data.length,
+        wins:r.data.filter(function(row){return row.won === true;}).length
+      };
+    }
   }catch(e){}
   if(profile && profile.avatar_key)await loadAvatar(profile.avatar_key);
 }
@@ -1363,12 +1378,18 @@ function renderGames(){
   wrap.innerHTML = "";
   p.games.forEach(function(g){
     var href = gameHref(g.id);
-    var done = href && playedGame(g.id);
     var el = document.createElement(href ? "a" : "div");
     el.className = "game-link" + (href ? "" : " soon");
     if(href)el.href = href;
-    var badge = href ? (done ? p.done : p.live) : p.soon;
-    var bcls = href ? (done ? "done" : "live") : "soon";
+
+    var badge = p.soon;
+    var bcls = "soon";
+
+    if(href){
+      badge = (g.id === "zorta") ? (p.weekly || p.ranking || "Tydzień") : p.live;
+      bcls = "live";
+    }
+
     el.innerHTML =
       '<div class="game-icon">'+g.ico+'</div>'+
       '<div class="game-text"><div class="game-name">'+esc(g.name)+'</div><div class="game-desc">'+esc(g.desc)+'</div></div>'+
@@ -1383,8 +1404,6 @@ function renderStatic(){
   document.getElementById("heroKicker").textContent = p.kicker;
   document.getElementById("heroTitle").textContent = p.heroTitle;
   document.getElementById("heroLead").textContent = p.heroLead;
-  document.getElementById("heroPlay").textContent = p.play;
-  document.getElementById("heroRanking").textContent = p.ranking;
   document.getElementById("gamesTitle").textContent = p.gamesTitle;
   document.getElementById("familockTitle").textContent = p.familock;
   document.getElementById("erName").textContent = p.erName;
@@ -1392,6 +1411,14 @@ function renderStatic(){
   document.getElementById("starzikName").textContent = p.starzikName;
   document.getElementById("starzikDesc").textContent = p.starzikDesc;
   document.getElementById("miniCard").innerHTML = '<b>'+esc(p.todayTitle)+'</b>'+esc(p.todayText);
+  var ft = document.getElementById("footerTerms");
+  var fp = document.getElementById("footerPrivacy");
+  var fc = document.getElementById("footerCookies");
+  var fm = document.getElementById("footerMailing");
+  if(ft)ft.textContent = p.footerTerms || "Regulamin";
+  if(fp)fp.textContent = p.footerPrivacy || "Prywatność";
+  if(fc)fc.textContent = p.footerCookies || "Cookies";
+  if(fm)fm.textContent = p.footerMailing || "Mailing";
   document.getElementById("langPl").className = lang() === "pl" ? "on" : "";
   document.getElementById("langSzl").className = lang() === "szl" ? "on" : "";
   renderGames();
@@ -1690,7 +1717,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v44 clean");
+console.info("Szpilplac index.html v47 clean");
 </script>
 </body>
 </html>
