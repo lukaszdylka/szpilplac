@@ -12,7 +12,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v36";
+  var VERSION = "v37";
   var applying = false;
   var queued = false;
 
@@ -313,6 +313,13 @@
     return cur && cur !== profile ? cur : null;
   }
 
+  function directExisting(profile, id){
+    var node = document.getElementById(id);
+    if(!node)return null;
+    if(!profile.contains(node))return null;
+    return node;
+  }
+
   function ensureProfileHeader(profile){
     var head = document.getElementById("szpProfileHead");
     if(head)return head;
@@ -359,7 +366,11 @@
   }
 
   function moveIfExists(parent, node){
-    if(node && node.parentNode !== parent)parent.appendChild(node);
+    if(!parent || !node)return;
+    if(node === parent)return;
+    if(node.contains && node.contains(parent))return;
+    if(parent.contains && parent.contains(node) && node.parentNode === parent)return;
+    if(node.parentNode !== parent)parent.appendChild(node);
   }
 
   function normalizeProfile(){
@@ -442,7 +453,7 @@
         var loc = makeFoldout("szpLocationFoldout", "Dane do statystyk");
         var locBody = loc.querySelector(".szp-foldout-body");
         moveIfExists(locBody, locForm);
-        if(loc.parentNode !== side)side.appendChild(loc);
+        if(loc.parentNode !== side && !loc.contains(side))side.appendChild(loc);
       }
 
       var actions = profile.querySelector(".profile-actions");
@@ -454,16 +465,16 @@
           actionsPanel.className = "szp-actions-panel";
         }
         moveIfExists(actionsPanel, actions);
-        if(actionsPanel.parentNode !== side)side.appendChild(actionsPanel);
+        if(actionsPanel.parentNode !== side && !actionsPanel.contains(side))side.appendChild(actionsPanel);
       }
 
-      var mailingBlock = directChildContaining(profile, "#szpMarketingConsent") || directChildContaining(profile, "#szpSaveMarketing");
+      var mailingBlock = directExisting(profile, "szpMailingBox");
       if(mailingBlock && !mailingBlock.closest("#szpMailingFoldout")){
         var mailing = makeFoldout("szpMailingFoldout", "Mailing i zgody");
         mailing.classList.add("szp-mailing-compact");
         var mailingBody = mailing.querySelector(".szp-foldout-body");
         moveIfExists(mailingBody, mailingBlock);
-        if(mailing.parentNode !== side)side.appendChild(mailing);
+        if(mailing.parentNode !== side && !mailing.contains(side))side.appendChild(mailing);
       }
 
       var results = document.getElementById("resultsBox");
@@ -482,7 +493,7 @@
         var hist = makeFoldout("szpHistoryFoldout", "Historia wyników", "Rozwiń listę ostatnich gier zapisanych na koncie");
         var histBody = hist.querySelector(".szp-foldout-body");
         moveIfExists(histBody, results);
-        if(hist.parentNode !== historyPanel)historyPanel.appendChild(hist);
+        if(hist.parentNode !== historyPanel && !hist.contains(historyPanel))historyPanel.appendChild(hist);
       }
 
     } finally {
