@@ -189,5 +189,5 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v77 clean");
+  console.info("Szpilplac achievements-panel.js v78 clean");
 })();
