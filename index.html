@@ -938,6 +938,103 @@ footer.site-footer{
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important}
 }
+
+
+/* v64 mobile fit */
+html,
+body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{
+  max-width:100vw;
+}
+*{
+  min-width:0;
+}
+img,
+svg{
+  max-width:100%;
+}
+.topbar,
+.controls,
+.lang-tog{
+  min-width:0;
+}
+.topbar{
+  max-width:100%;
+}
+.controls{
+  flex:0 1 auto;
+  justify-content:flex-end;
+  max-width:100%;
+}
+.back{
+  min-width:0;
+  max-width:42vw;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  flex:0 1 auto;
+}
+.icon-btn,
+.coffee-btn,
+.account-btn,
+.rank-btn{
+  flex:none;
+}
+@media(max-width:430px){
+  .controls{
+    gap:4px;
+  }
+  .lang-tog button{
+    padding-left:8px;
+    padding-right:8px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:30px;
+    height:30px;
+  }
+  .back{
+    max-width:34vw;
+    font-size:11.5px;
+  }
+}
+@media(max-width:360px){
+  .lang-tog button{
+    padding-left:7px;
+    padding-right:7px;
+    font-size:10.5px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:28px;
+    height:28px;
+  }
+  .controls{
+    gap:3px;
+  }
+  .back{
+    max-width:30vw;
+  }
+}
+
+.game-grid,
+.dashboard,
+.hero,
+.card,
+.player-card,
+.menu,
+.player-menu{
+  max-width:100%;
+}
+
 </style>
 </head>
 <body>
@@ -2110,7 +2207,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v62 clean minimal");
+console.info("Szpilplac index.html v64 mobile fit");
 </script>
 </body>
 </html>

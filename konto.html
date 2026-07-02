@@ -458,6 +458,109 @@ input:focus,select:focus{
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important}
 }
+
+
+/* v64 mobile fit */
+html,
+body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{
+  max-width:100vw;
+}
+*{
+  min-width:0;
+}
+img,
+svg{
+  max-width:100%;
+}
+.topbar,
+.controls,
+.lang-tog{
+  min-width:0;
+}
+.topbar{
+  max-width:100%;
+}
+.controls{
+  flex:0 1 auto;
+  justify-content:flex-end;
+  max-width:100%;
+}
+.back{
+  min-width:0;
+  max-width:42vw;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  flex:0 1 auto;
+}
+.icon-btn,
+.coffee-btn,
+.account-btn,
+.rank-btn{
+  flex:none;
+}
+@media(max-width:430px){
+  .controls{
+    gap:4px;
+  }
+  .lang-tog button{
+    padding-left:8px;
+    padding-right:8px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:30px;
+    height:30px;
+  }
+  .back{
+    max-width:34vw;
+    font-size:11.5px;
+  }
+}
+@media(max-width:360px){
+  .lang-tog button{
+    padding-left:7px;
+    padding-right:7px;
+    font-size:10.5px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:28px;
+    height:28px;
+  }
+  .controls{
+    gap:3px;
+  }
+  .back{
+    max-width:30vw;
+  }
+}
+
+.wrap,
+.card,
+.konto-hero,
+.quick-games,
+.player-menu{
+  max-width:100%;
+}
+.quick-games{
+  grid-template-columns:1fr 1fr;
+}
+@media(max-width:360px){
+  .quick-games{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -623,7 +726,7 @@ input:focus,select:focus{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v62 clean minimal");
+console.info("Szpilplac konto.html v64 mobile fit");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
