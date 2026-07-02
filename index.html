@@ -1126,6 +1126,53 @@ svg{
   }
 }
 
+
+
+/* v66 mobile language below icons */
+@media(max-width:520px){
+  .topbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:6px;
+    align-items:start;
+  }
+  .controls{
+    transform:none!important;
+    width:158px;
+    max-width:158px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    align-items:center;
+    gap:3px;
+    overflow:visible;
+  }
+  .controls .lang-tog{
+    order:20;
+    flex:0 0 auto;
+    margin-top:3px;
+  }
+  .controls > a,
+  .controls > button,
+  .controls > .player-menu-wrap{
+    order:1;
+  }
+  .lang-tog button{
+    padding-left:9px;
+    padding-right:9px;
+  }
+}
+@media(max-width:380px){
+  .controls{
+    width:150px;
+    max-width:150px;
+  }
+  .lang-tog button{
+    padding-left:8px;
+    padding-right:8px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2298,7 +2345,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v65 mobile icons left");
+console.info("Szpilplac index.html v66 achievements mobile lang");
 </script>
 </body>
 </html>

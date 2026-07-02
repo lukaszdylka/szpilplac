@@ -668,6 +668,12 @@ svg{
       <a href="ranking.html">Ranking</a>
     </div>
 
+
+    <div class="sub-head">Odznaki</div>
+    <div id="achievementsBox" class="achievements-box" aria-live="polite">
+      <div class="muted">Ładuję odznaki...</div>
+    </div>
+
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
     <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
     <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
@@ -726,7 +732,7 @@ svg{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v64 mobile fit");
+console.info("Szpilplac konto.html v66 achievements");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -1385,6 +1391,7 @@ async function boot(){
 }
 boot();
 </script>
+<script src="achievements-panel.js?v=66"></script>
 <script src="konto-legal-bridge.js?v=19"></script>
 <script src="konto-mailing-bridge.js?v=20"></script>
 <script src="game-display-names.js?v=25"></script>
