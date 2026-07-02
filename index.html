@@ -1365,7 +1365,7 @@ async function loadProfile(){
   }catch(e){}
   try{
     var r = await c.from("user_game_results")
-      .select("game,mode,puzzle_no,score,won")
+      .select("game,mode,puzzle_no,score,won,finished_at")
       .eq("user_id",session.user.id);
 
     if(!r.error && Array.isArray(r.data)){
@@ -1374,8 +1374,23 @@ async function loadProfile(){
         games_played:r.data.length,
         wins:r.data.filter(function(row){return row.won === true;}).length
       };
+
       r.data.forEach(function(row){
-        markAccountPlayed(row.game,row.mode,row.puzzle_no);
+        var g = normalizeGameId(row.game);
+        var mode = String(row.mode || "").toLowerCase();
+        var no = Number(row.puzzle_no);
+
+        if(g === "slowko" && no === DAY_NO && isRecentForTile(row,"slowko")){
+          markAccountPlayed("slowko",mode || "daily",no);
+        }
+
+        if(g === "klodka" && mode === "daily" && no === DAY_NO && isRecentForTile(row,"klodka")){
+          markAccountPlayed("klodka","daily",no);
+        }
+
+        if(g === "zorta" && no === WEEK_IDX + 1 && isRecentForTile(row,"zorta")){
+          markAccountPlayed("zorta",mode || "weekly",no);
+        }
       });
     }
   }catch(e){}
@@ -1419,30 +1434,54 @@ function isFinishedGame(x){
 function hasResult(obj,key){
   return !!(obj && obj.results && obj.results[String(key)]);
 }
+function warsawDateKey(date){
+  try{
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone:"Europe/Warsaw",
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }).format(date).replace(/\//g,"-");
+  }catch(e){
+    var d = date || new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+}
+function mondayKeyFor(date){
+  var d = new Date(date.getTime());
+  var day = d.getDay();
+  var diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return warsawDateKey(d);
+}
+var TODAY_DATE_KEY = warsawDateKey(new Date());
+var WEEK_DATE_KEY = mondayKeyFor(new Date());
+function isRecentForTile(row, game){
+  if(!row || !row.finished_at)return false;
+  var d = new Date(row.finished_at);
+  if(isNaN(d.getTime()))return false;
+  if(game === "slowko" || game === "klodka")return warsawDateKey(d) === TODAY_DATE_KEY;
+  if(game === "zorta" || game === "raja")return mondayKeyFor(d) === WEEK_DATE_KEY;
+  return false;
+}
+function normalizeGameId(game){
+  var g = String(game || "").toLowerCase();
+  if(g === "raja")return "zorta";
+  return g;
+}
 function markAccountPlayed(game,mode,puzzleNo){
   if(!game || puzzleNo == null)return;
-  var g = String(game).toLowerCase();
+  var g = normalizeGameId(game);
   var m = mode == null ? "any" : String(mode).toLowerCase();
   var n = String(puzzleNo);
   accountPlayed[g + ":" + m + ":" + n] = true;
   accountPlayed[g + ":any:" + n] = true;
-  accountPlayed[g + ":" + n] = true;
-  if(g === "zorta"){
-    accountPlayed["raja:" + m + ":" + n] = true;
-    accountPlayed["raja:any:" + n] = true;
-    accountPlayed["raja:" + n] = true;
-  }
-  if(g === "raja"){
-    accountPlayed["zorta:" + m + ":" + n] = true;
-    accountPlayed["zorta:any:" + n] = true;
-    accountPlayed["zorta:" + n] = true;
-  }
 }
 function accountHasPlayed(game,puzzleNo,mode){
-  var g = String(game || "").toLowerCase();
+  var g = normalizeGameId(game);
   var n = String(puzzleNo);
   if(mode && accountPlayed[g + ":" + String(mode).toLowerCase() + ":" + n])return true;
-  return !!(accountPlayed[g + ":any:" + n] || accountPlayed[g + ":" + n]);
+  return !!accountPlayed[g + ":any:" + n];
 }
 function playedSlowko(){
   if(accountHasPlayed("slowko",DAY_NO))return true;
@@ -1841,7 +1880,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v53 played badges");
+console.info("Szpilplac index.html v55 account synced played badges");
 </script>
 </body>
 </html>
