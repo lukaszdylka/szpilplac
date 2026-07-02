@@ -1035,6 +1035,97 @@ svg{
   max-width:100%;
 }
 
+
+
+/* v65 index mobile topbar safe shift */
+@media(max-width:520px){
+  body{
+    padding-left:10px;
+    padding-right:10px;
+  }
+  header{
+    width:100%;
+    max-width:100%;
+    padding-left:0;
+    padding-right:0;
+  }
+  .topbar{
+    width:100%;
+    max-width:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    column-gap:4px;
+    align-items:center;
+    overflow:visible;
+  }
+  .topbar .brand,
+  .topbar .back,
+  .brand{
+    min-width:0;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .controls{
+    justify-self:end;
+    transform:translateX(-10px);
+    max-width:calc(100vw - 126px);
+    overflow:visible;
+    gap:3px;
+  }
+  .lang-tog button{
+    padding-left:7px;
+    padding-right:7px;
+    font-size:10.5px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:28px;
+    height:28px;
+    min-width:28px;
+  }
+  .icon-btn svg,
+  .coffee-btn svg,
+  .account-btn svg,
+  .rank-btn svg{
+    width:14px;
+    height:14px;
+  }
+}
+@media(max-width:380px){
+  .controls{
+    transform:translateX(-14px);
+    max-width:calc(100vw - 112px);
+    gap:2px;
+  }
+  .lang-tog button{
+    padding-left:6px;
+    padding-right:6px;
+    font-size:10px;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .rank-btn{
+    width:27px;
+    height:27px;
+    min-width:27px;
+  }
+}
+@media(max-width:340px){
+  .controls{
+    transform:translateX(-18px);
+    max-width:calc(100vw - 100px);
+  }
+  .lang-tog button{
+    padding-left:5px;
+    padding-right:5px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2207,7 +2298,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v64 mobile fit");
+console.info("Szpilplac index.html v65 mobile icons left");
 </script>
 </body>
 </html>
