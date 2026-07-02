@@ -4,6 +4,31 @@
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
 
+  var VISIBLE_LOCKED = {
+    wkludzony:1,
+    pierszy:1,
+    fajrant:1,
+    dwazicher:1,
+    bezpodp:1,
+    godka:1,
+    tydzien:1,
+    ranga_bajtel:1,
+    ranga_karlus:1,
+    ranga_chop:1,
+    ranga_grubiorz:1,
+    ranga_hajer:1,
+    ranga_przodowy:1,
+    ranga_sztajger:1,
+    ranga_zeflik:1
+  };
+
+  function canonicalId(id){
+    id = String(id || "");
+    if(id.charAt(0) === "$")id = id.slice(1);
+    if(id === "zeflik")id = "ranga_zeflik";
+    return id;
+  }
+
   function esc(x){
     return String(x == null ? "" : x).replace(/[&<>"']/g,function(ch){
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch] || ch;
@@ -17,6 +42,10 @@
     }catch(e){
       return "";
     }
+  }
+
+  function fallbackSvg(){
+    return '<svg class="badge-svg" viewBox="0 0 80 96" xmlns="http://www.w3.org/2000/svg"><path d="M28 58l-10 34 12-6 10 6-6-30z" fill="#3d7a55"/><path d="M52 58l10 34-12-6-10 6 6-30z" fill="#3d7a55"/><circle cx="40" cy="40" r="36" fill="#4a9a6a"/><circle cx="40" cy="40" r="30" fill="none" stroke="#161310" stroke-width="1.3" opacity=".5"/><g transform="translate(22,22) scale(1.5)" fill="none" stroke="#161310" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.9 6.6 19.8l1-6.1-4.4-4.3 6.1-.9z"/></g></svg>';
   }
 
   function cfg(){
@@ -62,12 +91,40 @@
     document.head.appendChild(st);
   }
 
+  function cleanRows(rows){
+    var byId = {};
+    (rows || []).forEach(function(row){
+      var id = canonicalId(row.id || row.achievement_id);
+      if(!id)return;
+
+      var earned = !!row.earned_at;
+      var showLocked = row.show_locked === true || row.show_locked === "true" || !!VISIBLE_LOCKED[id];
+
+      if(!earned && !showLocked)return;
+
+      row.id = id;
+      row.show_locked = showLocked;
+      if(!row.svg)row.svg = fallbackSvg();
+
+      var old = byId[id];
+      if(!old || (!!row.earned_at && !old.earned_at) || ((row.sort_order || 9999) < (old.sort_order || 9999))){
+        byId[id] = row;
+      }
+    });
+
+    return Object.keys(byId).map(function(k){return byId[k];}).sort(function(a,b){
+      return (Number(a.sort_order || 9999) - Number(b.sort_order || 9999)) || String(a.label || a.id).localeCompare(String(b.label || b.id), "pl");
+    });
+  }
+
   function renderRows(rows){
     var box = document.getElementById("achievementsBox");
     if(!box)return;
     injectStyle();
 
-    if(!rows || !rows.length){
+    rows = cleanRows(rows);
+
+    if(!rows.length){
       box.innerHTML = '<div class="muted">Brak aktywnych odznak.</div>';
       return;
     }
@@ -76,7 +133,7 @@
       var earned = !!row.earned_at;
       return ''+
         '<article class="ach-card '+(earned ? 'earned' : 'locked')+'">'+
-          '<div class="ach-icon" aria-hidden="true">'+(row.svg || "")+'</div>'+
+          '<div class="ach-icon" aria-hidden="true">'+(row.svg || fallbackSvg())+'</div>'+
           '<div class="ach-title">'+esc(row.label || row.id)+'</div>'+
           (earned && row.description ? '<div class="ach-desc">'+esc(row.description)+'</div>' : '')+
           (earned ? '<div class="ach-date">Zdobyto: '+esc(fmtDate(row.earned_at))+'</div>' : '')+
@@ -131,4 +188,6 @@
 
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
+
+  console.info("Szpilplac achievements-panel.js v77 clean");
 })();

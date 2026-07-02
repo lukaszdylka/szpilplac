@@ -561,6 +561,53 @@ svg{
   }
 }
 
+
+
+/* v72 register success */
+.signup-success{
+  display:none;
+  border:1px solid rgba(63,138,90,.55);
+  background:rgba(63,138,90,.10);
+  color:var(--ink);
+  border-radius:16px;
+  padding:18px;
+  line-height:1.5;
+}
+.signup-success.show{
+  display:block;
+}
+.signup-success h2{
+  margin:0 0 8px;
+  font-family:"Oswald",system-ui,sans-serif;
+  font-size:26px;
+  line-height:1;
+  text-transform:uppercase;
+  color:var(--green);
+}
+.signup-success p{
+  margin:0 0 10px;
+  color:var(--ink2);
+  font-size:13.5px;
+}
+.signup-success b{
+  color:var(--ink);
+}
+.signup-success .signup-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.signup-success .btn{
+  width:auto;
+  min-width:150px;
+}
+@media(max-width:520px){
+  .signup-success .btn{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -597,6 +644,18 @@ svg{
 
   <section class="card auth-card" id="authCard">
     <div id="recoveryNotice" class="recovery-box hidden">Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej.</div>
+
+    <div id="signupSuccess" class="signup-success" role="status" aria-live="polite">
+      <h2>Sprawdź e-mail</h2>
+      <p>Wysłaliśmy link potwierdzający konto na adres:</p>
+      <p><b id="signupSuccessEmail">—</b></p>
+      <p>Kliknij link w wiadomości, a potem wróć do Szpilplaca i zaloguj się na konto.</p>
+      <div class="signup-actions">
+        <button class="btn" id="signupGoLogin" type="button">Przejdź do logowania</button>
+        <button class="btn secondary" id="signupAgain" type="button">Załóż inne konto</button>
+      </div>
+    </div>
+
 
     <div class="tabs" id="tabs">
       <button class="tab active" type="button" data-tab="register">Załóż konto</button>
@@ -732,7 +791,7 @@ svg{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v66 achievements");
+console.info("Szpilplac konto.html v77 clean achievements");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -753,6 +812,10 @@ var els = {
   profileCard:document.getElementById("profileCard"),
   tabs:document.getElementById("tabs"),
   recoveryNotice:document.getElementById("recoveryNotice"),
+  signupSuccess:document.getElementById("signupSuccess"),
+  signupSuccessEmail:document.getElementById("signupSuccessEmail"),
+  signupGoLogin:document.getElementById("signupGoLogin"),
+  signupAgain:document.getElementById("signupAgain"),
   registerForm:document.getElementById("registerForm"),
   loginForm:document.getElementById("loginForm"),
   resetForm:document.getElementById("resetForm"),
@@ -815,6 +878,28 @@ function setMsg(text,type){
   els.globalMsg.className = "msg" + (text ? " " + (type || "info") : " hidden");
 }
 function clearMsg(){setMsg("");}
+function hideSignupSuccess(){
+  if(els.signupSuccess)els.signupSuccess.classList.remove("show");
+}
+function showSignupSuccess(email){
+  clearMsg();
+  if(els.tabs)els.tabs.classList.add("hidden");
+  document.querySelectorAll(".panel").forEach(function(panel){
+    panel.classList.remove("active");
+    panel.classList.add("hidden");
+  });
+  if(els.signupSuccessEmail)els.signupSuccessEmail.textContent = email || "podany e-mail";
+  if(els.signupSuccess)els.signupSuccess.classList.add("show");
+  try{els.authCard.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}
+}
+function restoreAuthPanels(tab){
+  hideSignupSuccess();
+  document.querySelectorAll(".panel").forEach(function(panel){
+    panel.classList.remove("hidden");
+  });
+  if(els.tabs)els.tabs.classList.remove("hidden");
+  switchTab(tab || "login");
+}
 function setBusy(form,busy){
   if(!form)return;
   form.querySelectorAll("button,input,select").forEach(function(el){el.disabled=busy;});
@@ -878,6 +963,11 @@ function initSupabase(){
 }
 
 function switchTab(id){
+  hideSignupSuccess();
+  if(els.tabs)els.tabs.classList.remove("hidden");
+  document.querySelectorAll(".panel").forEach(function(panel){
+    panel.classList.remove("hidden");
+  });
   document.querySelectorAll(".tab").forEach(function(btn){
     btn.classList.toggle("active",btn.dataset.tab === id);
   });
@@ -889,6 +979,16 @@ function switchTab(id){
 document.querySelectorAll(".tab").forEach(function(btn){
   btn.onclick = function(){switchTab(btn.dataset.tab);};
 });
+if(els.signupGoLogin){
+  els.signupGoLogin.addEventListener("click",function(){
+    restoreAuthPanels("login");
+  });
+}
+if(els.signupAgain){
+  els.signupAgain.addEventListener("click",function(){
+    restoreAuthPanels("register");
+  });
+}
 
 function fillVoivodeshipSelect(select){
   if(!select)return;
@@ -1192,8 +1292,8 @@ els.registerForm.addEventListener("submit",async function(e){
       setMsg("Konto utworzone i jesteś zalogowany.","ok");
       await loadProfile();
     }else{
-      setMsg("Konto utworzone. Sprawdź maila i kliknij link potwierdzający konto.","ok");
-      switchTab("login");
+      els.registerForm.reset();
+      showSignupSuccess(email);
     }
   }catch(err){
     var session = await waitForSession(3000);
@@ -1391,7 +1491,7 @@ async function boot(){
 }
 boot();
 </script>
-<script src="achievements-panel.js?v=66"></script>
+<script src="achievements-panel.js?v=77"></script>
 <script src="konto-legal-bridge.js?v=19"></script>
 <script src="konto-mailing-bridge.js?v=20"></script>
 <script src="game-display-names.js?v=25"></script>

@@ -1,11 +1,12 @@
 (function(){
   "use strict";
 
-  var VERSION = "v69";
+  var VERSION = "v77";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
   var startedAt = Date.now();
+  var notifiedAchievements = {};
 
 
   function warsawDayString(){
@@ -110,11 +111,12 @@
       ".szp-result-actions a:hover{background:var(--surface,#fbf7ee);color:var(--green,#2f4a39)}" +
       ".szp-result-actions a.primary{background:var(--green,#2f4a39);border-color:var(--green,#2f4a39);color:#fff}" +
       ".szp-result-account-note{margin-top:10px;padding:9px 11px;border:1px dashed var(--line,#c9bfa6);border-radius:12px;background:rgba(191,138,58,.10);color:var(--ink2,#6a6150);font-size:12px;line-height:1.4;text-align:center}" +
-      ".szp-ach-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);z-index:9999;width:min(340px,calc(100vw - 24px));border:1px solid rgba(191,138,58,.75);border-radius:18px;background:var(--surface,#fbf7ee);color:var(--ink,#23201a);box-shadow:0 18px 50px -26px rgba(0,0,0,.7);padding:12px 14px;display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}" +
+      ".szp-ach-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);z-index:9999;width:min(360px,calc(100vw - 24px));border:1px solid rgba(191,138,58,.75);border-radius:18px;background:var(--surface,#fbf7ee);color:var(--ink,#23201a);box-shadow:0 18px 50px -26px rgba(0,0,0,.7);padding:12px 14px;display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;opacity:0;pointer-events:auto;transition:opacity .18s,transform .18s}" +
       ".szp-ach-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}" +
       ".szp-ach-toast .ico svg{width:42px;height:50px;display:block}" +
       ".szp-ach-toast .k{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--green,#2f4a39)}" +
       ".szp-ach-toast .t{font-family:Oswald,system-ui,sans-serif;font-size:20px;line-height:1.05;text-transform:uppercase}" +
+      ".szp-ach-toast .go{display:inline-flex;margin-top:6px;font-size:11.5px;font-weight:900;color:var(--green,#2f4a39);text-decoration:underline;text-underline-offset:2px}" +
       "@media(max-width:420px){.szp-result-actions{grid-template-columns:1fr}}";
     document.head.appendChild(st);
   }
@@ -188,47 +190,73 @@
     return client;
   }
 
+  function nval(x){
+    var n = Number(x);
+    return Number.isFinite(n) ? n : null;
+  }
+  function gnum(names){
+    for(var i=0;i<names.length;i++){
+      try{
+        var v = window[names[i]];
+        var n = nval(v);
+        if(n !== null)return n;
+      }catch(e){}
+    }
+    return null;
+  }
   function inferMeta(){
     var g = window.game || {};
     var guesses = Array.isArray(g.guesses) ? g.guesses : null;
     var attempts = guesses ? guesses.length : null;
-    if(!attempts && Number.isFinite(Number(window.tries)))attempts = Number(window.tries);
-    if(!attempts && Number.isFinite(Number(window.attempts)))attempts = Number(window.attempts);
+    if(!attempts)attempts = gnum(["tries","attempts","tryCount","guessCount"]);
 
     var won = null;
-    if(g.status === "won" || g.won === true)won = true;
-    if(g.status === "lost" || g.won === false)won = false;
+    if(g.status === "won" || g.won === true || window.won === true)won = true;
+    if(g.status === "lost" || g.won === false || window.won === false)won = false;
 
     var hints = null;
     if(typeof window.hintShown !== "undefined")hints = window.hintShown ? 1 : 0;
     if(typeof window.hintsUsed !== "undefined")hints = Number(window.hintsUsed) || 0;
     if(typeof window.usedHint !== "undefined" && typeof window.usedHint !== "function")hints = window.usedHint ? 1 : 0;
 
+    var dayIndex = (typeof window.currentDay === "number") ? window.currentDay : null;
+    var todayIndex = (typeof window.TODAY_IDX === "number") ? window.TODAY_IDX : null;
+
     return {
       game:gameKey(),
       game_name:gameName(),
       won:won,
       attempts:attempts,
+      max_attempts:gnum(["MAX_GUESSES","MAX_GUESSES_TEST","maxGuesses","maxAttempts"]),
       hints_used:hints,
       duration_seconds:Math.max(0,Math.round((Date.now()-startedAt)/1000)),
+      word_length:gnum(["LEN","WORD_LEN","wordLength"]),
+      day_index:dayIndex,
+      today_index:todayIndex,
+      mistakes:gnum(["mistakes","mistakeCount","errors","errorCount","wrong","wrongCount"]),
+      score:gnum(["score","points","lastScore"]),
       path:location.pathname
     };
   }
 
   function showAchievementToast(row){
     if(!row || !row.label)return;
+    var id = row.achievement_id || row.id || row.label;
+    if(notifiedAchievements[id])return;
+    notifiedAchievements[id] = true;
+
     injectStyle();
     var old = document.querySelector(".szp-ach-toast");
     if(old)old.remove();
 
     var el = document.createElement("div");
     el.className = "szp-ach-toast";
-    el.innerHTML = '<div class="ico">'+(row.svg || "")+'</div><div><div class="k">Nowa odznaka</div><div class="t"></div></div>';
+    el.innerHTML = '<div class="ico">'+(row.svg || "")+'</div><div><div class="k">Nowa odznaka</div><div class="t"></div><a class="go" href="'+root("konto.html")+'">Sprawdź w profilu</a></div>';
     el.querySelector(".t").textContent = row.label;
     document.body.appendChild(el);
     setTimeout(function(){el.classList.add("on");},40);
-    setTimeout(function(){el.classList.remove("on");},4300);
-    setTimeout(function(){el.remove();},4700);
+    setTimeout(function(){el.classList.remove("on");},5600);
+    setTimeout(function(){el.remove();},6100);
   }
 
   async function checkAchievements(eventName, meta){
