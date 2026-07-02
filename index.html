@@ -1169,7 +1169,11 @@ var COPY = {
     footerMailing:"Mailing",
     gamesTitle:"Gry na dziś",
     live:"Dzisiaj",
+    playToday:"Zagraj dzisiaj",
+    playWeek:"Zagraj w tym tygodniu",
     done:"Zagrane",
+    doneToday:"Zagrane dzisiaj",
+    doneWeek:"Zagrane w tym tygodniu",
     soon:"Wkrótce",
     familock:"Familock",
     erName:"Escape Room Familock",
@@ -1258,7 +1262,11 @@ var COPY = {
     footerMailing:"Mailing",
     gamesTitle:"Szpile na dzisiej",
     live:"Dzisiej",
+    playToday:"Szpilej dzisiej",
+    playWeek:"Szpilej w tym tydniu",
     done:"Zagrane",
+    doneToday:"Zagrane dzisiej",
+    doneWeek:"Zagrane w tym tydniu",
     soon:"Niydugo",
     familock:"Familock",
     erName:"Escape Room Familock",
@@ -1652,6 +1660,14 @@ function gameHref(id){
   var g = GAME_TILES[id];
   return g && g.active ? g.href : null;
 }
+function statusLabelForGame(id,isPlayed){
+  var p = pack();
+  var weekly = id === "zorta" || id === "raja";
+  if(isPlayed){
+    return weekly ? (p.doneWeek || p.done || "Zagrane") : (p.doneToday || p.done || "Zagrane");
+  }
+  return weekly ? (p.playWeek || p.weekly || "Tydzień") : (p.playToday || p.live || "Dzisiaj");
+}
 function renderGames(){
   var p = pack();
   var wrap = document.getElementById("games");
@@ -1666,13 +1682,9 @@ function renderGames(){
     var bcls = "soon";
 
     if(href){
-      if(playedGame(g.id)){
-        badge = p.done || "Zagrane";
-        bcls = "done";
-      }else{
-        badge = (g.id === "zorta") ? (p.weekly || p.ranking || "Tydzień") : p.live;
-        bcls = "live";
-      }
+      var played = playedGame(g.id);
+      badge = statusLabelForGame(g.id,played);
+      bcls = played ? "done" : "live";
     }
 
     el.innerHTML =
@@ -2098,7 +2110,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v57 player menu fixed");
+console.info("Szpilplac index.html v58 user friendly");
 </script>
 </body>
 </html>

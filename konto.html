@@ -93,6 +93,70 @@ header{padding-top:18px}
   color:var(--ink2);
 }
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
+.coffee-btn{
+  text-decoration:none;
+  flex:none;
+}
+.coffee-btn svg{
+  display:block;
+}
+.coffee-btn:hover{
+  color:var(--gold);
+}
+.konto-hero{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:14px;
+  align-items:stretch;
+}
+.konto-hero p{
+  margin:8px 0 0;
+  color:var(--ink2);
+  font-size:13px;
+  line-height:1.5;
+}
+.konto-hero-list{
+  display:grid;
+  gap:8px;
+}
+.konto-hero-pill{
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--surface2);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:900;
+}
+.quick-games{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:14px 0 4px;
+}
+.quick-games a{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--surface2);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:900;
+  text-align:center;
+}
+.quick-games a:hover{
+  background:var(--surface);
+  color:var(--green);
+}
+@media(max-width:720px){
+  .konto-hero{grid-template-columns:1fr}
+  .quick-games{grid-template-columns:1fr 1fr}
+}
+
 main{
   display:flex;
   flex-direction:column;
@@ -427,6 +491,12 @@ input:focus,select:focus{
       <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
         <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
       </a>
+      <a class="icon-btn coffee-btn" href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener" title="Postaw kawę" aria-label="Postaw kawę na buycoffee.to">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z"></path><path d="M16 10h2.2a2.2 2.2 0 0 1 0 4.4H16"></path><path d="M7 4.5c0 .8-.7.9-.7 1.6"></path><path d="M10 4.5c0 .8-.7.9-.7 1.6"></path><path d="M13 4.5c0 .8-.7.9-.7 1.6"></path><path d="M4 20h13"></path></svg>
+      </a>
+      <a class="icon-btn" href="ranking.html" title="Ranking" aria-label="Ranking">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16h12"/><path d="M6 16V9"/><path d="M10 16V5"/><path d="M14 16v-3"/></svg>
+      </a>
       <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw"></button>
     </div>
   </div>
@@ -434,6 +504,19 @@ input:focus,select:focus{
 
 <main>
   <div id="globalMsg" class="msg hidden"></div>
+
+  <section class="card konto-hero" id="kontoHero">
+    <div>
+      <h2>Panel gracza</h2>
+      <p>Tu zbierasz swoje wyniki, punkty, rangi i historię gier. Konto nie jest potrzebne do samej zabawy, ale pozwala wrócić do postępów z telefonu, komputera albo innej przeglądarki.</p>
+    </div>
+    <div class="konto-hero-list" aria-label="Co daje konto">
+      <div class="konto-hero-pill">Punkty i rangi</div>
+      <div class="konto-hero-pill">Historia wyników</div>
+      <div class="konto-hero-pill">Ranking graczy</div>
+      <div class="konto-hero-pill">Widoczność profilu pod kontrolą</div>
+    </div>
+  </section>
 
   <section class="card auth-card" id="authCard">
     <div id="recoveryNotice" class="recovery-box hidden">Jesteś w trybie resetowania hasła. Wpisz nowe hasło poniżej.</div>
@@ -446,7 +529,7 @@ input:focus,select:focus{
 
     <div id="register" class="panel active">
       <h2>Załóż konto</h2>
-      <p class="intro">Zapisuj wyniki, ranking i rangę na swoim koncie.</p>
+      <p class="intro">Konto zapisuje punkty, rangi, historię wyników i pozwala wrócić do postępów na innym urządzeniu.</p>
       <form id="registerForm">
         <label class="field">Login do rankingu<input id="regLogin" type="text" autocomplete="nickname" placeholder="np. Starzik92" required minlength="3" maxlength="24"></label>
         <div class="small">3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>
@@ -463,7 +546,7 @@ input:focus,select:focus{
 
     <div id="login" class="panel">
       <h2>Zaloguj się</h2>
-      <p class="intro">Zaloguj się e-mailem i hasłem.</p>
+      <p class="intro">Po zalogowaniu zobaczysz swoje punkty, rangę, ostatnie wyniki i ustawienia profilu.</p>
       <form id="loginForm">
         <label class="field">E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
         <label class="field">Hasło<input id="loginPassword" type="password" autocomplete="current-password" required></label>
@@ -492,13 +575,20 @@ input:focus,select:focus{
 
   <section class="card hidden" id="profileCard">
     <p class="hello" id="helloTitle">Cześć!</p>
-    <p class="intro" id="profileIntro">Twój profil gracza.</p>
+    <p class="intro" id="profileIntro">Twoje wyniki, punkty, ranga i historia gier w jednym miejscu.</p>
 
     <div class="profile-summary">
       <div class="stat"><div class="label">Ranga</div><div class="value" id="sumRank">Gorol</div></div>
       <div class="stat"><div class="label">Punkty</div><div class="value" id="sumPoints">0</div></div>
       <div class="stat"><div class="label">Gry</div><div class="value" id="sumGames">0</div></div>
       <div class="stat"><div class="label">Wygrane</div><div class="value" id="sumWins">0</div></div>
+    </div>
+
+    <div class="quick-games" aria-label="Szybkie przejścia do gier">
+      <a href="slowko.html">Słōwko</a>
+      <a href="klodka.html">Kłōdka</a>
+      <a href="raja/">Raja</a>
+      <a href="ranking.html">Ranking</a>
     </div>
 
     <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
@@ -559,7 +649,7 @@ input:focus,select:focus{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v49 clean-safe");
+console.info("Szpilplac konto.html v58 user friendly");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -835,7 +925,7 @@ async function loadProfile(){
     currentProfile = profile;
     var login = profile.login || profile.display_name || "graczu";
     els.helloTitle.textContent = "Cześć, " + login + "!";
-    els.profileIntro.textContent = "Twój profil gracza.";
+    els.profileIntro.textContent = "Twoje wyniki, punkty, ranga i historia gier w jednym miejscu.";
     els.pLogin.textContent = profile.login || "-";
     els.sumRank.textContent = profile.rank_name || "Gorol";
     els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
