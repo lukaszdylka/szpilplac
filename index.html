@@ -1173,6 +1173,149 @@ svg{
   }
 }
 
+
+
+/* v68 topbar/account menu hard fix */
+.player-menu{
+  width:285px!important;
+  min-width:245px!important;
+  max-width:min(285px, calc(100vw - 24px))!important;
+  overflow:visible!important;
+}
+.player-menu-actions a,
+.player-menu-actions button{
+  white-space:normal;
+}
+.player-menu-name,
+.player-menu-meta{
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.player-menu-wrap{
+  position:relative;
+  z-index:80;
+}
+@media(max-width:520px){
+  header{
+    padding-top:16px;
+  }
+  .topbar{
+    width:100%;
+    max-width:100%;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:start;
+    gap:8px;
+    overflow:visible;
+  }
+  .site-name{
+    font-size:32px;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .site-sub{
+    font-size:11px;
+    max-width:100%;
+  }
+  .controls{
+    width:156px!important;
+    max-width:156px!important;
+    min-width:156px!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:4px!important;
+    padding-top:0!important;
+    overflow:visible!important;
+    transform:none!important;
+  }
+  .controls .lang-tog{
+    order:30!important;
+    flex:0 0 100%!important;
+    width:max-content!important;
+    margin-left:auto!important;
+    margin-top:4px!important;
+  }
+  .controls > a,
+  .controls > button,
+  .controls > .player-menu-wrap{
+    order:10!important;
+  }
+  .lang-tog button{
+    min-width:34px!important;
+    padding:6px 9px!important;
+    font-size:10.5px!important;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .ranking-btn{
+    width:28px!important;
+    height:28px!important;
+    min-width:28px!important;
+  }
+  .icon-btn svg,
+  .coffee-btn svg,
+  .account-btn svg,
+  .ranking-btn svg{
+    width:14px!important;
+    height:14px!important;
+  }
+  .player-menu{
+    position:fixed!important;
+    top:74px!important;
+    left:12px!important;
+    right:12px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    max-height:calc(100vh - 92px)!important;
+    overflow:auto!important;
+    z-index:999!important;
+  }
+  .player-menu::before{
+    display:none!important;
+  }
+  .player-menu-head{
+    padding:9px 10px 10px!important;
+  }
+  .player-menu-actions{
+    gap:8px!important;
+  }
+  .player-menu-actions a,
+  .player-menu-actions button{
+    min-height:42px!important;
+    font-size:13px!important;
+  }
+}
+@media(max-width:380px){
+  .controls{
+    width:148px!important;
+    max-width:148px!important;
+    min-width:148px!important;
+    gap:3px!important;
+  }
+  .site-name{
+    font-size:30px;
+  }
+  .lang-tog button{
+    min-width:32px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .ranking-btn{
+    width:27px!important;
+    height:27px!important;
+    min-width:27px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2345,7 +2488,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v66 achievements mobile lang");
+console.info("Szpilplac index.html v68 topbar menu fix");
 </script>
 </body>
 </html>
