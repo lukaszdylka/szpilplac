@@ -1316,6 +1316,78 @@ svg{
   }
 }
 
+
+
+/* v71 account menu fixed-position repair */
+.player-menu.is-fixed-menu{
+  position:fixed!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:300px!important;
+  min-width:300px!important;
+  max-width:calc(100vw - 24px)!important;
+  overflow:visible!important;
+  z-index:10000!important;
+}
+.player-menu.is-fixed-menu::before{
+  display:none!important;
+}
+@media(max-width:560px){
+  .topbar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:start!important;
+    gap:8px!important;
+    overflow:visible!important;
+  }
+  .controls{
+    width:152px!important;
+    min-width:152px!important;
+    max-width:152px!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:4px!important;
+    overflow:visible!important;
+    transform:none!important;
+  }
+  .controls .lang-tog{
+    order:99!important;
+    flex:0 0 100%!important;
+    width:auto!important;
+    margin:4px 0 0 auto!important;
+  }
+  .controls > a,
+  .controls > button,
+  .controls > .player-menu-wrap{
+    order:1!important;
+  }
+  .lang-tog button{
+    min-width:33px!important;
+    padding:6px 8px!important;
+    font-size:10.5px!important;
+  }
+  .icon-btn,
+  .coffee-btn,
+  .account-btn,
+  .ranking-btn{
+    width:28px!important;
+    height:28px!important;
+    min-width:28px!important;
+  }
+  .player-menu.is-fixed-menu{
+    top:76px!important;
+    left:12px!important;
+    right:12px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    max-height:calc(100vh - 92px)!important;
+    overflow:auto!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2076,7 +2148,15 @@ function renderGames(){
 function closePlayerMenu(){
   var menu = document.getElementById("playerMenu");
   var btn = document.getElementById("playerMenuBtn");
-  if(menu)menu.classList.remove("open");
+  if(menu){
+    menu.classList.remove("open");
+    menu.classList.remove("is-fixed-menu");
+    menu.style.left = "";
+    menu.style.top = "";
+    menu.style.width = "";
+    menu.style.minWidth = "";
+    menu.style.maxWidth = "";
+  }
   if(btn)btn.setAttribute("aria-expanded","false");
 }
 function renderTopPlayerMenu(){
@@ -2128,11 +2208,46 @@ function renderTopPlayerMenu(){
     });
   });
 }
+function positionPlayerMenu(){
+  var menu = document.getElementById("playerMenu");
+  var btn = document.getElementById("playerMenuBtn");
+  if(!menu || !btn)return;
+
+  menu.classList.add("is-fixed-menu");
+
+  var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+
+  if(vw <= 560){
+    menu.style.left = "12px";
+    menu.style.top = "76px";
+    menu.style.width = "auto";
+    menu.style.minWidth = "0";
+    menu.style.maxWidth = "none";
+    return;
+  }
+
+  var r = btn.getBoundingClientRect();
+  var w = Math.min(300, vw - 24);
+  var left = Math.round(r.right - w);
+
+  if(left < 12)left = 12;
+  if(left + w > vw - 12)left = vw - w - 12;
+
+  menu.style.left = left + "px";
+  menu.style.top = Math.round(r.bottom + 10) + "px";
+  menu.style.width = w + "px";
+  menu.style.minWidth = w + "px";
+  menu.style.maxWidth = w + "px";
+}
 function openPlayerMenu(){
   renderTopPlayerMenu();
   var menu = document.getElementById("playerMenu");
   var btn = document.getElementById("playerMenuBtn");
-  if(menu)menu.classList.add("open");
+  if(menu){
+    menu.classList.add("open");
+    positionPlayerMenu();
+    setTimeout(positionPlayerMenu, 30);
+  }
   if(btn)btn.setAttribute("aria-expanded","true");
 }
 function togglePlayerMenu(){
@@ -2483,12 +2598,13 @@ document.addEventListener("keydown",function(e){
 window.addEventListener("pageshow",refreshHome);
 document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshHome();});
 window.addEventListener("focus",refreshHome);
+window.addEventListener("resize",function(){positionPlayerMenu();});
 window.SZPILPLAC_OPEN_AUTH = openAuth;
 applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v68 topbar menu fix");
+console.info("Szpilplac index.html v71 fixed account menu");
 </script>
 </body>
 </html>
