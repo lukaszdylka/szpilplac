@@ -103,30 +103,11 @@ header{padding-top:18px}
 .coffee-btn:hover{
   color:var(--gold);
 }
-.konto-hero{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:14px;
-  align-items:stretch;
-}
 .konto-hero p{
   margin:8px 0 0;
   color:var(--ink2);
   font-size:13px;
   line-height:1.5;
-}
-.konto-hero-list{
-  display:grid;
-  gap:8px;
-}
-.konto-hero-pill{
-  padding:10px 12px;
-  border:1px solid var(--line);
-  border-radius:13px;
-  background:var(--surface2);
-  color:var(--ink);
-  font-size:12px;
-  font-weight:900;
 }
 .quick-games{
   display:grid;
@@ -153,7 +134,6 @@ header{padding-top:18px}
   color:var(--green);
 }
 @media(max-width:720px){
-  .konto-hero{grid-template-columns:1fr}
   .quick-games{grid-template-columns:1fr 1fr}
 }
 
@@ -510,12 +490,6 @@ input:focus,select:focus{
       <h2>Panel gracza</h2>
       <p>Tu zbierasz swoje wyniki, punkty, rangi i historię gier. Konto nie jest potrzebne do samej zabawy, ale pozwala wrócić do postępów z telefonu, komputera albo innej przeglądarki.</p>
     </div>
-    <div class="konto-hero-list" aria-label="Co daje konto">
-      <div class="konto-hero-pill">Punkty i rangi</div>
-      <div class="konto-hero-pill">Historia wyników</div>
-      <div class="konto-hero-pill">Ranking graczy</div>
-      <div class="konto-hero-pill">Widoczność profilu pod kontrolą</div>
-    </div>
   </section>
 
   <section class="card auth-card" id="authCard">
@@ -649,7 +623,7 @@ input:focus,select:focus{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v58 user friendly");
+console.info("Szpilplac konto.html v62 clean minimal");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -780,8 +754,8 @@ function normalizeOptional(value){
 
 function initSupabase(){
   var cfg = window.SZPILPLAC_CONFIG || {};
-  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){setMsg("Brak konfiguracji Supabase.","err");return false;}
-  if(!window.supabase){setMsg("Nie załadowano biblioteki Supabase JS.","err");return false;}
+  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){setMsg("Nie udało się przygotować konta.","err");return false;}
+  if(!window.supabase){setMsg("Nie udało się przygotować konta.","err");return false;}
 
   if(window.__SZPILPLAC_SUPABASE_CLIENT){
     sb = window.__SZPILPLAC_SUPABASE_CLIENT;
@@ -1266,8 +1240,6 @@ async function boot(){
   var hash = new URLSearchParams((window.location.hash || "").replace(/^#/,""));
 
   sb.auth.onAuthStateChange(function(event,session){
-    console.log("Szpilplac auth event:",event);
-
     if(event === "PASSWORD_RECOVERY"){
       enterRecoveryMode("Kliknij poniżej i ustaw nowe hasło.");
       return;

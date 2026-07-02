@@ -1,12 +1,7 @@
-/*
-  Szpilplac game-result-actions.js v59
-  Dokłada przyjazne przyciski po zakończeniu gry.
-  Działa jako lekki mostek — nie zmienia logiki punktacji ani zapisu wyników.
-*/
 (function(){
   "use strict";
 
-  var VERSION = "v59";
+  var VERSION = "v62";
   var MARK = "data-szp-result-actions";
 
   function inRaja(){

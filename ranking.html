@@ -456,6 +456,40 @@ main{
   gap:10px;
   margin-top:14px;
 }
+
+.rules-details{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--surface);
+  overflow:hidden;
+}
+.rules-details summary{
+  list-style:none;
+  cursor:pointer;
+  padding:14px 16px;
+  display:grid;
+  gap:4px;
+}
+.rules-details summary::-webkit-details-marker{display:none}
+.rules-details summary span{
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:22px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--ink);
+}
+.rules-details summary small{
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.45;
+  font-weight:700;
+}
+.rules-details[open] summary{
+  border-bottom:1px solid var(--line);
+  background:var(--surface2);
+}
+
 .rules-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -742,8 +776,8 @@ var COPY = {
     loading:"Ładuję ranking...",
     emptyTitle:"Ranking jest jeszcze pusty",
     emptyText:"Pierwsze wyniki pojawią się po zapisaniu gry.",
-    errConfig:"Brak konfiguracji Supabase.",
-    errLib:"Nie załadowano biblioteki Supabase JS.",
+    errConfig:"Nie udało się przygotować rankingu.",
+    errLib:"Nie udało się przygotować rankingu.",
     errRanking:"Nie udało się pobrać rankingu: ",
     points:"pkt",
     games:"gier",
@@ -755,23 +789,21 @@ var COPY = {
     footerAccount:"Konto",
     footerFamilock:"Familock",
     rulesTitle:"Jak działa punktacja?",
-    rulesLead:"Ranking premiuje dobre wyniki, ale też regularne wracanie do gier. Im mniej prób i podpowiedzi, tym więcej punktów.",
-    generalTitle:"Najważniejsze zasady",
-    generalText:"Konto nie jest wymagane do gry, ale tylko konto zapisuje wynik do rankingu. Jeżeli gracz ukryje profil, nie będzie widoczny publicznie.",
+    rulesLead:"Im mniej prób i podpowiedzi, tym więcej punktów. Wyniki do rankingu zapisują się na koncie gracza.",
+    generalTitle:"Najważniejsze",
+    generalText:"Gra działa bez konta. Konto jest potrzebne tylko do punktów, rang i rankingu.",
     slowkoTitle:"Słōwko",
-    slowkoText:"Codzienne hasło. Najwięcej punktów dostaje się za szybkie odgadnięcie.",
+    slowkoText:"Codzienne hasło. Szybsze odgadnięcie daje więcej punktów.",
     klodkaTitle:"Kłōdka",
-    klodkaText:"Kod dnia i tygodniówka. Mniej prób oznacza więcej punktów.",
+    klodkaText:"Kod dnia i tygodniówka. Mniej prób to wyższy wynik.",
     rajaTitle:"Raja",
     rajaText:"Tygodniowa układanka. Podpowiedź pomaga, ale obniża wynik.",
     ranksTitle:"Rangi",
-    ranksText:"Rangi pokazują łączny postęp gracza. Pierwszy awans jest szybki, kolejne wymagają coraz więcej regularnej gry.",
-    note:"Punktacja może być jeszcze delikatnie dostrajana, ale zasada zostaje taka sama: lepszy wynik, mniej prób i regularna gra dają wyższą pozycję.",
+    ranksText:"Ranga pokazuje ogólny postęp gracza.",
+    note:"Lepszy wynik, mniej prób i regularna gra dają wyższą pozycję.",
     bullets:[
-      "Wyniki zapisują się tylko na koncie gracza.",
-      "Archiwalne gry służą do zabawy i ćwiczenia — ranking opiera się na aktualnych grach.",
-      "Gracz może ukryć się z publicznego rankingu w profilu.",
-      "Podpowiedzi obniżają wynik, ale nie psują zabawy."
+      "Wynik trafia do rankingu, gdy grasz na zalogowanym koncie.",
+      "Profil można ukryć w panelu gracza."
     ],
     slowkoRows:[["1. próba","100 pkt"],["2. próba","85 pkt"],["3. próba","70 pkt"],["4. próba","55 pkt"],["5. próba","40 pkt"],["6. próba","25 pkt"],["Nieudane podejście","5 pkt"],["Podpowiedź","-15 pkt"]],
     klodkaRows:[["Kłōdka dzienna","do 120 pkt"],["Kłōdka tygodniowa","do 150 pkt"],["Kolejne próby","mniej punktów"],["Nieudane podejście","5 pkt"]],
@@ -1014,17 +1046,19 @@ function renderRules(){
   var bulletHtml = '<ul class="rule-list">'+bulletRows.map(function(item){
     return '<li><span>'+esc(item[0])+'</span></li>';
   }).join("")+'</ul>';
+
   document.getElementById("rulesCard").innerHTML =
-    '<h2>'+esc(c.rulesTitle)+'</h2>'+
-    '<p class="intro">'+esc(c.rulesLead)+'</p>'+
-    '<div class="rules-grid">'+
-      '<div class="rule-box wide"><div class="rule-title">'+esc(c.generalTitle)+'</div><div class="rule-text">'+esc(c.generalText)+'</div>'+bulletHtml+'</div>'+
-      '<div class="rule-box"><div class="rule-title">'+esc(c.slowkoTitle)+'</div><div class="rule-text">'+esc(c.slowkoText)+'</div>'+rows(c.slowkoRows)+'</div>'+
-      '<div class="rule-box"><div class="rule-title">'+esc(c.klodkaTitle)+'</div><div class="rule-text">'+esc(c.klodkaText)+'</div>'+rows(c.klodkaRows)+'</div>'+
-      '<div class="rule-box"><div class="rule-title">'+esc(c.rajaTitle)+'</div><div class="rule-text">'+esc(c.rajaText)+'</div>'+rows(c.rajaRows)+'</div>'+
-      '<div class="rule-box"><div class="rule-title">'+esc(c.ranksTitle)+'</div><div class="rule-text">'+esc(c.ranksText)+'</div><div class="rank-track">'+c.ranks.map(function(r){return '<span class="rank-pill">'+esc(r[0])+'<small>'+esc(r[1])+'</small></span>';}).join("")+'</div></div>'+
-    '</div>'+
-    '<div class="note"><b>'+esc(c.rulesTitle)+'</b><br>'+esc(c.note)+'</div>';
+    '<details class="rules-details">'+
+      '<summary><span>'+esc(c.rulesTitle)+'</span><small>'+esc(c.rulesLead)+'</small></summary>'+
+      '<div class="rules-grid">'+
+        '<div class="rule-box wide"><div class="rule-title">'+esc(c.generalTitle)+'</div><div class="rule-text">'+esc(c.generalText)+'</div>'+bulletHtml+'</div>'+
+        '<div class="rule-box"><div class="rule-title">'+esc(c.slowkoTitle)+'</div><div class="rule-text">'+esc(c.slowkoText)+'</div>'+rows(c.slowkoRows)+'</div>'+
+        '<div class="rule-box"><div class="rule-title">'+esc(c.klodkaTitle)+'</div><div class="rule-text">'+esc(c.klodkaText)+'</div>'+rows(c.klodkaRows)+'</div>'+
+        '<div class="rule-box"><div class="rule-title">'+esc(c.rajaTitle)+'</div><div class="rule-text">'+esc(c.rajaText)+'</div>'+rows(c.rajaRows)+'</div>'+
+        '<div class="rule-box"><div class="rule-title">'+esc(c.ranksTitle)+'</div><div class="rule-text">'+esc(c.ranksText)+'</div></div>'+
+      '</div>'+
+      '<div class="note">'+esc(c.note)+'</div>'+
+    '</details>';
 }
 async function loadRanking(){
   if(!sb)return;
@@ -1103,7 +1137,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v60 player menu");
+console.info("Szpilplac ranking.html v62 clean minimal");
 boot();
 </script>
 <script>
