@@ -145,5 +145,6 @@ submitBtn.addEventListener("click",submit);clearBtn.addEventListener("click",cle
 function start(){SET=pickSet();document.getElementById("pno").textContent="#"+SET.no;if(savedGame&&savedGame.date===todayStr()&&savedGame.no===SET.no){solvedColors=savedGame.solvedColors||[];errors=savedGame.errors||0;finished=savedGame.finished||false;}SET.cats.forEach(function(cat){if(solvedColors.indexOf(cat.color)>=0)renderSolvedCat(cat);});buildGrid();renderTries();applyLang();if(finished)setTimeout(function(){endGame(solvedColors.length===SET.cats.length);},400);}
 start();
 </script>
+  <script src="game-result-actions.js?v=59"></script>
 </body>
 </html>
