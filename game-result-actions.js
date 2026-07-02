@@ -1,11 +1,84 @@
 (function(){
   "use strict";
 
-  var VERSION = "v66";
+  var VERSION = "v69";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
   var startedAt = Date.now();
+
+
+  function warsawDayString(){
+    try{
+      var parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone:"Europe/Warsaw",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit"
+      }).formatToParts(new Date());
+      var out = {};
+      parts.forEach(function(p){ if(p.type !== "literal") out[p.type] = p.value; });
+      return out.year + "-" + out.month + "-" + out.day;
+    }catch(e){
+      return new Date().toISOString().slice(0,10);
+    }
+  }
+
+  function resetDailyHintChoices(){
+    var today = warsawDayString();
+    var markerKey = "szpilplac_hint_reset_day";
+    var last = null;
+
+    try{ last = localStorage.getItem(markerKey); }catch(e){}
+
+    if(last === today)return;
+
+    var exactKeys = {
+      slowko_hint: "off",
+      klodka_hint: "off",
+      raja_hint: "off",
+      cuzamen_hint: "off",
+      szpilplac_hint: "off"
+    };
+
+    try{
+      Object.keys(exactKeys).forEach(function(k){
+        try{ localStorage.setItem(k, exactKeys[k]); }catch(e){}
+      });
+
+      var toRemove = [];
+      for(var i=0;i<localStorage.length;i++){
+        var key = localStorage.key(i);
+        if(!key)continue;
+        var low = key.toLowerCase();
+
+        if(
+          low.indexOf("hintshown") !== -1 ||
+          low.indexOf("hintsused") !== -1 ||
+          low.indexOf("hint_used") !== -1 ||
+          low.indexOf("hint-shown") !== -1 ||
+          low.indexOf("podpowiedz") !== -1 ||
+          low.indexOf("podpowiedzi") !== -1
+        ){
+          toRemove.push(key);
+        }
+      }
+
+      toRemove.forEach(function(k){
+        try{ localStorage.removeItem(k); }catch(e){}
+      });
+
+      localStorage.setItem(markerKey, today);
+    }catch(e){}
+
+    try{
+      if(typeof window.hintMode !== "undefined") window.hintMode = "off";
+      if(typeof window.hintShown !== "undefined") window.hintShown = false;
+      if(typeof window.hintsUsed !== "undefined") window.hintsUsed = 0;
+      if(typeof window.usedHint !== "undefined" && typeof window.usedHint !== "function") window.usedHint = false;
+      if(typeof window.updateHintBar === "function") window.updateHintBar();
+    }catch(e){}
+  }
 
   function inRaja(){
     return /\/raja\/?/.test(location.pathname);
@@ -234,6 +307,7 @@
     },true);
   }
   function boot(){
+    resetDailyHintChoices();
     injectStyle();
     hookShare();
     scan();
