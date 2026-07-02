@@ -975,6 +975,7 @@ var authMode = "login";
 var busy = false;
 var profile = null;
 var rankStats = null;
+var accountPlayed = {};
 var avatars = {};
 
 var store = (function(){
@@ -1352,6 +1353,7 @@ async function loadAvatar(key){
 async function loadProfile(){
   profile = null;
   rankStats = null;
+  accountPlayed = {};
   var session = await getSession();
   if(!session || !session.user)return;
   var c;
@@ -1363,7 +1365,7 @@ async function loadProfile(){
   }catch(e){}
   try{
     var r = await c.from("user_game_results")
-      .select("score,won")
+      .select("game,mode,puzzle_no,score,won")
       .eq("user_id",session.user.id);
 
     if(!r.error && Array.isArray(r.data)){
@@ -1372,6 +1374,9 @@ async function loadProfile(){
         games_played:r.data.length,
         wins:r.data.filter(function(row){return row.won === true;}).length
       };
+      r.data.forEach(function(row){
+        markAccountPlayed(row.game,row.mode,row.puzzle_no);
+      });
     }
   }catch(e){}
   if(profile && profile.avatar_key)await loadAvatar(profile.avatar_key);
@@ -1414,12 +1419,39 @@ function isFinishedGame(x){
 function hasResult(obj,key){
   return !!(obj && obj.results && obj.results[String(key)]);
 }
+function markAccountPlayed(game,mode,puzzleNo){
+  if(!game || puzzleNo == null)return;
+  var g = String(game).toLowerCase();
+  var m = mode == null ? "any" : String(mode).toLowerCase();
+  var n = String(puzzleNo);
+  accountPlayed[g + ":" + m + ":" + n] = true;
+  accountPlayed[g + ":any:" + n] = true;
+  accountPlayed[g + ":" + n] = true;
+  if(g === "zorta"){
+    accountPlayed["raja:" + m + ":" + n] = true;
+    accountPlayed["raja:any:" + n] = true;
+    accountPlayed["raja:" + n] = true;
+  }
+  if(g === "raja"){
+    accountPlayed["zorta:" + m + ":" + n] = true;
+    accountPlayed["zorta:any:" + n] = true;
+    accountPlayed["zorta:" + n] = true;
+  }
+}
+function accountHasPlayed(game,puzzleNo,mode){
+  var g = String(game || "").toLowerCase();
+  var n = String(puzzleNo);
+  if(mode && accountPlayed[g + ":" + String(mode).toLowerCase() + ":" + n])return true;
+  return !!(accountPlayed[g + ":any:" + n] || accountPlayed[g + ":" + n]);
+}
 function playedSlowko(){
+  if(accountHasPlayed("slowko",DAY_NO))return true;
   if(isFinishedGame(parseStored("slowko_d" + DAY_IDX)))return true;
   var st = parseStored("slowko_v2");
   return !!(st && st.stats && hasResult(st.stats,DAY_IDX));
 }
 function playedKlodka(){
+  if(accountHasPlayed("klodka",DAY_NO,"daily"))return true;
   if(isFinishedGame(parseStored("klodka_daily_v1_d" + DAY_NO)))return true;
   var cur = parseStored("klodka_daily_v1");
   if(cur){
@@ -1438,6 +1470,7 @@ function playedCuzamen(){
   return !!(cg && sameTodayDate(cg.date) && cg.finished === true);
 }
 function playedRaja(){
+  if(accountHasPlayed("zorta",WEEK_IDX + 1) || accountHasPlayed("raja",WEEK_IDX + 1))return true;
   var st = parseStored("zorta_d" + WEEK_IDX);
   if(isFinishedGame(st))return true;
   var zs = parseStored("zorta_stats_v1");
@@ -1471,8 +1504,13 @@ function renderGames(){
     var bcls = "soon";
 
     if(href){
-      badge = (g.id === "zorta") ? (p.weekly || p.ranking || "Tydzień") : p.live;
-      bcls = "live";
+      if(playedGame(g.id)){
+        badge = p.done || "Zagrane";
+        bcls = "done";
+      }else{
+        badge = (g.id === "zorta") ? (p.weekly || p.ranking || "Tydzień") : p.live;
+        bcls = "live";
+      }
     }
 
     el.innerHTML =
@@ -1778,6 +1816,7 @@ async function refreshHome(){
   renderPlayer();
   await loadProfile();
   renderPlayer();
+  renderGames();
 }
 document.getElementById("themeBtn").addEventListener("click",toggleTheme);
 document.getElementById("langPl").addEventListener("click",function(){store.set(LK,"pl");refreshHome();});
@@ -1802,7 +1841,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v52 account icon");
+console.info("Szpilplac index.html v53 played badges");
 </script>
 </body>
 </html>
