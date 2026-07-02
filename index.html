@@ -123,6 +123,20 @@ header{padding-top:18px}
   color:var(--ink2);
 }
 .icon-btn:hover{background:var(--surface);color:var(--ink)}
+.account-btn{ text-decoration:none; flex:none; }
+.account-btn svg{ display:block; }
+.account-btn:hover{ color:var(--gold); }
+.coffee-btn{
+  text-decoration:none;
+  flex:none;
+}
+.coffee-btn svg{
+  display:block;
+}
+.coffee-btn:hover{
+  color:var(--gold);
+}
+
 main{
   display:flex;
   flex-direction:column;
@@ -508,37 +522,76 @@ main{
   letter-spacing:.03em;
   text-transform:uppercase;
 }
-footer{
+footer.site-footer{
   margin-top:24px;
   color:var(--ink2);
   font-size:12px;
   text-align:center;
 }
-.footer-links,.footer-social,.footer-nav{
+.footer-icons{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.footer-icons a{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  color:var(--green);
+  box-shadow:0 8px 18px -16px rgba(35,32,26,.55);
+}
+.footer-icons a:hover{
+  background:var(--surface);
+  color:var(--gold);
+  transform:translateY(-1px);
+}
+.footer-nav{
   display:flex;
   justify-content:center;
   gap:8px;
   flex-wrap:wrap;
+  margin-top:12px;
 }
-.footer-social{margin-top:12px}
-.footer-nav{margin-top:10px}
-.footer-links a,.footer-social a,.footer-nav a{
-  min-height:32px;
+.footer-nav a{
+  min-height:30px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
-  padding:7px 11px;
+  padding:6px 12px;
   border:1px solid var(--line);
   border-radius:999px;
+  background:rgba(191,138,58,.08);
+  color:var(--ink);
+  font-size:11px;
+  font-weight:900;
+}
+.footer-nav a:hover{
   background:var(--surface2);
+  color:var(--green);
+}
+.footer-legal{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:12px;
   color:var(--ink2);
   font-size:11px;
-  font-weight:800;
+  line-height:1.6;
+  opacity:.82;
 }
-.footer-links a:hover,.footer-social a:hover,.footer-nav a:hover{
-  background:var(--surface);
+.footer-legal a{
+  color:var(--ink2);
+  font-weight:700;
+}
+.footer-legal a:hover{
   color:var(--green);
+  text-decoration:underline;
 }
 .modal-scrim{
   position:fixed;
@@ -789,6 +842,22 @@ footer{
         <button id="langPl" type="button">PL</button>
         <button id="langSzl" type="button">ŚL</button>
       </div>
+      <a class="icon-btn coffee-btn" href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener" title="Postaw kawę" aria-label="Postaw kawę na buycoffee.to">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z"></path>
+          <path d="M16 10h2.2a2.2 2.2 0 0 1 0 4.4H16"></path>
+          <path d="M7 4.5c0 .8-.7.9-.7 1.6"></path>
+          <path d="M10 4.5c0 .8-.7.9-.7 1.6"></path>
+          <path d="M13 4.5c0 .8-.7.9-.7 1.6"></path>
+          <path d="M4 20h13"></path>
+        </svg>
+      </a>
+      <a class="icon-btn account-btn" href="konto.html" title="Panel gracza" aria-label="Panel gracza lub logowanie">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="10" cy="6.5" r="3.2"></circle>
+          <path d="M4 18c.9-4.1 3-6.2 6-6.2s5.1 2.1 6 6.2"></path>
+        </svg>
+      </a>
       <button class="icon-btn" id="helpBtn" type="button" aria-label="O Szpilplacu">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 113 1.73c-.6.35-1 .97-1 1.77"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg>
       </button>
@@ -837,23 +906,39 @@ footer{
   </div>
 </main>
 
-<footer>
-  <div class="footer-links">
-    <a href="regulamin.html" id="footerTerms">Regulamin</a>
-    <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
-    <a href="cookies.html" id="footerCookies">Cookies</a>
-    <a href="mailing.html" id="footerMailing">Mailing</a>
+<footer class="site-footer">
+  <div class="footer-icons" aria-label="Familock w social mediach">
+    <a href="https://dylka.pl" target="_blank" rel="noopener" aria-label="Łukasz Dyłka">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6" r="3"/><path d="M4 18c.9-4 3-6 6-6s5.1 2 6 6"/></svg>
+    </a>
+    <a href="https://www.familock.pl" target="_blank" rel="noopener" aria-label="Familock">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M7 18v-6h6v6"/></svg>
+    </a>
+    <a href="https://www.facebook.com/escaperoomfamilock" target="_blank" rel="noopener" aria-label="Fanpage">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="currentColor"><path d="M12.2 3.4h2V0h-2.9C8.1 0 6.2 1.9 6.2 5.3v2.4H3.5v3.6h2.7V20h3.8v-8.7h3.1l.5-3.6H10V5.6c0-1.1.3-2.2 2.2-2.2z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="4"/><circle cx="10" cy="10" r="3.2"/><circle cx="14.6" cy="5.4" r=".8" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener" aria-label="Wspólnota Familoka">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="8" r="2.5"/><path d="M2.5 17c.7-3.6 2.3-5.4 4.5-5.4s3.8 1.8 4.5 5.4"/><path d="M11.8 13c2.6.2 4.2 1.5 4.9 4"/></svg>
+    </a>
   </div>
-  <div class="footer-social" aria-label="Familock w social mediach">
-    <a href="https://dylka.pl" target="_blank" rel="noopener">Łukasz Dyłka</a>
-    <a href="https://www.facebook.com/escaperoomfamilock" target="_blank" rel="noopener">Fanpage</a>
-    <a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener">Instagram</a>
-    <a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener">Wspólnota Familoka</a>
-  </div>
-  <div class="footer-nav">
+
+  <nav class="footer-nav" aria-label="Nawigacja">
     <a href="/">Szpilplac</a>
     <a href="ranking.html">Ranking</a>
     <a href="konto.html">Konto</a>
+  </nav>
+
+  <div class="footer-legal">
+    <a href="regulamin.html" id="footerTerms">Regulamin</a>
+    <span>·</span>
+    <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
+    <span>·</span>
+    <a href="cookies.html" id="footerCookies">Cookies</a>
+    <span>·</span>
+    <a href="mailing.html" id="footerMailing">Mailing</a>
   </div>
 </footer>
 
@@ -1717,7 +1802,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v47 clean");
+console.info("Szpilplac index.html v52 account icon");
 </script>
 </body>
 </html>
