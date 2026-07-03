@@ -1,12 +1,13 @@
 /*
-  Szpilplac Raja Auth Bridge v80
-  - zapisuje wynik Rai na koncie
-  - blokuje ponowne granie na drugim urządzeniu, jeśli wynik tygodnia jest już zapisany na koncie
+  Szpilplac Raja Auth Bridge v92
+  - Raja jako gra codzienna z archiwum od 04.07.2026
+  - zapisuje wynik na koncie jako game=zorta, mode=daily
+  - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
 */
 (function(){
   "use strict";
 
-  var VERSION="v80";
+  var VERSION="v92";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -83,6 +84,18 @@
     }
     return null;
   }
+  function currentDay(){
+    return Number(window.currentDay||0);
+  }
+  function todayIdx(){
+    return Number(window.TODAY_IDX||0);
+  }
+  function puzzleNo(){
+    return currentDay()+1;
+  }
+  function isCurrent(){
+    return currentDay()===todayIdx();
+  }
   function scoreRaja(won,tries,hintUsed){
     tries=Math.max(1,Math.min(4,Number(tries||4)));
     if(!won)return 5;
@@ -94,28 +107,34 @@
   function localFinished(){
     try{
       if(window.status&&window.status!=="playing")return true;
-      if(typeof window.loadState==="function"){
-        var st=window.loadState(Number(window.currentWeek));
+      var raw=localStorage.getItem("zorta_daily_d"+currentDay());
+      if(raw){
+        var st=JSON.parse(raw);
         if(st&&st.status&&st.status!=="playing")return true;
       }
     }catch(e){}
     return false;
   }
   function snapshot(won){
-    var currentWeek=Number(window.currentWeek);
-    var thisWeek=Number(window.TW);
     var tries=1;
     try{tries=window.guessHistory&&Array.isArray(window.guessHistory)?Math.max(1,window.guessHistory.length):Number(window.MAX_TRIES||4);}
     catch(e){tries=Number(window.MAX_TRIES||4);}
-    var hintUsed=false,demo=false,tester=false;
+    var hintUsed=false;
     try{hintUsed=!!window.hintData;}catch(e){}
-    try{demo=!!window.DEMO;}catch(e){}
-    try{tester=!!window.IS_TESTER;}catch(e){}
-    return {game:"zorta",mode:"weekly",puzzleNo:currentWeek+1,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreRaja(!!won,tries,hintUsed),isCurrent:(!demo&&!tester&&currentWeek===thisWeek)};
+    return {
+      game:"zorta",
+      mode:"daily",
+      puzzleNo:puzzleNo(),
+      won:!!won,
+      tries:tries,
+      errors:Math.max(0,tries-(won?1:0)),
+      score:scoreRaja(!!won,tries,hintUsed),
+      isCurrent:isCurrent()
+    };
   }
   async function saveResult(data){
     if(!data||!data.isCurrent){
-      setNote("Archiwum/test Rai zostaje lokalnie — do rankingu zapisuje się tylko aktualny tydzień.","err");
+      setNote("Archiwum Rai zostaje lokalnie — do rankingu zapisuje się tylko dzisiejsza gra.","err");
       return;
     }
     var session=await getSession();
@@ -125,7 +144,15 @@
     }
     setNote("Zapisuję wynik Rai na koncie...","");
     var client=await ensureClient();
-    var res=await client.rpc("save_user_game_result",{p_game:data.game,p_mode:data.mode,p_puzzle_no:data.puzzleNo,p_won:data.won,p_tries:data.tries,p_errors:data.errors,p_score:data.score});
+    var res=await client.rpc("save_user_game_result",{
+      p_game:data.game,
+      p_mode:data.mode,
+      p_puzzle_no:data.puzzleNo,
+      p_won:data.won,
+      p_tries:data.tries,
+      p_errors:data.errors,
+      p_score:data.score
+    });
     if(res.error)throw res.error;
     setNote("Wynik Rai zapisany na koncie. +"+data.score+" pkt","ok");
   }
@@ -159,9 +186,7 @@
   async function hydrateAccountResult(){
     try{
       if(hydrated)return;
-      var currentWeek=Number(window.currentWeek);
-      var thisWeek=Number(window.TW);
-      if(!Number.isFinite(currentWeek)||currentWeek!==thisWeek)return;
+      if(!isCurrent())return;
       if(localFinished())return;
       var session=await getSession();
       if(!session||!session.user)return;
@@ -170,8 +195,8 @@
         .select("game,mode,puzzle_no,won,tries,score,created_at")
         .eq("user_id",session.user.id)
         .eq("game","zorta")
-        .eq("mode","weekly")
-        .eq("puzzle_no",currentWeek+1)
+        .eq("mode","daily")
+        .eq("puzzle_no",puzzleNo())
         .maybeSingle();
       if(!res.error&&res.data)showAccountDone(res.data);
     }catch(e){}
@@ -186,7 +211,12 @@
       var k=data.game+":"+data.mode+":"+data.puzzleNo;
       if(!attempts[k]){
         attempts[k]=true;
-        setTimeout(function(){saveResult(data).catch(function(err){console.warn("Raja account save error:",err);setNote("Nie udało się zapisać wyniku Rai na koncie.","err");});},80);
+        setTimeout(function(){
+          saveResult(data).catch(function(err){
+            console.warn("Raja account save error:",err);
+            setNote("Nie udało się zapisać wyniku Rai na koncie.","err");
+          });
+        },80);
       }
       return ret;
     };
