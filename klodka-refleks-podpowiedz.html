@@ -1,0 +1,215 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     PODPOWIEDŹ TYGODNIA — TEST REFLEKSU  (wklejka, samodzielny blok)
+     ────────────────────────────────────────────────────────────────────
+     GDZIE WKLEIĆ:
+     Zaraz PO tej linii w klodka.html:
+       <div class="weekly-hint" id="weeklyHint" aria-live="polite"></div>
+     (czyli jako kolejny element w <main>, tuż pod oryginalnym boxem)
+
+     TO JEST PODPOWIEDŹ TYLKO NA JEDEN, KONKRETNY TYDZIEŃ:
+     Blok sam się wyłącza (usuwa z DOM), gdy WEEK_NO na stronie nie
+     zgadza się z REFLEX_TARGET_WEEK (patrz <script> niżej). Dla
+     wszystkich innych tygodni #weeklyHint działa normalnie, jakby
+     tego bloku tu nie było. Numer aktualnego tygodnia widać wprost
+     na stronie w trybie tygodniowym (napis "Tydzień N" przy tytule)
+     — stamtąd bierz wartość do REFLEX_TARGET_WEEK.
+
+     ŻEBY ZAJĘŁO MIEJSCE OBECNEJ PODPOWIEDZI (tylko na tydzień docelowy):
+     W Supabase (klodka_weekly_hints) potrzebujesz WIERSZA dla tego
+     week_no z published=true i visible_hint = '' (pusty string, nie
+     brak wiersza — brak wiersza sprawi, że pokaże się domyślny trop
+     ">>> F12 <<<" z WEEKLY_HINT_DEFAULTS). Pusty visible_hint sprawia,
+     że oryginalny #weeklyHint chowa się sam (patrz updateWeeklyHint()),
+     a ten blok wchodzi na jego miejsce wizualnie. console_hint możesz
+     zostawić jak jest albo też wyczyścić — to osobna sprawa.
+
+     DLACZEGO NIE PRZEZ POLE visible_hint / CMS:
+     visible_hint trafia na stronę przez el.innerHTML = ... (patrz
+     updateWeeklyHint() w klodka.html). Przeglądarki NIE wykonują <script>
+     wstawionego przez innerHTML, więc gra by się nie odpaliła, gdyby
+     wkleić ten kod tam. Stąd wersja jako blok na stałe w pliku.
+
+     DLACZEGO CZEKA NA DOMContentLoaded:
+     Ten blok siedzi w HTML PRZED głównym <script> klodka.html (który
+     dopiero tam liczy WEEK_NO). Gdyby kod odpalił się od razu, WEEK_NO
+     jeszcze by nie istniał. DOMContentLoaded gwarantuje, że główny
+     skrypt już się wykonał.
+
+     KONFIG — do zmiany w każdej chwili:
+       REFLEX_TARGET_WEEK  (niżej w <script>) — na który tydzień to ma być
+       REFLEX_THRESHOLD_MS (niżej w <script>) — próg w ms
+       REFLEX_CODE          (niżej w <script>) — kod, który się odsłania
+
+     Blok korzysta z Twoich zmiennych motywu (--surface, --ink, --correct,
+     --wrong, --gold, --line, --ink2) — z fallbackami na wartości trybu
+     ciemnego, więc jeśli otworzysz ten plik osobno, wygląda sensownie,
+     ale docelowo ma dziedziczyć prawdziwe wartości z klodka.html.
+     Klasy .weekly-hint / .hint-kicker są celowo ponownie użyte z
+     klodka.html (nie duplikuję ich tutaj) — pasek karty i chowanie/
+     pokazywanie na tryb dzienny/tygodniowy działają przez nie.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<div class="weekly-hint reflex-hint" id="weeklyHintGame">
+  <span class="hint-kicker">Zagadka tygodnia</span>
+  <button type="button" class="rx-stage" id="rxStage" aria-describedby="rxStatus">
+    <div class="rx-inner" id="rxInner">
+      <div class="rx-title">Test refleksu</div>
+      <div class="rx-sub">Kliknij, poczekaj na zielone, kliknij najszybciej jak umiesz.</div>
+    </div>
+  </button>
+  <div class="rx-status" id="rxStatus" aria-live="polite">Gotowy do startu</div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+.reflex-hint{padding:0;overflow:hidden}
+.reflex-hint .hint-kicker{padding:11px 13px 0}
+
+.rx-stage{display:flex;width:100%;height:188px;align-items:center;justify-content:center;
+  margin-top:8px;padding:0 22px;text-align:center;position:relative;
+  background:var(--surface,#262018);transition:background .12s}
+.rx-stage.wait{background:var(--wrong,#c06a55)}
+.rx-stage.go{background:var(--correct,#4a9a6a)}
+
+.rx-inner,.rx-status,.rx-again{font-family:'VT323',monospace}
+
+.rx-title{font-size:27px;line-height:1.1;color:var(--ink,#ede5d0)}
+.rx-sub{font-size:17px;line-height:1.3;margin-top:5px;color:var(--ink2,#9a907a)}
+.rx-stage.wait .rx-title,.rx-stage.wait .rx-sub,
+.rx-stage.go .rx-title,.rx-stage.go .rx-sub{color:#f7f0df}
+
+.rx-code{position:absolute;transform:translate(-50%,-50%);
+  font-family:'VT323',monospace;font-size:56px;letter-spacing:.14em;color:#f7f0df}
+
+.rx-status{font-size:17px;text-align:center;color:var(--ink2,#9a907a);padding:5px 13px 12px}
+.rx-again{margin-left:6px;text-decoration:underline;font-size:17px;color:var(--gold,#c49050)}
+</style>
+
+<script>
+(function(){
+  var REFLEX_TARGET_WEEK  = 3; // tydzień 3 = 07.07–13.07.2026
+  var REFLEX_THRESHOLD_MS = 350;
+  var REFLEX_CODE = "5701";
+
+  /* czeka, aż główny <script> klodka.html policzy WEEK_NO (ten blok
+     siedzi w HTML wcześniej niż ten skrypt) */
+  document.addEventListener('DOMContentLoaded', function(){
+    var gameEl = document.getElementById('weeklyHintGame');
+    if(!gameEl) return;
+
+    if(typeof WEEK_NO !== 'undefined' && WEEK_NO !== REFLEX_TARGET_WEEK){
+      gameEl.remove(); // inny tydzień W klodka.html — #weeklyHint działa normalnie, tego bloku jakby nie było
+      return;
+    }
+    /* brak WEEK_NO (plik otwarty samodzielnie, poza klodka.html — czyli
+       podgląd) NIE chowa bloku — inaczej podgląd zawsze byłby pustą stroną */
+
+    var hintEl = document.getElementById('weeklyHint');
+    var stage  = document.getElementById('rxStage');
+    var inner  = document.getElementById('rxInner');
+    var status = document.getElementById('rxStatus');
+
+    /* pokazuj/chowaj razem z oryginalnym #weeklyHint, bez podpinania się
+       pod wewnętrzne zmienne klodka.html (mniej kruche na przyszłe zmiany) */
+    function syncVisibility(){
+      gameEl.classList.toggle('on', hintEl.classList.contains('on'));
+    }
+    if(hintEl){
+      syncVisibility();
+      new MutationObserver(syncVisibility).observe(hintEl, {attributes:true, attributeFilter:['class']});
+    } else {
+      gameEl.classList.add('on');
+    }
+
+    var phase = 'idle'; // idle -> wait -> go -> idle | done
+    var timer = null;
+    var goAt = 0;
+
+    function clearCode(){
+      var old = stage.querySelector('.rx-code');
+      if(old) old.remove();
+    }
+
+    function startRound(){
+      clearCode();
+      phase = 'wait';
+      stage.className = 'rx-stage wait';
+      inner.innerHTML = '<div class="rx-sub">Czekaj…</div>';
+      status.textContent = 'Nie klikaj jeszcze';
+      var delay = 1100 + Math.random() * 2600;
+      timer = setTimeout(function(){
+        phase = 'go';
+        goAt = performance.now();
+        stage.className = 'rx-stage go';
+        inner.innerHTML = '';
+      }, delay);
+    }
+
+    function armReplay(){
+      var again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'rx-again';
+      again.textContent = 'zagraj ponownie';
+      again.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        clearCode();
+        phase = 'idle';
+        stage.className = 'rx-stage';
+        inner.innerHTML = '<div class="rx-sub">Kliknij, aby zagrać ponownie.</div>';
+        status.textContent = 'Gotowy do startu';
+      });
+      status.appendChild(again);
+    }
+
+    stage.addEventListener('click', function(e){
+      if(phase === 'idle'){
+        startRound();
+        return;
+      }
+
+      if(phase === 'wait'){
+        clearTimeout(timer);
+        phase = 'idle';
+        stage.className = 'rx-stage';
+        inner.innerHTML = '<div class="rx-sub">Za wcześnie. Kliknij, aby spróbować jeszcze raz.</div>';
+        status.textContent = 'Fałszywy start';
+        return;
+      }
+
+      if(phase === 'go'){
+        var ms = Math.round(performance.now() - goAt);
+        var rect = stage.getBoundingClientRect();
+        var cx, cy;
+        if(e.detail === 0){ // aktywacja klawiaturą — brak sensownej pozycji kursora
+          cx = rect.width / 2; cy = rect.height / 2;
+        } else {
+          cx = e.clientX - rect.left; cy = e.clientY - rect.top;
+        }
+        cx = Math.min(Math.max(cx, 80), rect.width - 80);
+        cy = Math.min(Math.max(cy, 36), rect.height - 36);
+
+        if(ms < REFLEX_THRESHOLD_MS){
+          phase = 'done';
+          inner.innerHTML = '';
+          var code = document.createElement('div');
+          code.className = 'rx-code';
+          code.style.left = cx + 'px';
+          code.style.top = cy + 'px';
+          code.textContent = REFLEX_CODE;
+          stage.appendChild(code);
+          status.textContent = ms + ' ms — trafiony refleks.';
+          armReplay();
+        } else {
+          phase = 'idle';
+          inner.innerHTML = '<div class="rx-title">' + ms + ' ms</div><div class="rx-sub">Za wolno, trzeba poniżej ' + REFLEX_THRESHOLD_MS + ' ms. Kliknij, aby spróbować jeszcze raz.</div>';
+          status.textContent = ms + ' ms — spróbuj jeszcze raz';
+        }
+        return;
+      }
+      /* phase === 'done': celowo nic nie robimy — kod ma zostać widoczny,
+         dopóki gracz sam nie kliknie „zagraj ponownie” */
+    });
+  });
+})();
+</script>
