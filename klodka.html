@@ -482,7 +482,7 @@ footer a{color:var(--green);font-weight:600}
           armReplay();
         } else {
           phase = 'idle';
-          inner.innerHTML = '<div class="rx-title">' + ms + ' ms</div><div class="rx-sub">Za wolno, trzeba poniżej ' + REFLEX_THRESHOLD_MS + ' ms. Kliknij, aby spróbować jeszcze raz.</div>';
+          inner.innerHTML = '<div class="rx-title">' + ms + ' ms</div><div class="rx-sub">Za wolno. Kliknij, aby spróbować jeszcze raz.</div>';
           status.textContent = ms + ' ms — spróbuj jeszcze raz';
         }
         return;
