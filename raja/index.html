@@ -83,7 +83,7 @@ header{width:100%;padding:14px 2px 10px}
 .result .src{display:none}
 .share{margin-top:14px;width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--green);color:var(--green);font-family:"Oswald";font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:14px;background:transparent}
 [data-theme=dark] .share{border-color:var(--gold);color:var(--gold)}
-.hintbar{align-items:center;justify-content:center;gap:9px;margin:-2px 0 14px;min-height:32px;text-align:center}
+.hintbar{align-items:center;justify-content:center;gap:9px;margin:2px 0 12px;min-height:32px;text-align:center}
 .hint-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;border:1.5px solid var(--gold);color:var(--gold);background:transparent;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .hint-btn:hover{background:var(--surface2)}
 .hint-btn[disabled]{opacity:.45;cursor:default}
@@ -303,6 +303,59 @@ header{width:100%;padding:14px 2px 10px}
   .daynav .wk{min-width:128px}
   .row{padding:10px;gap:9px}
 }
+
+/* v99: podpowiedź i lista jako jeden pionowy blok */
+.raja-stack{
+  width:100%!important;
+  max-width:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:12px!important;
+  grid-column:1 / -1!important;
+  clear:both!important;
+  float:none!important;
+}
+.raja-stack #hintBar{
+  order:1!important;
+  width:100%!important;
+  max-width:none!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  margin:0!important;
+  padding:0!important;
+  grid-column:1 / -1!important;
+  clear:both!important;
+  float:none!important;
+}
+.raja-stack #hintBtn,
+.raja-stack .hint-btn{
+  width:100%!important;
+  max-width:100%!important;
+  min-height:48px!important;
+  margin:0!important;
+}
+.raja-stack #list{
+  order:2!important;
+  width:100%!important;
+  max-width:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:9px!important;
+  margin:0!important;
+  padding:0!important;
+  clear:both!important;
+  float:none!important;
+}
+.raja-stack #list .row{
+  width:100%!important;
+}
+#attempts,#checkBtn{
+  clear:both!important;
+  grid-column:1 / -1!important;
+}
+
 </style>
 </head>
 <body>
@@ -348,16 +401,14 @@ header{width:100%;padding:14px 2px 10px}
     <div class="dir"><span id="dirArrow" class="arrow">↓</span><span id="dirText">od najmniejszej wartości do największej</span></div>
   </section>
 
-
-  <div id="hintBar" class="hintbar" style="display:none">
+  <section class="raja-stack" aria-label="Układanie kolejności">
+    <div id="hintBar" class="hintbar" style="display:none">
     <button id="hintBtn" class="hint-btn" type="button">Pokaż podpowiedź</button>
     <div id="hintMsg" class="hint-msg"></div>
-
-
-  <ol id="list" class="list"></ol>
   </div>
-
-  <div id="attempts" class="attempts"></div>
+    <ol id="list" class="list"></ol>
+  </section>
+<div id="attempts" class="attempts"></div>
   <button id="checkBtn" class="cta-check" type="button" style="display:none">Sprawdź</button>
 
   <section id="result" class="result">
@@ -940,7 +991,7 @@ applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
 loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v94 hint on top");
+console.info("Szpilplac raja/index.html v99 hint stacked correct");
 })();
 </script>
 
