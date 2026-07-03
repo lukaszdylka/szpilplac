@@ -1767,6 +1767,7 @@ var COPY = {
     done:"Zagrane",
     doneToday:"Zagrane dzisiaj",
     doneWeek:"Zagrane w tym tygodniu",
+    rajaStart:"Start jutro",
     soon:"Wkrótce",
     familock:"Familock",
     erName:"Escape Room Familock",
@@ -1862,6 +1863,7 @@ var COPY = {
     done:"Zagrane",
     doneToday:"Zagrane dzisiej",
     doneWeek:"Zagrane w tym tydniu",
+    rajaStart:"Start jutro",
     soon:"Niydugo",
     familock:"Familock",
     erName:"Escape Room Familock",
@@ -2114,8 +2116,8 @@ async function loadProfile(){
           markAccountPlayed("klodka","daily",no);
         }
 
-        if(g === "zorta" && no === WEEK_IDX + 1 && isRecentForTile(row,"zorta")){
-          markAccountPlayed("zorta",mode || "weekly",no);
+        if(g === "zorta" && mode === "daily" && no === RAJA_DAY_NO && isRecentForTile(row,"zorta")){
+          markAccountPlayed("zorta","daily",no);
         }
       });
     }
@@ -2147,6 +2149,14 @@ function warsawDateKey(){
 var DAY_IDX = warsawDayIndex();
 var DAY_NO = DAY_IDX + 1;
 var WEEK_IDX = Math.max(0,Math.floor(DAY_IDX / 7));
+function rajaDayIndexRaw(){
+  var p = warsawParts(new Date());
+  return Math.floor((Date.UTC(p.year,p.month-1,p.day)-Date.UTC(2026,6,4))/86400000);
+}
+var RAJA_DAY_RAW = rajaDayIndexRaw();
+var RAJA_STARTED = RAJA_DAY_RAW >= 0;
+var RAJA_DAY_IDX = Math.max(0,RAJA_DAY_RAW);
+var RAJA_DAY_NO = RAJA_DAY_IDX + 1;
 function parseStored(k){
   try{return JSON.parse(store.get(k) || "null");}
   catch(e){return null;}
@@ -2186,8 +2196,7 @@ function isRecentForTile(row, game){
   if(!row || !row.finished_at)return false;
   var d = new Date(row.finished_at);
   if(isNaN(d.getTime()))return false;
-  if(game === "slowko" || game === "klodka")return warsawDateKey(d) === TODAY_DATE_KEY;
-  if(game === "zorta" || game === "raja")return mondayKeyFor(d) === WEEK_DATE_KEY;
+  if(game === "slowko" || game === "klodka" || game === "zorta" || game === "raja")return warsawDateKey(d) === TODAY_DATE_KEY;
   return false;
 }
 function normalizeGameId(game){
@@ -2235,11 +2244,12 @@ function playedCuzamen(){
   return !!(cg && sameTodayDate(cg.date) && cg.finished === true);
 }
 function playedRaja(){
-  if(accountHasPlayed("zorta",WEEK_IDX + 1) || accountHasPlayed("raja",WEEK_IDX + 1))return true;
-  var st = parseStored("zorta_d" + WEEK_IDX);
+  if(!RAJA_STARTED)return false;
+  if(accountHasPlayed("zorta",RAJA_DAY_NO,"daily") || accountHasPlayed("raja",RAJA_DAY_NO,"daily"))return true;
+  var st = parseStored("zorta_daily_d" + RAJA_DAY_IDX);
   if(isFinishedGame(st))return true;
-  var zs = parseStored("zorta_stats_v1");
-  var r = zs && zs.weeks && zs.weeks[String(WEEK_IDX + 1)];
+  var zs = parseStored("zorta_daily_stats_v1");
+  var r = zs && zs.days && zs.days[String(RAJA_DAY_IDX)];
   return !!(r && (r.won === true || r.won === false));
 }
 function playedGame(id){
@@ -2257,11 +2267,14 @@ function gameHref(id){
 }
 function statusLabelForGame(id,isPlayed){
   var p = pack();
-  var weekly = id === "zorta" || id === "raja";
-  if(isPlayed){
-    return weekly ? (p.doneWeek || p.done || "Zagrane") : (p.doneToday || p.done || "Zagrane");
+  if(id === "zorta" || id === "raja"){
+    if(!RAJA_STARTED)return p.rajaStart || "Start jutro";
+    return isPlayed ? (p.doneToday || p.done || "Zagrane") : (p.playToday || p.live || "Dzisiaj");
   }
-  return weekly ? (p.playWeek || p.weekly || "Tydzień") : (p.playToday || p.live || "Dzisiaj");
+  if(isPlayed){
+    return p.doneToday || p.done || "Zagrane";
+  }
+  return p.playToday || p.live || "Dzisiaj";
 }
 function renderGames(){
   var p = pack();
@@ -2759,7 +2772,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v87 cookies visible fix");
+console.info("Szpilplac index.html v93 raja daily status");
 </script>
 
 <script>

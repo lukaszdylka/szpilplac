@@ -127,6 +127,7 @@ header{width:100%;padding:14px 2px 10px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .notice{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;margin:0 0 14px;font-size:13px;line-height:1.45;color:var(--ink2);text-align:center}
 .notice b{font-family:"Oswald";text-transform:uppercase;letter-spacing:.04em;color:var(--ink);font-size:15px}
+.start-locked{display:grid;gap:10px;text-align:center}.start-locked .big{font-family:Oswald;text-transform:uppercase;font-size:22px;color:var(--ink)}.start-locked .small{font-size:13px;color:var(--ink2);line-height:1.45}
 .foot{margin-top:auto;padding-top:22px;text-align:center}
 .foot a{color:var(--green);font-weight:800;text-decoration:none;font-size:13px}
 [data-theme=dark] .foot a{color:var(--gold)}
@@ -480,11 +481,16 @@ function warsawDay(d){
   p.forEach(function(x){if(x.type!=="literal")o[x.type]=Number(x.value);});
   return Date.UTC(o.year,o.month-1,o.day);
 }
-function todayIndex(){return Math.max(0,Math.floor((warsawDay(new Date())-EPOCH_UTC)/86400000));}
+function todayIndexRaw(){return Math.floor((warsawDay(new Date())-EPOCH_UTC)/86400000);}
+function todayIndex(){return Math.max(0,todayIndexRaw());}
+var TODAY_IDX_RAW=todayIndexRaw();
+var RAJA_STARTED=(TODAY_IDX_RAW>=0);
 var TODAY_IDX=todayIndex();
 var currentDay=TODAY_IDX;
 
 window.TODAY_IDX=TODAY_IDX;
+window.TODAY_IDX_RAW=TODAY_IDX_RAW;
+window.RAJA_STARTED=RAJA_STARTED;
 window.currentDay=currentDay;
 window.MAX_TRIES=MAX_TRIES;
 window.IS_TESTER=IS_TESTER;
@@ -592,6 +598,8 @@ window.hintData=hintData;
 function syncGlobals(){
   window.currentDay=currentDay;
   window.TODAY_IDX=TODAY_IDX;
+window.TODAY_IDX_RAW=TODAY_IDX_RAW;
+window.RAJA_STARTED=RAJA_STARTED;
   window.meta=meta;
   window.order=order;
   window.guessHistory=guessHistory;
@@ -802,7 +810,23 @@ function finishUp(won){
     trackEvent({game:"zorta",puzzle_no:currentDay+1,puzzle_word:meta?meta.kategoria:"raja",won:won,tries:guessHistory.length,lang:lang,hint_used:!!hintData,mode:"daily"});
   }
 }
+function showPreStart(){
+  currentDay=0;
+  window.currentDay=currentDay;
+  var prev=$("prevDay"), next=$("nextDay");
+  if(prev)prev.disabled=true;
+  if(next)next.disabled=true;
+  $("dayLabel").innerHTML="Raja<small>start 04.07.2026</small>";
+  $("result").classList.remove("show");
+  $("banner").style.display="none";
+  $("list").innerHTML="";
+  $("attempts").style.display="none";
+  $("checkBtn").style.display="none";
+  $("hintBar").style.display="none";
+  showNotice('<div class="start-locked"><div class="big">Raja startuje jutro</div><div class="small">Pierwsza codzienna Raja rusza 04.07.2026. Od tego dnia będzie można wracać do archiwum, ale nie wcześniej niż do dnia 1.</div></div>');
+}
 function loadDay(d){
+  if(!RAJA_STARTED){showPreStart();return;}
   d=Number(d);
   if(!isFinite(d))d=TODAY_IDX;
   d=Math.max(0,Math.floor(d));
@@ -828,6 +852,7 @@ function loadDay(d){
   });
 }
 function updateDayNav(){
+  if(!RAJA_STARTED){showPreStart();return;}
   var prev=$("prevDay"), next=$("nextDay");
   if(prev)prev.disabled=(currentDay<=0);
   if(next)next.disabled=(!IS_TESTER && currentDay>=TODAY_IDX);
@@ -906,14 +931,14 @@ $("hintBtn").addEventListener("click",useHint);
 $("checkBtn").addEventListener("click",check);
 $("shareBtn").addEventListener("click",share);
 var prevBtn=$("prevDay"), nextBtn=$("nextDay");
-if(prevBtn)prevBtn.addEventListener("click",function(){if(currentDay>0)loadDay(currentDay-1);});
-if(nextBtn)nextBtn.addEventListener("click",function(){if(IS_TESTER||currentDay<TODAY_IDX)loadDay(currentDay+1);});
+if(prevBtn)prevBtn.addEventListener("click",function(){if(RAJA_STARTED&&currentDay>0)loadDay(currentDay-1);});
+if(nextBtn)nextBtn.addEventListener("click",function(){if(RAJA_STARTED&&(IS_TESTER||currentDay<TODAY_IDX))loadDay(currentDay+1);});
 
 applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
-loadConfig().then(function(){loadDay(TODAY_IDX);}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v92 archive from july4 old icons");
+loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
+console.info("Szpilplac raja/index.html v93 start guard interleaved");
 })();
 </script>
 
@@ -945,7 +970,7 @@ console.info("Szpilplac raja/index.html v92 archive from july4 old icons");
 </script>
 
 <script src="../coffee.js"></script>
-<script src="raja-auth-bridge.js?v=92"></script>
-<script src="../game-result-actions.js?v=92"></script>
+<script src="raja-auth-bridge.js?v=93"></script>
+<script src="../game-result-actions.js?v=93"></script>
 </body>
 </html>
