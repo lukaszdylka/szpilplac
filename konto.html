@@ -703,6 +703,13 @@ svg{
   }
 }
 
+
+/* v96 konto footer dedupe */
+.site-footer .footer-nav{display:none!important}
+.site-footer .footer-legal + .footer-legal{display:none!important}
+.site-footer .footer-legal a{color:var(--green);font-weight:900}
+.site-footer .footer-legal a:hover{color:var(--gold)}
+
 </style>
 </head>
 <body>
@@ -877,8 +884,6 @@ svg{
   </div>
 
   <div class="footer-legal">
-    <a href="nowosci.html" id="footerNews">Nowości</a>
-    <span>·</span>
     <a href="regulamin.html" id="footerTerms">Regulamin</a>
     <span>·</span>
     <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
@@ -904,7 +909,7 @@ svg{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v78 clean achievements");
+console.info("Szpilplac konto.html v96 footer dedupe");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -1652,6 +1657,36 @@ boot();
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootCookies);
   else bootCookies();
+})();
+</script>
+
+
+<script>
+(function(){
+  "use strict";
+  function cleanKontoFooter(){
+    var footer = document.querySelector(".site-footer");
+    if(!footer)return;
+
+    footer.querySelectorAll(".footer-nav").forEach(function(el){ el.remove(); });
+    footer.querySelectorAll(".footer-legal").forEach(function(el){ el.remove(); });
+
+    var legal = document.createElement("div");
+    legal.className = "footer-legal";
+    legal.innerHTML =
+      '<a href="regulamin.html" id="footerTerms">Regulamin</a>'+
+      '<span>·</span>'+
+      '<a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>'+
+      '<span>·</span>'+
+      '<a href="cookies.html" id="footerCookies">Cookies</a>'+
+      '<span>·</span>'+
+      '<a href="mailing.html" id="footerMailing">Mailing</a>';
+    footer.appendChild(legal);
+  }
+  if(document.readyState === "loading")document.addEventListener("DOMContentLoaded", cleanKontoFooter);
+  else cleanKontoFooter();
+  setTimeout(cleanKontoFooter, 150);
+  setTimeout(cleanKontoFooter, 800);
 })();
 </script>
 
