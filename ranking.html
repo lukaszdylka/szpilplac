@@ -1163,9 +1163,12 @@ function renderLang(){
   document.getElementById("tabWeekly").textContent = t("tabWeekly");
   document.getElementById("tabAll").textContent = t("tabAll");
   document.getElementById("refreshBtn").textContent = t("refresh");
-  document.getElementById("footerHome").textContent = t("footerHome");
-  document.getElementById("footerAccount").textContent = t("footerAccount");
-  document.getElementById("footerFamilock").textContent = t("footerFamilock");
+  var footerHome = document.getElementById("footerHome");
+  var footerAccount = document.getElementById("footerAccount");
+  var footerFamilock = document.getElementById("footerFamilock");
+  if(footerHome)footerHome.textContent = t("footerHome");
+  if(footerAccount)footerAccount.textContent = t("footerAccount");
+  if(footerFamilock)footerFamilock.textContent = t("footerFamilock");
   renderAccount();
   renderRules();
 }
@@ -1271,7 +1274,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v64 mobile fit");
+console.info("Szpilplac ranking.html v84 / previous v64 mobile fit");
 boot();
 </script>
 <script>

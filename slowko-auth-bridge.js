@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v79
+  Szpilplac Słōwko Account Bridge v83
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v79";
+  var VERSION = "v83";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 
   var STATE = {
@@ -19,6 +19,91 @@
     crossDeviceApplied:false,
     saveStartedAt:0
   };
+
+
+  function todayIdx(){
+    try{
+      if(typeof window.TODAY_IDX === "number")return window.TODAY_IDX;
+      if(typeof window.todayIndex === "function")return window.todayIndex();
+    }catch(e){}
+    return null;
+  }
+
+  function storageGet(k){
+    try{return localStorage.getItem(k);}catch(e){return null;}
+  }
+
+  function storageSet(k,v){
+    try{localStorage.setItem(k,v);}catch(e){}
+  }
+
+  function resetDailyAssistDefaults(){
+    /*
+      v83:
+      Kategoria i tłumaczenie są podpowiedziami.
+      Nie mogą przechodzić automatycznie z poprzedniego dnia,
+      bo gracz mógłby stracić odznakę "Bez Podpowiydzi" przez stary zapis.
+      Reset jest raz dziennie. W tym samym dniu świadomy wybór gracza zostaje.
+    */
+    var idx = todayIdx();
+    if(idx === null || !Number.isFinite(Number(idx)))return;
+
+    var resetKey = "slowko_assist_reset_day_v83";
+    var today = String(idx);
+
+    if(storageGet(resetKey) === today)return;
+
+    storageSet("slowko_hint","off");
+    storageSet("slowko_cat","off");
+    storageSet(resetKey,today);
+
+    try{window.hintMode = "off";}catch(e){}
+    try{window.catMode = "off";}catch(e){}
+    try{window.hintShown = false;}catch(e){}
+    try{window.categoryShown = false;}catch(e){}
+    try{window.hintsUsed = 0;}catch(e){}
+
+    try{
+      if(typeof window.updateHintBar === "function")window.updateHintBar();
+      if(typeof window.updateCatBar === "function")window.updateCatBar();
+    }catch(e){}
+  }
+
+  function patchAssistUsageTracking(){
+    if(typeof window.updateCatBar === "function" && !window.updateCatBar.__szpV83){
+      var originalCat = window.updateCatBar;
+      window.updateCatBar = function(){
+        var ret = originalCat.apply(this, arguments);
+        try{
+          var el = document.getElementById("catBar");
+          if(el && el.style.display !== "none" && String(el.textContent || "").trim()){
+            window.categoryShown = true;
+            window.hintsUsed = Math.max(Number(window.hintsUsed || 0), 1);
+          }
+        }catch(e){}
+        return ret;
+      };
+      window.updateCatBar.__szpV83 = true;
+    }
+
+    if(typeof window.updateHintBar === "function" && !window.updateHintBar.__szpV83){
+      var originalHint = window.updateHintBar;
+      window.updateHintBar = function(){
+        var ret = originalHint.apply(this, arguments);
+        try{
+          var el = document.getElementById("hintBar");
+          if(el && el.style.display !== "none" && String(el.textContent || "").trim().indexOf("???") === -1){
+            if(window.hintShown){
+              window.hintsUsed = Math.max(Number(window.hintsUsed || 0), 1);
+            }
+          }
+        }catch(e){}
+        return ret;
+      };
+      window.updateHintBar.__szpV83 = true;
+    }
+  }
+
 
   var TEXT = {
     pl:{
@@ -423,6 +508,9 @@
     if(STATE.booted)return;
     STATE.booted = true;
 
+    resetDailyAssistDefaults();
+    patchAssistUsageTracking();
+
     console.info("Szpilplac slowko-auth-bridge.js " + VERSION);
 
     ensureDeps()
@@ -432,6 +520,9 @@
     var tries = 0;
     var timer = setInterval(function(){
       tries++;
+      resetDailyAssistDefaults();
+      patchAssistUsageTracking();
+
       var ok1 = wrapShowEnd();
       var ok2 = wrapFinish();
 
@@ -442,6 +533,7 @@
       if((ok1 || typeof window.showEnd === "function") &&
          (ok2 || typeof window.finish === "function")){
         clearInterval(timer);
+        patchAssistUsageTracking();
         setTimeout(hydrateAccountResult,900);
       }
 
