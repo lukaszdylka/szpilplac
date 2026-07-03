@@ -703,6 +703,101 @@ footer.site-footer{
   color:var(--green);
   text-decoration:underline;
 }
+
+.footer-head{
+  margin:0 0 4px;
+  color:var(--ink);
+  font-size:13px;
+  font-weight:900;
+}
+.footer-copy{
+  margin:0 0 12px;
+  color:var(--ink2);
+  font-size:11px;
+  line-height:1.5;
+}
+.cookie-banner{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  z-index:9998;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  max-width:980px;
+  margin:0 auto;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(38,32,24,.96);
+  color:#ede5d0;
+  box-shadow:0 24px 70px -35px rgba(0,0,0,.75);
+}
+.cookie-banner[hidden]{display:none !important}
+.cookie-banner__text strong{
+  display:block;
+  font-size:13px;
+  margin-bottom:4px;
+}
+.cookie-banner__text p{
+  margin:0;
+  font-size:12px;
+  line-height:1.5;
+  color:#d1c5ad;
+}
+.cookie-banner__text a{
+  display:inline-block;
+  margin-top:6px;
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+  text-decoration:underline;
+}
+.cookie-banner__actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.cookie-btn{
+  min-height:40px;
+  border-radius:999px;
+  border:1px solid #5a503d;
+  padding:10px 14px;
+  font-size:12px;
+  font-weight:900;
+}
+.cookie-btn--ghost{
+  background:transparent;
+  color:#ede5d0;
+}
+.cookie-btn--solid{
+  background:#4a7a56;
+  color:#fff;
+  border-color:#4a7a56;
+}
+.cookie-btn:hover{transform:translateY(-1px)}
+.cookie-btn--ghost:hover{background:rgba(255,255,255,.05)}
+.cookie-btn--solid:hover{filter:brightness(1.05)}
+@media(max-width:760px){
+  .cookie-banner{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:13px;
+  }
+  .cookie-banner__actions{
+    justify-content:stretch;
+  }
+  .cookie-btn{
+    width:100%;
+  }
+}
+
 .modal-scrim{
   position:fixed;
   inset:0;
@@ -1480,6 +1575,9 @@ svg{
 </main>
 
 <footer class="site-footer">
+  <div class="footer-head">Szpilplac i Familock</div>
+  <div class="footer-copy">Zajrzyj też do naszych miejsc i ważnych informacji.</div>
+
   <div class="footer-icons" aria-label="Familock w social mediach">
     <a href="https://dylka.pl" target="_blank" rel="noopener" aria-label="Łukasz Dyłka">
       <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6" r="3"/><path d="M4 18c.9-4 3-6 6-6s5.1 2 6 6"/></svg>
@@ -1498,13 +1596,9 @@ svg{
     </a>
   </div>
 
-  <nav class="footer-nav" aria-label="Nawigacja">
-    <a href="/">Szpilplac</a>
-    <a href="ranking.html">Ranking</a>
-    <a href="konto.html">Konto</a>
-  </nav>
-
   <div class="footer-legal">
+    <a href="nowosci.html" id="footerNews">Nowości</a>
+    <span>·</span>
     <a href="regulamin.html" id="footerTerms">Regulamin</a>
     <span>·</span>
     <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
@@ -1514,6 +1608,19 @@ svg{
     <a href="mailing.html" id="footerMailing">Mailing</a>
   </div>
 </footer>
+
+<div class="cookie-banner" id="cookieBanner" hidden>
+  <div class="cookie-banner__text">
+    <strong>Cookies w Szpilplacu</strong>
+    <p>Używamy niezbędnych plików cookies, żeby strona działała poprawnie. Za Twoją zgodą możemy też zapisać pozostałe ustawienia opisane w polityce cookies.</p>
+    <a href="cookies.html">Zobacz szczegóły</a>
+  </div>
+  <div class="cookie-banner__actions">
+    <button type="button" class="cookie-btn cookie-btn--ghost" id="cookieRequiredBtn">Akceptuję tylko wymagane</button>
+    <button type="button" class="cookie-btn cookie-btn--solid" id="cookieAllBtn">Akceptuję wszystkie</button>
+  </div>
+</div>
+
 
 <div class="modal-scrim" id="authScrim">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -1613,6 +1720,7 @@ var COPY = {
     play:"Zagraj w Słōwko",
     ranking:"Ranking",
     weekly:"Tydzień",
+    footerNews:"Nowości",
     footerTerms:"Regulamin",
     footerPrivacy:"Prywatność",
     footerCookies:"Cookies",
@@ -1706,6 +1814,7 @@ var COPY = {
     play:"Szpilej w Słōwko",
     ranking:"Ranking",
     weekly:"Tydziyń",
+    footerNews:"Nowości",
     footerTerms:"Regulamin",
     footerPrivacy:"Prywatność",
     footerCookies:"Cookies",
@@ -2284,10 +2393,12 @@ function renderStatic(){
   document.getElementById("starzikName").textContent = p.starzikName;
   document.getElementById("starzikDesc").textContent = p.starzikDesc;
   document.getElementById("miniCard").innerHTML = '<b>'+esc(p.todayTitle)+'</b>'+esc(p.todayText);
+  var fn = document.getElementById("footerNews");
   var ft = document.getElementById("footerTerms");
   var fp = document.getElementById("footerPrivacy");
   var fc = document.getElementById("footerCookies");
   var fm = document.getElementById("footerMailing");
+  if(fn)fn.textContent = p.footerNews || "Nowości";
   if(ft)ft.textContent = p.footerTerms || "Regulamin";
   if(fp)fp.textContent = p.footerPrivacy || "Prywatność";
   if(fc)fc.textContent = p.footerCookies || "Cookies";
@@ -2606,5 +2717,49 @@ renderPlayer();
 refreshHome();
 console.info("Szpilplac index.html v71 fixed account menu");
 </script>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "szpilplac_cookie_consent_v1";
+  function saveConsent(all){
+    try{
+      localStorage.setItem(KEY, JSON.stringify({required:true, all:!!all, saved_at:new Date().toISOString()}));
+    }catch(e){}
+    window.SZP_COOKIE_CONSENT = {required:true, all:!!all};
+  }
+  function readConsent(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(!raw)return null;
+      return JSON.parse(raw);
+    }catch(e){return null;}
+  }
+  function hideBanner(){
+    var el = document.getElementById('cookieBanner');
+    if(el) el.hidden = true;
+  }
+  function showBanner(){
+    var el = document.getElementById('cookieBanner');
+    if(el) el.hidden = false;
+  }
+  function bootCookies(){
+    var current = readConsent();
+    if(current){
+      window.SZP_COOKIE_CONSENT = current;
+      hideBanner();
+    }else{
+      showBanner();
+    }
+    var req = document.getElementById('cookieRequiredBtn');
+    var all = document.getElementById('cookieAllBtn');
+    if(req) req.addEventListener('click', function(){ saveConsent(false); hideBanner(); });
+    if(all) all.addEventListener('click', function(){ saveConsent(true); hideBanner(); });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootCookies);
+  else bootCookies();
+})();
+</script>
+
 </body>
 </html>
