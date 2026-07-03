@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v78";
+  var VERSION = "v79";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
@@ -310,8 +310,14 @@
     el.insertAdjacentHTML("beforeend", actionHtml());
     if(!el.hasAttribute("data-szp-achievements-checked")){
       el.setAttribute("data-szp-achievements-checked","1");
-      setTimeout(function(){checkAchievements("game_finished", inferMeta());},900);
-      setTimeout(function(){checkAchievements("game_finished", inferMeta());},2400);
+      /*
+        v79 safety:
+        Nie przyznajemy odznak za samo pojawienie się okna wyniku.
+        To okno może pojawić się po odtworzeniu zapisanego wyniku,
+        po wejściu na drugim urządzeniu albo po odświeżeniu strony.
+        Dzięki temu nie wpada fałszywie Gibki Umysł / Bez Podpowiydzi.
+        Wynik, rangi i podstawowe odznaki idą przez zapis w bazie oraz triggery.
+      */
     }
   }
   function scan(){
