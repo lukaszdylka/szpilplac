@@ -1,7 +1,7 @@
 /*
-  Szpilplac Raja Auth Bridge v80
-  - zapisuje wynik Rai na koncie
-  - blokuje ponowne granie na drugim urządzeniu, jeśli wynik tygodnia jest już zapisany na koncie
+  Szpilplac Cuzamen Auth Bridge v80
+  - dodaje zapis Cuzamen na koncie
+  - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany
 */
 (function(){
   "use strict";
@@ -14,22 +14,22 @@
   var attempts={};
 
   function injectStyle(){
-    if(document.getElementById("szpRajaAccountStyle"))return;
+    if(document.getElementById("szpCuzamenAccountStyle"))return;
     var style=document.createElement("style");
-    style.id="szpRajaAccountStyle";
+    style.id="szpCuzamenAccountStyle";
     style.textContent=
-      '.szp-account-save-note{margin:8px auto 0;max-width:340px;text-align:center;font-size:11.5px;line-height:1.35;color:var(--ink2,#6a6150);background:var(--surface2,#f3ecda);border:1px dashed var(--line,#c9bfa6);border-radius:999px;padding:7px 10px}.szp-account-save-note.ok{color:var(--green,#2f4a39);border-color:var(--green,#2f4a39)}.szp-account-save-note.err{color:var(--wrong,#a14b3a);border-color:var(--wrong,#a14b3a)}'+
+      '.szp-account-save-note{margin:8px auto 0;max-width:340px;text-align:center;font-size:11.5px;line-height:1.35;color:var(--ink2,#6a6150);background:var(--surface2,#f3ecda);border:1px dashed var(--line,#c9bfa6);border-radius:999px;padding:7px 10px}.szp-account-save-note.ok{color:var(--green,#2f4a39);border-color:var(--green,#2f4a39)}.szp-account-save-note.err{color:#a14b3a;border-color:#a14b3a}'+
       '.szp-account-done{margin:10px auto 12px;max-width:430px;text-align:center;font-size:12.5px;line-height:1.45;color:var(--ink,#23201a);background:var(--surface,#fbf7ee);border:1px solid var(--line,#c9bfa6);border-radius:13px;padding:11px 12px}.szp-account-done b{color:var(--green,#2f4a39)}';
     document.head.appendChild(style);
   }
   function setNote(text,type){
     injectStyle();
-    var el=document.getElementById("szpRajaAccountNote");
+    var el=document.getElementById("szpCuzamenAccountNote");
     if(!el){
       el=document.createElement("div");
-      el.id="szpRajaAccountNote";
+      el.id="szpCuzamenAccountNote";
       el.className="szp-account-save-note";
-      var host=document.getElementById("result")||document.querySelector(".wrap")||document.body;
+      var host=document.getElementById("toast")||document.querySelector("main")||document.body;
       if(host&&host.insertAdjacentElement)host.insertAdjacentElement("afterend",el);
       else document.body.appendChild(el);
     }
@@ -53,8 +53,8 @@
   }
   async function ensureClient(){
     await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",function(){return !!window.supabase;});
-    var url=window.SUPABASE_URL||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL);
-    var key=window.SUPABASE_ANON_KEY||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY);
+    var url=window.SUPABASE_URL||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL)||window.STATS_URL;
+    var key=window.SUPABASE_ANON_KEY||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY)||window.STATS_KEY;
     if(!url||!key)throw new Error("Brak konfiguracji Supabase");
     if(!sb)sb=window.supabase.createClient(url,key,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
     return sb;
@@ -83,51 +83,53 @@
     }
     return null;
   }
-  function scoreRaja(won,tries,hintUsed){
-    tries=Math.max(1,Math.min(4,Number(tries||4)));
-    if(!won)return 5;
-    var table=[150,120,90,60];
-    var score=table[tries-1]||60;
-    if(hintUsed)score=Math.max(20,score-25);
-    return score;
+  function puzzleNo(){
+    try{
+      if(window.SET&&Number.isFinite(Number(window.SET.no)))return Number(window.SET.no);
+    }catch(e){}
+    return 1;
   }
   function localFinished(){
     try{
-      if(window.status&&window.status!=="playing")return true;
-      if(typeof window.loadState==="function"){
-        var st=window.loadState(Number(window.currentWeek));
-        if(st&&st.status&&st.status!=="playing")return true;
+      if(window.finished)return true;
+      var raw=localStorage.getItem("cuzamen_v1");
+      if(raw){
+        var s=JSON.parse(raw);
+        if(s&&s.finished===true)return true;
       }
     }catch(e){}
     return false;
   }
+  function scoreCuzamen(won,errors){
+    errors=Math.max(0,Math.min(4,Number(errors||0)));
+    if(!won)return 5;
+    var table=[180,140,100,70,45];
+    return table[errors]||45;
+  }
   function snapshot(won){
-    var currentWeek=Number(window.currentWeek);
-    var thisWeek=Number(window.TW);
-    var tries=1;
-    try{tries=window.guessHistory&&Array.isArray(window.guessHistory)?Math.max(1,window.guessHistory.length):Number(window.MAX_TRIES||4);}
-    catch(e){tries=Number(window.MAX_TRIES||4);}
-    var hintUsed=false,demo=false,tester=false;
-    try{hintUsed=!!window.hintData;}catch(e){}
-    try{demo=!!window.DEMO;}catch(e){}
-    try{tester=!!window.IS_TESTER;}catch(e){}
-    return {game:"zorta",mode:"weekly",puzzleNo:currentWeek+1,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreRaja(!!won,tries,hintUsed),isCurrent:(!demo&&!tester&&currentWeek===thisWeek)};
+    var errors=Number(window.errors||0);
+    return {
+      game:"cuzamen",
+      mode:"daily",
+      puzzleNo:puzzleNo(),
+      won:!!won,
+      tries:errors,
+      errors:errors,
+      score:scoreCuzamen(!!won,errors),
+      isCurrent:true
+    };
   }
   async function saveResult(data){
-    if(!data||!data.isCurrent){
-      setNote("Archiwum/test Rai zostaje lokalnie — do rankingu zapisuje się tylko aktualny tydzień.","err");
-      return;
-    }
     var session=await getSession();
     if(!session||!session.user){
-      setNote("Grasz bez konta — wynik Rai został zapisany lokalnie.","");
+      setNote("Grasz bez konta — wynik Cuzamen został zapisany lokalnie.","");
       return;
     }
-    setNote("Zapisuję wynik Rai na koncie...","");
+    setNote("Zapisuję wynik Cuzamen na koncie...","");
     var client=await ensureClient();
     var res=await client.rpc("save_user_game_result",{p_game:data.game,p_mode:data.mode,p_puzzle_no:data.puzzleNo,p_won:data.won,p_tries:data.tries,p_errors:data.errors,p_score:data.score});
     if(res.error)throw res.error;
-    setNote("Wynik Rai zapisany na koncie. +"+data.score+" pkt","ok");
+    setNote("Wynik Cuzamen zapisany na koncie. +"+data.score+" pkt","ok");
   }
   function showAccountDone(row){
     if(!row||hydrated)return;
@@ -135,33 +137,30 @@
     hydrated=true;
     injectStyle();
 
-    try{window.status=row.won?"won":"lost";}catch(e){}
+    try{window.finished=true;}catch(e){}
 
-    var check=document.getElementById("checkBtn");
-    if(check)check.style.display="none";
-    var attempts=document.getElementById("attempts");
-    if(attempts)attempts.style.display="none";
+    var grid=document.getElementById("grid");
+    if(grid)grid.style.display="none";
+    var actions=document.querySelector(".actions");
+    if(actions)actions.style.display="none";
+    var tries=document.getElementById("tries");
+    if(tries)tries.style.display="none";
 
-    var box=document.getElementById("szpRajaAccountDone");
+    var box=document.getElementById("szpCuzamenAccountDone");
     if(!box){
       box=document.createElement("div");
-      box.id="szpRajaAccountDone";
+      box.id="szpCuzamenAccountDone";
       box.className="szp-account-done";
-      var banner=document.getElementById("banner")||document.querySelector(".wrap")||document.body;
-      if(banner&&banner.insertAdjacentElement)banner.insertAdjacentElement("afterend",box);
-      else document.body.appendChild(box);
+      var main=document.querySelector("main")||document.body;
+      main.insertAdjacentElement("afterbegin",box);
     }
     var result=row.won?"wygrana":"nieukończone";
-    var tries=row.tries?(" · "+row.tries+"/"+(window.MAX_TRIES||4)):"";
     var score=Number.isFinite(Number(row.score))?(" · Punkty: "+row.score):"";
-    box.innerHTML="<b>Ta Raja jest już zapisana na koncie.</b><br>Wynik z innego urządzenia: "+result+tries+score;
+    box.innerHTML="<b>Ten Cuzamen jest już zapisany na koncie.</b><br>Wynik z innego urządzenia: "+result+score;
   }
   async function hydrateAccountResult(){
     try{
       if(hydrated)return;
-      var currentWeek=Number(window.currentWeek);
-      var thisWeek=Number(window.TW);
-      if(!Number.isFinite(currentWeek)||currentWeek!==thisWeek)return;
       if(localFinished())return;
       var session=await getSession();
       if(!session||!session.user)return;
@@ -169,33 +168,33 @@
       var res=await client.from("user_game_results")
         .select("game,mode,puzzle_no,won,tries,score,created_at")
         .eq("user_id",session.user.id)
-        .eq("game","zorta")
-        .eq("mode","weekly")
-        .eq("puzzle_no",currentWeek+1)
+        .eq("game","cuzamen")
+        .eq("mode","daily")
+        .eq("puzzle_no",puzzleNo())
         .maybeSingle();
       if(!res.error&&res.data)showAccountDone(res.data);
     }catch(e){}
   }
   function hook(){
     if(patched)return true;
-    if(typeof window.finishUp!=="function")return false;
-    var original=window.finishUp;
-    window.finishUp=function(won){
+    if(typeof window.endGame!=="function")return false;
+    var original=window.endGame;
+    window.endGame=function(won){
       var data=snapshot(!!won);
       var ret=original.apply(this,arguments);
       var k=data.game+":"+data.mode+":"+data.puzzleNo;
       if(!attempts[k]){
         attempts[k]=true;
-        setTimeout(function(){saveResult(data).catch(function(err){console.warn("Raja account save error:",err);setNote("Nie udało się zapisać wyniku Rai na koncie.","err");});},80);
+        setTimeout(function(){saveResult(data).catch(function(err){console.warn("Cuzamen account save error:",err);setNote("Nie udało się zapisać wyniku Cuzamen na koncie.","err");});},100);
       }
       return ret;
     };
     patched=true;
-    console.info("Szpilplac raja-auth-bridge.js "+VERSION+" hooked");
+    console.info("Szpilplac cuzamen-auth-bridge.js "+VERSION+" hooked");
     return true;
   }
   function boot(){
-    console.info("Szpilplac raja-auth-bridge.js "+VERSION);
+    console.info("Szpilplac cuzamen-auth-bridge.js "+VERSION);
     setTimeout(hydrateAccountResult,700);
     setTimeout(hydrateAccountResult,1800);
     var tries=0,timer=setInterval(function(){
