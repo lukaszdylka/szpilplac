@@ -1507,6 +1507,13 @@ svg{
   }
 }
 
+
+.footer-legal #footerCookies{
+  display:inline !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
 </style>
 </head>
 <body>
@@ -2438,7 +2445,7 @@ function renderStatic(){
   }
   if(ft)ft.textContent = p.footerTerms || "Regulamin";
   if(fp)fp.textContent = p.footerPrivacy || "Prywatność";
-  if(fc)fc.textContent = p.footerCookies || "Cookies";
+  if(fc)fc.textContent = "Cookies";
   if(fm)fm.textContent = p.footerMailing || "Mailing";
   document.getElementById("langPl").className = lang() === "pl" ? "on" : "";
   document.getElementById("langSzl").className = lang() === "szl" ? "on" : "";
@@ -2752,7 +2759,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v86 news footer button");
+console.info("Szpilplac index.html v87 cookies visible fix");
 </script>
 
 <script>
@@ -2795,6 +2802,36 @@ console.info("Szpilplac index.html v86 news footer button");
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootCookies);
   else bootCookies();
+})();
+</script>
+
+
+<script>
+(function(){
+  "use strict";
+  function forceFooterLabels(){
+    var labels = {
+      footerTerms: "Regulamin",
+      footerPrivacy: "Prywatność",
+      footerCookies: "Cookies",
+      footerMailing: "Mailing"
+    };
+    Object.keys(labels).forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && !String(el.textContent || "").trim()){
+        el.textContent = labels[id];
+      }
+    });
+    var cookies = document.getElementById("footerCookies");
+    if(cookies)cookies.textContent = "Cookies";
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", forceFooterLabels);
+  }else{
+    forceFooterLabels();
+  }
+  setTimeout(forceFooterLabels, 250);
+  setTimeout(forceFooterLabels, 1000);
 })();
 </script>
 
