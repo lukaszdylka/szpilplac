@@ -778,6 +778,107 @@ svg{
 }
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
+
+/* v101 ranking: poprawka rozwalonego menu gracza */
+.player-menu,
+#playerMenu{
+  position:fixed!important;
+  z-index:9999!important;
+  width:300px!important;
+  min-width:300px!important;
+  max-width:min(300px, calc(100vw - 24px))!important;
+  box-sizing:border-box!important;
+  padding:14px!important;
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  background:var(--surface)!important;
+  box-shadow:0 24px 70px -35px rgba(0,0,0,.75)!important;
+  overflow:visible!important;
+  white-space:normal!important;
+}
+.player-menu.open,
+#playerMenu.open{
+  display:block!important;
+}
+.player-menu *,
+#playerMenu *{
+  box-sizing:border-box!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+}
+.player-menu-head{
+  padding:0 0 12px!important;
+  margin:0 0 10px!important;
+  border-bottom:1px solid var(--line)!important;
+}
+.player-menu-kicker{
+  color:var(--gold)!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  letter-spacing:.06em!important;
+}
+.player-menu-name{
+  margin-top:4px!important;
+  color:var(--ink)!important;
+  font-family:Oswald,system-ui,sans-serif!important;
+  font-size:22px!important;
+  line-height:1.05!important;
+  text-transform:uppercase!important;
+}
+.player-menu-meta{
+  margin-top:5px!important;
+  color:var(--ink2)!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.player-menu-actions{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+  width:100%!important;
+}
+.player-menu-actions a,
+.player-menu-actions button{
+  width:100%!important;
+  min-height:44px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  padding:10px 12px!important;
+  border:1px solid var(--line)!important;
+  border-radius:12px!important;
+  background:var(--surface2)!important;
+  color:var(--ink)!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  text-align:left!important;
+}
+.player-menu-actions a:hover,
+.player-menu-actions button:hover{
+  background:var(--surface)!important;
+  color:var(--green)!important;
+}
+.player-menu-actions .danger,
+.player-menu-actions button.danger{
+  color:var(--danger,#d76a4f)!important;
+}
+@media(max-width:560px){
+  .player-menu,
+  #playerMenu{
+    left:12px!important;
+    right:12px!important;
+    top:76px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1319,7 +1420,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v100 footer normalized");
+console.info("Szpilplac ranking.html v101 player menu fix");
 boot();
 </script>
 <script>
@@ -1519,5 +1620,57 @@ boot();
 })();
 </script>
 <script src="footer-normalizer.js?v=100"></script>
+
+<script>
+(function(){
+  "use strict";
+  function fixRankingPlayerMenuPosition(){
+    var menu = document.getElementById("playerMenu");
+    var btn = document.getElementById("playerMenuBtn");
+    if(!menu || !btn || !menu.classList.contains("open"))return;
+
+    var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    if(vw <= 560){
+      menu.style.left = "12px";
+      menu.style.right = "12px";
+      menu.style.top = "76px";
+      menu.style.width = "auto";
+      menu.style.minWidth = "0";
+      menu.style.maxWidth = "none";
+      return;
+    }
+
+    var rect = btn.getBoundingClientRect();
+    var width = Math.min(300, vw - 24);
+    var left = Math.round(rect.right - width);
+
+    if(left < 12)left = 12;
+    if(left + width > vw - 12)left = vw - width - 12;
+
+    menu.style.left = left + "px";
+    menu.style.right = "auto";
+    menu.style.top = Math.round(rect.bottom + 10) + "px";
+    menu.style.width = width + "px";
+    menu.style.minWidth = width + "px";
+    menu.style.maxWidth = width + "px";
+  }
+
+  document.addEventListener("click", function(){
+    setTimeout(fixRankingPlayerMenuPosition, 0);
+    setTimeout(fixRankingPlayerMenuPosition, 40);
+  }, true);
+
+  window.addEventListener("resize", fixRankingPlayerMenuPosition);
+  window.addEventListener("scroll", fixRankingPlayerMenuPosition, true);
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", fixRankingPlayerMenuPosition);
+  }else{
+    fixRankingPlayerMenuPosition();
+  }
+  console.info("Szpilplac ranking menu fix v101");
+})();
+</script>
+
 </body>
 </html>
