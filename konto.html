@@ -912,6 +912,44 @@ svg{
   .next-goal span{text-align:left}
 }
 
+
+/* v105 konto: dzisiejsze gry klikalne + Cuzamen wyszarzony */
+.quick-games{display:none!important}
+.daily-games{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+.daily-chip{
+  text-decoration:none!important;
+  color:inherit!important;
+  transition:transform .12s, background .12s, border-color .12s;
+}
+a.daily-chip:hover{
+  transform:translateY(-1px);
+  background:var(--surface)!important;
+  border-color:var(--gold)!important;
+}
+.daily-chip.disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  filter:grayscale(.35);
+}
+.daily-chip.disabled:hover{
+  transform:none;
+  background:var(--surface2)!important;
+  border-color:var(--line)!important;
+}
+.daily-chip .sub{
+  font-size:9.5px;
+  font-weight:800;
+  color:var(--ink2);
+  line-height:1.1;
+}
+@media(max-width:720px){
+  .daily-games{
+    grid-template-columns:1fr!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1039,15 +1077,6 @@ svg{
         </div>
       </div>
     </section>
-
-    <div class="quick-games" aria-label="Szybkie przejścia do gier">
-      <a href="slowko.html">Słōwko</a>
-      <a href="klodka.html">Kłōdka</a>
-      <a href="raja/">Raja</a>
-      <a href="ranking.html">Ranking</a>
-    </div>
-
-
     <div class="sub-head">Odznaki</div>
     <div id="achievementsBox" class="achievements-box" aria-live="polite">
       <div class="muted">Ładuję odznaki...</div>
@@ -1132,7 +1161,7 @@ svg{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v103 moje postepy");
+console.info("Szpilplac konto.html v105 postepy clickable raja fix");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -1504,6 +1533,41 @@ function ppNiceGameKey(game){
   if(g === "raja")return "zorta";
   return g;
 }
+
+function ppRajaDayIndexRaw(){
+  try{
+    var p = new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()), o = {};
+    p.forEach(function(x){if(x.type !== "literal")o[x.type] = Number(x.value);});
+    return Math.floor((Date.UTC(o.year,o.month-1,o.day)-Date.UTC(2026,6,4))/86400000);
+  }catch(e){
+    return 0;
+  }
+}
+function ppRajaDayNo(){
+  return Math.max(0,ppRajaDayIndexRaw()) + 1;
+}
+function ppLocalFinished(key){
+  try{
+    var raw = localStorage.getItem(key);
+    if(!raw)return false;
+    var st = JSON.parse(raw);
+    return !!(st && st.status && st.status !== "playing");
+  }catch(e){
+    return false;
+  }
+}
+function ppLocalStatsDone(storeKey, dayKey){
+  try{
+    var raw = localStorage.getItem(storeKey);
+    if(!raw)return false;
+    var st = JSON.parse(raw);
+    if(!st)return false;
+    if(st.days && st.days[String(dayKey)])return true;
+    if(st.weeks && st.weeks[String(dayKey)])return true;
+  }catch(e){}
+  return false;
+}
+
 function ppRankGoal(points){
   var rankName = currentProfile && currentProfile.rank_name ? String(currentProfile.rank_name) : "";
   if(rankName.toLowerCase() === "starzik"){
@@ -1533,18 +1597,45 @@ function renderProfileProgress(rows){
 
   rows = Array.isArray(rows) ? rows : [];
   var today = ppWarsawTodayKey();
+  var rajaNo = ppRajaDayNo();
+
   var playedDays = {};
-  var todayGames = {slowko:false, klodka:false, zorta:false, cuzamen:false};
+  var todayGames = {slowko:false, klodka:false, zorta:false};
 
   rows.forEach(function(row){
-    if(!row || !row.finished_at)return;
-    var key = ppWarsawDateKeyFromDate(new Date(row.finished_at));
+    if(!row)return;
     var game = ppNiceGameKey(row.game);
-    playedDays[key] = true;
-    if(key === today && Object.prototype.hasOwnProperty.call(todayGames, game)){
-      todayGames[game] = true;
+    var whenKey = row.finished_at ? ppWarsawDateKeyFromDate(new Date(row.finished_at)) : "";
+    var no = Number(row.puzzle_no || 0);
+    var mode = String(row.mode || "").toLowerCase();
+
+    if(whenKey)playedDays[whenKey] = true;
+
+    if(game === "slowko"){
+      if(whenKey === today || no === Number(typeof DAY_NO !== "undefined" ? DAY_NO : 0)){
+        todayGames.slowko = true;
+      }
+    }
+
+    if(game === "klodka"){
+      if(whenKey === today || no === Number(typeof DAY_NO !== "undefined" ? DAY_NO : 0)){
+        todayGames.klodka = true;
+      }
+    }
+
+    if(game === "zorta"){
+      if(whenKey === today || (mode === "daily" && no === rajaNo) || no === rajaNo){
+        todayGames.zorta = true;
+      }
     }
   });
+
+  if(ppLocalFinished("slowko_d"+(typeof DAY_IDX !== "undefined" ? DAY_IDX : "")))todayGames.slowko = true;
+  if(ppLocalFinished("klodka_d"+(typeof DAY_IDX !== "undefined" ? DAY_IDX : "")))todayGames.klodka = true;
+  if(ppLocalFinished("zorta_daily_d"+Math.max(0,ppRajaDayIndexRaw())))todayGames.zorta = true;
+  if(ppLocalStatsDone("zorta_daily_stats_v1", Math.max(0,ppRajaDayIndexRaw())))todayGames.zorta = true;
+
+  if(todayGames.slowko || todayGames.klodka || todayGames.zorta)playedDays[today] = true;
 
   var todayPlayed = !!playedDays[today];
   var streak = 0;
@@ -1559,6 +1650,7 @@ function renderProfileProgress(rows){
   var weekProgress = Math.min(streak,7);
   var monthProgress = Math.min(streak,30);
   var doneToday = Object.keys(todayGames).filter(function(k){return todayGames[k];}).length;
+  var dailyTotal = 3;
   var points = Number((document.getElementById("sumPoints") || {}).textContent || 0) || 0;
   var goal = ppRankGoal(points);
 
@@ -1568,11 +1660,18 @@ function renderProfileProgress(rows){
     dots += '<span class="'+cls+'" aria-hidden="true"></span>';
   }
 
-  function chip(key,label){
+  function chip(key,label,href){
     var done = !!todayGames[key];
-    return '<div class="daily-chip '+(done ? "done" : "")+'">'+
+    return '<a class="daily-chip '+(done ? "done" : "")+'" href="'+href+'" aria-label="Przejdź do gry '+ppEsc(label)+'">'+
       '<div class="mark">'+(done ? "✓" : "—")+'</div>'+
       '<div class="name">'+ppEsc(label)+'</div>'+
+    '</a>';
+  }
+  function disabledChip(label){
+    return '<div class="daily-chip disabled" aria-disabled="true">'+
+      '<div class="mark">—</div>'+
+      '<div class="name">'+ppEsc(label)+'</div>'+
+      '<div class="sub">wkrótce</div>'+
     '</div>';
   }
 
@@ -1588,8 +1687,8 @@ function renderProfileProgress(rows){
     '</div>'+
     '<div class="progress-card">'+
       '<div class="progress-kicker">Dzisiojszy komplet</div>'+
-      '<div class="progress-main">'+doneToday+' / 4</div>'+
-      '<div class="progress-note">'+(doneToday === 4 ? "Komplet zrobiony. Fest!" : "Zostało do zrobienia: "+(4-doneToday)+".")+'</div>'+
+      '<div class="progress-main">'+doneToday+' / '+dailyTotal+'</div>'+
+      '<div class="progress-note">'+(doneToday === dailyTotal ? "Komplet zrobiony. Fest!" : "Zostało do zrobienia: "+(dailyTotal-doneToday)+".")+'</div>'+
     '</div>'+
     '<div class="progress-card wide">'+
       '<div class="progress-kicker">Cel tygodniowy</div>'+
@@ -1606,11 +1705,12 @@ function renderProfileProgress(rows){
     '<div class="progress-card wide">'+
       '<div class="progress-kicker">Dzisiejsze gry</div>'+
       '<div class="daily-games">'+
-        chip("slowko","Słōwko")+
-        chip("klodka","Kłōdka")+
-        chip("zorta","Raja")+
-        chip("cuzamen","Cuzamen")+
+        chip("slowko","Słōwko","slowko.html")+
+        chip("klodka","Kłōdka","klodka.html")+
+        chip("zorta","Raja","raja/")+
+        disabledChip("Cuzamen")+
       '</div>'+
+      '<div class="progress-note">Cuzamen jest na razie poza dzisiejszym kompletem.</div>'+
       '<div class="next-goal"><strong>'+ppEsc(goal.title)+'</strong><span>'+ppEsc(goal.text)+'</span></div>'+
     '</div>';
 }
