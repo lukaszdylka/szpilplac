@@ -1,13 +1,13 @@
 /*
-  Szpilplac Cuzamen Auth Bridge v80
+  Szpilplac Cuzamen Auth Bridge v102
   - dodaje zapis Cuzamen na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany
 */
 (function(){
   "use strict";
 
-  var VERSION="v80";
-  var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+  var VERSION="v102";
+  var AUTH_STORAGE_KEY="szpilplac-auth-v102";
   var sb=null;
   var patched=false;
   var hydrated=false;
@@ -119,7 +119,28 @@
       isCurrent:true
     };
   }
+
+  async function tryCommonGameSave(data){
+    try{
+      if(!window.SZP_GAME_SAVE){
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=102";
+        await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
+      }
+      if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
+      var res = await window.SZP_GAME_SAVE.saveResult(data,{
+        skipMessage:"Do rankingu zapisuje si\u0119 tylko bie\u017c\u0105ca zagadka.",
+        noAccountMessage:"Grasz bez konta \u2014 wynik Cuzamen zosta\u0142 zapisany lokalnie.",
+        savedMessage:"Wynik Cuzamen zapisany na koncie." + " +" + (data && data.score ? data.score : 0) + " pkt",
+        errorMessage:"Nie uda\u0142o si\u0119 zapisa\u0107 wyniku Cuzamen."
+      });
+      if(res && res.message)setNote(res.message,res.type || "");
+      if(res && res.error)throw res.error;
+      return true;
+    }catch(e){throw e;}
+  }
+
   async function saveResult(data){
+    if(await tryCommonGameSave(data))return;
     var session=await getSession();
     if(!session||!session.user){
       setNote("Grasz bez konta — wynik Cuzamen został zapisany lokalnie.","");

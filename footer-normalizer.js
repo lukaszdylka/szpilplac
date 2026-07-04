@@ -1,5 +1,5 @@
 /*
-  Szpilplac footer-normalizer.js v100
+  Szpilplac footer-normalizer.js v102
   Jedno źródło prawdy dla stopki:
   - usuwa stare footer-nav i zdublowane footer-legal
   - zawsze buduje jedną linię: Regulamin · Prywatność · Cookies · Mailing
@@ -8,7 +8,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v100";
+  var VERSION = "v102";
 
   function isNested(){
     return /\/raja\/[^\/]*$/.test(location.pathname);
@@ -73,7 +73,7 @@
         '<a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener" aria-label="Instagram">'+iconSvg("instagram")+'</a>'+
         '<a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener" aria-label="Wspólnota Familoka">'+iconSvg("group")+'</a>'+
       '</div>'+
-      '<div class="footer-legal" data-footer-legal="v100">'+
+      '<div class="footer-legal" data-footer-legal="v102">'+
         '<a href="'+p+'regulamin.html" id="footerTerms">Regulamin</a>'+
         '<span>·</span>'+
         '<a href="'+p+'polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>'+
@@ -94,7 +94,7 @@
     if(!footer)return;
 
     footer.innerHTML = buildFooter();
-    footer.setAttribute("data-footer-normalized","v100");
+    footer.setAttribute("data-footer-normalized","v102");
   }
 
   if(document.readyState === "loading"){

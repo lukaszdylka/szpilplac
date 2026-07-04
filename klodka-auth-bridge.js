@@ -1,13 +1,13 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v80
+  Szpilplac Kłōdka Auth Bridge v102
   - zapisuje wynik Kłōdki na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik jest już zapisany na koncie
 */
 (function(){
   "use strict";
 
-  var VERSION="v80";
-  var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+  var VERSION="v102";
+  var AUTH_STORAGE_KEY="szpilplac-auth-v102";
   var sb=null;
   var patched=false;
   var hydrated=false;
@@ -136,7 +136,28 @@
     return {game:"klodka",mode:mode,puzzleNo:idx,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreKlodka(mode,!!won,tries),isCurrent:isCurrent(mode,idx)};
   }
 
+
+  async function tryCommonGameSave(data){
+    try{
+      if(!window.SZP_GAME_SAVE){
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=102";
+        await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
+      }
+      if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
+      var res = await window.SZP_GAME_SAVE.saveResult(data,{
+        skipMessage:"Archiwum K\u0142\u014ddki zostaje lokalnie \u2014 do rankingu zapisuje si\u0119 tylko bie\u017c\u0105ca zagadka.",
+        noAccountMessage:"Grasz bez konta \u2014 wynik K\u0142\u014ddki zosta\u0142 zapisany lokalnie.",
+        savedMessage:"Wynik K\u0142\u014ddki zapisany na koncie." + " +" + (data && data.score ? data.score : 0) + " pkt",
+        errorMessage:"Nie uda\u0142o si\u0119 zapisa\u0107 wyniku K\u0142\u014ddki."
+      });
+      if(res && res.message)setNote(res.message,res.type || "");
+      if(res && res.error)throw res.error;
+      return true;
+    }catch(e){throw e;}
+  }
+
   async function saveResult(data){
+    if(await tryCommonGameSave(data))return;
     if(!data||!data.isCurrent){
       setNote("Archiwum Kłōdki zostaje lokalnie — do rankingu zapisuje się tylko bieżąca zagadka.","err");
       return;

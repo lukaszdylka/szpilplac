@@ -1,0 +1,79 @@
+{
+  "version": "v102",
+  "files": [
+    "README.txt",
+    "cuzamen-auth-bridge.js",
+    "daily-status.js",
+    "footer-normalizer.js",
+    "game-played.js",
+    "game-result-actions.js",
+    "game-save.js",
+    "index.html",
+    "klodka-auth-bridge.js",
+    "konto.html",
+    "nowosci.html",
+    "player-menu-common.js",
+    "raja/index.html",
+    "raja/raja-auth-bridge.js",
+    "ranking.html",
+    "slowko-auth-bridge.js",
+    "topbar-common.js"
+  ],
+  "validation": [
+    {
+      "file": "index.html",
+      "topbar-common": true,
+      "footer-normalizer": true,
+      "player-menu-common": true,
+      "daily-status": true,
+      "game-played": true,
+      "footer-legal-source-count": 1,
+      "footer-nav-source-count": 0,
+      "footerCookies-id-count": 1
+    },
+    {
+      "file": "konto.html",
+      "topbar-common": true,
+      "footer-normalizer": true,
+      "player-menu-common": true,
+      "daily-status": true,
+      "game-played": true,
+      "footer-legal-source-count": 1,
+      "footer-nav-source-count": 0,
+      "footerCookies-id-count": 2
+    },
+    {
+      "file": "ranking.html",
+      "topbar-common": true,
+      "footer-normalizer": true,
+      "player-menu-common": true,
+      "daily-status": true,
+      "game-played": true,
+      "footer-legal-source-count": 1,
+      "footer-nav-source-count": 0,
+      "footerCookies-id-count": 1
+    },
+    {
+      "file": "nowosci.html",
+      "topbar-common": true,
+      "footer-normalizer": true,
+      "player-menu-common": true,
+      "daily-status": true,
+      "game-played": true,
+      "footer-legal-source-count": 1,
+      "footer-nav-source-count": 0,
+      "footerCookies-id-count": 1
+    },
+    {
+      "file": "raja/index.html",
+      "topbar-common": true,
+      "footer-normalizer": true,
+      "player-menu-common": true,
+      "daily-status": true,
+      "game-played": true,
+      "footer-legal-source-count": 1,
+      "footer-nav-source-count": 0,
+      "footerCookies-id-count": 1
+    }
+  ]
+}
