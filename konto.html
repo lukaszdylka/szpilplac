@@ -732,6 +732,186 @@ svg{
 }
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
+
+/* v103 konto: prywatne postępy gracza */
+.profile-progress{
+  margin:18px 0 18px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(191,138,58,.10), rgba(191,138,58,.035));
+}
+.progress-top{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.progress-title{
+  margin:0;
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:21px;
+  line-height:1.05;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.progress-sub{
+  margin:4px 0 0;
+  color:var(--ink2);
+  font-size:12.5px;
+  line-height:1.45;
+}
+.progress-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.progress-card{
+  min-width:0;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--surface);
+}
+.progress-card.wide{
+  grid-column:1 / -1;
+}
+.progress-kicker{
+  color:var(--ink2);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.progress-main{
+  margin-top:4px;
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:27px;
+  line-height:1;
+  color:var(--green);
+}
+[data-theme=dark] .progress-main{color:var(--gold)}
+.progress-note{
+  margin-top:6px;
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.4;
+}
+.progress-dots{
+  display:flex;
+  gap:6px;
+  margin-top:11px;
+}
+.progress-dot{
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--surface2);
+  display:grid;
+  place-items:center;
+  color:transparent;
+}
+.progress-dot.on{
+  border-color:var(--green);
+  background:var(--green);
+}
+.progress-dot.today{
+  box-shadow:0 0 0 3px rgba(191,138,58,.18);
+  border-color:var(--gold);
+}
+.progress-dot.on::after{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  background:#fff;
+}
+.progress-bar-wrap{
+  width:100%;
+  height:16px;
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface2);
+  overflow:hidden;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:var(--green);
+}
+[data-theme=dark] .progress-bar{background:var(--gold)}
+.daily-games{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.daily-chip{
+  min-height:48px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:8px 6px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--surface2);
+  text-align:center;
+}
+.daily-chip.done{
+  border-color:rgba(63,138,90,.7);
+  background:rgba(63,138,90,.12);
+}
+.daily-chip .mark{
+  font-size:15px;
+  font-weight:900;
+  color:var(--green);
+  line-height:1;
+}
+.daily-chip:not(.done) .mark{
+  color:var(--ink2);
+}
+.daily-chip .name{
+  font-size:11px;
+  font-weight:900;
+  color:var(--ink);
+  line-height:1.15;
+}
+.next-goal{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+  padding:11px 12px;
+  border:1px dashed rgba(191,138,58,.65);
+  border-radius:13px;
+  background:rgba(191,138,58,.08);
+}
+.next-goal strong{
+  color:var(--ink);
+  font-size:13px;
+}
+.next-goal span{
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.35;
+  text-align:right;
+}
+@media(max-width:720px){
+  .progress-top{align-items:flex-start;flex-direction:column}
+  .progress-grid{grid-template-columns:1fr}
+  .daily-games{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .next-goal{align-items:flex-start;flex-direction:column}
+  .next-goal span{text-align:left}
+}
+
 </style>
 </head>
 <body>
@@ -844,6 +1024,22 @@ svg{
       <div class="stat"><div class="label">Wygrane</div><div class="value" id="sumWins">0</div></div>
     </div>
 
+
+    <section class="profile-progress" id="profileProgress" aria-label="Moje postępy">
+      <div class="progress-top">
+        <div>
+          <h2 class="progress-title">Moje postępy</h2>
+          <p class="progress-sub">Twoja prywatna seria, dzisiejszy komplet i następne cele.</p>
+        </div>
+      </div>
+      <div id="profileProgressBody" class="progress-grid">
+        <div class="progress-card wide">
+          <div class="progress-kicker">Ładowanie</div>
+          <div class="progress-note">Sprawdzam Twoje zapisane wyniki...</div>
+        </div>
+      </div>
+    </section>
+
     <div class="quick-games" aria-label="Szybkie przejścia do gier">
       <a href="slowko.html">Słōwko</a>
       <a href="klodka.html">Kłōdka</a>
@@ -936,7 +1132,7 @@ svg{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v102 common system");
+console.info("Szpilplac konto.html v103 moje postepy");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -1278,6 +1474,147 @@ function niceGame(value){
   var raw = String(value || "");
   return map[raw.toLowerCase()] || raw;
 }
+
+function ppPad(n){return String(n).padStart(2,"0");}
+function ppWarsawDateKeyFromDate(d){
+  try{
+    var parts = new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d), o = {};
+    parts.forEach(function(p){if(p.type !== "literal")o[p.type] = p.value;});
+    return o.year + "-" + o.month + "-" + o.day;
+  }catch(e){
+    return d.getFullYear()+"-"+ppPad(d.getMonth()+1)+"-"+ppPad(d.getDate());
+  }
+}
+function ppWarsawTodayKey(){return ppWarsawDateKeyFromDate(new Date());}
+function ppAddDaysKey(key,delta){
+  var d = new Date(key + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.getUTCFullYear()+"-"+ppPad(d.getUTCMonth()+1)+"-"+ppPad(d.getUTCDate());
+}
+function ppEsc(value){
+  return String(value == null ? "" : value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+function ppNiceGameKey(game){
+  var g = String(game || "").toLowerCase();
+  if(g === "raja")return "zorta";
+  return g;
+}
+function ppRankGoal(points){
+  var rankName = currentProfile && currentProfile.rank_name ? String(currentProfile.rank_name) : "";
+  if(rankName.toLowerCase() === "starzik"){
+    return {title:"Następny cel", text:"Masz rangę specjalną: Starzik."};
+  }
+  var ranks = [
+    ["Bajtel",100],
+    ["Karlus",500],
+    ["Chop",1500],
+    ["Grubiorz",4000],
+    ["Hajer",8000],
+    ["Przodowy",15000],
+    ["Sztajger",25000],
+    ["Zeflik",100000]
+  ];
+  points = Number(points || 0);
+  for(var i=0;i<ranks.length;i++){
+    if(points < ranks[i][1]){
+      return {title:"Następna ranga", text:"Do rangi "+ranks[i][0]+" brakuje "+(ranks[i][1]-points)+" pkt."};
+    }
+  }
+  return {title:"Następna ranga", text:"Masz już najwyższy próg punktowy: Zeflik."};
+}
+function renderProfileProgress(rows){
+  var box = document.getElementById("profileProgressBody");
+  if(!box)return;
+
+  rows = Array.isArray(rows) ? rows : [];
+  var today = ppWarsawTodayKey();
+  var playedDays = {};
+  var todayGames = {slowko:false, klodka:false, zorta:false, cuzamen:false};
+
+  rows.forEach(function(row){
+    if(!row || !row.finished_at)return;
+    var key = ppWarsawDateKeyFromDate(new Date(row.finished_at));
+    var game = ppNiceGameKey(row.game);
+    playedDays[key] = true;
+    if(key === today && Object.prototype.hasOwnProperty.call(todayGames, game)){
+      todayGames[game] = true;
+    }
+  });
+
+  var todayPlayed = !!playedDays[today];
+  var streak = 0;
+  var cursor = todayPlayed ? today : ppAddDaysKey(today,-1);
+  while(playedDays[cursor]){
+    streak++;
+    cursor = ppAddDaysKey(cursor,-1);
+  }
+
+  var streakLabel = streak + " " + (streak === 1 ? "dzień" : "dni");
+  var streakNote = todayPlayed ? "Seria obejmuje dzisiejszą grę." : (streak ? "Zagraj dziś, żeby utrzymać serię." : "Zagraj dziś, żeby zacząć serię.");
+  var weekProgress = Math.min(streak,7);
+  var monthProgress = Math.min(streak,30);
+  var doneToday = Object.keys(todayGames).filter(function(k){return todayGames[k];}).length;
+  var points = Number((document.getElementById("sumPoints") || {}).textContent || 0) || 0;
+  var goal = ppRankGoal(points);
+
+  var dots = "";
+  for(var i=1;i<=7;i++){
+    var cls = "progress-dot" + (i <= weekProgress ? " on" : "") + (i === weekProgress && todayPlayed ? " today" : "");
+    dots += '<span class="'+cls+'" aria-hidden="true"></span>';
+  }
+
+  function chip(key,label){
+    var done = !!todayGames[key];
+    return '<div class="daily-chip '+(done ? "done" : "")+'">'+
+      '<div class="mark">'+(done ? "✓" : "—")+'</div>'+
+      '<div class="name">'+ppEsc(label)+'</div>'+
+    '</div>';
+  }
+
+  var toWeek = Math.max(0,7-weekProgress);
+  var toMonth = Math.max(0,30-monthProgress);
+  var monthPct = Math.max(0,Math.min(100,Math.round(monthProgress/30*100)));
+
+  box.innerHTML =
+    '<div class="progress-card">'+
+      '<div class="progress-kicker">Seria dni</div>'+
+      '<div class="progress-main">'+ppEsc(streakLabel)+'</div>'+
+      '<div class="progress-note">'+ppEsc(streakNote)+'</div>'+
+    '</div>'+
+    '<div class="progress-card">'+
+      '<div class="progress-kicker">Dzisiojszy komplet</div>'+
+      '<div class="progress-main">'+doneToday+' / 4</div>'+
+      '<div class="progress-note">'+(doneToday === 4 ? "Komplet zrobiony. Fest!" : "Zostało do zrobienia: "+(4-doneToday)+".")+'</div>'+
+    '</div>'+
+    '<div class="progress-card wide">'+
+      '<div class="progress-kicker">Cel tygodniowy</div>'+
+      '<div class="progress-main">'+weekProgress+' / 7</div>'+
+      '<div class="progress-dots" aria-label="Postęp 7 dni">'+dots+'</div>'+
+      '<div class="progress-note">'+(toWeek ? "Jeszcze "+toWeek+" dni do tygodniowej serii." : "Tygodniowo seria gotowo!")+'</div>'+
+    '</div>'+
+    '<div class="progress-card wide">'+
+      '<div class="progress-kicker">Cel miesięczny</div>'+
+      '<div class="progress-main">'+monthProgress+' / 30</div>'+
+      '<div class="progress-bar-wrap" aria-label="Postęp 30 dni"><div class="progress-bar" style="width:'+monthPct+'%"></div></div>'+
+      '<div class="progress-note">'+(toMonth ? "Do miesięcznego celu zostało "+toMonth+" dni." : "Miesięczny cel zrobiony.")+'</div>'+
+    '</div>'+
+    '<div class="progress-card wide">'+
+      '<div class="progress-kicker">Dzisiejsze gry</div>'+
+      '<div class="daily-games">'+
+        chip("slowko","Słōwko")+
+        chip("klodka","Kłōdka")+
+        chip("zorta","Raja")+
+        chip("cuzamen","Cuzamen")+
+      '</div>'+
+      '<div class="next-goal"><strong>'+ppEsc(goal.title)+'</strong><span>'+ppEsc(goal.text)+'</span></div>'+
+    '</div>';
+}
+
 async function loadResults(userId){
   try{
     var res = await withTimeout(
@@ -1292,10 +1629,12 @@ async function loadResults(userId){
 
     if(res.error){
       els.resultsBox.textContent = "Błąd odczytu wyników: " + res.error.message;
+      renderProfileProgress([]);
       return;
     }
 
     var data = res.data || [];
+    renderProfileProgress(data);
     var games = data.length;
     var wins = data.filter(function(r){return r.won;}).length;
     var points = data.reduce(function(sum,r){return sum + (Number(r.score) || 0);},0);
@@ -1318,6 +1657,7 @@ async function loadResults(userId){
     }).join("");
   }catch(e){
     els.resultsBox.textContent = "Nie udało się odczytać wyników. Sesja konta nadal jest aktywna.";
+    renderProfileProgress([]);
   }
 }
 function enterRecoveryMode(message){
