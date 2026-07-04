@@ -304,6 +304,28 @@ footer a{
   }
 }
 
+
+/* v100 canonical footer safety */
+.site-footer .footer-nav{display:none!important}
+.site-footer .footer-legal + .footer-legal{display:none!important}
+.footer-news-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:34px;
+  margin:2px 0 12px;
+  padding:8px 14px;
+  border:1px solid rgba(191,138,58,.55);
+  border-radius:999px;
+  background:rgba(191,138,58,.12);
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
+
 </style>
 </head>
 <body>
@@ -421,7 +443,7 @@ footer a{
   <div class="note">Drobne poprawki wyglądu i porządki techniczne pomijamy.</div>
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer" data-footer-normalized="static-v100">
   <div class="footer-head">Szpilplac i Familock</div>
   <div class="footer-copy">Zajrzyj też do naszych miejsc i ważnych informacji.</div>
 
@@ -443,9 +465,7 @@ footer a{
     </a>
   </div>
 
-  <div class="footer-legal">
-    <a href="nowosci.html" id="footerNews">Nowości</a>
-    <span>·</span>
+  <div class="footer-legal" data-footer-legal="v100">
     <a href="regulamin.html" id="footerTerms">Regulamin</a>
     <span>·</span>
     <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
@@ -487,7 +507,7 @@ footer a{
       setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
     });
   }
-  console.info("Szpilplac nowosci.html v95 raja daily");
+  console.info("Szpilplac nowosci.html v100 footer normalized");
 })();
 </script>
 
@@ -534,5 +554,6 @@ footer a{
 })();
 </script>
 
+<script src="footer-normalizer.js?v=100"></script>
 </body>
 </html>

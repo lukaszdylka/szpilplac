@@ -1514,6 +1514,28 @@ svg{
   opacity:1 !important;
 }
 
+
+/* v100 canonical footer safety */
+.site-footer .footer-nav{display:none!important}
+.site-footer .footer-legal + .footer-legal{display:none!important}
+.footer-news-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:34px;
+  margin:2px 0 12px;
+  padding:8px 14px;
+  border:1px solid rgba(191,138,58,.55);
+  border-radius:999px;
+  background:rgba(191,138,58,.12);
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
+
 </style>
 </head>
 <body>
@@ -1605,11 +1627,11 @@ svg{
   </div>
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer" data-footer-normalized="static-v100">
   <div class="footer-head">Szpilplac i Familock</div>
   <div class="footer-copy">Zajrzyj też do naszych miejsc i ważnych informacji.</div>
 
-  <a class="footer-news-btn" href="nowosci.html" id="footerNewsButton" aria-label="Zobacz nowości w Szpilplacu">
+  <a class="footer-news-btn" href="nowosci.html" aria-label="Zobacz nowości w Szpilplacu">
     <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V4.5A1.5 1.5 0 015.5 3h9A1.5 1.5 0 0116 4.5v11A1.5 1.5 0 0114.5 17h-9A1.5 1.5 0 014 15.5z"/><path d="M7 7h6M7 10h6M7 13h3"/></svg>
     Co nowego?
   </a>
@@ -1632,7 +1654,7 @@ svg{
     </a>
   </div>
 
-  <div class="footer-legal">
+  <div class="footer-legal" data-footer-legal="v100">
     <a href="regulamin.html" id="footerTerms">Regulamin</a>
     <span>·</span>
     <a href="polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>
@@ -2772,7 +2794,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v93 raja daily status");
+console.info("Szpilplac index.html v100 footer normalized");
 </script>
 
 <script>
@@ -2848,5 +2870,6 @@ console.info("Szpilplac index.html v93 raja daily status");
 })();
 </script>
 
+<script src="footer-normalizer.js?v=100"></script>
 </body>
 </html>
