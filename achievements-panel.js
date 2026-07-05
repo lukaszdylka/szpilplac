@@ -9,6 +9,7 @@
     pierszy:1,
     fajrant:1,
     dwazicher:1,
+    trzynazicher:1,
     bezpodp:1,
     godka:1,
     tydzien:1,
@@ -189,5 +190,5 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v78 clean");
+  console.info("Szpilplac achievements-panel.js v109 trzy na zicher");
 })();

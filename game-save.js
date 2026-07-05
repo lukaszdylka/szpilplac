@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v102 */
+/* Szpilplac game-save.js v110 */
 (function(){
   "use strict";
-  var VERSION="v102";
+  var VERSION="v110";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   function nested(){return /\/raja\/?/.test(location.pathname);} 
@@ -36,6 +36,65 @@
     if(s&&s.access_token&&s.refresh_token){try{var set=await c.auth.setSession({access_token:s.access_token,refresh_token:s.refresh_token}); if(set&&set.data&&set.data.session)return set.data.session;}catch(e){} return s;}
     return null;
   }
+
+  async function ensureAchievementToast(){
+    if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
+    await loadScript(root("achievement-toast.js?v=110"),function(){
+      return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
+    }).catch(function(){});
+    return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
+  }
+  function achievementMeta(payload, original){
+    original = original || {};
+    payload = payload || {};
+    return {
+      game: payload.game,
+      mode: payload.mode || "daily",
+      puzzle_no: payload.puzzleNo,
+      won: !!payload.won,
+      attempts: payload.tries,
+      tries: payload.tries,
+      errors: payload.errors,
+      score: payload.score,
+      hints_used: Number(original.hintsUsed != null ? original.hintsUsed : (original.hints_used != null ? original.hints_used : 0)) || 0,
+      source: "game-save-v110",
+      path: location.pathname
+    };
+  }
+  async function checkAchievementsAfterSave(payload, original){
+    try{
+      var c = await getClient();
+      var session = await getSession();
+      if(!c || !session || !session.user)return [];
+      var meta = achievementMeta(payload, original);
+      var res = await c.rpc("szpilplac_check_achievement_event",{
+        p_event:"game_finished",
+        p_source_game:payload.game,
+        p_won:!!payload.won,
+        p_attempts:payload.tries == null ? null : Number(payload.tries),
+        p_hints_used:meta.hints_used,
+        p_score:payload.score == null ? null : Number(payload.score),
+        p_meta:meta
+      });
+      if(res.error)return [];
+      var rows = Array.isArray(res.data) ? res.data : [];
+      var fresh = rows.filter(function(r){return r && r.is_new;});
+      if(fresh.length){
+        await ensureAchievementToast();
+        if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function"){
+          window.SZP_ACHIEVEMENT_TOAST.showMany(fresh);
+        }
+        if(window.SZPILPLAC_REFRESH_ACHIEVEMENTS){
+          try{window.SZPILPLAC_REFRESH_ACHIEVEMENTS();}catch(e){}
+        }
+      }
+      return fresh;
+    }catch(e){
+      console.warn("Szpilplac achievement check error:",e);
+      return [];
+    }
+  }
+
   function normalizePayload(data){
     data=data||{};
     return {game:data.game,mode:data.mode||"daily",puzzleNo:data.puzzleNo!=null?data.puzzleNo:data.puzzle_no,won:!!data.won,tries:data.tries,errors:data.errors,score:data.score,isCurrent:data.isCurrent!==false};
@@ -50,7 +109,8 @@
     var res=await c.rpc("save_user_game_result",{p_game:p.game,p_mode:p.mode,p_puzzle_no:p.puzzleNo,p_won:p.won,p_tries:p.tries,p_errors:p.errors,p_score:p.score});
     if(res.error)return {saved:false,reason:"supabase",type:"err",message:res.error.message||opts.errorMessage||"Nie udało się zapisać wyniku.",error:res.error};
     if(window.SZP_GAME_PLAYED&&window.SZP_GAME_PLAYED.markAccountPlayed)window.SZP_GAME_PLAYED.markAccountPlayed(p.game,p.mode,p.puzzleNo);
-    return {saved:true,reason:"saved",type:"ok",message:opts.savedMessage||("Wynik zapisany na koncie. +"+(p.score||0)+" pkt"),score:p.score};
+    var freshAchievements = await checkAchievementsAfterSave(p,data);
+    return {saved:true,reason:"saved",type:"ok",message:opts.savedMessage||("Wynik zapisany na koncie. +"+(p.score||0)+" pkt"),score:p.score,achievements:freshAchievements};
   }
   window.SZP_GAME_SAVE={version:VERSION,getClient:getClient,getSession:getSession,saveResult:saveResult};
   if(!window.SZPILPLAC_AUTH)window.SZPILPLAC_AUTH={};

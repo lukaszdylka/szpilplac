@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v102";
+  var VERSION = "v110";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
@@ -111,13 +111,13 @@
       ".szp-result-actions a:hover{background:var(--surface,#fbf7ee);color:var(--green,#2f4a39)}" +
       ".szp-result-actions a.primary{background:var(--green,#2f4a39);border-color:var(--green,#2f4a39);color:#fff}" +
       ".szp-result-account-note{margin-top:10px;padding:9px 11px;border:1px dashed var(--line,#c9bfa6);border-radius:12px;background:rgba(191,138,58,.10);color:var(--ink2,#6a6150);font-size:12px;line-height:1.4;text-align:center}" +
-      ".szp-ach-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);z-index:9999;width:min(360px,calc(100vw - 24px));border:1px solid rgba(191,138,58,.75);border-radius:18px;background:var(--surface,#fbf7ee);color:var(--ink,#23201a);box-shadow:0 18px 50px -26px rgba(0,0,0,.7);padding:12px 14px;display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;opacity:0;pointer-events:auto;transition:opacity .18s,transform .18s}" +
-      ".szp-ach-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}" +
-      ".szp-ach-toast .ico svg{width:42px;height:50px;display:block}" +
+      ".szp-ach-toast{position:fixed;right:18px;bottom:18px;transform:translateY(16px);z-index:10050;width:min(390px,calc(100vw - 28px));border:1px solid rgba(191,138,58,.82);border-radius:20px;background:var(--surface,#fbf7ee);color:var(--ink,#23201a);box-shadow:0 24px 70px -28px rgba(0,0,0,.78);padding:14px 15px 16px;display:grid;grid-template-columns:58px 1fr;gap:12px;align-items:center;opacity:0;pointer-events:auto;overflow:hidden;transition:opacity .18s,transform .18s}" +
+      ".szp-ach-toast.on{opacity:1;transform:translateY(0)}" +
+      ".szp-ach-toast .ico svg{width:58px;height:68px;display:block}" +
       ".szp-ach-toast .k{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--green,#2f4a39)}" +
-      ".szp-ach-toast .t{font-family:Oswald,system-ui,sans-serif;font-size:20px;line-height:1.05;text-transform:uppercase}" +
+      ".szp-ach-toast .t{font-family:Oswald,system-ui,sans-serif;font-size:23px;line-height:1.04;text-transform:uppercase}" +
       ".szp-ach-toast .go{display:inline-flex;margin-top:6px;font-size:11.5px;font-weight:900;color:var(--green,#2f4a39);text-decoration:underline;text-underline-offset:2px}" +
-      "@media(max-width:420px){.szp-result-actions{grid-template-columns:1fr}}";
+      ".szp-ach-toast .timer{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--gold,#bf8a3a);transform-origin:left center;animation:szpAchTimer 5s linear forwards}@keyframes szpAchTimer{from{transform:scaleX(1)}to{transform:scaleX(0)}}@media(max-width:560px){.szp-ach-toast{left:12px;right:12px;bottom:12px;width:auto;grid-template-columns:50px 1fr}.szp-ach-toast .ico svg{width:50px;height:60px}.szp-ach-toast .t{font-size:20px}}@media(max-width:420px){.szp-result-actions{grid-template-columns:1fr}}";
     document.head.appendChild(st);
   }
   function hasAccountSession(){
@@ -245,18 +245,25 @@
     if(notifiedAchievements[id])return;
     notifiedAchievements[id] = true;
 
+    if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.show === "function"){
+      window.SZP_ACHIEVEMENT_TOAST.show(row);
+      return;
+    }
+
     injectStyle();
     var old = document.querySelector(".szp-ach-toast");
     if(old)old.remove();
 
     var el = document.createElement("div");
     el.className = "szp-ach-toast";
-    el.innerHTML = '<div class="ico">'+(row.svg || "")+'</div><div><div class="k">Nowa odznaka</div><div class="t"></div><a class="go" href="'+root("konto.html")+'">Sprawdź w profilu</a></div>';
+    el.setAttribute("role","status");
+    el.setAttribute("aria-live","polite");
+    el.innerHTML = '<div class="ico">'+(row.svg || "")+'</div><div><div class="k">Nowa odznaka</div><div class="t"></div><a class="go" href="'+root("konto.html")+'">Sprawdź w profilu</a></div><div class="timer" aria-hidden="true"></div>';
     el.querySelector(".t").textContent = row.label;
     document.body.appendChild(el);
     setTimeout(function(){el.classList.add("on");},40);
-    setTimeout(function(){el.classList.remove("on");},5600);
-    setTimeout(function(){el.remove();},6100);
+    setTimeout(function(){el.classList.remove("on");},5000);
+    setTimeout(function(){el.remove();},5250);
   }
 
   async function checkAchievements(eventName, meta){
@@ -340,6 +347,12 @@
       },250);
     },true);
   }
+  window.SZP_RESULT_ACHIEVEMENTS = {
+    version:VERSION,
+    check:checkAchievements,
+    show:showAchievementToast
+  };
+
   function boot(){
     resetDailyHintChoices();
     injectStyle();
