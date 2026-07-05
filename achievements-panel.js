@@ -176,6 +176,52 @@
     }).join("");
   }
 
+
+  async function achievementEarnedMap(c){
+    var out = {};
+    try{
+      var res = await c.rpc("szpilplac_my_achievements");
+      var rows = Array.isArray(res.data) ? res.data : [];
+      rows.forEach(function(row){
+        if(row && row.earned_at)out[String(row.id || row.achievement_id)] = row;
+      });
+    }catch(e){}
+    return out;
+  }
+  async function showProfileRepairToasts(c,before){
+    try{
+      var after = await achievementEarnedMap(c);
+      var fresh = [];
+      Object.keys(after).forEach(function(id){
+        if(!before[id] && after[id]){
+          fresh.push({
+            achievement_id:id,
+            id:id,
+            label:after[id].label,
+            description:after[id].description,
+            svg:after[id].svg,
+            earned_at:after[id].earned_at,
+            is_new:true
+          });
+        }
+      });
+      if(fresh.length){
+        if(!window.SZP_ACHIEVEMENT_TOAST){
+          await new Promise(function(resolve){
+            var s=document.createElement("script");
+            s.src="achievement-toast.js?v=118";
+            s.onload=resolve;
+            s.onerror=resolve;
+            document.head.appendChild(s);
+          });
+        }
+        if(window.SZP_ACHIEVEMENT_TOAST && window.SZP_ACHIEVEMENT_TOAST.showMany){
+          window.SZP_ACHIEVEMENT_TOAST.showMany(fresh);
+        }
+      }
+    }catch(e){}
+  }
+
   async function loadAchievements(){
     var box = document.getElementById("achievementsBox");
     if(!box)return;
@@ -195,6 +241,8 @@
         return;
       }
 
+      var beforeRepairAchievements = await achievementEarnedMap(c);
+
       try{
         await c.rpc("szpilplac_check_achievement_event", {
           p_event:"account",
@@ -210,6 +258,8 @@
       try{
         await c.rpc("szpilplac_repair_my_daily_achievements");
       }catch(e){}
+
+      await showProfileRepairToasts(c,beforeRepairAchievements);
 
       var res = await c.rpc("szpilplac_my_achievements");
       if(res.error)throw res.error;
@@ -228,7 +278,7 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v116 trzy na zicher");
+  console.info("Szpilplac achievements-panel.js v118 trzy na zicher");
 })();
 
 

@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v116";
+  var VERSION = "v118";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
