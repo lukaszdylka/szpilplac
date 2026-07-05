@@ -226,3 +226,29 @@
 
   console.info("Szpilplac achievements-panel.js v109 trzy na zicher");
 })();
+
+
+(function(){
+  "use strict";
+  function dedupeTrzyNaZicherCards(){
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".achievement-card,.badge-card,.ach-card,[data-achievement-id],[data-achievement]"));
+    var trzy = cards.filter(function(card){
+      return /trzy\s+na\s+zicher/i.test(card.textContent || "");
+    });
+    if(trzy.length <= 1)return;
+
+    trzy.sort(function(a,b){
+      var ae = /zdobyto|✓|odblokowano/i.test(a.textContent || "") ? 1 : 0;
+      var be = /zdobyto|✓|odblokowano/i.test(b.textContent || "") ? 1 : 0;
+      return be - ae;
+    });
+    trzy.slice(1).forEach(function(card){card.style.display = "none";});
+  }
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(dedupeTrzyNaZicherCards,100);
+    setTimeout(dedupeTrzyNaZicherCards,600);
+    setTimeout(dedupeTrzyNaZicherCards,1500);
+  });
+  window.SZP_DEDUPE_TRZY_NA_ZICHER_CARDS = dedupeTrzyNaZicherCards;
+})();
+

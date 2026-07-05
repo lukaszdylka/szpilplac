@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v112
+  Szpilplac Raja Auth Bridge v114
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -136,7 +136,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=112";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=114";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
