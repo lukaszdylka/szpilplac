@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v119 */
+/* Szpilplac game-save.js v120 */
 (function(){
   "use strict";
-  var VERSION="v119";
+  var VERSION="v120";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   function nested(){return /\/raja\/?/.test(location.pathname);} 
@@ -39,7 +39,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript(root("achievement-toast.js?v=119"),function(){
+    await loadScript(root("achievement-toast.js?v=120"),function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -56,8 +56,10 @@
       tries: payload.tries,
       errors: payload.errors,
       score: payload.score,
+      day_index: payload.dayIndex != null ? payload.dayIndex : (typeof window.currentDay === "number" ? window.currentDay : null),
+      today_index: payload.todayIndex != null ? payload.todayIndex : (typeof window.TODAY_IDX === "number" ? window.TODAY_IDX : null),
       hints_used: Number(original.hintsUsed != null ? original.hintsUsed : (original.hints_used != null ? original.hints_used : 0)) || 0,
-      source: "game-save-v119",
+      source: "game-save-v120",
       path: location.pathname
     };
   }

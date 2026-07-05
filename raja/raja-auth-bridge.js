@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v119
+  Szpilplac Raja Auth Bridge v120
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v119";
+  var VERSION="v120";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -136,6 +136,7 @@
       puzzleNo:puzzleNo(),
       puzzle_no:puzzleNo(),
       dayIndex:currentDay(),
+      todayIndex:todayIdx(),
       won:won,
       tries:tries,
       errors:Math.max(0,tries-(won?1:0)),
@@ -143,7 +144,7 @@
       isCurrent:isCurrent(),
       hintUsed:hintUsed,
       finishedAt:new Date().toISOString(),
-      source:"local-raja-sync-v119"
+      source:"local-raja-sync-v120"
     };
   }
 
@@ -180,6 +181,8 @@
       tries:tries,
       errors:Math.max(0,tries-(won?1:0)),
       score:scoreRaja(!!won,tries,hintUsed),
+      dayIndex:currentDay(),
+      todayIndex:todayIdx(),
       isCurrent:isCurrent()
     };
   }
@@ -187,7 +190,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=119";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=120";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
@@ -283,6 +286,60 @@
     var score=Number.isFinite(Number(row.score))?(" · Punkty: "+row.score):"";
     box.innerHTML="<b>Ta Raja jest już zapisana na koncie.</b><br>Wynik z innego urządzenia: "+result+tries+score;
   }
+
+  async function ensureAchievementToast(){
+    if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
+    await loadScript("../achievement-toast.js?v=120",function(){
+      return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
+    }).catch(function(){});
+    return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
+  }
+  var nazodAwardAttempts = {};
+  async function awardNazodIfArchive(){
+    try{
+      var day = currentDay();
+      var today = todayIdx();
+      if(!(day < today))return;
+      var key = day + ":" + today;
+      if(nazodAwardAttempts[key])return;
+      nazodAwardAttempts[key] = true;
+
+      var session = await getSession();
+      if(!session || !session.user)return;
+
+      var client = await ensureClient();
+      var res = await client.rpc("szpilplac_award_archive_achievement",{
+        p_source_game:"zorta",
+        p_day_index:day,
+        p_today_index:today,
+        p_meta:{
+          source:"raja-archive-nav-v120",
+          path:location.pathname,
+          puzzle_no:day+1
+        }
+      });
+
+      if(res && res.error){
+        console.warn("Nazod achievement error:",res.error);
+        return;
+      }
+
+      var rows = Array.isArray(res && res.data) ? res.data : [];
+      var fresh = rows.filter(function(row){return row && row.is_new;});
+      if(fresh.length){
+        await ensureAchievementToast();
+        if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function"){
+          window.SZP_ACHIEVEMENT_TOAST.showMany(fresh);
+        }
+        if(window.SZPILPLAC_REFRESH_ACHIEVEMENTS){
+          try{window.SZPILPLAC_REFRESH_ACHIEVEMENTS();}catch(e){}
+        }
+      }
+    }catch(e){
+      console.warn("Nazod archive award error:",e);
+    }
+  }
+
   async function fetchAccountResult(){
     var ready = await ensureSupabase();
     if(!ready)return null;
@@ -405,6 +462,10 @@
     setTimeout(hydrateAccountResult,700);
     setTimeout(hydrateAccountResult,1800);
     setTimeout(hydrateAccountResult,3200);
+
+    setTimeout(awardNazodIfArchive,900);
+    setTimeout(awardNazodIfArchive,1800);
+    setInterval(awardNazodIfArchive,1200);
     var tries=0,timer=setInterval(function(){
       tries++;
       if(hook()||tries>80)clearInterval(timer);
