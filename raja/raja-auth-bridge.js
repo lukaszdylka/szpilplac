@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v102
+  Szpilplac Raja Auth Bridge v106
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,8 +7,8 @@
 (function(){
   "use strict";
 
-  var VERSION="v102";
-  var AUTH_STORAGE_KEY="szpilplac-auth-v102";
+  var VERSION="v106";
+  var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
   var hydrated=false;
@@ -204,24 +204,56 @@
     var score=Number.isFinite(Number(row.score))?(" · Punkty: "+row.score):"";
     box.innerHTML="<b>Ta Raja jest już zapisana na koncie.</b><br>Wynik z innego urządzenia: "+result+tries+score;
   }
+  async function fetchAccountResult(){
+    var session=await getSession();
+    if(!session||!session.user)return null;
+    var client=await ensureClient();
+    var base=client.from("user_game_results")
+      .select("game,mode,puzzle_no,won,tries,score,created_at")
+      .eq("user_id",session.user.id)
+      .eq("mode","daily")
+      .eq("puzzle_no",puzzleNo());
+    var res=await base.eq("game","zorta").maybeSingle();
+    if(!res.error&&res.data)return res.data;
+    var res2=await client.from("user_game_results")
+      .select("game,mode,puzzle_no,won,tries,score,created_at")
+      .eq("user_id",session.user.id)
+      .eq("game","raja")
+      .eq("mode","daily")
+      .eq("puzzle_no",puzzleNo())
+      .maybeSingle();
+    if(!res2.error&&res2.data)return res2.data;
+    return null;
+  }
   async function hydrateAccountResult(){
     try{
       if(hydrated)return;
       if(!isCurrent())return;
       if(localFinished())return;
-      var session=await getSession();
-      if(!session||!session.user)return;
-      var client=await ensureClient();
-      var res=await client.from("user_game_results")
-        .select("game,mode,puzzle_no,won,tries,score,created_at")
-        .eq("user_id",session.user.id)
-        .eq("game","zorta")
-        .eq("mode","daily")
-        .eq("puzzle_no",puzzleNo())
-        .maybeSingle();
-      if(!res.error&&res.data)showAccountDone(res.data);
+      var row=await fetchAccountResult();
+      if(row)showAccountDone(row);
     }catch(e){}
   }
+
+  function onRajaFinished(ev){
+    var data=(ev&&ev.detail)||window.__SZP_LAST_RAJA_RESULT||snapshot(false);
+    if(!data)return;
+    data.game=data.game||"zorta";
+    data.mode=data.mode||"daily";
+    if(data.puzzleNo==null&&data.puzzle_no!=null)data.puzzleNo=data.puzzle_no;
+    if(data.puzzleNo==null)data.puzzleNo=puzzleNo();
+    if(data.isCurrent==null)data.isCurrent=isCurrent();
+    var k=data.game+":"+data.mode+":"+data.puzzleNo;
+    if(attempts[k])return;
+    attempts[k]=true;
+    setTimeout(function(){
+      saveResult(data).catch(function(err){
+        console.warn("Raja account save error:",err);
+        setNote("Nie udało się zapisać wyniku Rai na koncie.","err");
+      });
+    },80);
+  }
+
   function hook(){
     if(patched)return true;
     if(typeof window.finishUp!=="function")return false;
@@ -247,6 +279,8 @@
   }
   function boot(){
     console.info("Szpilplac raja-auth-bridge.js "+VERSION);
+    window.addEventListener("szpilplac:raja-finished",onRajaFinished);
+    if(window.__SZP_LAST_RAJA_RESULT)setTimeout(function(){onRajaFinished({detail:window.__SZP_LAST_RAJA_RESULT});},120);
     setTimeout(hydrateAccountResult,700);
     setTimeout(hydrateAccountResult,1800);
     var tries=0,timer=setInterval(function(){

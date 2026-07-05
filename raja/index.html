@@ -876,6 +876,46 @@ function check(){
     toast("Błąd sprawdzania.");
   });
 }
+
+function scoreRajaAccount(won,tries,hintUsed){
+  tries=Math.max(1,Math.min(MAX_TRIES,Number(tries||MAX_TRIES)));
+  if(!won)return 5;
+  var table=[150,120,90,60];
+  var score=table[tries-1]||60;
+  if(hintUsed)score=Math.max(20,score-25);
+  return score;
+}
+function rajaAccountPayload(won){
+  var tries=Math.max(1,Number(guessHistory&&guessHistory.length?guessHistory.length:MAX_TRIES));
+  return {
+    game:"zorta",
+    mode:"daily",
+    puzzleNo:currentDay+1,
+    puzzle_no:currentDay+1,
+    dayIndex:currentDay,
+    won:!!won,
+    tries:tries,
+    errors:Math.max(0,tries-(won?1:0)),
+    score:scoreRajaAccount(!!won,tries,!!hintData),
+    isCurrent:!!(RAJA_STARTED && currentDay===TODAY_IDX && TODAY_IDX_RAW>=0),
+    hintUsed:!!hintData,
+    finishedAt:new Date().toISOString()
+  };
+}
+function notifyRajaAccountFinished(won){
+  try{
+    var data=rajaAccountPayload(won);
+    window.__SZP_LAST_RAJA_RESULT=data;
+    if(typeof CustomEvent==="function"){
+      window.dispatchEvent(new CustomEvent("szpilplac:raja-finished",{detail:data}));
+    }else{
+      var ev=document.createEvent("CustomEvent");
+      ev.initCustomEvent("szpilplac:raja-finished",false,false,data);
+      window.dispatchEvent(ev);
+    }
+  }catch(e){console.warn("Raja account event error",e);}
+}
+
 function finishUp(won){
   playSound(won?"win":"lose");
   syncGlobals();renderList();renderAttempts();showResult(won);
@@ -884,6 +924,7 @@ function finishUp(won){
   if(!IS_TESTER || currentDay<=TODAY_IDX){
     trackEvent({game:"zorta",puzzle_no:currentDay+1,puzzle_word:meta?meta.kategoria:"raja",won:won,tries:guessHistory.length,lang:lang,hint_used:!!hintData,mode:"daily"});
   }
+  notifyRajaAccountFinished(won);
 }
 function showPreStart(){
   currentDay=0;
@@ -1013,7 +1054,7 @@ applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
 loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v102 common system");
+console.info("Szpilplac raja/index.html v106 account save event");
 })();
 </script>
 
@@ -1045,7 +1086,7 @@ console.info("Szpilplac raja/index.html v102 common system");
 </script>
 
 <script src="../coffee.js"></script>
-<script src="raja-auth-bridge.js?v=102"></script>
+<script src="raja-auth-bridge.js?v=106"></script>
 <script src="../game-result-actions.js?v=102"></script>
 <script src="../daily-status.js?v=102"></script>
 <script src="../game-played.js?v=102"></script>
