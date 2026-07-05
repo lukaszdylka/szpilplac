@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Starzik w kopalni</title>
+<style>
+  :root{
+    --bg:#161310;
+    --rock-dark:#100d0a;
+    --rock:#241d16;
+    --rock-light:#4a3f2e;
+    --wood:#5a3c22;
+    --wood-dark:#3a2414;
+    --gold:#c49050;
+    --green:#4a9a6a;
+    --cream:#ede5d0;
+    --muted:#9a907a;
+    --footer:#3d3629;
+    --lamp:#f4c96a;
+    --danger:#b5453a;
+    --oxygen:#5fa8c9;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Inter',Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  h1{
+    font-family:'Oswald',Arial,sans-serif;
+    font-weight:700; letter-spacing:1px; color:var(--gold);
+    margin:0 0 4px 0; text-transform:uppercase; font-size:22px;
+  }
+  #hud{
+    display:flex; gap:16px; align-items:center; flex-wrap:wrap;
+    justify-content:center; font-size:13px; color:var(--muted);
+    max-width:800px;
+  }
+  #coalCount{ color:var(--gold); font-weight:700; }
+  #metanWrap{ display:flex; align-items:center; gap:6px; }
+  #metanBarOuter{
+    width:110px; height:10px; background:var(--rock-dark);
+    border:1px solid var(--footer); border-radius:4px; overflow:hidden;
+  }
+  #metanBarInner{
+    height:100%; width:0%; background:var(--green);
+    transition:width .15s linear, background .3s linear;
+  }
+  canvas{ border:2px solid var(--footer); border-radius:6px; display:block; }
+  #hint{ font-size:12px; color:var(--muted); }
+  #rideCaption{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%);
+    background:var(--footer); color:var(--gold); padding:6px 16px;
+    border-radius:6px; font-family:'Oswald',Arial,sans-serif;
+    letter-spacing:1px; font-size:14px; display:none; z-index:5;
+  }
+  #rideCaption.show{ display:block; }
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,9,7,0.93);
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; gap:12px; text-align:center; z-index:10;
+    padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .overlay h2{
+    font-family:'Oswald',Arial,sans-serif; font-size:24px;
+    letter-spacing:1px; margin:0; text-transform:uppercase;
+  }
+  #overlayWin h2{ color:var(--green); }
+  #overlayDead h2{ color:var(--danger); }
+  #code{
+    font-family:'Oswald',Arial,sans-serif; font-size:56px; font-weight:700;
+    letter-spacing:10px; color:var(--gold); background:var(--footer);
+    padding:14px 30px; border-radius:8px; border:2px solid var(--gold);
+  }
+  .overlay p{ color:var(--muted); font-size:13px; max-width:360px; line-height:1.5; }
+  button{
+    font-family:'Inter',Arial,sans-serif; background:var(--green); color:#0e1a0e;
+    border:none; padding:8px 18px; border-radius:5px; font-weight:600;
+    cursor:pointer; font-size:13px;
+  }
+  button:hover{ filter:brightness(1.1); }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>Starzik w kopalni Familock</h1>
+  <div id="hud">
+    <div>⛏️ Węgiel: <span id="coalCount">0</span>/<span id="coalTotal">0</span></div>
+    <div id="lifeDisplay"></div>
+    <div id="metanWrap">Metan <div id="metanBarOuter"><div id="metanBarInner"></div></div></div>
+    <div id="hint">← → ruch, spacja/↑ skok, X - kilof</div>
+  </div>
+  <canvas id="game" width="800" height="380"></canvas>
+</div>
+
+<div id="rideCaption">Winda jedzie na wiyrch…</div>
+
+<div class="overlay" id="overlayWin">
+  <h2>Na wiyrchu!</h2>
+  <p>Zebrołżeś cały wyngiel i szola wywiozła Cie na wiyrch. Sztajger odbiero wyngiel i dowo Ci klucz do kłódki.</p>
+  <div id="code">7648</div>
+  <button onclick="restart()">Zagrej jeszcze roz</button>
+</div>
+
+<div class="overlay" id="overlayDead">
+  <h2 id="deadTitle">Koniec szychty</h2>
+  <p id="deadText"></p>
+  <button onclick="restart()">Zagrej jeszcze roz</button>
+</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const GRAVITY = 0.55;
+const GROUND_Y = H - 60;
+const WORLD_LEN = 5400;
+const ELEVATOR_DURATION = 130;
+const ELEVATOR_RISE = 260;
+const SWING_DURATION = 18;
+const ATTACK_COOLDOWN = 26;
+const STUN_DURATION = 130;
+
+let keys = {};
+window.addEventListener('keydown', e=>{
+  keys[e.code]=true;
+  if(['ArrowLeft','ArrowRight','ArrowUp','Space'].includes(e.code)) e.preventDefault();
+});
+window.addEventListener('keyup', e=>{ keys[e.code]=false; });
+
+// fixed background decor (generated once, not re-randomized each frame)
+const lamps = [];
+for(let x=150; x<WORLD_LEN; x+=260){
+  lamps.push({x, y:40+Math.random()*30});
+}
+const rockSpecks = [];
+for(let i=0;i<180;i++){
+  rockSpecks.push({x:Math.random()*WORLD_LEN, y:Math.random()*H, r:1+Math.random()*2});
+}
+
+function makePlatforms(){
+  let plats = [];
+  const gaps = [[650,80],[1300,90],[1950,70],[2650,100],[3350,90],[4050,110],[4650,80]];
+  let cursor = 0;
+  for(const [gx,gw] of gaps){
+    plats.push({x:cursor, y:GROUND_Y, w:gx-cursor, h:H-GROUND_Y, ground:true});
+    cursor = gx+gw;
+  }
+  plats.push({x:cursor, y:GROUND_Y, w:WORLD_LEN-cursor+400, h:H-GROUND_Y, ground:true});
+
+  const floaters = [
+    [220,260],[430,210],[760,280],[980,220],[1200,180],
+    [1440,260],[1700,300],[1900,230],[2120,180],[2380,250],
+    [2600,300],[2820,220],[3060,180],[3300,260],[3520,210],
+    [3760,290],[3980,230],[4220,180],[4460,250],[4700,300],
+    [4920,220],[5140,270]
+  ];
+  for(const [x,y] of floaters){
+    plats.push({x, y, w:100, h:18});
+  }
+
+  const rocks = [900, 1850, 2950, 4150, 5000];
+  for(const rx of rocks){
+    plats.push({x:rx, y:GROUND_Y-60, w:56, h:60, rock:true});
+  }
+  return plats;
+}
+
+function makeCoal(){
+  const spots = [
+    [270,225],[480,175],[810,245],[1030,185],[1250,145],
+    [1490,225],[1750,265],[1950,195],[2170,145],[2430,215],
+    [2650,265],[2870,185],[3110,145],[3350,225],[3570,175],
+    [3810,255],[4030,195],[4270,145],[4510,215],[4750,265],
+    [4970,185],[5190,235]
+  ];
+  return spots.map(([x,y])=>({x,y,taken:false}));
+}
+
+function makeOxygen(){
+  const spots = [750,1950,3150,4450];
+  return spots.map(x=>({x, y:GROUND_Y-34, taken:false}));
+}
+
+function makeBats(){
+  // latające: patrolują w powietrzu, skrzydła cały czas rozwinięte
+  const flyDefs = [
+    [700,850,190,0.3],[1650,1820,170,1.4],[2650,2820,200,2.1],
+    [3750,3920,150,0.9],[4850,5020,210,1.6]
+  ];
+  const flying = flyDefs.map(([xMin,xMax,y,phase])=>(
+    {type:'fly', xMin,xMax,y,phase,curX:xMin,curY:y,localT:0,stunned:0}
+  ));
+
+  // wiszące: śpią przy suficie, spadają i zaczynają latać gdy podejdziesz bliżej
+  const hangDefs = [
+    [350,34,0],[1300,38,1],[2400,30,2],[3500,36,0.6],[4600,32,1.8]
+  ];
+  const hanging = hangDefs.map(([x,ceilY,phase])=>(
+    {type:'hang', state:'sleep', x, ceilY, phase, curX:x, curY:ceilY, fallTimer:0, localT:0, stunned:0}
+  ));
+
+  return [...flying, ...hanging];
+}
+
+let platforms, coalList, oxyList, bats, player, camX, state, elevatorTimer, life, metan, invuln, frameT, elevatorBaseY, elevatorRiseNow;
+
+function updateLifeDisplay(){
+  let html='';
+  for(let i=0;i<3;i++){
+    html += `<span style="color:${i<life ? '#c0453a' : '#4a4038'}">❤</span>`;
+  }
+  document.getElementById('lifeDisplay').innerHTML = html;
+}
+
+function updateMetanBar(){
+  const inner = document.getElementById('metanBarInner');
+  inner.style.width = metan+'%';
+  inner.style.background = metan<40 ? '#4a9a6a' : (metan<75 ? '#c49050' : '#b5453a');
+}
+
+function reset(){
+  platforms = makePlatforms();
+  coalList = makeCoal();
+  oxyList = makeOxygen();
+  bats = makeBats();
+  player = { x:40, y:GROUND_Y-42, w:26, h:42, vx:0, vy:0, onGround:false, facing:1, walk:0, attackTimer:0, attackCooldown:0 };
+  camX = 0;
+  state = 'play';
+  elevatorTimer = 0;
+  elevatorBaseY = 0;
+  elevatorRiseNow = 0;
+  life = 3;
+  metan = 0;
+  invuln = 0;
+  frameT = 0;
+
+  document.getElementById('coalTotal').textContent = coalList.length;
+  document.getElementById('coalCount').textContent = 0;
+  updateLifeDisplay();
+  updateMetanBar();
+  document.getElementById('overlayWin').classList.remove('show');
+  document.getElementById('overlayDead').classList.remove('show');
+  document.getElementById('rideCaption').classList.remove('show');
+}
+reset();
+function restart(){ reset(); }
+window.restart = restart;
+
+function rectsOverlap(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+
+function triggerDeath(reason){
+  state = 'dead';
+  const title = document.getElementById('deadTitle');
+  const text = document.getElementById('deadText');
+  if(reason==='metan'){
+    title.textContent = 'Wybuch metanu';
+    text.textContent = 'Zebrało się za dużo gazu w sztolni. Zbieraj tlen po drodze, żeby wskaźnik nie doszedł do końca.';
+  } else {
+    title.textContent = 'Koniec szychty';
+    text.textContent = 'Nietoperze Cię pokonały. Odskakuj w bok, żeby ich unikać.';
+  }
+  document.getElementById('overlayDead').classList.add('show');
+}
+
+function showWin(){
+  document.getElementById('rideCaption').classList.remove('show');
+  document.getElementById('overlayWin').classList.add('show');
+}
+
+function update(){
+  if(state==='dead' || state==='done') return;
+
+  if(state==='elevator'){
+    elevatorTimer++;
+    const t = Math.min(1, elevatorTimer/ELEVATOR_DURATION);
+    const eased = t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+    elevatorRiseNow = eased*ELEVATOR_RISE;
+    player.y = elevatorBaseY - elevatorRiseNow;
+    if(elevatorTimer > ELEVATOR_DURATION){
+      state = 'done';
+      showWin();
+    }
+    return;
+  }
+
+  frameT += 1/60;
+
+  const speed = 4.4;
+  if(keys['ArrowLeft']){ player.vx=-speed; player.facing=-1; player.walk+=1; }
+  else if(keys['ArrowRight']){ player.vx=speed; player.facing=1; player.walk+=1; }
+  else { player.vx*=0.7; player.walk=0; }
+
+  if((keys['Space']||keys['ArrowUp']) && player.onGround){
+    player.vy=-12; player.onGround=false;
+  }
+
+  if(keys['KeyX'] && player.attackCooldown<=0){
+    player.attackTimer = SWING_DURATION;
+    player.attackCooldown = ATTACK_COOLDOWN;
+  }
+  if(player.attackTimer>0) player.attackTimer--;
+  if(player.attackCooldown>0) player.attackCooldown--;
+
+  player.vy += GRAVITY;
+  if(player.vy>14) player.vy=14;
+
+  const prevX = player.x;
+  player.x += player.vx;
+  if(player.x<0) player.x=0;
+  for(const p of platforms){
+    if(p.rock){
+      const pb={x:player.x,y:player.y,w:player.w,h:player.h};
+      const box={x:p.x,y:p.y,w:p.w,h:p.h};
+      if(rectsOverlap(pb,box)) player.x = prevX;
+    }
+  }
+
+  player.y += player.vy;
+
+  player.onGround = false;
+  for(const p of platforms){
+    const feet={x:player.x+4,y:player.y+player.h,w:player.w-8,h:6};
+    const top={x:p.x,y:p.y,w:p.w,h:6};
+    if(player.vy>=0 && feet.x<top.x+top.w && feet.x+feet.w>top.x && feet.y<top.y+6 && feet.y+feet.h>top.y-4){
+      player.y = p.y - player.h; player.vy=0; player.onGround=true;
+    }
+  }
+
+  if(player.y > H+80){
+    player.x = Math.max(20, player.x-260);
+    player.y = GROUND_Y-42; player.vy=0;
+  }
+
+  for(const c of coalList){
+    if(!c.taken){
+      const cb={x:c.x-11,y:c.y-11,w:22,h:22};
+      const pb={x:player.x,y:player.y,w:player.w,h:player.h};
+      if(rectsOverlap(cb,pb)){
+        c.taken = true;
+        document.getElementById('coalCount').textContent = coalList.filter(k=>k.taken).length;
+      }
+    }
+  }
+
+  for(const o of oxyList){
+    if(!o.taken){
+      const ob={x:o.x-9,y:o.y-14,w:18,h:28};
+      const pb={x:player.x,y:player.y,w:player.w,h:player.h};
+      if(rectsOverlap(ob,pb)){
+        o.taken = true;
+        metan = Math.max(0, metan-30);
+      }
+    }
+  }
+
+  metan = Math.min(100, metan + 100/4200);
+  updateMetanBar();
+  if(metan>=100){ triggerDeath('metan'); return; }
+
+  if(invuln>0) invuln--;
+
+  for(const b of bats){
+    // zamach kilofem ogłusza nietoperza w zasięgu (jeśli już nie jest ogłuszony)
+    if(player.attackTimer>0 && b.stunned<=0){
+      const hx = player.x + player.w/2 + player.facing*30;
+      const hy = player.y + player.h/2 - 4;
+      const hdx = b.curX-hx, hdy = b.curY-hy;
+      if(Math.sqrt(hdx*hdx+hdy*hdy) < 34){
+        b.stunned = STUN_DURATION;
+      }
+    }
+
+    if(b.stunned>0){
+      b.stunned--; // ogłuszony wisi bezwładnie w miejscu, ruch zamrożony
+    } else {
+      b.localT += 1/60;
+      if(b.type==='fly'){
+        b.curX = b.xMin + (b.xMax-b.xMin)*(0.5+0.5*Math.sin(b.localT*1.6+b.phase));
+        b.curY = b.y + Math.sin(b.localT*2.7+b.phase)*15;
+      } else if(b.state==='sleep'){
+        b.curX = b.x + Math.sin(b.localT*1.1+b.phase)*4;
+        b.curY = b.ceilY + Math.sin(b.localT*0.9+b.phase)*3;
+        const wakeDist = Math.abs((player.x+player.w/2) - b.curX);
+        if(wakeDist < 130){
+          b.state = 'falling';
+          b.fallTimer = 0;
+        }
+      } else if(b.state==='falling'){
+        b.fallTimer++;
+        b.curY += 3 + b.fallTimer*0.06;
+        b.curX += Math.sign((player.x+player.w/2) - b.curX) * 1.6;
+        if(b.curY > 150 || b.fallTimer > 70){
+          b.state = 'fly';
+          b.xMin = b.curX - 90;
+          b.xMax = b.curX + 90;
+          b.y = b.curY;
+        }
+      } else {
+        // wiszący, po obudzeniu lata tak samo jak latający
+        b.curX = b.xMin + (b.xMax-b.xMin)*(0.5+0.5*Math.sin(b.localT*1.6+b.phase));
+        b.curY = b.y + Math.sin(b.localT*2.7+b.phase)*15;
+      }
+    }
+
+    if(invuln<=0 && b.stunned<=0){
+      const dx = (player.x+player.w/2)-b.curX;
+      const dy = (player.y+player.h/2)-b.curY;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < 26){
+        life--;
+        metan = Math.min(100, metan+18);
+        invuln = 60;
+        player.vx = dx<0 ? 5 : -5;
+        player.vy = -5;
+        updateLifeDisplay();
+        if(life<=0){ triggerDeath('life'); return; }
+      }
+    }
+  }
+
+  const doorX = WORLD_LEN-70;
+  const allCoal = coalList.every(c=>c.taken);
+  if(player.x+player.w > doorX && allCoal && state==='play'){
+    state = 'elevator';
+    elevatorTimer = 0;
+    elevatorBaseY = player.y;
+    document.getElementById('rideCaption').classList.add('show');
+  } else if(player.x+player.w > doorX+50){
+    player.x = doorX+50-player.w;
+  }
+
+  camX = Math.max(0, Math.min(WORLD_LEN-W, player.x - W/2));
+}
+
+function drawBackground(){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#241d16');
+  g.addColorStop(1, '#100d0a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle = 'rgba(154,144,122,0.25)';
+  for(const s of rockSpecks){
+    const sx = s.x - camX*0.6;
+    if(sx<-10 || sx>W+10) continue;
+    ctx.beginPath();
+    ctx.arc(sx, s.y, s.r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  for(const l of lamps){
+    const lx = l.x - camX*0.85;
+    if(lx<-40 || lx>W+40) continue;
+    const glow = ctx.createRadialGradient(lx,l.y,0,lx,l.y,55);
+    glow.addColorStop(0, 'rgba(244,201,106,0.35)');
+    glow.addColorStop(1, 'rgba(244,201,106,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(lx,l.y,55,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#3d3629';
+    ctx.fillRect(lx-3,l.y-6,6,14);
+    ctx.fillStyle = '#f4c96a';
+    ctx.beginPath();
+    ctx.arc(lx,l.y+10,5,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawRock(p){
+  ctx.fillStyle = '#3a332a';
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y+p.h);
+  ctx.lineTo(p.x+p.w*0.2, p.y+p.h*0.3);
+  ctx.lineTo(p.x+p.w*0.5, p.y);
+  ctx.lineTo(p.x+p.w*0.8, p.y+p.h*0.35);
+  ctx.lineTo(p.x+p.w, p.y+p.h);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#1c1712';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(154,144,122,0.25)';
+  ctx.beginPath();
+  ctx.moveTo(p.x+p.w*0.5, p.y);
+  ctx.lineTo(p.x+p.w*0.42, p.y+p.h*0.5);
+  ctx.lineTo(p.x+p.w*0.58, p.y+p.h*0.5);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawPlank(p){
+  ctx.fillStyle = '#5a3c22';
+  ctx.fillRect(p.x, p.y, p.w, p.h);
+  ctx.strokeStyle = '#3a2414';
+  ctx.lineWidth = 1.5;
+  for(let lx=p.x+10; lx<p.x+p.w; lx+=20){
+    ctx.beginPath(); ctx.moveTo(lx,p.y); ctx.lineTo(lx,p.y+p.h); ctx.stroke();
+  }
+  ctx.fillStyle = '#7a5230';
+  ctx.fillRect(p.x, p.y, p.w, 4);
+}
+
+function drawCoal(x,y){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.fillStyle = '#141414';
+  ctx.beginPath();
+  ctx.moveTo(-10,4); ctx.lineTo(-6,-8); ctx.lineTo(3,-10);
+  ctx.lineTo(10,-2); ctx.lineTo(7,7); ctx.lineTo(-3,9);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.arc(-2,-3,2.2,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawOxygen(x,y){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.fillStyle = '#5fa8c9';
+  ctx.fillRect(-7,-12,14,24);
+  ctx.strokeStyle = '#2c5a70';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(-7,-12,14,24);
+  ctx.fillStyle = '#dff3fa';
+  ctx.fillRect(-4,-9,8,6);
+  ctx.fillStyle = '#2c5a70';
+  ctx.fillRect(-3,-16,6,5);
+  ctx.restore();
+}
+
+function drawBatFlying(x,y,t,phase){
+  const wing = Math.sin(t*8+phase)*14;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.shadowColor = 'rgba(0,0,0,0.65)';
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = '#453a5c';
+  ctx.strokeStyle = '#8a7fa0';
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(-22,-10-wing,-32,3);
+  ctx.quadraticCurveTo(-15,7,0,0);
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(22,-10-wing,32,3);
+  ctx.quadraticCurveTo(15,7,0,0);
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(0,0,10,8.5,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.moveTo(-5,-7); ctx.lineTo(-9,-17); ctx.lineTo(-2,-6); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(5,-7); ctx.lineTo(9,-17); ctx.lineTo(2,-6); ctx.closePath(); ctx.fill();
+  const glow = ctx.createRadialGradient(0,-1,0,0,-1,11);
+  glow.addColorStop(0,'rgba(230,90,70,0.55)');
+  glow.addColorStop(1,'rgba(230,90,70,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(0,-1,11,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ff6b57';
+  ctx.beginPath();
+  ctx.arc(-3.5,-1,1.9,0,Math.PI*2);
+  ctx.arc(3.5,-1,1.9,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBatHanging(x,y,t,phase){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(Math.sin(t*1.1+phase)*0.15);
+  ctx.strokeStyle = '#1c1712';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0,-16); ctx.lineTo(0,-7);
+  ctx.stroke();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 6;
+  ctx.fillStyle = '#453a5c';
+  ctx.strokeStyle = '#8a7fa0';
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.moveTo(0,-7);
+  ctx.quadraticCurveTo(-12,2,-9,15);
+  ctx.quadraticCurveTo(0,21,9,15);
+  ctx.quadraticCurveTo(12,2,0,-7);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.moveTo(-5,-6); ctx.lineTo(-9,-13); ctx.lineTo(-2,-5); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(5,-6); ctx.lineTo(9,-13); ctx.lineTo(2,-5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(200,80,65,0.6)';
+  ctx.beginPath();
+  ctx.arc(-3,4,1.5,0,Math.PI*2);
+  ctx.arc(3,4,1.5,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawElevator(x, allCoal, riseOffset, shakeX){
+  const ox = x + shakeX;
+  const topY = GROUND_Y-140-riseOffset;
+  const botY = GROUND_Y-riseOffset;
+  // lina wyciągowa, znika w szybie nad ekranem
+  ctx.strokeStyle = '#2a241c';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox+35, topY); ctx.lineTo(ox+35, -50);
+  ctx.stroke();
+
+  ctx.strokeStyle = allCoal ? '#4a9a6a' : '#5a2f2f';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(ox, topY, 70, 140);
+  ctx.beginPath();
+  ctx.moveTo(ox, botY-70); ctx.lineTo(ox+70, botY-70);
+  ctx.moveTo(ox, topY); ctx.lineTo(ox+70, botY);
+  ctx.moveTo(ox+70, topY); ctx.lineTo(ox, botY);
+  ctx.stroke();
+  ctx.fillStyle = '#c49050';
+  ctx.font = "bold 12px Arial";
+  ctx.fillText("SZOLA", ox+8, topY-8);
+}
+
+function drawPickaxe(pivotX, pivotY, angleRad){
+  ctx.save();
+  ctx.translate(pivotX, pivotY);
+  ctx.rotate(angleRad);
+  ctx.fillStyle = '#6b4a2a';
+  ctx.strokeStyle = '#3a2414';
+  ctx.lineWidth = 1;
+  ctx.fillRect(-2, 0, 4, 22);
+  ctx.strokeRect(-2, 0, 4, 22);
+  ctx.fillStyle = '#6a6a6a';
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.beginPath();
+  ctx.moveTo(-2,0); ctx.lineTo(-15,-7); ctx.lineTo(-2,4); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(2,0); ctx.lineTo(15,-7); ctx.lineTo(2,4); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+function drawTinyStar(x,y,r){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a1 = -Math.PI/2 + i*(Math.PI*2/5);
+    const a2 = a1 + Math.PI/5;
+    ctx.lineTo(Math.cos(a1)*r, Math.sin(a1)*r);
+    ctx.lineTo(Math.cos(a2)*(r*0.45), Math.sin(a2)*(r*0.45));
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawStunStars(x,y,t){
+  ctx.fillStyle = '#f4c96a';
+  for(let i=0;i<3;i++){
+    const a = t*5 + i*(Math.PI*2/3);
+    drawTinyStar(x+Math.cos(a)*13, y-16+Math.sin(a)*5, 4);
+  }
+}
+
+function draw(){
+  drawBackground();
+
+  ctx.save();
+  ctx.translate(-camX, 0);
+
+  for(const p of platforms){
+    if(p.rock) drawRock(p);
+    else if(p.ground){
+      ctx.fillStyle = '#2a241c';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.fillStyle = '#4a3f2e';
+      ctx.fillRect(p.x, p.y, p.w, 6);
+    } else {
+      drawPlank(p);
+    }
+  }
+
+  for(const c of coalList){ if(!c.taken) drawCoal(c.x, c.y); }
+  for(const o of oxyList){ if(!o.taken) drawOxygen(o.x, o.y); }
+  for(const b of bats){
+    ctx.save();
+    if(b.stunned>0){
+      ctx.translate(b.curX, b.curY);
+      ctx.rotate(0.6);
+      ctx.translate(-b.curX, -b.curY);
+    }
+    if(b.type==='hang' && b.state==='sleep') drawBatHanging(b.curX, b.curY, b.localT, b.phase);
+    else drawBatFlying(b.curX, b.curY, b.localT, b.phase);
+    ctx.restore();
+    if(b.stunned>0) drawStunStars(b.curX, b.curY, frameT);
+  }
+
+  const allCoal = coalList.every(c=>c.taken);
+  const shakeX = state==='elevator' ? Math.sin(elevatorTimer*2.3)*1.3 : 0;
+  drawElevator(WORLD_LEN-70, allCoal, state==='elevator' ? elevatorRiseNow : 0, shakeX);
+
+  const blink = invuln>0 && Math.floor(invuln/6)%2===0;
+  if(!blink){
+    ctx.save();
+    ctx.translate(player.x + player.w/2 + shakeX, player.y);
+    ctx.scale(player.facing, 1);
+    const bob = player.onGround ? Math.sin(player.walk*0.35)*3 : 0;
+    ctx.fillStyle = '#2c2620';
+    ctx.fillRect(-10, 22+(player.onGround?-bob:0), 8, 20);
+    ctx.fillRect(2, 22+(player.onGround?bob:0), 8, 20);
+    ctx.fillStyle = '#4a9a6a';
+    ctx.fillRect(-13,-2,26,24);
+    ctx.fillRect(-16,2,6,16);
+    ctx.fillRect(10,2,6,16);
+    ctx.fillStyle = '#d9b98a';
+    ctx.beginPath(); ctx.arc(0,-14,12,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ede5d0';
+    ctx.beginPath(); ctx.arc(0,-6,8,0,Math.PI); ctx.fill();
+    ctx.fillStyle = '#3d3629';
+    ctx.fillRect(-13,-26,26,6);
+    ctx.fillRect(-9,-32,18,8);
+    // helmet lamp
+    ctx.fillStyle = '#f4c96a';
+    ctx.beginPath(); ctx.arc(0,-30,3,0,Math.PI*2); ctx.fill();
+    // kilof w dłoni - spoczynek albo zamach
+    let pickAngle;
+    if(player.attackTimer>0){
+      const progress = 1 - player.attackTimer/SWING_DURATION;
+      pickAngle = -1.3 + progress*1.9;
+    } else {
+      pickAngle = 0.3;
+    }
+    drawPickaxe(12, -2, pickAngle);
+    ctx.restore();
+  }
+
+  ctx.restore();
+
+  if(state==='elevator'){
+    ctx.fillStyle = `rgba(10,9,7,${Math.min(0.6, elevatorTimer/ELEVATOR_DURATION*0.6)})`;
+    ctx.fillRect(0,0,W,H);
+  }
+}
+
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
