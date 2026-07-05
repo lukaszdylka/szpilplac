@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v114 */
+/* Szpilplac game-save.js v116 */
 (function(){
   "use strict";
-  var VERSION="v114";
+  var VERSION="v116";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   function nested(){return /\/raja\/?/.test(location.pathname);} 
@@ -39,7 +39,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript(root("achievement-toast.js?v=114"),function(){
+    await loadScript(root("achievement-toast.js?v=116"),function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -57,7 +57,7 @@
       errors: payload.errors,
       score: payload.score,
       hints_used: Number(original.hintsUsed != null ? original.hintsUsed : (original.hints_used != null ? original.hints_used : 0)) || 0,
-      source: "game-save-v114",
+      source: "game-save-v116",
       path: location.pathname
     };
   }
@@ -66,6 +66,21 @@
       var c = await getClient();
       var session = await getSession();
       if(!c || !session || !session.user)return [];
+
+      async function earnedMap(){
+        var out = {};
+        try{
+          var r = await c.rpc("szpilplac_my_achievements");
+          var rows = Array.isArray(r.data) ? r.data : [];
+          rows.forEach(function(row){
+            if(row && row.earned_at)out[String(row.id || row.achievement_id)] = row;
+          });
+        }catch(e){}
+        return out;
+      }
+
+      var before = await earnedMap();
+
       var meta = achievementMeta(payload, original);
       var res = await c.rpc("szpilplac_check_achievement_event",{
         p_event:"game_finished",
@@ -75,10 +90,36 @@
         p_hints_used:meta.hints_used,
         p_score:payload.score == null ? null : Number(payload.score),
         p_meta:meta
-      });
-      if(res.error)return [];
+      }).catch(function(){return {data:[],error:null};});
+
+      try{ await c.rpc("szpilplac_repair_my_daily_achievements"); }catch(e){}
+
       var rows = Array.isArray(res.data) ? res.data : [];
       var fresh = rows.filter(function(r){return r && r.is_new;});
+
+      var after = await earnedMap();
+      Object.keys(after).forEach(function(id){
+        if(!before[id] && after[id]){
+          fresh.push({
+            achievement_id:id,
+            id:id,
+            label:after[id].label,
+            description:after[id].description,
+            svg:after[id].svg,
+            earned_at:after[id].earned_at,
+            is_new:true
+          });
+        }
+      });
+
+      var seen = {};
+      fresh = fresh.filter(function(r){
+        var id = String(r.achievement_id || r.id || r.label || "");
+        if(!id || seen[id])return false;
+        seen[id] = true;
+        return true;
+      });
+
       if(fresh.length){
         await ensureAchievementToast();
         if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function"){

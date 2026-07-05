@@ -1,12 +1,12 @@
 /*
-  Szpilplac Cuzamen Auth Bridge v114
+  Szpilplac Cuzamen Auth Bridge v116
   - dodaje zapis Cuzamen na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany
 */
 (function(){
   "use strict";
 
-  var VERSION="v110";
+  var VERSION="v116";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -123,7 +123,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=114";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=116";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;

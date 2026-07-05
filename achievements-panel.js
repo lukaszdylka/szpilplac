@@ -207,6 +207,10 @@
         });
       }catch(e){}
 
+      try{
+        await c.rpc("szpilplac_repair_my_daily_achievements");
+      }catch(e){}
+
       var res = await c.rpc("szpilplac_my_achievements");
       if(res.error)throw res.error;
       renderRows(res.data || []);
@@ -224,7 +228,7 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v109 trzy na zicher");
+  console.info("Szpilplac achievements-panel.js v116 trzy na zicher");
 })();
 
 

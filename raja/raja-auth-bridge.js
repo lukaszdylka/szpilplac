@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v114
+  Szpilplac Raja Auth Bridge v116
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v110";
+  var VERSION="v116";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -20,7 +20,11 @@
     style.id="szpRajaAccountStyle";
     style.textContent=
       '.szp-account-save-note{margin:8px auto 0;max-width:340px;text-align:center;font-size:11.5px;line-height:1.35;color:var(--ink2,#6a6150);background:var(--surface2,#f3ecda);border:1px dashed var(--line,#c9bfa6);border-radius:999px;padding:7px 10px}.szp-account-save-note.ok{color:var(--green,#2f4a39);border-color:var(--green,#2f4a39)}.szp-account-save-note.err{color:var(--wrong,#a14b3a);border-color:var(--wrong,#a14b3a)}'+
-      '.szp-account-done{margin:10px auto 12px;max-width:430px;text-align:center;font-size:12.5px;line-height:1.45;color:var(--ink,#23201a);background:var(--surface,#fbf7ee);border:1px solid var(--line,#c9bfa6);border-radius:13px;padding:11px 12px}.szp-account-done b{color:var(--green,#2f4a39)}';
+      '.szp-account-done{margin:10px auto 12px;max-width:430px;text-align:center;font-size:12.5px;line-height:1.45;color:var(--ink,#23201a);background:var(--surface,#fbf7ee);border:1px solid var(--line,#c9bfa6);border-radius:13px;padding:11px 12px}.szp-account-done b{color:var(--green,#2f4a39)}'+
+      'body.raja-account-locked #list,body.raja-account-locked .raja-stack{pointer-events:none!important;opacity:.62!important}'+
+      'body.raja-account-locked .order-mini-btn,body.raja-account-locked #checkBtn,body.raja-account-locked #hintBtn{display:none!important}'+
+      'body.raja-account-locked .order-mobile-hint{display:none!important}'+
+      'body.raja-account-locked .row,body.raja-account-locked .item,body.raja-account-locked li{cursor:default!important}';
     document.head.appendChild(style);
   }
   function setNote(text,type){
@@ -136,7 +140,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=114";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=116";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
@@ -177,6 +181,26 @@
     if(res.error)throw res.error;
     setNote("Wynik Rai zapisany na koncie. +"+data.score+" pkt","ok");
   }
+
+  function lockAccountDoneUI(){
+    try{document.body.classList.add("raja-account-locked");}catch(e){}
+    ["checkBtn","hintBtn"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){el.disabled=true;el.style.display="none";}
+    });
+    var list=document.getElementById("list");
+    if(list){
+      list.setAttribute("aria-disabled","true");
+      Array.prototype.slice.call(list.querySelectorAll("button,.order-mini-btn")).forEach(function(btn){
+        btn.disabled=true;
+        btn.setAttribute("aria-disabled","true");
+      });
+    }
+    if(window.RAJA_SYNC_DOM_ORDER){
+      try{window.RAJA_SYNC_DOM_ORDER();}catch(e){}
+    }
+  }
+
   function showAccountDone(row){
     if(!row||hydrated)return;
     if(localFinished())return;
@@ -184,6 +208,7 @@
     injectStyle();
 
     try{window.status=row.won?"won":"lost";}catch(e){}
+    lockAccountDoneUI();
 
     var check=document.getElementById("checkBtn");
     if(check)check.style.display="none";
@@ -223,6 +248,16 @@
       .eq("puzzle_no",puzzleNo())
       .maybeSingle();
     if(!res2.error&&res2.data)return res2.data;
+
+    var any = await client.from("user_game_results")
+      .select("game,mode,puzzle_no,won,tries,score,created_at")
+      .eq("user_id",session.user.id)
+      .in("game",["zorta","raja"])
+      .eq("puzzle_no",puzzleNo())
+      .order("created_at",{ascending:false})
+      .limit(1);
+    if(!any.error && any.data && any.data[0])return any.data[0];
+
     return null;
   }
   async function hydrateAccountResult(){
