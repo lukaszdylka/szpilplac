@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v116
+  Szpilplac Raja Auth Bridge v118
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v116";
+  var VERSION="v118";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -100,6 +100,53 @@
   function isCurrent(){
     return currentDay()===todayIdx();
   }
+
+  function dateKeyFromValue(value){
+    if(!value)return "";
+    try{
+      var d = value instanceof Date ? value : new Date(value);
+      if(isNaN(d.getTime()))return "";
+      var parts = new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+      var o = {};
+      parts.forEach(function(p){if(p.type !== "literal")o[p.type] = p.value;});
+      return o.year + "-" + o.month + "-" + o.day;
+    }catch(e){return "";}
+  }
+  function todayWarsawKey(){
+    return dateKeyFromValue(new Date());
+  }
+  function localState(){
+    try{
+      var raw = localStorage.getItem("zorta_daily_d"+currentDay());
+      if(!raw)return null;
+      var st = JSON.parse(raw);
+      return st || null;
+    }catch(e){return null;}
+  }
+  function localResultPayload(){
+    var st = localState();
+    if(!st || !st.status || st.status === "playing")return null;
+    var hist = Array.isArray(st.history) ? st.history : [];
+    var won = st.status === "won";
+    var tries = Math.max(1, hist.length || 1);
+    var hintUsed = !!st.hintData;
+    return {
+      game:"zorta",
+      mode:"daily",
+      puzzleNo:puzzleNo(),
+      puzzle_no:puzzleNo(),
+      dayIndex:currentDay(),
+      won:won,
+      tries:tries,
+      errors:Math.max(0,tries-(won?1:0)),
+      score:scoreRaja(won,tries,hintUsed),
+      isCurrent:isCurrent(),
+      hintUsed:hintUsed,
+      finishedAt:new Date().toISOString(),
+      source:"local-raja-sync-v118"
+    };
+  }
+
   function scoreRaja(won,tries,hintUsed){
     tries=Math.max(1,Math.min(4,Number(tries||4)));
     if(!won)return 5;
@@ -140,7 +187,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=116";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=118";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
@@ -199,11 +246,13 @@
     if(window.RAJA_SYNC_DOM_ORDER){
       try{window.RAJA_SYNC_DOM_ORDER();}catch(e){}
     }
+    if(window.RAJA_LOCK_ACCOUNT_DONE_UI){
+      try{window.RAJA_LOCK_ACCOUNT_DONE_UI();}catch(e){}
+    }
   }
 
   function showAccountDone(row){
     if(!row||hydrated)return;
-    if(localFinished())return;
     hydrated=true;
     injectStyle();
 
@@ -230,33 +279,47 @@
     box.innerHTML="<b>Ta Raja jest już zapisana na koncie.</b><br>Wynik z innego urządzenia: "+result+tries+score;
   }
   async function fetchAccountResult(){
-    var session=await getSession();
-    if(!session||!session.user)return null;
-    var client=await ensureClient();
-    var base=client.from("user_game_results")
-      .select("game,mode,puzzle_no,won,tries,score,created_at")
-      .eq("user_id",session.user.id)
-      .eq("mode","daily")
-      .eq("puzzle_no",puzzleNo());
-    var res=await base.eq("game","zorta").maybeSingle();
-    if(!res.error&&res.data)return res.data;
-    var res2=await client.from("user_game_results")
-      .select("game,mode,puzzle_no,won,tries,score,created_at")
-      .eq("user_id",session.user.id)
-      .eq("game","raja")
-      .eq("mode","daily")
-      .eq("puzzle_no",puzzleNo())
-      .maybeSingle();
-    if(!res2.error&&res2.data)return res2.data;
+    var ready = await ensureSupabase();
+    if(!ready)return null;
+    var session = await getSession();
+    if(!session || !session.user)return null;
 
-    var any = await client.from("user_game_results")
-      .select("game,mode,puzzle_no,won,tries,score,created_at")
-      .eq("user_id",session.user.id)
-      .in("game",["zorta","raja"])
-      .eq("puzzle_no",puzzleNo())
-      .order("created_at",{ascending:false})
-      .limit(1);
-    if(!any.error && any.data && any.data[0])return any.data[0];
+    var day = puzzleNo();
+    var today = todayWarsawKey();
+    var games = ["zorta","raja"];
+
+    async function queryRows(withFinished, exactPuzzle){
+      var sel = withFinished
+        ? "game,mode,puzzle_no,won,tries,score,created_at,finished_at"
+        : "game,mode,puzzle_no,won,tries,score,created_at";
+
+      var q = client.from("user_game_results")
+        .select(sel)
+        .eq("user_id",session.user.id)
+        .in("game",games);
+
+      if(exactPuzzle)q = q.eq("puzzle_no",day);
+
+      q = q.order("created_at",{ascending:false}).limit(exactPuzzle ? 1 : 30);
+
+      var res = await q;
+      if(res && res.error && withFinished){
+        return queryRows(false, exactPuzzle);
+      }
+      if(res && res.error)return [];
+      return (res && res.data) ? res.data : [];
+    }
+
+    var exact = await queryRows(true,true);
+    if(exact && exact[0])return exact[0];
+
+    var rows = await queryRows(true,false);
+    for(var i=0;i<rows.length;i++){
+      var row = rows[i];
+      if(Number(row.puzzle_no||0) === day)return row;
+      var d = row.finished_at || row.created_at;
+      if(today && d && dateKeyFromValue(d) === today)return row;
+    }
 
     return null;
   }
@@ -264,10 +327,27 @@
     try{
       if(hydrated)return;
       if(!isCurrent())return;
-      if(localFinished())return;
-      var row=await fetchAccountResult();
-      if(row)showAccountDone(row);
-    }catch(e){}
+
+      var row = await fetchAccountResult();
+      if(row){
+        showAccountDone(row);
+        return;
+      }
+
+      var local = localResultPayload();
+      if(local){
+        var session = await getSession();
+        if(session && session.user){
+          setNote("Synchronizuję ukończoną Raję z kontem...","");
+          await saveResult(local);
+          var saved = await fetchAccountResult();
+          if(saved)showAccountDone(saved);
+          else lockAccountDoneUI();
+        }
+      }
+    }catch(e){
+      console.warn("Raja hydrate/sync error:",e);
+    }
   }
 
   function onRajaFinished(ev){
@@ -318,6 +398,7 @@
     if(window.__SZP_LAST_RAJA_RESULT)setTimeout(function(){onRajaFinished({detail:window.__SZP_LAST_RAJA_RESULT});},120);
     setTimeout(hydrateAccountResult,700);
     setTimeout(hydrateAccountResult,1800);
+    setTimeout(hydrateAccountResult,3200);
     var tries=0,timer=setInterval(function(){
       tries++;
       if(hook()||tries>80)clearInterval(timer);
