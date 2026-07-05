@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v118
+  Szpilplac Słōwko Account Bridge v119
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v118";
+  var VERSION = "v119";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 
   var STATE = {

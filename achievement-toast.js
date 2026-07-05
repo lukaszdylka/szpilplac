@@ -1,8 +1,8 @@
-/* Szpilplac achievement-toast.js v118 */
+/* Szpilplac achievement-toast.js v119 */
 (function(){
   "use strict";
 
-  var VERSION = "v118";
+  var VERSION = "v119";
   var queue = [];
   var showing = false;
   var seen = {};

@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v118
+  Szpilplac Raja Auth Bridge v119
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v118";
+  var VERSION="v119";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -143,7 +143,7 @@
       isCurrent:isCurrent(),
       hintUsed:hintUsed,
       finishedAt:new Date().toISOString(),
-      source:"local-raja-sync-v118"
+      source:"local-raja-sync-v119"
     };
   }
 
@@ -187,7 +187,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=118";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=119";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
@@ -269,10 +269,15 @@
       box=document.createElement("div");
       box.id="szpRajaAccountDone";
       box.className="szp-account-done";
-      var banner=document.getElementById("banner")||document.querySelector(".wrap")||document.body;
+      var banner=document.getElementById("banner");
+      var stack=document.querySelector(".raja-stack");
+      var wrap=document.querySelector(".wrap")||document.body;
       if(banner&&banner.insertAdjacentElement)banner.insertAdjacentElement("afterend",box);
+      else if(stack&&stack.parentNode)stack.parentNode.insertBefore(box,stack);
+      else if(wrap&&wrap.insertAdjacentElement)wrap.insertAdjacentElement("afterbegin",box);
       else document.body.appendChild(box);
     }
+    setNote("Ta Raja jest już zapisana na koncie.","ok");
     var result=row.won?"wygrana":"nieukończone";
     var tries=row.tries?(" · "+row.tries+"/"+(window.MAX_TRIES||4)):"";
     var score=Number.isFinite(Number(row.score))?(" · Punkty: "+row.score):"";
@@ -283,6 +288,7 @@
     if(!ready)return null;
     var session = await getSession();
     if(!session || !session.user)return null;
+    var client = await ensureClient();
 
     var day = puzzleNo();
     var today = todayWarsawKey();
