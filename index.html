@@ -1537,6 +1537,7 @@ svg{
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
 </style>
+<script src="rank-icons.js?v=122"></script>
 </head>
 <body>
 <header>
@@ -1697,11 +1698,11 @@ svg{
   </div>
 </div>
 
-<script src="daily-status.js?v=121"></script>
-<script src="game-played.js?v=121"></script>
-<script src="topbar-common.js?v=121"></script>
-<script src="player-menu-common.js?v=121"></script>
-<script src="footer-normalizer.js?v=121"></script>
+<script src="daily-status.js?v=122"></script>
+<script src="game-played.js?v=122"></script>
+<script src="topbar-common.js?v=122"></script>
+<script src="player-menu-common.js?v=122"></script>
+<script src="footer-normalizer.js?v=122"></script>
 <script>
 "use strict";
 
@@ -2151,6 +2152,9 @@ async function loadProfile(){
   }catch(e){}
   if(profile && profile.avatar_key)await loadAvatar(profile.avatar_key);
 }
+function rankIconHtml(rank){
+  return window.SZP_RANK_ICONS ? window.SZP_RANK_ICONS.html(rank) : "";
+}
 function avatarMarkup(svg,hasAvatar){
   var safeSvg = svg || PLACEHOLDER_AVATAR;
   return '<div class="player-avatar '+(hasAvatar ? "has-avatar" : "")+'"><span class="player-avatar-img">'+safeSvg+'</span></div>';
@@ -2359,7 +2363,7 @@ function renderTopPlayerMenu(){
       '<div class="player-menu-head">'+
         '<div class="player-menu-kicker">'+esc(p.profileLabel || "Twój profil")+'</div>'+
         '<div class="player-menu-name">'+esc(login)+'</div>'+
-        '<div class="player-menu-meta">'+esc(p.rank || "Ranga")+': '+esc(rank)+' · '+esc(p.points || "Punkty")+': '+esc(points)+'</div>'+
+        '<div class="player-menu-meta">'+rankIconHtml(rank)+'<span>'+esc(p.rank || "Ranga")+': '+esc(rank)+' · '+esc(p.points || "Punkty")+': '+esc(points)+'</span></div>'+
       '</div>'+
       '<div class="player-menu-actions">'+
         '<a href="konto.html" role="menuitem">'+esc(p.myProfile || "Moje konto")+'<span>→</span></a>'+
@@ -2509,7 +2513,7 @@ function renderPlayer(){
         '<div class="player-name">'+
           '<div class="player-label">'+esc(p.profileLabel)+'</div>'+
           '<div class="player-login">'+esc(login)+'</div>'+
-          '<div class="player-sub">'+esc(p.rank)+': '+esc(rank)+'</div>'+
+          '<div class="player-sub szp-rank-line">'+rankIconHtml(rank)+'<span>'+esc(p.rank)+': '+esc(rank)+'</span></div>'+
         '</div>'+
       '</div>'+
       '<div class="player-stats">'+
@@ -2799,7 +2803,7 @@ applyTheme();
 renderStatic();
 renderPlayer();
 refreshHome();
-console.info("Szpilplac index.html v121 achievements audit fix");
+console.info("Szpilplac index.html v122 rank avatar graphics");
 </script>
 
 <script>

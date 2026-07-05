@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="rank-icons.js?v=122"></script>
 <style>
 :root{
   --bg:#f0e8d4;
@@ -1161,7 +1162,7 @@ a.daily-chip:hover{
 
 <script>
 "use strict";
-console.info("Szpilplac konto.html v121 achievements audit fix");
+console.info("Szpilplac konto.html v122 rank avatar graphics");
 
 var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 var TERMS_VERSION = window.TERMS_VERSION || "2026-06-30";
@@ -1293,6 +1294,11 @@ function niceError(error){
   if(low.indexOf("auth session missing") !== -1)return "Brakuje aktywnej sesji resetowania hasła. Kliknij najnowszy link z maila resetującego.";
   return msg;
 }
+function rankValueHtml(rank){
+  rank = rank || "Gorol";
+  if(window.SZP_RANK_ICONS)return window.SZP_RANK_ICONS.line(rank,rank);
+  return escapeHtml(rank);
+}
 function escapeHtml(v){
   return String(v == null ? "" : v).replace(/[&<>"']/g,function(ch){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
@@ -1390,7 +1396,7 @@ function showLoggedInShell(user){
   els.pRanking.textContent = "—";
   els.pVoivodeship.textContent = "—";
   els.pCity.textContent = "—";
-  els.sumRank.textContent = "Gorol";
+  els.sumRank.innerHTML = rankValueHtml("Gorol");
   els.sumPoints.textContent = "0";
   els.sumGames.textContent = "0";
   els.sumWins.textContent = "0";
@@ -1480,7 +1486,7 @@ async function loadProfile(){
     els.helloTitle.textContent = "Cześć, " + login + "!";
     els.profileIntro.textContent = "Twoje wyniki, punkty, ranga i historia gier w jednym miejscu.";
     els.pLogin.textContent = profile.login || "-";
-    els.sumRank.textContent = profile.rank_name || "Gorol";
+    els.sumRank.innerHTML = rankValueHtml(profile.rank_name || "Gorol");
     els.pRanking.textContent = profile.show_in_ranking ? "widoczny" : "ukryty";
     els.pVoivodeship.textContent = profile.voivodeship || "—";
     els.pCity.textContent = profile.city || "—";
@@ -2076,8 +2082,8 @@ async function boot(){
 }
 boot();
 </script>
-<script src="achievement-toast.js?v=121"></script>
-<script src="achievements-panel.js?v=121"></script>
+<script src="achievement-toast.js?v=122"></script>
+<script src="achievements-panel.js?v=122"></script>
 <script src="konto-legal-bridge.js?v=19"></script>
 <script src="konto-mailing-bridge.js?v=20"></script>
 <script src="game-display-names.js?v=25"></script>
@@ -2157,10 +2163,10 @@ boot();
   setTimeout(cleanKontoFooter, 800);
 })();
 </script>
-<script src="daily-status.js?v=121"></script>
-<script src="game-played.js?v=121"></script>
-<script src="topbar-common.js?v=121"></script>
-<script src="player-menu-common.js?v=121"></script>
-<script src="footer-normalizer.js?v=121"></script>
+<script src="daily-status.js?v=122"></script>
+<script src="game-played.js?v=122"></script>
+<script src="topbar-common.js?v=122"></script>
+<script src="player-menu-common.js?v=122"></script>
+<script src="footer-normalizer.js?v=122"></script>
 </body>
 </html>

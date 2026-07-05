@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="rank-icons.js?v=122"></script>
 <style>
 :root{
   --bg:#f0e8d4;
@@ -1155,6 +1156,9 @@ async function loadAvatars(keys){
     }
   }catch(e){}
 }
+function rankIconHtml(rank){
+  return window.SZP_RANK_ICONS ? window.SZP_RANK_ICONS.html(rank) : "";
+}
 function avatarHtml(key){
   var av = key && avatarMap[key] ? avatarMap[key] : null;
   var svg = av ? av.svg : PLACEHOLDER_AVATAR;
@@ -1291,7 +1295,7 @@ function renderRanking(rowsData){
       avatarHtml(row.avatar_key)+
       '<div class="player">'+
         '<div class="login">'+esc(login)+(isMe ? ' · '+esc(t("you")) : '')+'</div>'+
-        '<div class="rank-name">'+esc(rank)+'</div>'+
+        '<div class="rank-name">'+rankIconHtml(rank)+'<span>'+esc(rank)+'</span></div>'+
       '</div>'+
       '<div class="points"><strong>'+esc(points)+'</strong><span>'+esc(t("points"))+'</span></div>'+
       '<div class="details">'+
@@ -1320,7 +1324,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v121 achievements audit fix");
+console.info("Szpilplac ranking.html v122 rank avatar graphics");
 boot();
 </script>
 <script>
@@ -1519,10 +1523,10 @@ boot();
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootCookies); else bootCookies();
 })();
 </script>
-<script src="daily-status.js?v=121"></script>
-<script src="game-played.js?v=121"></script>
-<script src="topbar-common.js?v=121"></script>
-<script src="player-menu-common.js?v=121"></script>
-<script src="footer-normalizer.js?v=121"></script>
+<script src="daily-status.js?v=122"></script>
+<script src="game-played.js?v=122"></script>
+<script src="topbar-common.js?v=122"></script>
+<script src="player-menu-common.js?v=122"></script>
+<script src="footer-normalizer.js?v=122"></script>
 </body>
 </html>
