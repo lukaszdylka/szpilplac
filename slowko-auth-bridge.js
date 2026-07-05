@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v120
+  Szpilplac Słōwko Account Bridge v121
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v120";
+  var VERSION = "v121";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 
   var STATE = {
@@ -259,6 +259,18 @@
   function usedHint(){
     return !!window.hintShown;
   }
+  function wordLengthForAchievement(){
+    try{
+      var n = Number(window.LEN || window.WORD_LEN || window.wordLength || 0);
+      if(Number.isFinite(n) && n > 0)return n;
+    }catch(e){}
+    try{
+      var g = getGame();
+      var w = g && (g.solution || g.answer || g.word || g.target);
+      if(w)return String(w).length;
+    }catch(e){}
+    return null;
+  }
   function calculateScore(won){
     var tries = getTries() || 0;
     if(!won)return 5;
@@ -283,7 +295,10 @@
       won:!!won,
       tries:tries,
       errors:tries == null ? null : (won ? Math.max(0, tries - 1) : tries),
-      score:calculateScore(!!won)
+      score:calculateScore(!!won),
+      hintsUsed:usedHint()?1:0,
+      wordLength:wordLengthForAchievement(),
+      maxAttempts:6
     };
   }
   function accountNoteNode(){

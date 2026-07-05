@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v120
+  Szpilplac Raja Auth Bridge v121
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v120";
+  var VERSION="v121";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -141,10 +141,11 @@
       tries:tries,
       errors:Math.max(0,tries-(won?1:0)),
       score:scoreRaja(won,tries,hintUsed),
+      maxAttempts:Number(window.MAX_TRIES||4),
       isCurrent:isCurrent(),
       hintUsed:hintUsed,
       finishedAt:new Date().toISOString(),
-      source:"local-raja-sync-v120"
+      source:"local-raja-sync-v121"
     };
   }
 
@@ -181,6 +182,7 @@
       tries:tries,
       errors:Math.max(0,tries-(won?1:0)),
       score:scoreRaja(!!won,tries,hintUsed),
+      maxAttempts:Number(window.MAX_TRIES||4),
       dayIndex:currentDay(),
       todayIndex:todayIdx(),
       isCurrent:isCurrent()
@@ -190,7 +192,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=120";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=121";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
@@ -289,7 +291,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript("../achievement-toast.js?v=120",function(){
+    await loadScript("../achievement-toast.js?v=121",function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -313,7 +315,7 @@
         p_day_index:day,
         p_today_index:today,
         p_meta:{
-          source:"raja-archive-nav-v120",
+          source:"raja-archive-nav-v121",
           path:location.pathname,
           puzzle_no:day+1
         }

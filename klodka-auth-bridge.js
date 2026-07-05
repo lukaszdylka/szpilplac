@@ -1,12 +1,12 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v120
+  Szpilplac Kłōdka Auth Bridge v121
   - zapisuje wynik Kłōdki na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik jest już zapisany na koncie
 */
 (function(){
   "use strict";
 
-  var VERSION="v120";
+  var VERSION="v121";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -133,14 +133,14 @@
     var mode=currentMode();
     var idx=currentPuzzleNo(mode);
     var tries=triesFromGame();
-    return {game:"klodka",mode:mode,puzzleNo:idx,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreKlodka(mode,!!won,tries),isCurrent:isCurrent(mode,idx)};
+    return {game:"klodka",mode:mode,puzzleNo:idx,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreKlodka(mode,!!won,tries),maxAttempts:window.MAX_TRIES||6,isCurrent:isCurrent(mode,idx)};
   }
 
 
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=120";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=121";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;

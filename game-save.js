@@ -1,9 +1,10 @@
-/* Szpilplac game-save.js v120 */
+/* Szpilplac game-save.js v121 */
 (function(){
   "use strict";
-  var VERSION="v120";
+  var VERSION="v121";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
+  var PAGE_STARTED_AT = Date.now();
   function nested(){return /\/raja\/?/.test(location.pathname);} 
   function root(path){return (nested()?"../":"")+path;}
   function loadScript(src,testFn){
@@ -39,14 +40,48 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript(root("achievement-toast.js?v=120"),function(){
+    await loadScript(root("achievement-toast.js?v=121"),function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
   }
+
+  function firstNumber(){
+    for(var i=0;i<arguments.length;i++){
+      var v = arguments[i];
+      if(v == null || v === "")continue;
+      var n = Number(v);
+      if(Number.isFinite(n))return n;
+    }
+    return null;
+  }
+  function globalNumber(names){
+    for(var i=0;i<names.length;i++){
+      try{
+        var n = firstNumber(window[names[i]]);
+        if(n !== null)return n;
+      }catch(e){}
+    }
+    return null;
+  }
+  function detectHints(original,payload){
+    var n = firstNumber(original.hintsUsed, original.hints_used, original.hints, payload.hintsUsed, payload.hints_used, payload.hints);
+    if(n !== null)return n;
+    try{ if(typeof window.hintsUsed !== "undefined")return Number(window.hintsUsed) || 0; }catch(e){}
+    try{ if(typeof window.hintShown !== "undefined")return window.hintShown ? 1 : 0; }catch(e){}
+    try{ if(typeof window.usedHint !== "undefined" && typeof window.usedHint !== "function")return window.usedHint ? 1 : 0; }catch(e){}
+    return 0;
+  }
+
   function achievementMeta(payload, original){
     original = original || {};
     payload = payload || {};
+    var hints = detectHints(original,payload);
+    var duration = firstNumber(original.duration_seconds, original.durationSeconds, payload.duration_seconds, payload.durationSeconds);
+    if(duration === null)duration = Math.max(0, Math.round((Date.now() - PAGE_STARTED_AT) / 1000));
+    var wordLength = firstNumber(original.word_length, original.wordLength, original.length, payload.word_length, payload.wordLength, payload.length, globalNumber(["LEN","WORD_LEN","wordLength"]));
+    var mistakes = firstNumber(original.mistakes, original.errors, original.wrong, original.errorCount, payload.mistakes, payload.errors, payload.wrong, globalNumber(["mistakes","mistakeCount","errors","errorCount","wrong","wrongCount"]));
+    var maxAttempts = firstNumber(original.max_attempts, original.maxAttempts, original.maxTries, payload.max_attempts, payload.maxAttempts, payload.maxTries, globalNumber(["MAX_TRIES","MAX_GUESSES","MAX_GUESSES_TEST","maxGuesses","maxAttempts"]));
     return {
       game: payload.game,
       mode: payload.mode || "daily",
@@ -55,11 +90,15 @@
       attempts: payload.tries,
       tries: payload.tries,
       errors: payload.errors,
+      mistakes: mistakes,
       score: payload.score,
       day_index: payload.dayIndex != null ? payload.dayIndex : (typeof window.currentDay === "number" ? window.currentDay : null),
       today_index: payload.todayIndex != null ? payload.todayIndex : (typeof window.TODAY_IDX === "number" ? window.TODAY_IDX : null),
-      hints_used: Number(original.hintsUsed != null ? original.hintsUsed : (original.hints_used != null ? original.hints_used : 0)) || 0,
-      source: "game-save-v120",
+      hints_used: hints,
+      max_attempts: maxAttempts,
+      duration_seconds: duration,
+      word_length: wordLength,
+      source: "game-save-v121",
       path: location.pathname
     };
   }
