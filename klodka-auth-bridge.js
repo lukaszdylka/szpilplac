@@ -1,5 +1,5 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v110
+  Szpilplac Kłōdka Auth Bridge v112
   - zapisuje wynik Kłōdki na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik jest już zapisany na koncie
 */
@@ -140,7 +140,7 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=110";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=112";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;

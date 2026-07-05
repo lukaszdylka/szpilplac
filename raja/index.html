@@ -378,6 +378,63 @@ header{width:100%;padding:14px 2px 10px}
 }
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
+
+/* v111 Raja: stabilniejsze układanie kolejności na telefonach */
+.list{
+  touch-action:manipulation!important;
+}
+.row{
+  touch-action:manipulation!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.row.selected,
+.item.selected,
+li.selected{
+  outline:3px solid var(--gold)!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 5px rgba(191,138,58,.16)!important;
+}
+.row .moveBtns,
+.item .moveBtns,
+li .moveBtns{
+  display:flex;
+  gap:5px;
+  margin-left:auto;
+  align-items:center;
+}
+.order-mini-btn{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  border-radius:10px!important;
+  border:1px solid var(--line)!important;
+  background:var(--surface2)!important;
+  color:var(--ink)!important;
+  font-weight:900!important;
+  font-size:14px!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.order-mini-btn:disabled{
+  opacity:.35!important;
+  cursor:not-allowed!important;
+}
+.order-mobile-hint{
+  margin:0 0 10px;
+  padding:9px 11px;
+  border:1px dashed rgba(191,138,58,.55);
+  border-radius:12px;
+  background:rgba(191,138,58,.08);
+  color:var(--ink2);
+  font-size:12px;
+  line-height:1.35;
+  text-align:center;
+}
+@media(pointer:fine){
+  .order-mobile-hint{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -1054,7 +1111,7 @@ applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
 loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v110 achievement toast");
+console.info("Szpilplac raja/index.html v112 trzy dedupe raja fix");
 })();
 </script>
 
@@ -1086,14 +1143,190 @@ console.info("Szpilplac raja/index.html v110 achievement toast");
 </script>
 
 <script src="../coffee.js"></script>
-<script src="raja-auth-bridge.js?v=110"></script>
-<script src="../achievement-toast.js?v=110"></script>
-<script src="../game-result-actions.js?v=110"></script>
-<script src="../daily-status.js?v=110"></script>
-<script src="../game-played.js?v=110"></script>
-<script src="../topbar-common.js?v=110"></script>
-<script src="../player-menu-common.js?v=110"></script>
-<script src="../game-save.js?v=110"></script>
-<script src="../footer-normalizer.js?v=110"></script>
+<script src="raja-auth-bridge.js?v=112"></script>
+<script src="../achievement-toast.js?v=112"></script>
+<script src="../game-result-actions.js?v=112"></script>
+<script src="../daily-status.js?v=112"></script>
+<script src="../game-played.js?v=112"></script>
+<script src="../topbar-common.js?v=112"></script>
+<script src="../player-menu-common.js?v=112"></script>
+<script src="../game-save.js?v=112"></script>
+<script src="../footer-normalizer.js?v=112"></script>
+
+<script>
+(function(){
+  "use strict";
+  var selectedIndex = null;
+  var listObserver = null;
+
+  function getList(){
+    return document.getElementById("list");
+  }
+  function rows(){
+    var list = getList();
+    if(!list)return [];
+    return Array.prototype.slice.call(list.children).filter(function(el){
+      return el && el.nodeType === 1;
+    });
+  }
+  function clearSelection(){
+    rows().forEach(function(el){el.classList.remove("selected");});
+    selectedIndex = null;
+  }
+  function syncOrderFromDom(){
+    var r = rows();
+    var ids = r.map(function(el){
+      return el.dataset.id || el.getAttribute("data-id") || el.dataset.key || el.getAttribute("data-key") || el.id || "";
+    }).filter(Boolean);
+
+    // The original Raja uses one of these globals depending on version. Keep all in sync when present.
+    try{ if(Array.isArray(window.order) && ids.length) window.order = ids.slice(); }catch(e){}
+    try{ if(Array.isArray(window.currentOrder) && ids.length) window.currentOrder = ids.slice(); }catch(e){}
+    try{ if(Array.isArray(window.userOrder) && ids.length) window.userOrder = ids.slice(); }catch(e){}
+
+    // Also store a neutral snapshot. If original check reads DOM, no harm; if bridge/debug needs it, it is ready.
+    window.RAJA_DOM_ORDER = ids.slice();
+    return ids;
+  }
+  function moveDom(from,to){
+    var list = getList();
+    var r = rows();
+    if(!list || from === to || from < 0 || to < 0 || from >= r.length || to >= r.length)return;
+    var item = r[from];
+    var ref = r[to];
+    if(from < to){
+      list.insertBefore(item, ref.nextSibling);
+    }else{
+      list.insertBefore(item, ref);
+    }
+    selectedIndex = to;
+    enhanceRows();
+    syncOrderFromDom();
+  }
+  function moveBy(delta, el){
+    var r = rows();
+    var idx = r.indexOf(el);
+    if(idx < 0)return;
+    moveDom(idx, Math.max(0, Math.min(r.length - 1, idx + delta)));
+  }
+  function swapOrSelect(el){
+    var r = rows();
+    var idx = r.indexOf(el);
+    if(idx < 0)return;
+
+    if(selectedIndex === null || selectedIndex === idx){
+      clearSelection();
+      selectedIndex = idx;
+      el.classList.add("selected");
+      return;
+    }
+
+    moveDom(selectedIndex, idx);
+    clearSelection();
+  }
+  function enhanceRows(){
+    var r = rows();
+    r.forEach(function(el,idx){
+      el.setAttribute("draggable","false");
+      el.style.touchAction = "manipulation";
+      el.style.webkitUserSelect = "none";
+      el.style.userSelect = "none";
+
+      if(!el.dataset.rajaTapMoveBound){
+        el.dataset.rajaTapMoveBound = "1";
+        el.addEventListener("click", function(ev){
+          if(ev.target && ev.target.closest && ev.target.closest(".order-mini-btn"))return;
+          swapOrSelect(el);
+        }, true);
+        el.addEventListener("touchend", function(){
+          // On some mobile browsers click fires late; this keeps order synced even if native drag fired.
+          setTimeout(syncOrderFromDom, 0);
+          setTimeout(enhanceRows, 20);
+        }, {passive:true});
+      }
+
+      var holder = el.querySelector(".moveBtns");
+      if(!holder){
+        holder = document.createElement("span");
+        holder.className = "moveBtns";
+        var up = document.createElement("button");
+        up.type = "button";
+        up.className = "order-mini-btn";
+        up.textContent = "↑";
+        up.setAttribute("aria-label","Przesuń wyżej");
+        up.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          moveBy(-1, el);
+        });
+        var down = document.createElement("button");
+        down.type = "button";
+        down.className = "order-mini-btn";
+        down.textContent = "↓";
+        down.setAttribute("aria-label","Przesuń niżej");
+        down.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          moveBy(1, el);
+        });
+        holder.appendChild(up);
+        holder.appendChild(down);
+        el.appendChild(holder);
+      }
+
+      var buttons = holder.querySelectorAll("button");
+      if(buttons[0])buttons[0].disabled = idx === 0;
+      if(buttons[1])buttons[1].disabled = idx === r.length - 1;
+    });
+  }
+  function addHint(){
+    var list = getList();
+    if(!list || document.getElementById("rajaOrderMobileHint"))return;
+    var hint = document.createElement("div");
+    hint.id = "rajaOrderMobileHint";
+    hint.className = "order-mobile-hint";
+    hint.textContent = "Na telefonie możesz dotknąć element, a potem miejsce docelowe. Możesz też użyć strzałek ↑ ↓.";
+    list.parentNode.insertBefore(hint, list);
+  }
+  function patchCheckButton(){
+    var btn = document.getElementById("checkBtn") || document.querySelector("[data-check]") || Array.prototype.slice.call(document.querySelectorAll("button")).find(function(b){
+      return /sprawdź|sprawdz|check/i.test(b.textContent || "");
+    });
+    if(!btn || btn.dataset.rajaCheckSyncBound)return;
+    btn.dataset.rajaCheckSyncBound = "1";
+    btn.addEventListener("click", function(){
+      // Run before original bubbling handler and again after native drag settles.
+      syncOrderFromDom();
+      setTimeout(syncOrderFromDom, 0);
+    }, true);
+  }
+  function boot(){
+    addHint();
+    enhanceRows();
+    patchCheckButton();
+    syncOrderFromDom();
+
+    var list = getList();
+    if(list && !listObserver){
+      listObserver = new MutationObserver(function(){
+        enhanceRows();
+        syncOrderFromDom();
+      });
+      listObserver.observe(list,{childList:true,subtree:false,attributes:true});
+    }
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", boot);
+  }else{
+    boot();
+  }
+  setTimeout(boot,250);
+  setTimeout(boot,1000);
+  window.RAJA_SYNC_DOM_ORDER = syncOrderFromDom;
+  console.info("Szpilplac raja mobile order fix v112");
+})();
+</script>
+
 </body>
 </html>

@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v110
+  Szpilplac Słōwko Account Bridge v112
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania

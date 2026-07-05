@@ -1,6 +1,40 @@
 (function(){
   "use strict";
 
+  function normalizeAchievementId(id){
+    id = String(id || "");
+    if(id === "trzy_na_zicher")return "trzynazicher";
+    return id;
+  }
+  function dedupeAchievements(rows){
+    if(!Array.isArray(rows))return [];
+    var map = {};
+    rows.forEach(function(row){
+      if(!row)return;
+      var id = normalizeAchievementId(row.id || row.achievement_id || row.code);
+      var label = String(row.label || row.name || "").trim().toLowerCase();
+      var key = id || label;
+      if(label === "trzy na zicher")key = "trzynazicher";
+
+      var clone = Object.assign({}, row);
+      if(id)clone.id = id;
+      if(!map[key]){
+        map[key] = clone;
+        return;
+      }
+      var prev = map[key];
+      var cloneEarned = !!(clone.earned_at || clone.unlocked_at || clone.obtained_at || clone.is_unlocked || clone.earned);
+      var prevEarned = !!(prev.earned_at || prev.unlocked_at || prev.obtained_at || prev.is_unlocked || prev.earned);
+      var cloneCanonical = normalizeAchievementId(clone.id || clone.achievement_id || clone.code) === "trzynazicher";
+      var prevCanonical = normalizeAchievementId(prev.id || prev.achievement_id || prev.code) === "trzynazicher";
+      if((cloneEarned && !prevEarned) || (cloneCanonical && !prevCanonical)){
+        map[key] = clone;
+      }
+    });
+    return Object.keys(map).map(function(k){return map[k];});
+  }
+
+
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
 
