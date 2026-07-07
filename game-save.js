@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v124 */
+/* Szpilplac game-save.js v125 */
 (function(){
   "use strict";
-  var VERSION="v124";
+  var VERSION="v125";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   var PAGE_STARTED_AT = Date.now();
@@ -40,7 +40,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript(root("achievement-toast.js?v=124"),function(){
+    await loadScript(root("achievement-toast.js?v=125"),function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -50,6 +50,7 @@
     for(var i=0;i<arguments.length;i++){
       var v = arguments[i];
       if(v == null || v === "")continue;
+      if(typeof v === "boolean")return v ? 1 : 0;
       var n = Number(v);
       if(Number.isFinite(n))return n;
     }
@@ -65,10 +66,14 @@
     return null;
   }
   function detectHints(original,payload){
-    var n = firstNumber(original.hintsUsed, original.hints_used, original.hints, payload.hintsUsed, payload.hints_used, payload.hints);
+    var n = firstNumber(
+      original.hintsUsed, original.hints_used, original.hints, original.hintUsed, original.hint_used,
+      payload.hintsUsed, payload.hints_used, payload.hints, payload.hintUsed, payload.hint_used
+    );
     if(n !== null)return n;
     try{ if(typeof window.hintsUsed !== "undefined")return Number(window.hintsUsed) || 0; }catch(e){}
     try{ if(typeof window.hintShown !== "undefined")return window.hintShown ? 1 : 0; }catch(e){}
+    try{ if(typeof window.hintData !== "undefined")return window.hintData ? 1 : 0; }catch(e){}
     try{ if(typeof window.usedHint !== "undefined" && typeof window.usedHint !== "function")return window.usedHint ? 1 : 0; }catch(e){}
     return 0;
   }
@@ -98,7 +103,7 @@
       max_attempts: maxAttempts,
       duration_seconds: duration,
       word_length: wordLength,
-      source: "game-save-v124",
+      source: "game-save-v125",
       path: location.pathname
     };
   }
@@ -121,7 +126,6 @@
       }
 
       var before = await earnedMap();
-
       var meta = achievementMeta(payload, original);
       var res = await c.rpc("szpilplac_check_achievement_event",{
         p_event:"game_finished",
@@ -141,15 +145,7 @@
       var after = await earnedMap();
       Object.keys(after).forEach(function(id){
         if(!before[id] && after[id]){
-          fresh.push({
-            achievement_id:id,
-            id:id,
-            label:after[id].label,
-            description:after[id].description,
-            svg:after[id].svg,
-            earned_at:after[id].earned_at,
-            is_new:true
-          });
+          fresh.push({achievement_id:id,id:id,label:after[id].label,description:after[id].description,svg:after[id].svg,earned_at:after[id].earned_at,is_new:true});
         }
       });
 
@@ -163,12 +159,8 @@
 
       if(fresh.length){
         await ensureAchievementToast();
-        if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function"){
-          window.SZP_ACHIEVEMENT_TOAST.showMany(fresh);
-        }
-        if(window.SZPILPLAC_REFRESH_ACHIEVEMENTS){
-          try{window.SZPILPLAC_REFRESH_ACHIEVEMENTS();}catch(e){}
-        }
+        if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")window.SZP_ACHIEVEMENT_TOAST.showMany(fresh);
+        if(window.SZPILPLAC_REFRESH_ACHIEVEMENTS){try{window.SZPILPLAC_REFRESH_ACHIEVEMENTS();}catch(e){}}
       }
       return fresh;
     }catch(e){
@@ -179,7 +171,20 @@
 
   function normalizePayload(data){
     data=data||{};
-    return {game:data.game,mode:data.mode||"daily",puzzleNo:data.puzzleNo!=null?data.puzzleNo:data.puzzle_no,won:!!data.won,tries:data.tries,errors:data.errors,score:data.score,dayIndex:data.dayIndex, todayIndex:data.todayIndex,maxAttempts:data.maxAttempts,isCurrent:data.isCurrent!==false};
+    return {
+      game:data.game,
+      mode:data.mode||"daily",
+      puzzleNo:data.puzzleNo!=null?data.puzzleNo:data.puzzle_no,
+      won:!!data.won,
+      tries:data.tries,
+      errors:data.errors,
+      score:data.score,
+      dayIndex:data.dayIndex,
+      todayIndex:data.todayIndex,
+      maxAttempts:data.maxAttempts,
+      hintsUsed:firstNumber(data.hintsUsed,data.hints_used,data.hintUsed,data.hint_used,data.hints),
+      isCurrent:data.isCurrent!==false
+    };
   }
   async function saveResult(data,opts){
     opts=opts||{}; var p=normalizePayload(data);
