@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v125 */
+/* Szpilplac game-save.js v126 */
 (function(){
   "use strict";
-  var VERSION="v125";
+  var VERSION="v126";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   var PAGE_STARTED_AT = Date.now();
@@ -65,6 +65,34 @@
     }
     return null;
   }
+
+  function warsawLocalInfo(){
+    var now = new Date();
+    try{
+      var parts = new Intl.DateTimeFormat("en-CA",{
+        timeZone:"Europe/Warsaw",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:false
+      }).formatToParts(now);
+      var o = {};
+      parts.forEach(function(p){ if(p.type !== "literal") o[p.type] = p.value; });
+      var hour = Number(o.hour || 0);
+      return {
+        date: o.year+"-"+o.month+"-"+o.day,
+        time: (o.hour||"00")+":"+(o.minute||"00")+":"+(o.second||"00"),
+        hour: Number.isFinite(hour) ? hour : 0,
+        timezone: "Europe/Warsaw",
+        utc: now.toISOString()
+      };
+    }catch(e){
+      return {date:now.toISOString().slice(0,10),time:now.toISOString().slice(11,19),hour:now.getHours(),timezone:"Europe/Warsaw",utc:now.toISOString()};
+    }
+  }
   function detectHints(original,payload){
     var n = firstNumber(
       original.hintsUsed, original.hints_used, original.hints, original.hintUsed, original.hint_used,
@@ -82,6 +110,7 @@
     original = original || {};
     payload = payload || {};
     var hints = detectHints(original,payload);
+    var local = warsawLocalInfo();
     var duration = firstNumber(original.duration_seconds, original.durationSeconds, payload.duration_seconds, payload.durationSeconds);
     if(duration === null)duration = Math.max(0, Math.round((Date.now() - PAGE_STARTED_AT) / 1000));
     var wordLength = firstNumber(original.word_length, original.wordLength, original.length, payload.word_length, payload.wordLength, payload.length, globalNumber(["LEN","WORD_LEN","wordLength"]));
@@ -103,7 +132,12 @@
       max_attempts: maxAttempts,
       duration_seconds: duration,
       word_length: wordLength,
-      source: "game-save-v125",
+      source: "game-save-v126",
+      local_date: local.date,
+      local_time: local.time,
+      local_hour: local.hour,
+      timezone: local.timezone,
+      utc_finished_at: local.utc,
       path: location.pathname
     };
   }

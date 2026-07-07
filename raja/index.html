@@ -564,6 +564,27 @@ li .moveBtns{
   .cta-check{min-height:52px!important;font-size:17px!important}
   .hint-btn{width:100%!important;min-height:48px!important}
 }
+
+/* SZPILPLAC RAJA FIXED CORRECT SLOTS v131 */
+.row.fixed{
+  opacity:1!important;
+}
+.row.fixed .name{
+  font-weight:900!important;
+}
+.row.fixed .arrows{
+  display:none!important;
+}
+.row.fixed .tick{
+  width:38px;
+  min-width:38px;
+  height:34px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  background:var(--correct,#3f8a5a);
+  color:#fff;
+}
 </style>
 </head>
 <body>
@@ -946,8 +967,10 @@ function renderList(){
     var fixed=!!(mask&&mask[i]);
     var hintTag=(status==="playing"&&hintData&&hintData.name===name)?'<span class="hinttag">'+L().hintPlace.replace("{pos}",hintData.pos)+'</span>':'';
     var html='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>'+hintTag;
-    if(!locked){
-      html+='<div class="arrows"><button data-up="'+i+'" '+(i===0?'disabled':'')+'>▲</button><button data-down="'+i+'" '+(i===order.length-1?'disabled':'')+'>▼</button></div>';
+    if(!locked&&!fixed){
+      var upDisabled=movableTarget(i,-1)<0;
+      var downDisabled=movableTarget(i,1)<0;
+      html+='<div class="arrows"><button data-up="'+i+'" '+(upDisabled?'disabled':'')+'>▲</button><button data-down="'+i+'" '+(downDisabled?'disabled':'')+'>▼</button></div>';
     }else if(fixed){html+='<div class="tick">✓</div>';}
     li.innerHTML=html;
     if(!locked){
@@ -968,7 +991,9 @@ function makeDragGhost(li,e){
   document.body.appendChild(dragGhost);positionDragGhost(e);li.classList.add("drag-source");
 }
 function positionDragGhost(e){if(!dragGhost)return;dragGhost.style.left=(e.clientX-dragOffsetX)+"px";dragGhost.style.top=(e.clientY-dragOffsetY)+"px";}
-function reorder(from,to){if(from<0||to<0||from===to||from>=order.length||to>=order.length)return;var item=order.splice(from,1)[0];order.splice(to,0,item);selIdx=-1;persist();playSound("drop");renderList();}
+function fixedAt(i){var mask=lastMask();return !!(mask&&mask[i]);}
+function movableTarget(i,dir){var j=i+dir;while(j>=0&&j<order.length){if(!fixedAt(j))return j;j+=dir;}return -1;}
+function reorder(from,to){if(from<0||to<0||from===to||from>=order.length||to>=order.length)return;if(fixedAt(from))return;if(fixedAt(to)){to=movableTarget(from,to>from?1:-1);}if(to<0||to>=order.length||fixedAt(to))return;var item=order.splice(from,1)[0];order.splice(to,0,item);selIdx=-1;persist();playSound("drop");renderList();}
 function dragOverIndex(x,y){
   var rows=[].slice.call(document.querySelectorAll("#list .row"));
   if(!rows.length)return -1;
@@ -993,8 +1018,8 @@ function attachDrag(li,i){
   });
   li.addEventListener("pointercancel",function(){clearDragClasses();dragFrom=-1;dragMoved=false;setTimeout(function(){suppressClick=false;},80);});
 }
-function pick(i){if(status!=="playing")return;if(selIdx===-1){selIdx=i;}else if(selIdx===i){selIdx=-1;}else{var t=order[selIdx];order[selIdx]=order[i];order[i]=t;selIdx=-1;persist();playSound("move");}renderList();}
-function move(i,dir){var j=i+dir;if(j<0||j>=order.length)return;var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();playSound("move");renderList();}
+function pick(i){if(status!=="playing"||fixedAt(i))return;if(selIdx===-1){selIdx=i;}else if(selIdx===i){selIdx=-1;}else{if(fixedAt(selIdx)||fixedAt(i)){selIdx=-1;renderList();return;}var t=order[selIdx];order[selIdx]=order[i];order[i]=t;selIdx=-1;persist();playSound("move");}renderList();}
+function move(i,dir){if(fixedAt(i))return;var j=movableTarget(i,dir);if(j<0||j>=order.length)return;var t=order[i];order[i]=order[j];order[j]=t;selIdx=-1;persist();playSound("move");renderList();}
 
 function renderAttempts(){
   var box=$("attempts");box.innerHTML="";box.style.display=(status==="playing")?"flex":"none";
