@@ -1,8 +1,11 @@
 -- Szpilplac · korekta zasad odznak: Fajrant i Bez Podpowiydzi
 --
--- Ten plik jest bezpiecznym helperem do Supabase SQL Editor.
--- Nie uruchamiaj całego pliku bez czytania komentarzy, bo schemat odznak może mieć inną nazwę tabeli/funkcji
--- w Twoim projekcie. Najpierw odpal sekcje DIAGNOSTYKA.
+-- Ten plik jest helperem do Supabase SQL Editor.
+-- U Ciebie tabele odznak to:
+--   public.szpilplac_achievements
+--   public.user_achievements
+--
+-- Nie uruchamiaj całego pliku jak instalatora. Najpierw diagnostyka, potem konkretna poprawka funkcji.
 --
 -- Cel funkcjonalny:
 -- 1. Fajrant: przyznawaj dopiero wtedy, gdy gracz ma opuszczony dzień,
@@ -11,33 +14,49 @@
 -- 2. Bez Podpowiydzi: przyznawaj po jednej dowolnej grze dziennej wygranej bez podpowiedzi.
 --    Nie licz tygodniowej Kłōdki, bo tam podpowiedzi są częścią zagadki.
 --
--- W praktyce reguła Bez Podpowiydzi zależy od RPC public.szpilplac_check_achievement_event,
--- bo to tam frontend przekazuje p_hints_used. Front został już poprawiony w game-save.js v125,
--- żeby przekazywać hintUsed/hint_used z Rai i innych gier.
+-- Front został poprawiony w game-save.js v125, żeby przekazywać hintUsed/hint_used z Rai i innych gier.
 
 -- ============================================================
--- 1. DIAGNOSTYKA: czy odznaki istnieją i jak są nazwane
+-- 1. DIAGNOSTYKA: odznaki Fajrant i Bez Podpowiydzi
 -- ============================================================
 
 select *
-from public.achievements
+from public.szpilplac_achievements
 where id in ('fajrant','bezpodp')
    or lower(label) like '%fajrant%'
    or lower(label) like '%podpow%'
 order by sort_order nulls last, id;
 
--- Jeśli tabela public.achievements nie istnieje, sprawdź nazwy tabel:
--- select table_schema, table_name
--- from information_schema.tables
--- where table_schema = 'public'
---   and table_name ilike '%achiev%'
--- order by table_name;
+-- Kolumny tabel odznak, gdyby trzeba było dopasować INSERT-y:
+
+select table_name, column_name, data_type, is_nullable
+from information_schema.columns
+where table_schema = 'public'
+  and table_name in ('szpilplac_achievements','user_achievements')
+order by table_name, ordinal_position;
 
 -- ============================================================
--- 2. DIAGNOSTYKA: dni bez żadnej gry dla aktualnie zalogowanego usera
+-- 2. DIAGNOSTYKA: definicje funkcji odznak
 -- ============================================================
--- Działa w SQL Editor tylko, jeśli wpiszesz user_id ręcznie.
--- Pokazuje dni od pierwszego wyniku do wczoraj, w których gracz nie ma żadnego zapisanego wyniku.
+-- Te definicje są potrzebne, żeby zrobić dokładne CREATE OR REPLACE bez kasowania obecnej logiki.
+
+select pg_get_functiondef(p.oid) as function_definition
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and p.proname in (
+    'szpilplac_check_achievement_event',
+    'szpilplac_repair_my_daily_achievements',
+    'szpilplac_repair_user_daily_achievements',
+    'szpilplac_award_user_achievement',
+    'szpilplac_award_achievement'
+  )
+order by p.proname;
+
+-- ============================================================
+-- 3. DIAGNOSTYKA: dni bez żadnej gry dla konkretnego usera
+-- ============================================================
+-- Podmień user_id. Pokazuje dni od pierwszego wyniku do wczoraj, w których gracz nie ma żadnego zapisanego wyniku.
 
 -- with params as (
 --   select 'TU_WPISZ_USER_ID'::uuid as user_id,
@@ -66,14 +85,11 @@ order by sort_order nulls last, id;
 -- order by d.day desc;
 
 -- ============================================================
--- 3. Logika do public.szpilplac_check_achievement_event: Bez Podpowiydzi
+-- 4. Logika do public.szpilplac_check_achievement_event: Bez Podpowiydzi
 -- ============================================================
--- Tę logikę trzeba mieć w funkcji RPC, która obsługuje zdarzenie game_finished.
--- Nie daję tu CREATE OR REPLACE całej funkcji, bo bez aktualnej definicji łatwo nadpisać inne odznaki.
--- Wklej warunek w istniejącą funkcję w miejscu, gdzie przyznawane są odznaki za koniec gry.
---
--- Założenie: istnieje helper/przyznawanie w stylu insert do public.user_achievements.
--- Jeśli u Ciebie funkcja ma własny helper, użyj jego zamiast INSERT-a.
+-- Do wklejenia w istniejącej funkcji tam, gdzie obsługiwane jest p_event = 'game_finished'.
+-- Jeśli aktualna funkcja korzysta z helpera public.szpilplac_award_user_achievement albo public.szpilplac_award_achievement,
+-- użyj helpera zamiast ręcznego INSERT-a.
 
 -- if p_event = 'game_finished'
 --    and coalesce(p_won, false) = true
@@ -97,9 +113,8 @@ order by sort_order nulls last, id;
 -- end if;
 
 -- ============================================================
--- 4. Logika do public.szpilplac_check_achievement_event albo repair: Fajrant
+-- 5. Logika do repair/account event: Fajrant
 -- ============================================================
--- Fajrant najlepiej sprawdzać przy wejściu na konto / account event / repair achievements.
 -- Reguła: od pierwszego zapisanego wyniku do wczoraj istnieje dzień bez żadnej gry.
 -- Nie patrzymy na logowania, profile ani aktywność konta. Tylko public.user_game_results.
 
@@ -135,12 +150,11 @@ order by sort_order nulls last, id;
 -- end if;
 
 -- ============================================================
--- 5. Kontrola po wdrożeniu
+-- 6. Kontrola po wdrożeniu
 -- ============================================================
--- Sprawdź, czy konkretni użytkownicy dostali odznaki tylko raz.
 
 -- select ua.*, a.label
 -- from public.user_achievements ua
--- join public.achievements a on a.id = ua.achievement_id
+-- join public.szpilplac_achievements a on a.id = ua.achievement_id
 -- where ua.achievement_id in ('fajrant','bezpodp')
 -- order by ua.earned_at desc;
