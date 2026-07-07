@@ -326,34 +326,6 @@ footer a{
 }
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
-
-/* SZPILPLAC MOBILE POLISH v1 */
-@media(max-width:640px){
-  html,body{max-width:100%;overflow-x:hidden}
-  body{-webkit-text-size-adjust:100%}
-  input,textarea,select{font-size:16px!important}
-  button,
-  input[type="button"],
-  input[type="submit"],
-  .btn,
-  .small-btn,
-  .icon-btn,
-  .nav-btn,
-  .game-tab,
-  .footer-news-btn,
-  a.btn{
-    min-height:44px;
-  }
-  .controls,.topbar-right,.tile-actions,.actions{gap:8px!important}
-  .card,.tile,.day-card,.result,.banner,.notice,.modal{border-radius:16px!important}
-  .table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:560px}
-  .site-footer{padding-bottom:96px}
-}
-@media(max-width:420px){
-  .controls{justify-content:flex-start!important}
-  .site-name,.brand,h1{word-break:keep-all}
-}
 </style>
 </head>
 <body>

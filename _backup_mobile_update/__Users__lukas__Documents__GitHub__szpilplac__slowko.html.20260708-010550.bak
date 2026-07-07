@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Słōwko · Szpilplac · Familock</title>
 <meta name="description" content="Codziennie jedno śląskie słowo — zgadnij je w 6 próbach. Gra od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -268,34 +268,6 @@ footer a{color:var(--green);font-weight:600}
 
 @media(prefers-reduced-motion:reduce){.tile.reveal,.tile.filled,.row.shake{animation:none!important}}
 .no-anim .tile.reveal,.no-anim .tile.filled,.no-anim .row.shake{animation:none!important}
-
-/* SZPILPLAC MOBILE POLISH v1 */
-@media(max-width:640px){
-  html,body{max-width:100%;overflow-x:hidden}
-  body{-webkit-text-size-adjust:100%}
-  input,textarea,select{font-size:16px!important}
-  button,
-  input[type="button"],
-  input[type="submit"],
-  .btn,
-  .small-btn,
-  .icon-btn,
-  .nav-btn,
-  .game-tab,
-  .footer-news-btn,
-  a.btn{
-    min-height:44px;
-  }
-  .controls,.topbar-right,.tile-actions,.actions{gap:8px!important}
-  .card,.tile,.day-card,.result,.banner,.notice,.modal{border-radius:16px!important}
-  .table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:560px}
-  .site-footer{padding-bottom:96px}
-}
-@media(max-width:420px){
-  .controls{justify-content:flex-start!important}
-  .site-name,.brand,h1{word-break:keep-all}
-}
 </style>
 </head>
 <body>

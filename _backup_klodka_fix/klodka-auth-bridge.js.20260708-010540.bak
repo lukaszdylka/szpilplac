@@ -1,5 +1,5 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v127
+  Szpilplac Kłōdka Auth Bridge v126
   - zapisuje wynik Kłōdki na koncie
   - blokuje ponowne granie na drugim urządzeniu, osobno dla trybu daily i weekly
   - tygodniówka liczy tydzień od poniedziałku
@@ -8,7 +8,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v127";
+  var VERSION="v126";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -45,7 +45,6 @@
   }
 
   function clearAccountDoneUI(){
-    try{if(window.game)delete window.game.__accountDone;}catch(e){}
     var box=document.getElementById("szpKlodkaAccountDone");
     if(box&&box.parentNode)box.parentNode.removeChild(box);
     var pad=document.getElementById("pad");
@@ -122,7 +121,6 @@
   function localFinished(mode,idx){
     try{
       if(typeof window.loadSavedGame==="function"){var saved=window.loadSavedGame(mode,idx);if(saved&&(saved.status==="won"||saved.status==="lost"))return true;}
-      if(window.game&&window.game.__accountDone===true)return false;
       if(window.game&&(window.game.status==="won"||window.game.status==="lost")){var gm=window.game.mode||currentMode();var gi=window.game.idx!=null?Number(window.game.idx):currentPuzzleNo(gm);if(gm===mode&&String(gi)===String(idx))return true;}
     }catch(e){}
     return false;
@@ -171,7 +169,7 @@
   }
   function showAccountDone(row,mode,idx){
     var k=keyOf(mode,idx);if(!row||hydratedKey===k)return;if(localFinished(mode,idx))return;hydratedKey=k;injectStyle();
-    try{if(window.game){window.game.status=row.won?"won":"lost";window.game.mode=mode;window.game.idx=idx;window.game.__accountDone=true;}window.current="";}catch(e){}
+    try{if(window.game){window.game.status=row.won?"won":"lost";window.game.mode=mode;window.game.idx=idx;}window.current="";}catch(e){}
     var pad=document.getElementById("pad");if(pad)pad.style.display="none";
     var board=document.getElementById("board");var box=document.getElementById("szpKlodkaAccountDone");
     if(!box){box=document.createElement("div");box.id="szpKlodkaAccountDone";box.className="szp-account-done";if(board&&board.parentNode)board.insertAdjacentElement("beforebegin",box);else if(document.querySelector("main"))document.querySelector("main").insertAdjacentElement("afterbegin",box);else document.body.appendChild(box);}

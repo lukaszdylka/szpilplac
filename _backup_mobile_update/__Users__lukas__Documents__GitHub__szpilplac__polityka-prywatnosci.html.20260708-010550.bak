@@ -46,34 +46,6 @@ footer{text-align:center;color:var(--ink2);font-size:12px;margin-top:18px;line-h
 footer nav{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
 small{color:var(--ink2)}
 @media(max-width:560px){.card{padding:17px}.table{font-size:12px}th,td{padding:9px 8px}.topbar{align-items:flex-start;flex-direction:column}}
-
-/* SZPILPLAC MOBILE POLISH v1 */
-@media(max-width:640px){
-  html,body{max-width:100%;overflow-x:hidden}
-  body{-webkit-text-size-adjust:100%}
-  input,textarea,select{font-size:16px!important}
-  button,
-  input[type="button"],
-  input[type="submit"],
-  .btn,
-  .small-btn,
-  .icon-btn,
-  .nav-btn,
-  .game-tab,
-  .footer-news-btn,
-  a.btn{
-    min-height:44px;
-  }
-  .controls,.topbar-right,.tile-actions,.actions{gap:8px!important}
-  .card,.tile,.day-card,.result,.banner,.notice,.modal{border-radius:16px!important}
-  .table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:560px}
-  .site-footer{padding-bottom:96px}
-}
-@media(max-width:420px){
-  .controls{justify-content:flex-start!important}
-  .site-name,.brand,h1{word-break:keep-all}
-}
 </style>
 </head>
 <body>

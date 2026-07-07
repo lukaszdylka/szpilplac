@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Raja · Szpilplac · Familock</title>
 <meta name="description" content="Codzienna śląska zagadka — poukładaj pięć rzeczy we właściwej kolejności. Gra od Familocka Starzik.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -491,79 +491,6 @@ body.raja-account-locked #hintBtn{
   display:none!important;
 }
 
-
-/* SZPILPLAC RAJA MOBILE ARROWS ONLY v130 */
-#settBtn{
-  display:none!important;
-}
-#rajaOrderMobileHint{
-  display:block;
-  margin:0 0 10px;
-  padding:10px 12px;
-  border:1px dashed rgba(191,138,58,.55);
-  border-radius:12px;
-  background:rgba(191,138,58,.08);
-  color:var(--ink2);
-  font-size:12px;
-  line-height:1.35;
-  text-align:center;
-}
-.row.can-drag{
-  cursor:default!important;
-  touch-action:manipulation!important;
-}
-.row{
-  touch-action:manipulation!important;
-  user-select:none!important;
-  -webkit-user-select:none!important;
-}
-.row.sel,
-.row.selected,
-.item.selected,
-li.selected{
-  outline:none!important;
-  box-shadow:none!important;
-}
-.row.drag-source,
-.row.drop-target,
-.drag-ghost{
-  display:none!important;
-}
-.row .moveBtns,
-.item .moveBtns,
-li .moveBtns{
-  display:none!important;
-}
-.arrows{
-  gap:6px!important;
-}
-.arrows button{
-  width:46px!important;
-  min-width:46px!important;
-  height:40px!important;
-  min-height:40px!important;
-  border-radius:12px!important;
-  font-size:18px!important;
-  font-weight:900!important;
-}
-@media(max-width:430px){
-  .wrap{padding-left:12px!important;padding-right:12px!important}
-  .topbar{align-items:flex-start}
-  .controls{gap:6px!important}
-  .lang-tog button{min-height:36px!important;padding:7px 11px!important}
-  .icon-btn{width:36px!important;height:36px!important}
-  .brand h1{font-size:27px!important}
-  .brand p{font-size:11.5px!important}
-  .daynav button{width:42px!important;height:40px!important;font-size:24px!important}
-  .daynav .wk{min-width:120px!important}
-  .banner{padding:14px!important;margin-bottom:12px!important}
-  .row{padding:10px 9px!important;gap:8px!important}
-  .rank{width:30px!important;height:30px!important}
-  .name{font-size:14px!important;line-height:1.22!important}
-  .val{font-size:12px!important}
-  .cta-check{min-height:52px!important;font-size:17px!important}
-  .hint-btn{width:100%!important;min-height:48px!important}
-}
 </style>
 </head>
 <body>
@@ -614,7 +541,6 @@ li .moveBtns{
     <button id="hintBtn" class="hint-btn" type="button">Pokaż podpowiedź</button>
     <div id="hintMsg" class="hint-msg"></div>
   </div>
-    <div id="rajaOrderMobileHint" class="order-mobile-hint">Użyj strzałek ↑ ↓ przy kafelkach. To jedyny sposób zmiany kolejności.</div>
     <ol id="list" class="list"></ol>
   </section>
 <div id="attempts" class="attempts"></div>
@@ -951,8 +877,8 @@ function renderList(){
     }else if(fixed){html+='<div class="tick">✓</div>';}
     li.innerHTML=html;
     if(!locked){
-      // Mobile-first v130: układanie wyłącznie strzałkami.
-      // Wyłączone: tap-to-swap i drag/drop, bo na telefonach dawały za dużo sposobów układania.
+      li.addEventListener("click",function(e){if(e.target.closest(".arrows"))return;if(suppressClick||dragMoved)return;pick(i);});
+      attachDrag(li,i);
     }
     ul.appendChild(li);
   });
@@ -1273,21 +1199,179 @@ console.info("Szpilplac raja/index.html v124 achievements audit fix");
 </script>
 
 <script src="../coffee.js"></script>
-<script src="raja-auth-bridge.js?v=126"></script>
+<script src="raja-auth-bridge.js?v=125"></script>
 <script src="../achievement-toast.js?v=125"></script>
-<script src="../game-result-actions.js?v=127"></script>
+<script src="../game-result-actions.js?v=126"></script>
 <script src="../daily-status.js?v=124"></script>
 <script src="../game-played.js?v=125"></script>
 <script src="../topbar-common.js?v=124"></script>
 <script src="../player-menu-common.js?v=124"></script>
-<script src="../game-save.js?v=126"></script>
+<script src="../game-save.js?v=125"></script>
 <script src="../game-stats-common.js?v=124"></script>
 <script src="../archive-achievement-common.js?v=125"></script>
 <script src="../footer-normalizer.js?v=124"></script>
 
 
+<script>
+(function(){
+  "use strict";
+  var listObserver = null;
 
+  function getList(){
+    return document.getElementById("list");
+  }
+  function rows(){
+    var list = getList();
+    if(!list)return [];
+    return Array.prototype.slice.call(list.children).filter(function(el){
+      return el && el.nodeType === 1;
+    });
+  }
+  function syncOrderFromDom(){
+    var r = rows();
+    var ids = r.map(function(el){
+      return el.dataset.id || el.getAttribute("data-id") || el.dataset.key || el.getAttribute("data-key") || el.id || "";
+    }).filter(Boolean);
 
+    try{ if(Array.isArray(window.order) && ids.length) window.order = ids.slice(); }catch(e){}
+    try{ if(Array.isArray(window.currentOrder) && ids.length) window.currentOrder = ids.slice(); }catch(e){}
+    try{ if(Array.isArray(window.userOrder) && ids.length) window.userOrder = ids.slice(); }catch(e){}
+
+    window.RAJA_DOM_ORDER = ids.slice();
+    return ids;
+  }
+  function moveDom(from,to){
+    var list = getList();
+    var r = rows();
+    if(!list || from === to || from < 0 || to < 0 || from >= r.length || to >= r.length)return;
+    var item = r[from];
+    var ref = r[to];
+    if(from < to) list.insertBefore(item, ref.nextSibling);
+    else list.insertBefore(item, ref);
+    enhanceRows();
+    syncOrderFromDom();
+  }
+  function moveBy(delta, el){
+    var r = rows();
+    var idx = r.indexOf(el);
+    if(idx < 0)return;
+    moveDom(idx, Math.max(0, Math.min(r.length - 1, idx + delta)));
+  }
+  function enhanceRows(){
+    var r = rows();
+    r.forEach(function(el,idx){
+      el.classList.remove("selected");
+      el.setAttribute("draggable","false");
+      el.style.touchAction = "manipulation";
+      el.style.webkitUserSelect = "none";
+      el.style.userSelect = "none";
+
+      if(!el.dataset.rajaSimpleBound){
+        el.dataset.rajaSimpleBound = "1";
+        el.addEventListener("touchend", function(){
+          setTimeout(syncOrderFromDom, 0);
+          setTimeout(enhanceRows, 20);
+        }, {passive:true});
+      }
+
+      var holder = el.querySelector(".moveBtns");
+      if(!holder){
+        holder = document.createElement("span");
+        holder.className = "moveBtns";
+
+        var up = document.createElement("button");
+        up.type = "button";
+        up.className = "order-mini-btn";
+        up.textContent = "↑";
+        up.setAttribute("aria-label","Przesuń wyżej");
+        up.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          moveBy(-1, el);
+        });
+
+        var down = document.createElement("button");
+        down.type = "button";
+        down.className = "order-mini-btn";
+        down.textContent = "↓";
+        down.setAttribute("aria-label","Przesuń niżej");
+        down.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          moveBy(1, el);
+        });
+
+        holder.appendChild(up);
+        holder.appendChild(down);
+        el.appendChild(holder);
+      }
+
+      var buttons = holder.querySelectorAll("button");
+      if(buttons[0])buttons[0].disabled = idx === 0;
+      if(buttons[1])buttons[1].disabled = idx === r.length - 1;
+    });
+  }
+  function addHint(){
+    var list = getList();
+    if(!list || document.getElementById("rajaOrderMobileHint"))return;
+    var hint = document.createElement("div");
+    hint.id = "rajaOrderMobileHint";
+    hint.className = "order-mobile-hint";
+    hint.textContent = "Na telefonie użyj przycisków ↑ ↓ przy kafelkach. To najpewniejszy sposób układania kolejności.";
+    list.parentNode.insertBefore(hint, list);
+  }
+  function patchCheckButton(){
+    var btn = document.getElementById("checkBtn") || Array.prototype.slice.call(document.querySelectorAll("button")).find(function(b){
+      return /sprawdź|sprawdz|check/i.test(b.textContent || "");
+    });
+    if(!btn || btn.dataset.rajaCheckSyncBound)return;
+    btn.dataset.rajaCheckSyncBound = "1";
+    btn.addEventListener("click", function(){
+      syncOrderFromDom();
+      setTimeout(syncOrderFromDom, 0);
+    }, true);
+  }
+  function boot(){
+    addHint();
+    enhanceRows();
+    patchCheckButton();
+    syncOrderFromDom();
+
+    var list = getList();
+    if(list && !listObserver){
+      listObserver = new MutationObserver(function(){
+        enhanceRows();
+        syncOrderFromDom();
+      });
+      listObserver.observe(list,{childList:true,subtree:false,attributes:true});
+    }
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+
+  setTimeout(boot,250);
+  setTimeout(boot,1000);
+
+  window.RAJA_SYNC_DOM_ORDER = syncOrderFromDom;
+  window.RAJA_LOCK_ACCOUNT_DONE_UI = function(){
+    try{document.body.classList.add("raja-account-locked");}catch(e){}
+    ["checkBtn","hintBtn"].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){el.disabled = true; el.style.display = "none";}
+    });
+    var list = getList();
+    if(list){
+      list.setAttribute("aria-disabled","true");
+      Array.prototype.slice.call(list.querySelectorAll("button,.order-mini-btn")).forEach(function(btn){
+        btn.disabled = true;
+        btn.setAttribute("aria-disabled","true");
+      });
+    }
+  };
+  console.info("Szpilplac raja simple move fix v124");
+})();
+</script>
 
 </body>
 </html>
