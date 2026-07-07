@@ -1,0 +1,80 @@
+name: Bump cache versions
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    if: ${{ !contains(github.event.head_commit.message, 'Bump HTML cache versions') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Bump script query versions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              'konto.html': {
+                  'achievement-toast.js?v=124': 'achievement-toast.js?v=125',
+                  'achievements-panel.js?v=124': 'achievements-panel.js?v=125',
+                  'google-auth-bridge.js?v=124': 'google-auth-bridge.js?v=125',
+                  'game-display-names.js?v=124': 'game-display-names.js?v=125',
+                  'avatar-select.js?v=124': 'avatar-select.js?v=125',
+                  'konto-dashboard.js?v=124': 'konto-dashboard.js?v=039',
+                  'konto-delete-bridge.js?v=124': 'konto-delete-bridge.js?v=038',
+              },
+              'klodka.html': {
+                  'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
+                  'game-result-actions.js?v=80': 'game-result-actions.js?v=126',
+              },
+              'slowko.html': {
+                  'game-result-actions.js?v=79': 'game-result-actions.js?v=126',
+              },
+              'raja/index.html': {
+                  'raja-auth-bridge.js?v=124': 'raja-auth-bridge.js?v=125',
+                  '../achievement-toast.js?v=124': '../achievement-toast.js?v=125',
+                  '../game-result-actions.js?v=124': '../game-result-actions.js?v=126',
+                  '../game-played.js?v=124': '../game-played.js?v=125',
+                  '../game-save.js?v=124': '../game-save.js?v=125',
+                  '../archive-achievement-common.js?v=124': '../archive-achievement-common.js?v=125',
+              },
+          }
+
+          changed = []
+          for file, reps in replacements.items():
+              p = Path(file)
+              text = p.read_text(encoding='utf-8')
+              old_text = text
+              for old, new in reps.items():
+                  text = text.replace(old, new)
+              if text != old_text:
+                  p.write_text(text, encoding='utf-8', newline='')
+                  changed.append(file)
+                  print('changed', file)
+              else:
+                  print('no changes', file)
+
+          if not changed:
+              print('nothing to commit')
+          PY
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet -- konto.html klodka.html slowko.html raja/index.html; then
+            echo "No HTML cache-version changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add konto.html klodka.html slowko.html raja/index.html
+          git commit -m "Bump HTML cache versions"
+          git push
