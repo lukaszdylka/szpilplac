@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wyniki gier · Admin · Szpilplac</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js?v=13"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;
+  --line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;
+  --sh:0 18px 50px -34px rgba(35,32,26,.72)
+}
+[data-theme=dark]{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#aaa18d;
+  --line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;
+  --sh:0 18px 50px -34px rgba(0,0,0,.88)
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100vh;font-family:Inter,system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at top left,rgba(191,138,58,.17),transparent 34%),var(--bg);
+  display:flex;flex-direction:column;align-items:center;padding:0 16px 42px
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;color:inherit}
+header,main,footer{width:100%;max-width:1120px}
+header{padding-top:20px}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.site-name{font-family:Oswald,system-ui,sans-serif;font-size:clamp(34px,7vw,56px);font-weight:700;text-transform:uppercase;line-height:.95;letter-spacing:.01em}
+.site-sub{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.45;max-width:760px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.icon-btn,.nav-btn{
+  min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);
+  display:inline-flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:12px;
+  padding:8px 12px;cursor:pointer
+}
+.icon-btn{width:36px;padding:0}
+.icon-btn:hover,.nav-btn:hover{background:var(--surface);color:var(--green)}
+main{display:flex;flex-direction:column;gap:14px}
+.card{
+  background:rgba(251,247,238,.88);border:1px solid var(--line);border-radius:20px;
+  box-shadow:var(--sh);padding:18px;backdrop-filter:blur(8px)
+}
+[data-theme=dark] .card{background:rgba(38,32,24,.9)}
+h2,h3{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;line-height:1.03;margin:0}
+h2{font-size:24px;margin-bottom:10px}
+h3{font-size:17px;margin-bottom:8px}
+.muted{color:var(--ink2);font-size:13px;line-height:1.5}
+.msg{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
+.msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
+.hidden{display:none!important}
+.btn{
+  border-radius:13px;border:1px solid var(--green);background:var(--green);color:#fff;font-weight:900;font-size:13px;
+  padding:11px 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center
+}
+.btn.secondary{background:var(--surface2);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.55;cursor:wait}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.stat.good{border-color:rgba(63,138,90,.55)}
+.stat.warn{border-color:rgba(181,72,47,.5)}
+.stat .label{font-size:10.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--ink2);font-weight:900}
+.stat .value{font-family:Oswald,system-ui,sans-serif;font-size:30px;line-height:1.08;margin-top:5px}
+.stat .hint{margin-top:4px;color:var(--ink2);font-size:11.5px;line-height:1.35}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;background:var(--surface2);font-size:13px}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:900;background:rgba(0,0,0,.03)}
+td.num,th.num{text-align:right}
+tr:last-child td{border-bottom:0}
+.empty{color:var(--ink2);font-size:13px;line-height:1.5;padding:12px;border:1px dashed var(--line);border-radius:12px}
+footer{text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
+footer a{color:var(--green);font-weight:900}
+@media(max-width:1040px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){body{padding-left:12px;padding-right:12px}.topbar{display:block}.controls{justify-content:flex-start;margin-top:12px}.card{padding:15px;border-radius:16px}.grid{grid-template-columns:1fr}th,td{padding:9px 8px}.site-name{font-size:34px}}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.segment{display:inline-flex;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px;gap:4px}
+.segment button{border:0;background:transparent;border-radius:999px;padding:8px 12px;font-weight:900;font-size:12px;cursor:pointer}
+.segment button.on{background:var(--green);color:#fff}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.day-card{background:var(--surface2);border:1px solid var(--line);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px}
+.day-card.today{border-color:var(--gold)}
+.day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.day-name{font-family:Oswald,system-ui,sans-serif;font-size:20px;text-transform:uppercase;line-height:1}
+.day-date{font-size:12px;color:var(--ink2);font-weight:800;margin-top:3px}
+.day-no{font-size:11px;color:var(--ink2);font-weight:900;border:1px solid var(--line);border-radius:999px;padding:5px 8px;white-space:nowrap}
+.solution{display:grid;gap:8px}
+.sol-row{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 10px;font-size:13px;line-height:1.4}
+.sol-row b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin-bottom:4px}
+.sol-main{font-family:Oswald,system-ui,sans-serif;font-size:20px;letter-spacing:.02em}
+.order{margin:0;padding-left:20px}
+.order li{margin:4px 0}
+@media(max-width:980px){.result-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.result-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <div class="site-name">Wyniki gier</div>
+      <div class="site-sub">Osobny panel admina dla rozwiązań Słōwka, Kłōdki i Rai. Zakres: 7, 14 albo 31 dni. Dzięki temu podpowiedzi nie pokazują już słów i kodów z przyszłych dni.</div>
+    </div>
+    <div class="controls">
+      <a class="nav-btn" href="admin.html">Admin</a>
+      <a class="nav-btn" href="stats.html">Statystyki</a>
+      <button class="icon-btn" id="refreshBtn" type="button">↻</button>
+      <button class="icon-btn" id="themeBtn" type="button">◐</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="msg" class="msg">Ładuję wyniki...</div>
+  <section class="card hidden" id="guestCard"><h2>Dostęp tylko dla admina</h2><p class="muted">Zaloguj się kontem admina.</p><div class="actions"><a class="btn" href="konto.html">Zaloguj się</a></div></section>
+  <section class="card hidden" id="controlCard">
+    <div class="toolbar">
+      <div>
+        <h2>Zakres</h2>
+        <p class="muted" id="rangeText">—</p>
+      </div>
+      <div class="segment" id="rangeBtns">
+        <button data-days="7" class="on">7 dni</button>
+        <button data-days="14">14 dni</button>
+        <button data-days="31">31 dni</button>
+      </div>
+    </div>
+  </section>
+  <section class="result-grid hidden" id="resultsGrid"></section>
+</main>
+<footer><a href="admin.html">Admin</a> · <a href="podpowiedzi.html">Podpowiedzi</a> · <a href="stats.html">Statystyki</a></footer>
+<script>
+"use strict";
+console.info("Szpilplac game-results-admin.html v1");
+
+var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+var sb=null;
+function setMsg(text,type){var el=document.getElementById("msg"); if(!el)return; el.textContent=text; el.className="msg"+(type?" "+type:""); el.classList.remove("hidden");}
+function hideMsg(){var el=document.getElementById("msg"); if(el)el.classList.add("hidden");}
+function show(el){if(el)el.classList.remove("hidden");}
+function hide(el){if(el)el.classList.add("hidden");}
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+function num(v){var n=Number(v);return Number.isFinite(n)?n:0;}
+function fmtInt(v){return new Intl.NumberFormat("pl-PL").format(num(v));}
+function fmtDate(v){if(!v)return "—";try{return new Date(v).toLocaleString("pl-PL");}catch(e){return String(v);}}
+function fmtDay(v){if(!v)return "—";try{return new Date(v).toLocaleDateString("pl-PL");}catch(e){return String(v);}}
+function pct(a,b){a=num(a);b=num(b);return b?Math.round((a/b)*100):0;}
+function fmtPct(v){return fmtInt(v)+"%";}
+function initTheme(){
+  var theme=localStorage.getItem("szpilplac_theme")||"light";
+  function apply(){document.documentElement.setAttribute("data-theme",theme);}
+  var btn=document.getElementById("themeBtn");
+  if(btn)btn.onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);apply();};
+  apply();
+}
+function initSupabase(){
+  if(sb)return true;
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak config.js albo danych Supabase.","err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano Supabase JS.","err");return false;}
+  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+  return true;
+}
+function getStoredSession(){try{var raw=localStorage.getItem(AUTH_STORAGE_KEY);if(!raw)return null;var data=JSON.parse(raw);return data.currentSession||data.session||data;}catch(e){return null;}}
+async function getSession(){
+  var r=await sb.auth.getSession();
+  if(r&&r.data&&r.data.session)return r.data.session;
+  var stored=getStoredSession();
+  if(stored&&stored.access_token&&stored.refresh_token){
+    try{var sr=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});if(sr&&sr.data&&sr.data.session)return sr.data.session;}catch(e){}
+    return stored;
+  }
+  return null;
+}
+async function requireAdmin(){
+  if(!initSupabase())return false;
+  var session=await getSession();
+  if(!session||!session.user){setMsg("Nie jesteś zalogowany.","err");var g=document.getElementById("guestCard"); if(g)show(g);return false;}
+  var r=await sb.from("stats_admin_overview").select("*").limit(1);
+  if(r.error||!r.data||!r.data.length){setMsg("Brak dostępu admina albo widok stats_admin_overview nie działa.","err");var g=document.getElementById("guestCard"); if(g)show(g);return false;}
+  return r.data[0];
+}
+async function tryView(name,limit){
+  try{var q=sb.from(name).select("*"); if(limit)q=q.limit(limit); var r=await q; if(r.error)throw r.error; return {ok:true,data:r.data||[]};}
+  catch(e){console.warn("View skipped",name,e.message||e);return {ok:false,data:[],error:e.message||String(e)};}
+}
+
+var daysRange=7;
+function pad(n){return String(n).padStart(2,"0");}
+function warsawTodayKey(){try{var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};parts.forEach(function(p){if(p.type!=="literal")o[p.type]=p.value;});return o.year+"-"+o.month+"-"+o.day;}catch(e){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}}
+function addDaysKey(key,delta){var d=new Date(key+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+delta);return d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate());}
+function dayIndex(key,baseY,baseM,baseD){var d=new Date(key+"T12:00:00Z");return Math.floor((Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-Date.UTC(baseY,baseM,baseD))/86400000);}
+function labelDay(key,offset){if(offset===0)return "dziś";if(offset===1)return "jutro";return new Date(key+"T12:00:00Z").toLocaleDateString("pl-PL",{weekday:"long"});}
+function fmtKey(key){return new Date(key+"T12:00:00Z").toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"});}
+async function rpc(name,args){try{var r=await sb.rpc(name,args||{});if(r.error)throw r.error;return {ok:true,data:r.data};}catch(e){return {ok:false,error:e.message||String(e),data:null};}}
+function unwrapWord(data){var v=Array.isArray(data)?data[0]:data;return {word:(v&&v.word)||"—",meaning:(v&&v.meaning)||""};}
+function unwrapCode(data){if(typeof data==="string")return data;var v=Array.isArray(data)?data[0]:data;if(!v)return "—";return v.klodka_reveal||v.code||v.answer||v.value||"—";}
+function unwrapOrder(data){var v=Array.isArray(data)?data[0]:data;if(!v)return [];var out=[];["kolejnosc","order","answer","answers","items","solution"].some(function(k){if(Array.isArray(v[k])){out=v[k];return true;}return false;});if(!out.length&&typeof v.kolejnosc==="string")out=v.kolejnosc.split(/[,;|]/).map(function(s){return s.trim();}).filter(Boolean);return out;}
+function solRow(label,html){return '<div class="sol-row"><b>'+esc(label)+'</b>'+html+'</div>';}
+async function loadOne(key,off){
+  var slowIdx=Math.max(0,dayIndex(key,2026,5,23));
+  var klodkaIdx=slowIdx+1;
+  var rajaIdx=Math.max(0,dayIndex(key,2026,6,4));
+  var slow=await rpc("wihajster_reveal_day",{p_day:slowIdx});
+  var klo=await rpc("klodka_reveal",{p_mode:"daily",p_idx:klodkaIdx});
+  var raj=await rpc("zorta_daily_reveal",{p_day:rajaIdx});
+  var w=unwrapWord(slow.data);
+  var code=unwrapCode(klo.data);
+  var order=unwrapOrder(raj.data);
+  return {key:key,off:off,slowIdx:slowIdx,klodkaIdx:klodkaIdx,rajaIdx:rajaIdx,word:w.word,meaning:w.meaning,code:code,order:order,errors:[slow.ok?null:"Słōwko",klo.ok?null:"Kłōdka",raj.ok?null:"Raja"].filter(Boolean)};
+}
+function renderCard(r){
+  return '<article class="day-card '+(r.off===0?'today':'')+'"><div class="day-head"><div><div class="day-name">'+esc(labelDay(r.key,r.off))+'</div><div class="day-date">'+esc(fmtKey(r.key))+'</div></div><div class="day-no">S '+r.slowIdx+' · K '+r.klodkaIdx+' · R '+r.rajaIdx+'</div></div><div class="solution">'+
+    solRow("Słōwko",'<div class="sol-main">'+esc(r.word)+'</div>'+(r.meaning?'<div class="muted">'+esc(r.meaning)+'</div>':''))+
+    solRow("Kłōdka",'<div class="sol-main">'+esc(r.code)+'</div>')+
+    solRow("Raja",r.order.length?'<ol class="order">'+r.order.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol>':'<div class="muted">Brak danych.</div>')+
+    (r.errors.length?'<div class="empty">Nie udało się pobrać: '+esc(r.errors.join(", "))+'</div>':'')+
+  '</div></article>';
+}
+async function loadResults(){
+  initTheme();
+  var ok=await requireAdmin(); if(!ok)return;
+  try{
+    document.getElementById("refreshBtn").disabled=true;
+    setMsg("Ładuję wyniki gier...");
+    var today=warsawTodayKey(), rows=[];
+    for(var i=0;i<daysRange;i++)rows.push(await loadOne(addDaysKey(today,i),i));
+    document.getElementById("rangeText").textContent=fmtKey(rows[0].key)+" – "+fmtKey(rows[rows.length-1].key);
+    document.getElementById("resultsGrid").innerHTML=rows.map(renderCard).join("");
+    hideMsg(); show(document.getElementById("controlCard")); show(document.getElementById("resultsGrid"));
+  }catch(e){setMsg("Nie udało się pobrać wyników:\n"+(e.message||e),"err");}
+  finally{document.getElementById("refreshBtn").disabled=false;}
+}
+document.getElementById("rangeBtns").addEventListener("click",function(e){var b=e.target.closest("button[data-days]");if(!b)return;daysRange=parseInt(b.dataset.days,10)||7;document.querySelectorAll("#rangeBtns button").forEach(function(x){x.classList.toggle("on",x===b);});loadResults();});
+document.getElementById("refreshBtn").addEventListener("click",loadResults);
+loadResults();
+</script>
+</body>
+</html>

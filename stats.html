@@ -3,53 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statystyki · Szpilplac · Familock</title>
+<title>Statystyki admina · Szpilplac</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
-<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js?v=13"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;--sh:0 6px 18px -10px rgba(35,32,26,.4)}
-[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;--sh:0 6px 18px -10px rgba(0,0,0,.5)}
+
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;
+  --line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--danger:#b5482f;
+  --sh:0 18px 50px -34px rgba(35,32,26,.72)
+}
+[data-theme=dark]{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#aaa18d;
+  --line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--danger:#d76a4f;
+  --sh:0 18px 50px -34px rgba(0,0,0,.88)
+}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 16px 40px}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100vh;font-family:Inter,system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at top left,rgba(191,138,58,.17),transparent 34%),var(--bg);
+  display:flex;flex-direction:column;align-items:center;padding:0 16px 42px
+}
 a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
-header,main,footer{width:100%;max-width:980px}
+button{font-family:inherit;color:inherit}
+header,main,footer{width:100%;max-width:1120px}
 header{padding-top:20px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.site-name{font-family:"Oswald";font-size:clamp(30px,7vw,46px);font-weight:700;text-transform:uppercase;line-height:1}
-.site-sub{font-size:12px;color:var(--ink2);margin-top:3px}
-.controls{display:flex;gap:7px}
-.icon-btn{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-.icon-btn:hover{background:var(--surface);color:var(--ink)}.icon-btn:disabled{opacity:.45;cursor:wait}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.site-name{font-family:Oswald,system-ui,sans-serif;font-size:clamp(34px,7vw,56px);font-weight:700;text-transform:uppercase;line-height:.95;letter-spacing:.01em}
+.site-sub{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.45;max-width:760px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.icon-btn,.nav-btn{
+  min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);
+  display:inline-flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:12px;
+  padding:8px 12px;cursor:pointer
+}
+.icon-btn{width:36px;padding:0}
+.icon-btn:hover,.nav-btn:hover{background:var(--surface);color:var(--green)}
 main{display:flex;flex-direction:column;gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:18px}
-h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 12px;line-height:1.05}h3{font-family:"Oswald";font-size:17px;text-transform:uppercase;letter-spacing:.03em;margin:18px 0 9px;line-height:1.05}
-.msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
+.card{
+  background:rgba(251,247,238,.88);border:1px solid var(--line);border-radius:20px;
+  box-shadow:var(--sh);padding:18px;backdrop-filter:blur(8px)
+}
+[data-theme=dark] .card{background:rgba(38,32,24,.9)}
+h2,h3{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;line-height:1.03;margin:0}
+h2{font-size:24px;margin-bottom:10px}
+h3{font-size:17px;margin-bottom:8px}
+.muted{color:var(--ink2);font-size:13px;line-height:1.5}
+.msg{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface2);color:var(--ink2);font-size:13px;line-height:1.5;white-space:pre-wrap}
 .msg.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,138,90,.1)}
 .msg.err{border-color:var(--danger);color:var(--danger);background:rgba(181,72,47,.1)}
 .hidden{display:none!important}
-.btn{border-radius:12px;padding:11px 14px;background:var(--green);color:#fff;font-weight:900;font-size:14px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
-.btn.secondary{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn{
+  border-radius:13px;border:1px solid var(--green);background:var(--green);color:#fff;font-weight:900;font-size:13px;
+  padding:11px 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center
+}
+.btn.secondary{background:var(--surface2);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.55;cursor:wait}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900}
-.stat .value{font-family:"Oswald";font-size:30px;line-height:1.1;margin-top:5px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+.stat{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.stat.good{border-color:rgba(63,138,90,.55)}
+.stat.warn{border-color:rgba(181,72,47,.5)}
+.stat .label{font-size:10.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--ink2);font-weight:900}
+.stat .value{font-family:Oswald,system-ui,sans-serif;font-size:30px;line-height:1.08;margin-top:5px}
+.stat .hint{margin-top:4px;color:var(--ink2);font-size:11.5px;line-height:1.35}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}
 table{width:100%;border-collapse:collapse;background:var(--surface2);font-size:13px}
-th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:900;background:rgba(0,0,0,.03)}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:900;background:rgba(0,0,0,.03)}
+td.num,th.num{text-align:right}
 tr:last-child td{border-bottom:0}
 .empty{color:var(--ink2);font-size:13px;line-height:1.5;padding:12px;border:1px dashed var(--line);border-radius:12px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 footer{text-align:center;color:var(--ink2);font-size:11.5px;margin-top:20px;line-height:1.7}
-footer a{color:var(--green);font-weight:800}
-@media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:460px){.grid{grid-template-columns:1fr}th,td{padding:9px 8px}}
+footer a{color:var(--green);font-weight:900}
+@media(max-width:1040px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){body{padding-left:12px;padding-right:12px}.topbar{display:block}.controls{justify-content:flex-start;margin-top:12px}.card{padding:15px;border-radius:16px}.grid{grid-template-columns:1fr}th,td{padding:9px 8px}.site-name{font-size:34px}}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:14px;align-items:stretch}
+.hero-main{background:linear-gradient(135deg,rgba(47,74,57,.14),rgba(191,138,58,.12));border:1px solid var(--line);border-radius:18px;padding:18px}
+.hero-main h2{font-size:30px}
+.hero-side{display:grid;gap:10px}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+.signal-list{display:grid;gap:8px}
+.signal{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);background:var(--surface2);border-radius:13px;padding:10px 12px;font-size:13px}
+.signal b{font-weight:900}
+.signal span{color:var(--ink2);font-size:12px;text-align:right}
+details{border:1px solid var(--line);border-radius:16px;background:var(--surface2);overflow:hidden}
+summary{cursor:pointer;padding:13px 14px;font-weight:900;text-transform:uppercase;font-size:12px;letter-spacing:.05em;color:var(--ink2)}
+.details-body{padding:0 14px 14px}
+@media(max-width:1040px){.kpi-row{grid-template-columns:repeat(3,1fr)}.hero,.two-col,.three-col{grid-template-columns:1fr}}
+@media(max-width:560px){.kpi-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -57,15 +108,13 @@ footer a{color:var(--green);font-weight:800}
   <div class="topbar">
     <div>
       <div class="site-name">Statystyki</div>
-      <div class="site-sub">Szpilplac Familock</div>
+      <div class="site-sub">Pulpit admina: aktywność, gracze, gry i szybkie sygnały. Rozwiązania gier są w osobnym panelu.</div>
     </div>
     <div class="controls">
-      <a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">
-        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.4 10 3l7 6.4"/><path d="M5 8.6V17h10V8.6"/><path d="M8 17v-5h4v5"/></svg>
-      </a>
-      <button class="icon-btn" id="refreshBtn" type="button" title="Odśwież statystyki" aria-label="Odśwież statystyki">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 9a7 7 0 1 0-2 5"/><path d="M17 3v6h-6"/></svg>
-      </button>
+      <a class="nav-btn" href="admin.html">Admin</a>
+      <a class="nav-btn" href="game-results-admin.html">Wyniki gier</a>
+      <a class="nav-btn" href="ranking.html">Ranking</a>
+      <button class="icon-btn" id="refreshBtn" type="button" title="Odśwież">↻</button>
       <button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw">◐</button>
     </div>
   </div>
@@ -73,515 +122,83 @@ footer a{color:var(--green);font-weight:800}
 
 <main>
   <div id="msg" class="msg">Ładuję statystyki...</div>
-
-  <section class="card hidden" id="guestCard">
-    <h2>Dostęp tylko dla admina</h2>
-    <p class="msg">Zaloguj się kontem admina, żeby zobaczyć statystyki.</p>
-    <div class="actions">
-      <a class="btn" href="konto.html">Zaloguj się</a>
-      <a class="btn secondary" href="index.html">Szpilplac</a>
-    </div>
+  <section class="card hidden" id="guestCard"><h2>Dostęp tylko dla admina</h2><p class="muted">Zaloguj się kontem admina, żeby zobaczyć statystyki.</p><div class="actions"><a class="btn" href="konto.html">Zaloguj się</a></div></section>
+  <section class="card hidden" id="heroCard">
+    <div class="hero"><div class="hero-main"><h2 id="heroTitle">Pulpit dnia</h2><p class="muted" id="heroText">—</p><div class="actions"><a class="btn" href="game-results-admin.html">Wyniki gier 7/14/31</a><a class="btn secondary" href="ranking.html">Ranking</a></div></div><div class="hero-side" id="heroSide"></div></div>
+    <div class="kpi-row" id="kpiRow"></div>
   </section>
-
-  <section class="card hidden" id="oldNumbersCard">
-    <h2>Obecne statystyki gier</h2>
-    <div id="oldNumbers"></div>
-  </section>
-
-  <section class="card hidden" id="eventsCard">
-    <h2>Anonimowe zdarzenia</h2>
-    <div id="eventsOverview" style="margin-bottom:12px;"></div>
-    <div id="eventsByGame" style="margin-bottom:12px;"></div>
-    <div id="eventsDaily"></div>
-  </section>
-
-  <section class="card hidden" id="overviewCard">
-    <h2>Konta i ranking</h2>
-    <div class="grid" id="overviewGrid"></div>
-  </section>
-
-  <section class="card hidden" id="ranksCard">
-    <h2>Rangi</h2>
-    <div id="ranksTable"></div>
-  </section>
-
-  <section class="card hidden" id="locationCard">
-    <h2>Lokalizacja</h2>
-    <div id="voivodeshipTable" style="margin-bottom:12px;"></div>
-    <div id="cityTable"></div>
-  </section>
-
-  <section class="card hidden" id="gamesCard">
-    <h2>Wyniki kont</h2>
-    <div id="gamesTable"></div>
-  </section>
-
-  <section class="card hidden" id="dailyCard">
-    <h2>Ostatnie 30 dni</h2>
-    <div id="dailyTable"></div>
-  </section>
-
-  <section class="card hidden" id="playersCard">
-    <h2>Ostatni gracze</h2>
-    <div id="playersTable"></div>
-  </section>
+  <section class="card hidden" id="signalsCard"><h2>Szybkie sygnały</h2><div class="signal-list" id="signalsList"></div></section>
+  <section class="two-col hidden" id="mainStatsGrid"><section class="card"><h2>Gry i skuteczność</h2><div id="gamesTable"></div></section><section class="card"><h2>Ostatni gracze</h2><div id="playersTable"></div></section></section>
+  <section class="card hidden" id="dailyCard"><h2>Ostatnie 30 dni</h2><div id="dailyTable"></div></section>
+  <section class="three-col hidden" id="communityGrid"><section class="card"><h2>Rangi</h2><div id="ranksTable"></div></section><section class="card"><h2>Skąd są gracze</h2><div id="voivodeshipTable"></div></section><section class="card"><h2>Miasta</h2><div id="cityTable"></div></section></section>
+  <section class="card hidden" id="eventsCard"><details><summary>Techniczne zdarzenia i wejścia</summary><div class="details-body"><div id="eventsOverview" style="margin:12px 0;"></div><div id="eventsByGame"></div></div></details></section>
 </main>
-
-<footer>
-  <p>
-    <a href="index.html">Szpilplac</a>
-    ·
-    <a href="ranking.html">Ranking</a>
-    ·
-    <a href="konto.html">Mój profil</a>
-  </p>
-</footer>
-
+<footer><a href="admin.html">Admin</a> · <a href="index.html">Szpilplac</a> · <a href="game-results-admin.html">Wyniki gier</a></footer>
 <script>
 "use strict";
-console.info("Szpilplac stats.html v14-pl-refresh");
+console.info("Szpilplac stats.html v16-optimized");
 
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
-
-var els={
-  msg:document.getElementById("msg"),
-  guestCard:document.getElementById("guestCard"),
-  oldNumbersCard:document.getElementById("oldNumbersCard"),
-  oldNumbers:document.getElementById("oldNumbers"),
-  eventsCard:document.getElementById("eventsCard"),
-  eventsOverview:document.getElementById("eventsOverview"),
-  eventsByGame:document.getElementById("eventsByGame"),
-  eventsDaily:document.getElementById("eventsDaily"),
-  overviewCard:document.getElementById("overviewCard"),
-  ranksCard:document.getElementById("ranksCard"),
-  locationCard:document.getElementById("locationCard"),
-  gamesCard:document.getElementById("gamesCard"),
-  dailyCard:document.getElementById("dailyCard"),
-  playersCard:document.getElementById("playersCard"),
-  overviewGrid:document.getElementById("overviewGrid"),
-  ranksTable:document.getElementById("ranksTable"),
-  voivodeshipTable:document.getElementById("voivodeshipTable"),
-  cityTable:document.getElementById("cityTable"),
-  gamesTable:document.getElementById("gamesTable"),
-  dailyTable:document.getElementById("dailyTable"),
-  playersTable:document.getElementById("playersTable")
-};
-
-var theme=localStorage.getItem("szpilplac_theme")||"light";
-function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
-document.getElementById("themeBtn").onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);applyTheme();};
-applyTheme();
-
-var refreshBtn=document.getElementById("refreshBtn");
-var isRefreshing=false;
-if(refreshBtn){
-  refreshBtn.addEventListener("click",function(){
-    if(isRefreshing)return;
-    loadStats(true);
-  });
-}
-
-function setMsg(text,type){
-  els.msg.textContent=text;
-  els.msg.className="msg"+(type?" "+type:"");
-  els.msg.classList.remove("hidden");
-}
-function hideMsg(){els.msg.classList.add("hidden");}
-function show(node){node.classList.remove("hidden");}
-function hide(node){node.classList.add("hidden");}
+function setMsg(text,type){var el=document.getElementById("msg"); if(!el)return; el.textContent=text; el.className="msg"+(type?" "+type:""); el.classList.remove("hidden");}
+function hideMsg(){var el=document.getElementById("msg"); if(el)el.classList.add("hidden");}
+function show(el){if(el)el.classList.remove("hidden");}
+function hide(el){if(el)el.classList.add("hidden");}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
-function fmtDate(v){
-  if(!v)return "—";
-  try{return new Date(v).toLocaleString("pl-PL");}catch(e){return String(v);}
+function num(v){var n=Number(v);return Number.isFinite(n)?n:0;}
+function fmtInt(v){return new Intl.NumberFormat("pl-PL").format(num(v));}
+function fmtDate(v){if(!v)return "—";try{return new Date(v).toLocaleString("pl-PL");}catch(e){return String(v);}}
+function fmtDay(v){if(!v)return "—";try{return new Date(v).toLocaleDateString("pl-PL");}catch(e){return String(v);}}
+function pct(a,b){a=num(a);b=num(b);return b?Math.round((a/b)*100):0;}
+function fmtPct(v){return fmtInt(v)+"%";}
+function initTheme(){
+  var theme=localStorage.getItem("szpilplac_theme")||"light";
+  function apply(){document.documentElement.setAttribute("data-theme",theme);}
+  var btn=document.getElementById("themeBtn");
+  if(btn)btn.onclick=function(){theme=theme==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",theme);apply();};
+  apply();
 }
-function fmtDay(v){
-  if(!v)return "—";
-  try{return new Date(v).toLocaleDateString("pl-PL");}catch(e){return String(v);}
-}
-
 function initSupabase(){
+  if(sb)return true;
   var cfg=window.SZPILPLAC_CONFIG||{};
-  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
-    setMsg("Brak config.js albo danych Supabase.","err");
-    return false;
-  }
-  if(!window.supabase){
-    setMsg("Nie załadowano Supabase JS.","err");
-    return false;
-  }
-  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
-    auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
-  });
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){setMsg("Brak config.js albo danych Supabase.","err");return false;}
+  if(!window.supabase){setMsg("Nie załadowano Supabase JS.","err");return false;}
+  sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
   return true;
 }
-
-function getStoredSession(){
-  try{
-    var raw=localStorage.getItem(AUTH_STORAGE_KEY);
-    if(!raw)return null;
-    var data=JSON.parse(raw);
-    return data.currentSession||data.session||data;
-  }catch(e){return null;}
-}
-
+function getStoredSession(){try{var raw=localStorage.getItem(AUTH_STORAGE_KEY);if(!raw)return null;var data=JSON.parse(raw);return data.currentSession||data.session||data;}catch(e){return null;}}
 async function getSession(){
   var r=await sb.auth.getSession();
   if(r&&r.data&&r.data.session)return r.data.session;
-
   var stored=getStoredSession();
-  if(stored&&stored.user&&stored.access_token&&stored.refresh_token){
-    try{
-      var sr=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});
-      if(sr&&sr.data&&sr.data.session)return sr.data.session;
-    }catch(e){}
+  if(stored&&stored.access_token&&stored.refresh_token){
+    try{var sr=await sb.auth.setSession({access_token:stored.access_token,refresh_token:stored.refresh_token});if(sr&&sr.data&&sr.data.session)return sr.data.session;}catch(e){}
     return stored;
   }
   return null;
 }
-
-async function selectView(name){
-  var r=await sb.from(name).select("*");
-  if(r.error)throw new Error(name+": "+r.error.message);
-  return r.data||[];
-}
-
-function renderOverview(row){
-  var items=[
-    ["Zarejestrowani", row.registered_players],
-    ["Widoczni w rankingu", row.visible_players],
-    ["Z województwem", row.players_with_voivodeship],
-    ["Z miejscowością", row.players_with_city],
-    ["Wyniki", row.total_results],
-    ["Gracze z wynikami", row.players_with_results],
-    ["Wygrane", row.total_wins],
-    ["Punkty", row.total_points],
-    ["Aktywni dziś", row.active_today],
-    ["Aktywni 7 dni", row.active_7d],
-    ["Aktywni 30 dni", row.active_30d]
-  ];
-  els.overviewGrid.innerHTML=items.map(function(it){
-    return '<div class="stat"><div class="label">'+esc(it[0])+'</div><div class="value">'+esc(it[1]||0)+'</div></div>';
-  }).join("");
-}
-
-function titleize(key){
-  var k=String(key||"").toLowerCase();
-  var map={
-    // ogólne
-    id:"ID",
-    day:"Dzień",
-    date:"Data",
-    created_at:"Utworzono",
-    updated_at:"Aktualizacja",
-    finished_at:"Zakończono",
-    last_event:"Ostatni event",
-    last_play:"Ostatnia gra",
-    last_day:"Ostatni dzień",
-    last_win:"Ostatnia wygrana",
-
-    // konta
-    registered_players:"Zarejestrowani",
-    visible_players:"Widoczni w rankingu",
-    players_with_voivodeship:"Z województwem",
-    players_with_city:"Z miejscowością",
-    players_with_results:"Gracze z wynikami",
-    active_today:"Aktywni dziś",
-    active_7d:"Aktywni 7 dni",
-    active_30d:"Aktywni 30 dni",
-    login:"Login",
-    display_name:"Nazwa",
-    rank_name:"Ranga",
-    show_in_ranking:"Ranking",
-    voivodeship:"Województwo",
-    city:"Miejscowość",
-    games_played:"Gry",
-    points:"Punkty",
-
-    // wyniki
-    game:"Gra",
-    mode:"Tryb",
-    puzzle_no:"Numer",
-    puzzle_word:"Słowo",
-    word:"Słowo",
-    won:"Wygrana",
-    wins:"Wygrane",
-    total_wins:"Wygrane",
-    win_rate:"Skuteczność",
-    wpct:"% wygranych",
-    tries:"Próby",
-    guess_no:"Próba",
-    guesses:"Zgadywania",
-    errors:"Błędy",
-    score:"Wynik",
-    total_score:"Punkty razem",
-    total_points:"Punkty razem",
-    results:"Wyniki",
-    total_results:"Wyniki kont",
-    played:"Rozegrane",
-    total_played:"Rozegrane razem",
-    players:"Gracze",
-
-    // eventy
-    event:"Event",
-    event_type:"Typ eventu",
-    action:"Akcja",
-    total_events:"Eventy razem",
-    events:"Eventy",
-    events_today:"Eventy dziś",
-    events_7d:"Eventy 7 dni",
-    events_30d:"Eventy 30 dni",
-    today:"Dziś",
-    last_7d:"Ostatnie 7 dni",
-    last_30d:"Ostatnie 30 dni",
-
-    // stare widoki
-    total:"Razem",
-    count:"Liczba",
-    cnt:"Liczba",
-    amount:"Liczba",
-    daily:"Dziennie",
-    distribution:"Rozkład",
-    dist:"Rozkład",
-    avg_tries:"Śr. prób",
-    average_tries:"Śr. prób",
-    avg_score:"Śr. wynik",
-    max_streak:"Najlepsza seria",
-    streak:"Seria",
-    hint:"Podpowiedź",
-    hints:"Podpowiedzi",
-    used_hint:"Użyto podpowiedzi",
-    lang:"Język",
-    language:"Język",
-    category:"Kategoria",
-    max_tries:"Limit prób",
-    device:"Urządzenie",
-    source:"Źródło",
-    path:"Ścieżka",
-    page:"Strona",
-    referrer:"Źródło wejścia"
-  };
-  if(map[k])return map[k];
-
-  return String(key)
-    .replace(/^stats[_\s-]*/i,"")
-    .replace(/_/g," ")
-    .replace(/\b\w/g,function(c){return c.toUpperCase();});
-}
-function gameName(v){
-  var k=String(v||"").toLowerCase();
-  var map={
-    slowko:"Słōwko",
-    klodka:"Kłōdka",
-    zorta:"Raja",
-    raja:"Raja",
-    cuzamen:"Cuzamen"
-  };
-  return map[k]||v;
-}
-function valueForColumn(key, value){
-  var k=String(key||"").toLowerCase();
-  if(k==="game")return gameName(value);
-  if(k==="show_in_ranking")return value?"tak":"nie";
-  if(k==="won"||k==="last_win"||k==="used_hint")return value?"tak":"nie";
-  if(k==="mode"){
-    var m=String(value||"").toLowerCase();
-    if(m==="daily")return "dzienny";
-    if(m==="tester")return "testowy";
-    return value;
-  }
-  if(k==="lang"||k==="language"){
-    if(value==="pl")return "polski";
-    if(value==="szl")return "śląski";
-    return value;
-  }
-  return value;
-}
-function fmtVal(v){
-  if(v==null||v==="")return "—";
-  if(typeof v==="boolean")return v?"tak":"nie";
-  if(String(v).match(/^\d{4}-\d{2}-\d{2}T/))return fmtDate(v);
-  if(String(v).match(/^\d{4}-\d{2}-\d{2}$/))return fmtDay(v);
-  return String(v);
-}
-function table(rows, cols, empty){
-  if(!rows.length)return '<div class="empty">'+esc(empty||"Brak danych.")+'</div>';
-  if(!cols){
-    cols=Object.keys(rows[0]||{}).map(function(k){return {key:k,label:titleize(k)};});
-  }
-  return '<div class="table-wrap"><table><thead><tr>'+
-    cols.map(function(c){return '<th>'+esc(c.label)+'</th>';}).join("")+
-    '</tr></thead><tbody>'+
-    rows.map(function(r){
-      return '<tr>'+cols.map(function(c){
-        var v=typeof c.value==="function"?c.value(r):r[c.key];
-        return '<td>'+esc(fmtVal(valueForColumn(c.key||c.label,v)))+'</td>';
-      }).join("")+'</tr>';
-    }).join("")+
-    '</tbody></table></div>';
-}
-async function tryView(name, limit){
-  try{
-    var q=sb.from(name).select("*");
-    if(limit)q=q.limit(limit);
-    var r=await q;
-    if(r.error)throw r.error;
-    return {ok:true,data:r.data||[]};
-  }catch(e){
-    console.warn("Stats view skipped:", name, e.message || e);
-    return {ok:false,data:[],error:e.message||String(e)};
-  }
-}
-function renderCardsFromRow(row){
-  if(!row)return "";
-  return '<div class="grid">'+Object.keys(row).map(function(k){
-    return '<div class="stat"><div class="label">'+esc(titleize(k))+'</div><div class="value">'+esc(fmtVal(row[k]))+'</div></div>';
-  }).join("")+'</div>';
-}
-function legacyBlock(title, rows){
-  if(!rows.length)return "";
-  var html='<h3>'+esc(title)+'</h3>';
-  if(rows.length===1){
-    var numericCount=Object.values(rows[0]).filter(function(v){return typeof v==="number";}).length;
-    if(numericCount>=2)return html+renderCardsFromRow(rows[0]);
-  }
-  return html+table(rows,null,"Brak danych.");
-}
-
-async function loadStats(manualRefresh){
-  if(!initSupabase())return;
-
+async function requireAdmin(){
+  if(!initSupabase())return false;
   var session=await getSession();
-  if(!session||!session.user){
-    setMsg("Nie jesteś zalogowany.","err");
-    show(els.guestCard);
-    return;
-  }
-
-  try{
-    isRefreshing=true;
-    if(refreshBtn)refreshBtn.disabled=true;
-
-    [
-      els.oldNumbersCard,
-      els.eventsCard,
-      els.overviewCard,
-      els.ranksCard,
-      els.locationCard,
-      els.gamesCard,
-      els.dailyCard,
-      els.playersCard
-    ].forEach(function(card){ if(card)card.classList.add("hidden"); });
-
-    setMsg(manualRefresh ? "Odświeżam statystyki..." : "Ładuję statystyki...");
-
-    var overview=await selectView("stats_admin_overview");
-    if(!overview.length){
-      setMsg("Brak dostępu do statystyk.","err");
-      show(els.guestCard);
-      return;
-    }
-
-
-    var legacyViews=[
-      ["stats_admin_legacy_overview","Przegląd obecnych statystyk"],
-      ["stats_admin_legacy_daily","Dziennie"],
-      ["stats_admin_legacy_slowko_dist","Słōwko · rozkład"],
-      ["stats_admin_legacy_slowko_guesses","Słōwko · próby"],
-      ["stats_admin_legacy_slowko_words","Słōwko · słowa"],
-      ["stats_admin_legacy_cuzamen_dist","Cuzamen · rozkład"]
-    ];
-
-    var legacyHtml="";
-    for(var i=0;i<legacyViews.length;i++){
-      var lv=await tryView(legacyViews[i][0],300);
-      if(lv.ok)legacyHtml+=legacyBlock(legacyViews[i][1],lv.data);
-    }
-    if(legacyHtml){
-      els.oldNumbers.innerHTML=legacyHtml;
-      show(els.oldNumbersCard);
-    }
-
-    var evOverview=await tryView("stats_admin_events_overview");
-    var evByGame=await tryView("stats_admin_events_by_game",100);
-    var evDaily=await tryView("stats_admin_events_daily",300);
-    if((evOverview.ok&&evOverview.data.length)||(evByGame.ok&&evByGame.data.length)||(evDaily.ok&&evDaily.data.length)){
-      if(evOverview.ok&&evOverview.data.length)els.eventsOverview.innerHTML=renderCardsFromRow(evOverview.data[0]);
-      if(evByGame.ok)els.eventsByGame.innerHTML=table(evByGame.data,null,"Brak eventów według gry.");
-      if(evDaily.ok)els.eventsDaily.innerHTML=table(evDaily.data,null,"Brak eventów dziennych.");
-      show(els.eventsCard);
-    }
-
-    var ranks=await selectView("stats_admin_ranks");
-    var voivodeships=await selectView("stats_admin_voivodeships");
-    var cities=await selectView("stats_admin_cities");
-    var games=await selectView("stats_admin_games");
-    var daily=await selectView("stats_admin_daily_results");
-    var players=await selectView("stats_admin_latest_players");
-
-    renderOverview(overview[0]);
-
-    els.ranksTable.innerHTML=table(ranks,[
-      {key:"rank_name",label:"Ranga"},
-      {key:"players",label:"Gracze"}
-    ],"Brak rang.");
-
-    els.voivodeshipTable.innerHTML=table(voivodeships,[
-      {key:"voivodeship",label:"Województwo"},
-      {key:"players",label:"Gracze"}
-    ],"Brak danych województw.");
-
-    els.cityTable.innerHTML=table(cities,[
-      {key:"city",label:"Miejscowość"},
-      {key:"voivodeship",label:"Województwo"},
-      {key:"players",label:"Gracze"}
-    ],"Brak danych miejscowości.");
-
-    els.gamesTable.innerHTML=table(games,[
-      {key:"game",label:"Gra"},
-      {key:"results",label:"Wyniki"},
-      {key:"wins",label:"Wygrane"},
-      {key:"players",label:"Gracze"},
-      {key:"points",label:"Punkty"},
-      {label:"Ostatnia gra",value:function(r){return fmtDate(r.last_play);}}
-    ],"Brak wyników kont.");
-
-    els.dailyTable.innerHTML=table(daily,[
-      {label:"Dzień",value:function(r){return fmtDay(r.day);}},
-      {key:"game",label:"Gra"},
-      {key:"results",label:"Wyniki"},
-      {key:"wins",label:"Wygrane"},
-      {key:"players",label:"Gracze"},
-      {key:"points",label:"Punkty"}
-    ],"Brak wyników z ostatnich 30 dni.");
-
-    els.playersTable.innerHTML=table(players,[
-      {key:"login",label:"Login"},
-      {key:"rank_name",label:"Ranga"},
-      {label:"Ranking",value:function(r){return r.show_in_ranking?"tak":"nie";}},
-      {key:"voivodeship",label:"Województwo"},
-      {key:"city",label:"Miejscowość"},
-      {key:"games_played",label:"Gry"},
-      {key:"points",label:"Punkty"},
-      {label:"Utworzono",value:function(r){return fmtDate(r.created_at);}},
-      {label:"Ostatnia gra",value:function(r){return fmtDate(r.last_play);}}
-    ],"Brak graczy.");
-
-    hideMsg();
-    show(els.overviewCard);
-    show(els.ranksCard);
-    show(els.locationCard);
-    show(els.gamesCard);
-    show(els.dailyCard);
-    show(els.playersCard);
-  }catch(err){
-    setMsg("Nie udało się pobrać statystyk:\n"+err.message,"err");
-  }finally{
-    isRefreshing=false;
-    if(refreshBtn)refreshBtn.disabled=false;
-  }
+  if(!session||!session.user){setMsg("Nie jesteś zalogowany.","err");var g=document.getElementById("guestCard"); if(g)show(g);return false;}
+  var r=await sb.from("stats_admin_overview").select("*").limit(1);
+  if(r.error||!r.data||!r.data.length){setMsg("Brak dostępu admina albo widok stats_admin_overview nie działa.","err");var g=document.getElementById("guestCard"); if(g)show(g);return false;}
+  return r.data[0];
+}
+async function tryView(name,limit){
+  try{var q=sb.from(name).select("*"); if(limit)q=q.limit(limit); var r=await q; if(r.error)throw r.error; return {ok:true,data:r.data||[]};}
+  catch(e){console.warn("View skipped",name,e.message||e);return {ok:false,data:[],error:e.message||String(e)};}
 }
 
+function stat(label,value,hint,cls){return '<div class="stat '+(cls||'')+'"><div class="label">'+esc(label)+'</div><div class="value">'+esc(value)+'</div>'+(hint?'<div class="hint">'+esc(hint)+'</div>':'')+'</div>';}
+function titleize(key){var map={rank_name:"Ranga",players:"Gracze",game:"Gra",results:"Wyniki",wins:"Wygrane",points:"Punkty",last_play:"Ostatnia gra",day:"Dzień",city:"Miasto",voivodeship:"Województwo",login:"Login",games_played:"Gry",show_in_ranking:"Ranking",created_at:"Utworzono",active_today:"Aktywni dziś",active_7d:"Aktywni 7 dni",active_30d:"Aktywni 30 dni",total_results:"Wyniki",total_wins:"Wygrane",total_points:"Punkty",registered_players:"Konta",visible_players:"Ranking"}; return map[key]||String(key).replace(/_/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();});}
+function gameName(v){var k=String(v||"").toLowerCase();return {slowko:"Słōwko",klodka:"Kłōdka",zorta:"Raja",raja:"Raja",cuzamen:"Cuzamen"}[k]||v;}
+function val(k,v){if(v==null||v==="")return "—";if(k==="game")return gameName(v);if(k==="show_in_ranking")return v?"tak":"nie";if(k==="won")return v?"tak":"nie";if(String(v).match(/^\d{4}-\d{2}-\d{2}T/))return fmtDate(v);if(String(v).match(/^\d{4}-\d{2}-\d{2}$/))return fmtDay(v);return String(v);}
+function table(rows,cols,empty){if(!rows||!rows.length)return '<div class="empty">'+esc(empty||"Brak danych.")+'</div>'; if(!cols)cols=Object.keys(rows[0]).map(function(k){return {key:k,label:titleize(k)};}); return '<div class="table-wrap"><table><thead><tr>'+cols.map(function(c){return '<th class="'+(c.num?'num':'')+'">'+esc(c.label||titleize(c.key))+'</th>';}).join("")+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+cols.map(function(c){var value=typeof c.value==="function"?c.value(r):r[c.key];return '<td class="'+(c.num?'num':'')+'">'+esc(c.format?c.format(value,r):val(c.key,value))+'</td>';}).join("")+'</tr>';}).join("")+'</tbody></table></div>';}
+function signal(label,value,hint){return '<div class="signal"><b>'+esc(label)+'</b><span>'+esc(value)+(hint?' · '+esc(hint):'')+'</span></div>';}
+function renderHero(o,games,daily){var top=(games||[]).slice().sort(function(a,b){return num(b.results)-num(a.results);})[0];var last=(daily||[])[0];var wr=pct(o.total_wins,o.total_results);document.getElementById("heroText").textContent="Najważniejsze liczby bez przekopywania surowych tabel.";document.getElementById("heroSide").innerHTML=stat("Skuteczność",fmtPct(wr),"wygrane / wyniki",wr>=50?"good":"")+stat("Top gra",top?gameName(top.game):"—",top?fmtInt(top.results)+" wyników":"brak danych");document.getElementById("kpiRow").innerHTML=[stat("Konta",fmtInt(o.registered_players),"wszyscy gracze"),stat("Wyniki",fmtInt(o.total_results),"zapisane"),stat("Gracze z wynikami",fmtInt(o.players_with_results),fmtPct(pct(o.players_with_results,o.registered_players))+" kont"),stat("Aktywni dziś",fmtInt(o.active_today),"dzisiejsza aktywność",num(o.active_today)>0?"good":""),stat("Aktywni 7 dni",fmtInt(o.active_7d),"ostatni tydzień"),stat("Punkty",fmtInt(o.total_points),"łącznie")].join("");document.getElementById("signalsList").innerHTML=[signal("Aktywność 7 dni",fmtPct(pct(o.active_7d,o.registered_players)),"aktywnych kont"),signal("Aktywność 30 dni",fmtPct(pct(o.active_30d,o.registered_players)),"aktywnych kont"),signal("Średnio punktów na wynik",o.total_results?Math.round(num(o.total_points)/num(o.total_results)):"0","orientacyjnie"),signal("Najmocniejsza gra",top?gameName(top.game):"—",top?fmtInt(top.results)+" wyników":"brak danych"),signal("Ostatni dzień z ruchem",last?fmtDay(last.day):"—",last?fmtInt(last.results)+" wyników":"brak danych")].join("");}
+async function loadStats(manual){initTheme();var o=await requireAdmin();if(!o)return;try{document.getElementById("refreshBtn").disabled=true;setMsg(manual?"Odświeżam statystyki...":"Ładuję statystyki...");var games=(await tryView("stats_admin_games",40)).data;var daily=(await tryView("stats_admin_daily_results",120)).data;var players=(await tryView("stats_admin_latest_players",20)).data;var ranks=(await tryView("stats_admin_ranks",50)).data;var voiv=(await tryView("stats_admin_voivodeships",20)).data;var cities=(await tryView("stats_admin_cities",20)).data;var evOverview=await tryView("stats_admin_events_overview",1);var evByGame=await tryView("stats_admin_events_by_game",40);renderHero(o,games,daily);document.getElementById("gamesTable").innerHTML=table(games,[{key:"game",label:"Gra"},{key:"results",label:"Wyniki",num:true,format:fmtInt},{key:"wins",label:"Wygrane",num:true,format:fmtInt},{label:"Skuteczność",num:true,value:function(r){return pct(r.wins,r.results)},format:fmtPct},{key:"players",label:"Gracze",num:true,format:fmtInt},{key:"points",label:"Punkty",num:true,format:fmtInt},{label:"Ostatnia gra",value:function(r){return r.last_play},format:fmtDate}],"Brak wyników kont.");document.getElementById("playersTable").innerHTML=table(players,[{key:"login",label:"Login"},{key:"rank_name",label:"Ranga"},{key:"games_played",label:"Gry",num:true,format:fmtInt},{key:"points",label:"Punkty",num:true,format:fmtInt},{label:"Ostatnia gra",value:function(r){return r.last_play},format:fmtDate},{label:"Miasto",value:function(r){return [r.city,r.voivodeship].filter(Boolean).join(", ")||"—"}}],"Brak graczy.");document.getElementById("dailyTable").innerHTML=table(daily,[{label:"Dzień",value:function(r){return r.day},format:fmtDay},{key:"game",label:"Gra"},{key:"results",label:"Wyniki",num:true,format:fmtInt},{key:"wins",label:"Wygrane",num:true,format:fmtInt},{label:"Skuteczność",num:true,value:function(r){return pct(r.wins,r.results)},format:fmtPct},{key:"players",label:"Gracze",num:true,format:fmtInt},{key:"points",label:"Punkty",num:true,format:fmtInt}],"Brak wyników z ostatnich 30 dni.");document.getElementById("ranksTable").innerHTML=table(ranks,[{key:"rank_name",label:"Ranga"},{key:"players",label:"Gracze",num:true,format:fmtInt}],"Brak rang.");document.getElementById("voivodeshipTable").innerHTML=table(voiv,[{key:"voivodeship",label:"Województwo"},{key:"players",label:"Gracze",num:true,format:fmtInt}],"Brak województw.");document.getElementById("cityTable").innerHTML=table(cities,[{key:"city",label:"Miasto"},{key:"players",label:"Gracze",num:true,format:fmtInt}],"Brak miast.");if((evOverview.ok&&evOverview.data.length)||(evByGame.ok&&evByGame.data.length)){document.getElementById("eventsOverview").innerHTML=evOverview.ok&&evOverview.data.length?'<div class="grid">'+Object.keys(evOverview.data[0]).map(function(k){return stat(titleize(k),fmtInt(evOverview.data[0][k]));}).join("")+'</div>':'';document.getElementById("eventsByGame").innerHTML=evByGame.ok?table(evByGame.data,null,"Brak eventów według gry."):'';show(document.getElementById("eventsCard"));}hideMsg();["heroCard","signalsCard","mainStatsGrid","dailyCard","communityGrid"].forEach(function(id){show(document.getElementById(id));});}catch(e){setMsg("Nie udało się pobrać statystyk:\n"+(e.message||e),"err");}finally{document.getElementById("refreshBtn").disabled=false;}}
+document.getElementById("refreshBtn").addEventListener("click",function(){loadStats(true);});
 loadStats(false);
 </script>
 </body>
