@@ -1,17 +1,21 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v124
+  Szpilplac Kłōdka Auth Bridge v125
   - zapisuje wynik Kłōdki na koncie
-  - blokuje ponowne granie na drugim urządzeniu, jeśli wynik jest już zapisany na koncie
+  - blokuje ponowne granie na drugim urządzeniu, osobno dla trybu daily i weekly
+  - ponownie sprawdza konto po przełączeniu dziennej Kłōdki na tygodniówkę
 */
 (function(){
   "use strict";
 
-  var VERSION="v124";
+  var VERSION="v125";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
-  var hydrated=false;
+  var switchPatched=false;
+  var hydratedKey=null;
   var attempts={};
+
+  function keyOf(mode,idx){return String(mode||"daily").toLowerCase()+":"+String(idx);}
 
   function injectStyle(){
     if(document.getElementById("szpKlodkaAccountStyle"))return;
@@ -36,6 +40,13 @@
     }
     el.textContent=text||"";
     el.className="szp-account-save-note"+(type?(" "+type):"");
+  }
+
+  function clearAccountDoneUI(){
+    var box=document.getElementById("szpKlodkaAccountDone");
+    if(box&&box.parentNode)box.parentNode.removeChild(box);
+    var pad=document.getElementById("pad");
+    if(pad)pad.style.display="";
   }
 
   function loadScript(src,testFn){
@@ -103,15 +114,19 @@
   function isCurrent(mode,idx){
     var today=Number(window.TODAY_NO||window.DAY_NO||0);
     var week=Number(window.WEEK_NO||0);
-    return (mode==="daily"&&idx===today)||(mode==="weekly"&&idx===week);
+    return (mode==="daily"&&Number(idx)===today)||(mode==="weekly"&&Number(idx)===week);
   }
   function localFinished(mode,idx){
     try{
       if(typeof window.loadSavedGame==="function"){
-        var g=window.loadSavedGame(mode,idx);
-        if(g&&(g.status==="won"||g.status==="lost"))return true;
+        var saved=window.loadSavedGame(mode,idx);
+        if(saved&&(saved.status==="won"||saved.status==="lost"))return true;
       }
-      if(window.game&&(window.game.status==="won"||window.game.status==="lost"))return true;
+      if(window.game&&(window.game.status==="won"||window.game.status==="lost")){
+        var gm=window.game.mode||currentMode();
+        var gi=window.game.idx!=null?Number(window.game.idx):currentPuzzleNo(gm);
+        if(gm===mode&&String(gi)===String(idx))return true;
+      }
     }catch(e){}
     return false;
   }
@@ -136,19 +151,18 @@
     return {game:"klodka",mode:mode,puzzleNo:idx,won:!!won,tries:tries,errors:Math.max(0,tries-(won?1:0)),score:scoreKlodka(mode,!!won,tries),maxAttempts:window.MAX_TRIES||6,isCurrent:isCurrent(mode,idx)};
   }
 
-
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=124";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=125";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
       var res = await window.SZP_GAME_SAVE.saveResult(data,{
-        skipMessage:"Archiwum K\u0142\u014ddki zostaje lokalnie \u2014 do rankingu zapisuje si\u0119 tylko bie\u017c\u0105ca zagadka.",
-        noAccountMessage:"Grasz bez konta \u2014 wynik K\u0142\u014ddki zosta\u0142 zapisany lokalnie.",
+        skipMessage:"Archiwum Kłōdki zostaje lokalnie. Do rankingu zapisuje się tylko bieżąca zagadka.",
+        noAccountMessage:"Grasz bez konta. Wynik Kłōdki został zapisany lokalnie.",
         savedMessage:"Wynik zapisany na koncie. Punkty: " + (data && data.score ? data.score : 0) + ".",
-        errorMessage:"Nie uda\u0142o si\u0119 zapisa\u0107 wyniku K\u0142\u014ddki."
+        errorMessage:"Nie udało się zapisać wyniku Kłōdki."
       });
       if(res && res.message)setNote(res.message,res.type || "");
       if(res && res.error)throw res.error;
@@ -159,12 +173,12 @@
   async function saveResult(data){
     if(await tryCommonGameSave(data))return;
     if(!data||!data.isCurrent){
-      setNote("Archiwum Kłōdki zostaje lokalnie — do rankingu zapisuje się tylko bieżąca zagadka.","err");
+      setNote("Archiwum Kłōdki zostaje lokalnie. Do rankingu zapisuje się tylko bieżąca zagadka.","err");
       return;
     }
     var session=await getSession();
     if(!session||!session.user){
-      setNote("Grasz bez konta — wynik Kłōdki został zapisany lokalnie.","");
+      setNote("Grasz bez konta. Wynik Kłōdki został zapisany lokalnie.","");
       return;
     }
     setNote("Zapisuję wynik Kłōdki na koncie...","");
@@ -175,15 +189,19 @@
   }
 
   function showAccountDone(row,mode,idx){
-    if(!row||hydrated)return;
+    var k=keyOf(mode,idx);
+    if(!row||hydratedKey===k)return;
     if(localFinished(mode,idx))return;
-    hydrated=true;
+    hydratedKey=k;
     injectStyle();
 
     try{
       if(window.game){
         window.game.status=row.won?"won":"lost";
+        window.game.mode=mode;
+        window.game.idx=idx;
       }
+      window.current="";
     }catch(e){}
 
     var pad=document.getElementById("pad");
@@ -196,26 +214,32 @@
       box.id="szpKlodkaAccountDone";
       box.className="szp-account-done";
       if(board&&board.parentNode)board.insertAdjacentElement("beforebegin",box);
-      else document.querySelector("main").insertAdjacentElement("afterbegin",box);
+      else if(document.querySelector("main"))document.querySelector("main").insertAdjacentElement("afterbegin",box);
+      else document.body.appendChild(box);
     }
     var result=row.won?"wygrana":"nieukończone";
     var tries=row.tries?(" · "+row.tries+"/"+(window.MAX_TRIES||6)):"";
     var score=Number.isFinite(Number(row.score))?(" · Punkty: "+row.score):"";
     box.innerHTML="<b>Ta Kłōdka jest już zapisana na koncie.</b><br>Wynik z innego urządzenia: "+result+tries+score;
+    try{if(typeof window.paintFromGame==="function")window.paintFromGame();}catch(e){}
   }
 
   async function hydrateAccountResult(){
     try{
       var mode=currentMode();
       var idx=currentPuzzleNo(mode);
+      var k=keyOf(mode,idx);
       if(!isCurrent(mode,idx))return;
-      if(localFinished(mode,idx))return;
+      if(localFinished(mode,idx)){
+        if(hydratedKey===k){hydratedKey=null;clearAccountDoneUI();}
+        return;
+      }
 
       var session=await getSession();
       if(!session||!session.user)return;
       var client=await ensureClient();
       var res=await client.from("user_game_results")
-        .select("game,mode,puzzle_no,won,tries,score,created_at")
+        .select("game,mode,puzzle_no,won,tries,score,created_at,finished_at")
         .eq("user_id",session.user.id)
         .eq("game","klodka")
         .eq("mode",mode)
@@ -223,7 +247,24 @@
         .maybeSingle();
 
       if(!res.error&&res.data)showAccountDone(res.data,mode,idx);
+      else if(hydratedKey===k){hydratedKey=null;clearAccountDoneUI();}
     }catch(e){}
+  }
+
+  function hookSwitchView(){
+    if(switchPatched)return true;
+    if(typeof window.switchView!=="function")return false;
+    var original=window.switchView;
+    window.switchView=function(v){
+      clearAccountDoneUI();
+      hydratedKey=null;
+      var ret=original.apply(this,arguments);
+      setTimeout(hydrateAccountResult,120);
+      setTimeout(hydrateAccountResult,700);
+      return ret;
+    };
+    switchPatched=true;
+    return true;
   }
 
   function hook(){
@@ -247,16 +288,18 @@
 
   function boot(){
     console.info("Szpilplac klodka-auth-bridge.js "+VERSION);
-    loadScript("archive-achievement-common.js?v=124",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;}).catch(function(){});
-    loadScript("game-stats-common.js?v=124",function(){return !!window.SZP_GAME_STATS;}).catch(function(){});
+    window.SZP_KLODKA_ACCOUNT={version:VERSION,hydrate:hydrateAccountResult,saveResult:saveResult};
+    loadScript("archive-achievement-common.js?v=125",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;}).catch(function(){});
+    loadScript("game-stats-common.js?v=125",function(){return !!window.SZP_GAME_STATS;}).catch(function(){});
     setTimeout(hydrateAccountResult,500);
     setTimeout(hydrateAccountResult,1400);
     var tries=0,timer=setInterval(function(){
       tries++;
-      if(hook()||tries>80)clearInterval(timer);
+      var okFinish=hook();
+      var okSwitch=hookSwitchView();
+      if((okFinish&&okSwitch)||tries>80)clearInterval(timer);
       if(tries===10||tries===30)hydrateAccountResult();
     },100);
   }
-
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
