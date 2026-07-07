@@ -1,13 +1,14 @@
 "use strict";
 /*
-  Szpilplac v124 — Google login + identity linking
+  Szpilplac v125 — Google login + identity linking
   - Google jako dodatkowa metoda logowania
   - Podłączanie Google do istniejącego konta przez linkIdentity()
+  - Czytelny komunikat, gdy Google jest już podłączone do innego użytkownika
   - Nowe konto Google musi dokończyć profil gracza: nick + zgody
   - Nie zmienia profilu istniejącego gracza
 */
 (function(){
-  var VERSION = "v124";
+  var VERSION = "v125";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var LOGIN_RE = /^[A-Za-z0-9_ąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]{3,24}$/;
   var VOIVODESHIPS = [
@@ -93,9 +94,15 @@
 
     return false;
   }
+  function googleAlreadyLinkedMessage(){
+    return "To konto Google jest już podłączone do innego konta Szpilplaca. Zaloguj się przez Google albo usuń stare/testowe konto, do którego Google jest już przypięte, i dopiero wtedy podłącz je tutaj.";
+  }
   function niceOAuthError(err){
     var raw = String((err && err.message) || err || "");
     var low = raw.toLowerCase();
+    if(low.indexOf("identity_already_exists") !== -1 || low.indexOf("already linked to another user") !== -1){
+      return googleAlreadyLinkedMessage();
+    }
     if(low.indexOf("provider is not enabled") !== -1 || low.indexOf("provider not enabled") !== -1){
       return "Google nie jest jeszcze włączone w Supabase.";
     }
@@ -106,6 +113,24 @@
       return "Brakuje adresu powrotu w Redirect URLs w Supabase.";
     }
     return raw || "Nieznany błąd Google.";
+  }
+  function oauthReturnError(params){
+    var code = String(params.get("error_code") || "");
+    var err = String(params.get("error") || "");
+    var desc = String(params.get("error_description") || "");
+    var raw = [code,err,desc].join(" ");
+    var low = raw.toLowerCase();
+    if(!code && !err && !desc)return "";
+    if(low.indexOf("identity_already_exists") !== -1 || low.indexOf("already linked to another user") !== -1){
+      return googleAlreadyLinkedMessage();
+    }
+    if(low.indexOf("manual") !== -1 && low.indexOf("link") !== -1){
+      return "W Supabase trzeba włączyć ręczne łączenie tożsamości.";
+    }
+    if(low.indexOf("redirect") !== -1){
+      return "Google wróciło z błędem redirectu. Sprawdź Redirect URLs w Supabase i Authorized redirect URI w Google Cloud.";
+    }
+    return "Google wróciło z błędem: " + (desc || code || err || "nieznany błąd") + ".";
   }
 
   async function signInGoogle(){
@@ -193,8 +218,8 @@
       var box = document.createElement("div");
       box.className = "google-auth-box";
       box.innerHTML =
-        '<div class="google-sep">albo</div>'+
-        '<button class="btn secondary google-btn js-google-signin" type="button">'+googleIcon()+' Zaloguj przez Google</button>'+
+        '<div class="google-sep">albo</div>'+ 
+        '<button class="btn secondary google-btn js-google-signin" type="button">'+googleIcon()+' Zaloguj przez Google</button>'+ 
         '<div class="small" style="margin-top:8px;">Nowe konto Google i tak dokończy profil: nick, zgody i avatar w Szpilplacu.</div>';
       panel.appendChild(box);
     });
@@ -226,19 +251,19 @@
     box.className = "google-complete-card";
     box.id = "googleCompleteProfileBox";
     box.innerHTML =
-      '<h2>Dokończ profil gracza</h2>'+
-      '<p class="intro">Google służy tylko do logowania. Publiczny nick, ranking i avatar ustawiasz w Szpilplacu.</p>'+
-      '<form id="googleCompleteProfileForm">'+
-        '<label class="field">Login do rankingu<input id="googleProfileLogin" type="text" autocomplete="nickname" required minlength="3" maxlength="24" placeholder="np. Starzik92"></label>'+
-        '<div class="small">3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>'+
-        '<label class="field">Województwo <span class="small" style="font-weight:600;">opcjonalnie</span><select id="googleProfileVoivodeship">'+voivodeshipOptions("")+'</select></label>'+
-        '<label class="field">Miejscowość <span class="small" style="font-weight:600;">opcjonalnie</span><input id="googleProfileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>'+
-        '<label class="check"><input id="googleProfileTerms" type="checkbox" required><span>Akceptuję regulamin Szpilplaca i politykę prywatności.</span></label>'+
-        '<label class="check"><input id="googleProfileMarketing" type="checkbox"><span>Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span></label>'+
-        '<div class="google-complete-actions">'+
-          '<button class="btn" type="submit">Zapisz profil gracza</button>'+
-          '<button class="btn secondary" id="googleCompleteLogout" type="button">Wyloguj</button>'+
-        '</div>'+
+      '<h2>Dokończ profil gracza</h2>'+ 
+      '<p class="intro">Google służy tylko do logowania. Publiczny nick, ranking i avatar ustawiasz w Szpilplacu.</p>'+ 
+      '<form id="googleCompleteProfileForm">'+ 
+        '<label class="field">Login do rankingu<input id="googleProfileLogin" type="text" autocomplete="nickname" required minlength="3" maxlength="24" placeholder="np. Starzik92"></label>'+ 
+        '<div class="small">3–24 znaki. Dozwolone: litery, cyfry, podkreślenie, myślnik i polskie znaki.</div>'+ 
+        '<label class="field">Województwo <span class="small" style="font-weight:600;">opcjonalnie</span><select id="googleProfileVoivodeship">'+voivodeshipOptions("")+'</select></label>'+ 
+        '<label class="field">Miejscowość <span class="small" style="font-weight:600;">opcjonalnie</span><input id="googleProfileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>'+ 
+        '<label class="check"><input id="googleProfileTerms" type="checkbox" required><span>Akceptuję regulamin Szpilplaca i politykę prywatności.</span></label>'+ 
+        '<label class="check"><input id="googleProfileMarketing" type="checkbox"><span>Chcę dostawać informacje o Familocku, promocjach i nowościach. Opcjonalne.</span></label>'+ 
+        '<div class="google-complete-actions">'+ 
+          '<button class="btn" type="submit">Zapisz profil gracza</button>'+ 
+          '<button class="btn secondary" id="googleCompleteLogout" type="button">Wyloguj</button>'+ 
+        '</div>'+ 
       '</form>';
 
     var anchor = document.querySelector(".profile-summary");
@@ -390,11 +415,17 @@
 
   function announceOAuthReturn(){
     var params = new URLSearchParams(window.location.search);
+    var err = oauthReturnError(params);
+    if(err){
+      try{localStorage.removeItem("szp_google_auth_flow");}catch(e){}
+      setMsg(err,"err");
+      return;
+    }
     if(params.get("auth") === "google"){
       setMsg("Zalogowano przez Google. Sprawdzam profil gracza...","ok");
     }
     if(params.get("auth") === "google-linked"){
-      setMsg("Google wróciło do Szpilplaca. Sprawdzam podłączenie...","ok");
+      setMsg("Google podłączone do konta. Sprawdzam status...","ok");
     }
     if(params.get("profile") === "done"){
       setMsg("Profil gracza zapisany. Możesz teraz wybrać avatar i grać z zapisem na koncie.","ok");
