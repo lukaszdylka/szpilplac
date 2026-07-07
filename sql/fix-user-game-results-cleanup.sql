@@ -11,6 +11,11 @@
 -- Daty startu zgodne z frontem:
 -- Kłōdka dzień 1: 2026-06-23
 -- Raja dzień 1:   2026-07-04
+--
+-- Najbardziej prawdopodobny przypadek z 2026-07-07:
+-- błędny rekord: game = 'klodka', mode = 'weekly', puzzle_no = 3.
+-- Jeśli to Twoje konto ma fałszywy blok tygodniówki, zwykle wystarczy sekcja 1,
+-- potem sekcja 3 z wpisanym loginem profilu.
 
 -- ============================================================
 -- 0. Aktualne numery zagadek według czasu Europe/Warsaw
