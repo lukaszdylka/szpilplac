@@ -10,6 +10,10 @@
 --
 -- Dzięki temu nie powstaną dwa wyniki dla tej samej dziennej Rai, Słówka lub Kłōdki.
 -- Daily i weekly pozostają osobne, bo mode jest częścią indeksu.
+--
+-- Uwaga:
+-- To nie usuwa błędnego wyniku tygodniowej Kłōdki. Do tego służy plik cleanup.
+-- Ten indeks zapobiega późniejszym duplikatom tego samego wyniku.
 
 -- ============================================================
 -- 1. Diagnostyka przed założeniem indeksu
