@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v124
+  Szpilplac Słōwko Account Bridge v125
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v124";
+  var VERSION = "v125";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 
   var STATE = {
@@ -384,6 +384,35 @@
     try{
       await ensureDeps();
 
+      // Najpierw użyj wspólnego zapisu game-save.js.
+      // Ta ścieżka zapisuje wynik i od razu odpala odznaki.
+      try{
+        await loadScript("game-save.js?v=126",function(){return !!window.SZP_GAME_SAVE;});
+      }catch(e){}
+
+      if(window.SZP_GAME_SAVE && typeof window.SZP_GAME_SAVE.saveResult === "function"){
+        var commonRes = await window.SZP_GAME_SAVE.saveResult(payload,{
+          skipMessage:t("archive"),
+          noAccountMessage:t("notLogged"),
+          savedMessage:t("saved"),
+          errorMessage:t("error")
+        });
+
+        if(commonRes && commonRes.saved){
+          renderNote("ok",t("saved"),payload);
+          return;
+        }
+        if(commonRes && commonRes.reason === "not_logged_in"){
+          renderNote("login",t("notLogged"),payload);
+          return;
+        }
+        if(commonRes && commonRes.reason !== "no_client"){
+          renderNote("err",(commonRes && commonRes.message) || t("error"),payload);
+          return;
+        }
+      }
+
+      // Awaryjny stary zapis, tylko gdy game-save.js nie ruszy.
       if(!window.SZPILPLAC_AUTH || typeof window.SZPILPLAC_AUTH.saveResult !== "function"){
         renderNote("err",t("noAuth"),payload);
         return;

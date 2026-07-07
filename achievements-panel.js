@@ -209,7 +209,7 @@
         if(!window.SZP_ACHIEVEMENT_TOAST){
           await new Promise(function(resolve){
             var s=document.createElement("script");
-            s.src="achievement-toast.js?v=124";
+            s.src="achievement-toast.js?v=125";
             s.onload=resolve;
             s.onerror=resolve;
             document.head.appendChild(s);
@@ -278,7 +278,7 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v124 trzy na zicher");
+  console.info("Szpilplac achievements-panel.js v126 timezone/cache");
 })();
 
 

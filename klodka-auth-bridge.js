@@ -1,5 +1,5 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v127
+  Szpilplac Kłōdka Auth Bridge v128
   - zapisuje wynik Kłōdki na koncie
   - blokuje ponowne granie na drugim urządzeniu, osobno dla trybu daily i weekly
   - tygodniówka liczy tydzień od poniedziałku
@@ -8,7 +8,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v127";
+  var VERSION="v128";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -133,7 +133,7 @@
 
   async function tryCommonGameSave(data){
     try{
-      if(!window.SZP_GAME_SAVE){var commonPath=(/\/raja\/?/.test(location.pathname)?"../":"")+"game-save.js?v=125";await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});}
+      if(!window.SZP_GAME_SAVE){var commonPath=(/\/raja\/?/.test(location.pathname)?"../":"")+"game-save.js?v=126";await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});}
       if(!window.SZP_GAME_SAVE||typeof window.SZP_GAME_SAVE.saveResult!=="function")return false;
       var res=await window.SZP_GAME_SAVE.saveResult(data,{skipMessage:"Archiwum Kłōdki zostaje lokalnie. Do rankingu zapisuje się tylko bieżąca zagadka.",noAccountMessage:"Grasz bez konta. Wynik Kłōdki został zapisany lokalnie.",savedMessage:"Wynik zapisany na koncie. Punkty: "+(data&&data.score?data.score:0)+".",errorMessage:"Nie udało się zapisać wyniku Kłōdki."});
       if(res&&res.message)setNote(res.message,res.type||"");
