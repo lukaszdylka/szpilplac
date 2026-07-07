@@ -1,7 +1,7 @@
-/* Szpilplac game-played.js v102 */
+/* Szpilplac game-played.js v125 */
 (function(){
   "use strict";
-  var VERSION="v102";
+  var VERSION="v125";
   var accountPlayed={};
   function norm(game){var g=String(game||"").toLowerCase();return g==="raja"?"zorta":g;}
   function parse(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
@@ -11,12 +11,13 @@
   function markAccountPlayed(game,mode,puzzleNo){
     if(!game||puzzleNo==null)return;
     var g=norm(game), m=mode==null?"any":String(mode).toLowerCase(), n=String(puzzleNo);
-    accountPlayed[g+":"+m+":"+n]=true; accountPlayed[g+":any:"+n]=true;
+    accountPlayed[g+":"+m+":"+n]=true;
+    if(m==="any")accountPlayed[g+":any:"+n]=true;
   }
   function accountHasPlayed(game,puzzleNo,mode){
     var g=norm(game), n=String(puzzleNo);
-    if(mode&&accountPlayed[g+":"+String(mode).toLowerCase()+":"+n])return true;
-    return !!accountPlayed[g+":any:"+n];
+    if(mode)return !!accountPlayed[g+":"+String(mode).toLowerCase()+":"+n];
+    return !!(accountPlayed[g+":any:"+n]||accountPlayed[g+":daily:"+n]||accountPlayed[g+":weekly:"+n]);
   }
   function sameTodayDate(x){
     if(!x)return false;
@@ -24,14 +25,22 @@
     return a===today || a===String(new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate());
   }
   function isPlayed(game){
-    var g=norm(game), info=(window.SZP_DAILY&&window.SZP_DAILY.gameInfo?window.SZP_DAILY.gameInfo(g):{day_index:0,puzzle_no:1,started:true});
+    var g=norm(game), info=(window.SZP_DAILY&&window.SZP_DAILY.gameInfo?window.SZP_DAILY.gameInfo(g):{day_index:0,puzzle_no:1,started:true,mode:"daily"});
+    var mode=String(info.mode||"daily").toLowerCase();
     if(g==="zorta"&&!info.started)return false;
-    if(accountHasPlayed(g,info.puzzle_no,"daily")||accountHasPlayed(g,info.puzzle_no))return true;
     if(g==="slowko"){
+      if(accountHasPlayed(g,info.puzzle_no,"daily"))return true;
       if(isFinishedGame(parse("slowko_d"+info.day_index)))return true;
       var st=parse("slowko_v2"); return !!(st&&st.stats&&hasResult(st.stats,info.day_index));
     }
     if(g==="klodka"){
+      if(accountHasPlayed(g,info.puzzle_no,mode))return true;
+      if(mode==="weekly"){
+        if(isFinishedGame(parse("klodka_weekly_v1_w"+info.puzzle_no)))return true;
+        var wk=parse("klodka_weekly_v1");
+        if(wk){var curWeek=wk.week!==undefined?wk.week:(wk.game&&wk.game.idx);if(String(curWeek)===String(info.puzzle_no)&&isFinishedGame(wk))return true;}
+        return hasResult(parse("klodka_weekly_v1__hist"),info.puzzle_no);
+      }
       if(isFinishedGame(parse("klodka_daily_v1_d"+info.puzzle_no)))return true;
       var cur=parse("klodka_daily_v1");
       if(cur){var curDay=cur.day!==undefined?cur.day:(cur.game&&cur.game.idx);if(String(curDay)===String(info.puzzle_no)&&isFinishedGame(cur))return true;}
@@ -41,6 +50,7 @@
       var cg=parse("cuzamen_v1"); return !!(cg&&sameTodayDate(cg.date)&&cg.finished===true);
     }
     if(g==="zorta"){
+      if(accountHasPlayed(g,info.puzzle_no,"daily"))return true;
       if(isFinishedGame(parse("zorta_daily_d"+info.day_index)))return true;
       var zs=parse("zorta_daily_stats_v1"); var r=zs&&zs.days&&zs.days[String(info.day_index)]; return !!(r&&(r.won===true||r.won===false));
     }
