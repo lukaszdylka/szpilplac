@@ -1,5 +1,5 @@
 /*
-  Szpilplac Konto Dashboard v39
+  Szpilplac Konto Dashboard v40
   -----------------------------
   Porządkuje panel profilu gracza i poprawia cele tygodniowe:
   - ogólna seria dni zostaje bez zmian,
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v39";
+  var VERSION = "v40";
   var applying = false;
   var queued = false;
   var weeklyPatchInstalled = false;
@@ -99,7 +99,7 @@
     var main=card.querySelector(".progress-main"),dots=card.querySelector(".progress-dots"),note=card.querySelector(".progress-note");
     if(main)main.textContent=count+" / 7";
     if(dots){dots.innerHTML="";for(var i=1;i<=7;i++){var dot=document.createElement("span");dot.className="progress-dot"+(i<=count?" on":"");dot.setAttribute("aria-hidden","true");dots.appendChild(dot);}}
-    if(note){var txt=count>=7?"Tygodniowy cel gotowy w tym tygodniu!":"Jeszcze "+(7-count)+" dni do celu w tym tygodniu.";if(series>0)txt+=" · "+series+" "+weekWord(series)+" w serii.";note.textContent=txt;}
+    if(note){var txt=count>=7?"Tygodniowy cel gotowy w tym tygodniu!":"Jeszcze "+(7-count)+" dni do celu w tym tygodniu.";txt+=" · Zagrane pełne tygodnie: "+series+" "+weekWord(series)+".";note.textContent=txt;}
   }
   function installWeeklyPatch(){
     if(weeklyPatchInstalled)return true;if(typeof window.renderProfileProgress!=="function")return false;
