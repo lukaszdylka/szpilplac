@@ -1,5 +1,5 @@
 /*
-  Szpilplac Konto Dashboard v40
+  Szpilplac Konto Dashboard v41
   -----------------------------
   Porządkuje panel profilu gracza i poprawia cele tygodniowe:
   - ogólna seria dni zostaje bez zmian,
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v40";
+  var VERSION = "v41";
   var applying = false;
   var queued = false;
   var weeklyPatchInstalled = false;
@@ -92,14 +92,31 @@
     return count;
   }
   function weekWord(n){var mod10=n%10,mod100=n%100;if(n===1)return "tydzień";if(mod10>=2&&mod10<=4&&!(mod100>=12&&mod100<=14))return "tygodnie";return "tygodni";}
+  function findDailyStreakCard(){return Array.prototype.slice.call(document.querySelectorAll(".progress-card")).find(function(card){var kicker=card.querySelector(".progress-kicker");return kicker&&textOf(kicker).toLowerCase().indexOf("seria dni")!==-1;});}
+  function visibleDayStreakCount(rows){
+    var n=0;
+    try{
+      var card=findDailyStreakCard(),main=card&&card.querySelector(".progress-main");
+      var m=textOf(main).match(/(\d+)/);
+      if(m)n=Number(m[1]||0);
+    }catch(e){}
+    if(n>0)return n;
+    try{
+      var played=playedDaysMap(rows),key=warsawTodayKey();
+      if(!played[key])key=addDaysKey(key,-1);
+      while(played[key]){n++;key=addDaysKey(key,-1);}
+    }catch(e){}
+    return n;
+  }
+  function fullWeeksFromDayStreak(rows){return Math.floor(Math.max(0,visibleDayStreakCount(rows))/7);}
   function findWeeklyCard(){return Array.prototype.slice.call(document.querySelectorAll(".progress-card")).find(function(card){var kicker=card.querySelector(".progress-kicker");return kicker&&textOf(kicker).toLowerCase().indexOf("cel tygodniowy")!==-1;});}
   function updateWeeklyGoalCard(rows){
     var card=findWeeklyCard();if(!card)return;
-    var count=Math.max(0,Math.min(7,countCurrentWeekDays(rows))),series=weeklySeries(rows);
+    var count=Math.max(0,Math.min(7,countCurrentWeekDays(rows))),series=fullWeeksFromDayStreak(rows);
     var main=card.querySelector(".progress-main"),dots=card.querySelector(".progress-dots"),note=card.querySelector(".progress-note");
     if(main)main.textContent=count+" / 7";
     if(dots){dots.innerHTML="";for(var i=1;i<=7;i++){var dot=document.createElement("span");dot.className="progress-dot"+(i<=count?" on":"");dot.setAttribute("aria-hidden","true");dots.appendChild(dot);}}
-    if(note){var txt=count>=7?"Tygodniowy cel gotowy w tym tygodniu!":"Jeszcze "+(7-count)+" dni do celu w tym tygodniu.";txt+=" · Zagrane pełne tygodnie: "+series+" "+weekWord(series)+".";note.textContent=txt;}
+    if(note){var txt=count>=7?"Tygodniowy cel gotowy w tym tygodniu!":"Jeszcze "+(7-count)+" dni do celu w tym tygodniu.";txt+=" · Pełne tygodnie z serii: "+series+" "+weekWord(series)+".";note.textContent=txt;}
   }
   function installWeeklyPatch(){
     if(weeklyPatchInstalled)return true;if(typeof window.renderProfileProgress!=="function")return false;
