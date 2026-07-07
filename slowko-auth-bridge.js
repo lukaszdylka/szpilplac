@@ -1,5 +1,5 @@
 /*
-  Szpilplac Słōwko Account Bridge v121
+  Szpilplac Słōwko Account Bridge v124
   -----------------------------------
   - zapisuje wynik Słōwka na koncie
   - nie zmienia logiki zgadywania
@@ -9,7 +9,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v121";
+  var VERSION = "v124";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
 
   var STATE = {
@@ -527,6 +527,8 @@
     patchAssistUsageTracking();
 
     console.info("Szpilplac slowko-auth-bridge.js " + VERSION);
+    loadScript("archive-achievement-common.js?v=124",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;}).catch(function(){});
+    loadScript("game-stats-common.js?v=124",function(){return !!window.SZP_GAME_STATS;}).catch(function(){});
 
     ensureDeps()
       .then(function(){setTimeout(hydrateAccountResult,500);})

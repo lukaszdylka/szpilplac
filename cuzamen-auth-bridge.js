@@ -1,12 +1,12 @@
 /*
-  Szpilplac Cuzamen Auth Bridge v121
+  Szpilplac Cuzamen Auth Bridge v124
   - dodaje zapis Cuzamen na koncie
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany
 */
 (function(){
   "use strict";
 
-  var VERSION="v121";
+  var VERSION="v124";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -123,14 +123,14 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=121";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=124";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
       var res = await window.SZP_GAME_SAVE.saveResult(data,{
         skipMessage:"Do rankingu zapisuje si\u0119 tylko bie\u017c\u0105ca zagadka.",
         noAccountMessage:"Grasz bez konta \u2014 wynik Cuzamen zosta\u0142 zapisany lokalnie.",
-        savedMessage:"Wynik Cuzamen zapisany na koncie." + " +" + (data && data.score ? data.score : 0) + " pkt",
+        savedMessage:"Wynik zapisany na koncie. Punkty: " + (data && data.score ? data.score : 0) + ".",
         errorMessage:"Nie uda\u0142o si\u0119 zapisa\u0107 wyniku Cuzamen."
       });
       if(res && res.message)setNote(res.message,res.type || "");
@@ -150,7 +150,7 @@
     var client=await ensureClient();
     var res=await client.rpc("save_user_game_result",{p_game:data.game,p_mode:data.mode,p_puzzle_no:data.puzzleNo,p_won:data.won,p_tries:data.tries,p_errors:data.errors,p_score:data.score});
     if(res.error)throw res.error;
-    setNote("Wynik Cuzamen zapisany na koncie. +"+data.score+" pkt","ok");
+    setNote("Wynik zapisany na koncie. Punkty: "+data.score+".","ok");
   }
   function showAccountDone(row){
     if(!row||hydrated)return;
@@ -216,6 +216,8 @@
   }
   function boot(){
     console.info("Szpilplac cuzamen-auth-bridge.js "+VERSION);
+    loadScript("archive-achievement-common.js?v=124",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;}).catch(function(){});
+    loadScript("game-stats-common.js?v=124",function(){return !!window.SZP_GAME_STATS;}).catch(function(){});
     setTimeout(hydrateAccountResult,700);
     setTimeout(hydrateAccountResult,1800);
     var tries=0,timer=setInterval(function(){

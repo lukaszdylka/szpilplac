@@ -379,7 +379,7 @@ header{width:100%;padding:14px 2px 10px}
 .footer-news-btn:hover{background:rgba(191,138,58,.2);color:var(--ink);transform:translateY(-1px)}
 
 
-/* v111 Raja: stabilniejsze układanie kolejności na telefonach */
+/* v124 Raja: stabilniejsze układanie kolejności na telefonach */
 .list{
   touch-action:manipulation!important;
 }
@@ -436,7 +436,7 @@ li .moveBtns{
 }
 
 
-/* v117 Raja: jeden prosty sposób przesuwania — strzałki ↑ ↓ */
+/* v124 Raja: jeden prosty sposób przesuwania — strzałki ↑ ↓ */
 .order-mobile-hint{
   margin:0 0 10px;
   padding:9px 11px;
@@ -1167,7 +1167,7 @@ applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
 loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v121 achievements audit fix");
+console.info("Szpilplac raja/index.html v124 achievements audit fix");
 })();
 </script>
 
@@ -1199,15 +1199,17 @@ console.info("Szpilplac raja/index.html v121 achievements audit fix");
 </script>
 
 <script src="../coffee.js"></script>
-<script src="raja-auth-bridge.js?v=121"></script>
-<script src="../achievement-toast.js?v=121"></script>
-<script src="../game-result-actions.js?v=121"></script>
-<script src="../daily-status.js?v=121"></script>
-<script src="../game-played.js?v=121"></script>
-<script src="../topbar-common.js?v=121"></script>
-<script src="../player-menu-common.js?v=121"></script>
-<script src="../game-save.js?v=121"></script>
-<script src="../footer-normalizer.js?v=121"></script>
+<script src="raja-auth-bridge.js?v=124"></script>
+<script src="../achievement-toast.js?v=124"></script>
+<script src="../game-result-actions.js?v=124"></script>
+<script src="../daily-status.js?v=124"></script>
+<script src="../game-played.js?v=124"></script>
+<script src="../topbar-common.js?v=124"></script>
+<script src="../player-menu-common.js?v=124"></script>
+<script src="../game-save.js?v=124"></script>
+<script src="../game-stats-common.js?v=124"></script>
+<script src="../archive-achievement-common.js?v=124"></script>
+<script src="../footer-normalizer.js?v=124"></script>
 
 
 <script>
@@ -1367,7 +1369,7 @@ console.info("Szpilplac raja/index.html v121 achievements audit fix");
       });
     }
   };
-  console.info("Szpilplac raja simple move fix v121");
+  console.info("Szpilplac raja simple move fix v124");
 })();
 </script>
 

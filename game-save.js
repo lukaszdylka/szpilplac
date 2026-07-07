@@ -1,7 +1,7 @@
-/* Szpilplac game-save.js v121 */
+/* Szpilplac game-save.js v124 */
 (function(){
   "use strict";
-  var VERSION="v121";
+  var VERSION="v124";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var client=null;
   var PAGE_STARTED_AT = Date.now();
@@ -40,7 +40,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript(root("achievement-toast.js?v=121"),function(){
+    await loadScript(root("achievement-toast.js?v=124"),function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -98,7 +98,7 @@
       max_attempts: maxAttempts,
       duration_seconds: duration,
       word_length: wordLength,
-      source: "game-save-v121",
+      source: "game-save-v124",
       path: location.pathname
     };
   }
@@ -179,7 +179,7 @@
 
   function normalizePayload(data){
     data=data||{};
-    return {game:data.game,mode:data.mode||"daily",puzzleNo:data.puzzleNo!=null?data.puzzleNo:data.puzzle_no,won:!!data.won,tries:data.tries,errors:data.errors,score:data.score,isCurrent:data.isCurrent!==false};
+    return {game:data.game,mode:data.mode||"daily",puzzleNo:data.puzzleNo!=null?data.puzzleNo:data.puzzle_no,won:!!data.won,tries:data.tries,errors:data.errors,score:data.score,dayIndex:data.dayIndex, todayIndex:data.todayIndex,maxAttempts:data.maxAttempts,isCurrent:data.isCurrent!==false};
   }
   async function saveResult(data,opts){
     opts=opts||{}; var p=normalizePayload(data);
@@ -192,7 +192,7 @@
     if(res.error)return {saved:false,reason:"supabase",type:"err",message:res.error.message||opts.errorMessage||"Nie udało się zapisać wyniku.",error:res.error};
     if(window.SZP_GAME_PLAYED&&window.SZP_GAME_PLAYED.markAccountPlayed)window.SZP_GAME_PLAYED.markAccountPlayed(p.game,p.mode,p.puzzleNo);
     var freshAchievements = await checkAchievementsAfterSave(p,data);
-    return {saved:true,reason:"saved",type:"ok",message:opts.savedMessage||("Wynik zapisany na koncie. +"+(p.score||0)+" pkt"),score:p.score,achievements:freshAchievements};
+    return {saved:true,reason:"saved",type:"ok",message:opts.savedMessage||("Wynik zapisany na koncie. Punkty: "+(p.score||0)+"."),score:p.score,achievements:freshAchievements};
   }
   window.SZP_GAME_SAVE={version:VERSION,getClient:getClient,getSession:getSession,saveResult:saveResult};
   if(!window.SZPILPLAC_AUTH)window.SZPILPLAC_AUTH={};

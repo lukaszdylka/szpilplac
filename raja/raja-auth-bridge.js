@@ -1,5 +1,5 @@
 /*
-  Szpilplac Raja Auth Bridge v121
+  Szpilplac Raja Auth Bridge v124
   - Raja jako gra codzienna z archiwum od 04.07.2026
   - zapisuje wynik na koncie jako game=zorta, mode=daily
   - blokuje ponowne granie na drugim urządzeniu, jeśli wynik dnia jest już zapisany na koncie
@@ -7,7 +7,7 @@
 (function(){
   "use strict";
 
-  var VERSION="v121";
+  var VERSION="v124";
   var AUTH_STORAGE_KEY="szpilplac-auth-v05";
   var sb=null;
   var patched=false;
@@ -145,7 +145,7 @@
       isCurrent:isCurrent(),
       hintUsed:hintUsed,
       finishedAt:new Date().toISOString(),
-      source:"local-raja-sync-v121"
+      source:"local-raja-sync-v124"
     };
   }
 
@@ -192,14 +192,14 @@
   async function tryCommonGameSave(data){
     try{
       if(!window.SZP_GAME_SAVE){
-        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=121";
+        var commonPath = (/\/raja\/?/.test(location.pathname) ? "../" : "") + "game-save.js?v=124";
         await loadScript(commonPath,function(){return !!window.SZP_GAME_SAVE;}).catch(function(){});
       }
       if(!window.SZP_GAME_SAVE || typeof window.SZP_GAME_SAVE.saveResult !== "function")return false;
       var res = await window.SZP_GAME_SAVE.saveResult(data,{
         skipMessage:"Do rankingu zapisuje si\u0119 tylko dzisiejsza Raja.",
         noAccountMessage:"Grasz bez konta \u2014 wynik Rai zosta\u0142 zapisany lokalnie.",
-        savedMessage:"Wynik Rai zapisany na koncie." + " +" + (data && data.score ? data.score : 0) + " pkt",
+        savedMessage:"Wynik zapisany na koncie. Punkty: " + (data && data.score ? data.score : 0) + ".",
         errorMessage:"Nie uda\u0142o si\u0119 zapisa\u0107 wyniku Rai."
       });
       if(res && res.message)setNote(res.message,res.type || "");
@@ -231,7 +231,7 @@
       p_score:data.score
     });
     if(res.error)throw res.error;
-    setNote("Wynik Rai zapisany na koncie. +"+data.score+" pkt","ok");
+    setNote("Wynik zapisany na koncie. Punkty: "+data.score+".","ok");
   }
 
   function lockAccountDoneUI(){
@@ -291,7 +291,7 @@
 
   async function ensureAchievementToast(){
     if(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function")return true;
-    await loadScript("../achievement-toast.js?v=121",function(){
+    await loadScript("../achievement-toast.js?v=124",function(){
       return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
     }).catch(function(){});
     return !!(window.SZP_ACHIEVEMENT_TOAST && typeof window.SZP_ACHIEVEMENT_TOAST.showMany === "function");
@@ -315,7 +315,7 @@
         p_day_index:day,
         p_today_index:today,
         p_meta:{
-          source:"raja-archive-nav-v121",
+          source:"raja-archive-nav-v124",
           path:location.pathname,
           puzzle_no:day+1
         }
