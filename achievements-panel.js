@@ -54,7 +54,14 @@
     ranga_hajer:1,
     ranga_przodowy:1,
     ranga_sztajger:1,
-    ranga_zeflik:1
+    ranga_zeflik:1,
+    piyrszykamrat:1,
+    kamraty:1,
+    nawidoku:1,
+    dobreslowo:1,
+    przajawom:1,
+    swojnaplacu:1,
+    hersztbandy:1
   };
 
   function canonicalId(id){
@@ -278,7 +285,7 @@
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 
-  console.info("Szpilplac achievements-panel.js v126 timezone/cache");
+  console.info("Szpilplac achievements-panel.js v127 timezone/cache");
 })();
 
 
