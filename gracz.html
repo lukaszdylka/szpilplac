@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil gracza · Szpilplac · Familock</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="description" content="Publiczny profil gracza Szpilplaca Familock.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="rank-icons.js?v=124"></script>
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--danger:#b5482f;--shadow:0 10px 28px -18px rgba(35,32,26,.55)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#aaa18d;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--danger:#d76a4f;--shadow:0 10px 30px -18px rgba(0,0,0,.7)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{min-height:100vh;padding:0 16px 40px;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center}
+a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+header,main,footer{width:100%;max-width:780px}header{padding-top:18px}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.site-name{font-family:Oswald,system-ui,sans-serif;font-size:clamp(32px,6vw,46px);line-height:.95;text-transform:uppercase}
+.site-sub{margin-top:4px;color:var(--ink2);font-size:12px}.controls{display:flex;align-items:center;gap:7px;padding-top:8px}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);color:var(--ink2)}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);padding:18px}
+footer{margin-top:22px;color:var(--ink2);font-size:12px;text-align:center}.footer-links{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.footer-links a{min-height:32px;display:inline-flex;align-items:center;justify-content:center;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);font-size:11px;font-weight:800}
+.footer-links a:hover{background:var(--surface);color:var(--green)}
+</style>
+</head>
+<body>
+<header><div class="topbar"><div><div class="site-name">Szpilplac</div><div class="site-sub">Profil gracza</div></div><div class="controls"><a class="icon-btn" href="index.html" title="Szpilplac" aria-label="Wróć do Szpilplaca">⌂</a><a class="icon-btn" href="ranking.html" title="Ranking" aria-label="Ranking">↟</a><a class="icon-btn" href="konto.html" title="Konto" aria-label="Konto">☻</a></div></div></header>
+<main><section class="card"><div id="publicProfileBox">Ładuję profil...</div></section></main>
+<footer><div class="footer-links"><a href="index.html">Szpilplac</a><a href="ranking.html">Ranking</a><a href="konto.html">Konto</a><a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a></div></footer>
+<script src="kamraty.js?v=1"></script>
+</body></html>

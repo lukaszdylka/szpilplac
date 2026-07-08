@@ -1318,7 +1318,7 @@ function renderRanking(rowsData){
     var points = Number(row.points) || 0;
     var games = Number(row.games_played) || 0;
     var wins = Number(row.wins) || 0;
-    return '<div class="rank-row '+(isMe ? "me" : "")+'">'+
+    return '<div class="rank-row '+(isMe ? "me" : "")+'" data-user-id="'+esc(row.user_id || "")+'" data-login="'+esc(login)+'">'+
       '<div class="place">'+(idx+1)+'</div>'+
       avatarHtml(row.avatar_key)+
       '<div class="player">'+
@@ -1352,7 +1352,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v124 google login linking");
+console.info("Szpilplac ranking.html v125 kamraty z placu");
 boot();
 </script>
 <script>
@@ -1556,5 +1556,6 @@ boot();
 <script src="topbar-common.js?v=124"></script>
 <script src="player-menu-common.js?v=124"></script>
 <script src="footer-normalizer.js?v=124"></script>
+<script src="kamraty.js?v=1"></script>
 </body>
 </html>
