@@ -2,8 +2,6 @@ name: One-time Kamraty version fixer
 
 on:
   push:
-    paths:
-      - '.github/workflows/fix-kamraty-version.yml'
 
 permissions:
   contents: write
@@ -21,6 +19,7 @@ jobs:
         run: |
           set -e
           perl -0pi -e 's/kamraty\.js\?v=\d+/kamraty.js?v=4/g' konto.html ranking.html gracz.html
+          rm -f .github/kamraty-version-trigger.txt
           git rm .github/workflows/fix-kamraty-version.yml
 
       - name: Commit changes
@@ -28,12 +27,10 @@ jobs:
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add konto.html ranking.html gracz.html .github/workflows/fix-kamraty-version.yml
+          git add konto.html ranking.html gracz.html .github/kamraty-version-trigger.txt .github/workflows/fix-kamraty-version.yml
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
           git commit -m "Bump Kamraty cache versions to v4"
           git push
-
-# trigger: 2026-07-08
