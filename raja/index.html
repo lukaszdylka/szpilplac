@@ -586,6 +586,27 @@ li .moveBtns{
   color:#fff;
 }
 .szp-result-account-note{display:none!important}
+
+/* SZPILPLAC RAJA DESKTOP COMPACT ARROWS v132 */
+@media(min-width:721px){
+  .raja-stack #list{gap:8px!important}
+  .raja-stack #list .row,
+  #list .row{
+    min-height:54px!important;
+    padding:9px 11px!important;
+    gap:10px!important;
+  }
+  #list .arrows{gap:3px!important}
+  #list .arrows button{
+    width:32px!important;
+    min-width:32px!important;
+    height:22px!important;
+    min-height:22px!important;
+    border-radius:7px!important;
+    font-size:12px!important;
+    line-height:1!important;
+  }
+}
 </style>
 <script src="../event-visitor-bridge.js?v=1"></script>
 </head>
@@ -1280,7 +1301,7 @@ applyTheme(store.get(THEME_KEY)==="dark"?"dark":"light");
 applySettings();
 applyLang();
 loadConfig().then(function(){if(RAJA_STARTED)loadDay(TODAY_IDX);else showPreStart();}).catch(function(){showNotice("<b>Tryb podglądu niedostępny</b><br>Brak konfiguracji Supabase. Sprawdź plik <code>../config.js</code>.");});
-console.info("Szpilplac raja/index.html v124 achievements audit fix");
+console.info("Szpilplac raja/index.html v132 desktop arrows result stats");
 })();
 </script>
 
@@ -1320,7 +1341,7 @@ console.info("Szpilplac raja/index.html v124 achievements audit fix");
 <script src="../topbar-common.js?v=124"></script>
 <script src="../player-menu-common.js?v=124"></script>
 <script src="../game-save.js?v=126"></script>
-<script src="../game-stats-common.js?v=124"></script>
+<script src="../game-stats-common.js?v=125"></script>
 <script src="../archive-achievement-common.js?v=125"></script>
 <script src="../footer-normalizer.js?v=124"></script>
 
@@ -1328,5 +1349,6 @@ console.info("Szpilplac raja/index.html v124 achievements audit fix");
 
 
 
+<script src="../result-stats-snapshot.js?v=1"></script>
 </body>
 </html>
