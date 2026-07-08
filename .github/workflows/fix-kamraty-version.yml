@@ -1,0 +1,37 @@
+name: One-time Kamraty version fixer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-kamraty-version.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-kamraty-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump Kamraty script versions
+        run: |
+          set -e
+          perl -0pi -e 's/kamraty\.js\?v=\d+/kamraty.js?v=4/g' konto.html ranking.html gracz.html
+          git rm .github/workflows/fix-kamraty-version.yml
+
+      - name: Commit changes
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add konto.html ranking.html gracz.html .github/workflows/fix-kamraty-version.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Bump Kamraty cache versions to v4"
+          git push
