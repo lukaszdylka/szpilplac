@@ -11,7 +11,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v4";
+  var VERSION = "v5";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var sb = null;
   var currentUser = null;
@@ -401,9 +401,15 @@
       new MutationObserver(function(){ensureKontoPanel();}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
     }
     if(location.pathname.indexOf("ranking") !== -1){
-      setTimeout(enhanceRankingRows,800);
-      new MutationObserver(function(){setTimeout(enhanceRankingRows,120);}).observe(document.body,{childList:true,subtree:true});
-      document.addEventListener("click",function(e){if(e.target && e.target.closest && e.target.closest(".tab"))setTimeout(enhanceRankingRows,800);});
+      setTimeout(enhanceRankingRows,500);
+      setTimeout(enhanceRankingRows,1200);
+      setTimeout(enhanceRankingRows,2500);
+      document.addEventListener("click",function(e){
+        if(e.target && e.target.closest && e.target.closest(".tab")){
+          setTimeout(enhanceRankingRows,500);
+          setTimeout(enhanceRankingRows,1200);
+        }
+      });
     }
     if(location.pathname.indexOf("gracz") !== -1)renderPublicProfilePage();
   }
