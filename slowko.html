@@ -296,6 +296,7 @@ footer a{color:var(--green);font-weight:600}
   .controls{justify-content:flex-start!important}
   .site-name,.brand,h1{word-break:keep-all}
 }
+.modal .szp-auth-save-note{display:none!important}
 </style>
 </head>
 <body>
@@ -1036,11 +1037,9 @@ function showEnd(){
   openModal('<h2>'+(won?t.endW:t.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-word">'+rev.word+'</div>'+
     '<div class="reveal-pl">'+t.meaning+' <b>'+(rev.meaning||"")+'</b></div></div>'+
-    statsHtml()+distHtml()+  // statystyki zawsze
-    (isToday?cdHtml(t):'')+  // odliczanie tylko dla dzisiaj
+    (isToday?cdHtml(t):'')+
     '<button class="btn" id="shareBtn">'+t.share+'</button>'+
-    '<div class="share-msg" id="shareMsg" aria-live="polite"></div>'+
-    '<a class="cta" href="https://www.familock.pl/#rezerwacja" target="_blank" rel="noopener">'+t.cta+'</a>');
+    '<div class="share-msg" id="shareMsg" aria-live="polite"></div>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
   if(isToday)startCd();}
 
@@ -1277,6 +1276,6 @@ hydrateStatsFromDayGames();
 loadDay(TODAY_IDX);
 </script>
 <script src="slowko-auth-bridge.js?v=125"></script>
-  <script src="game-result-actions.js?v=126"></script>
+  <script src="game-result-actions.js?v=128"></script>
 </body>
 </html>

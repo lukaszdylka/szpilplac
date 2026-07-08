@@ -249,6 +249,7 @@ footer a{color:var(--green);font-weight:600}
   .controls{justify-content:flex-start!important}
   .site-name,.brand,h1{word-break:keep-all}
 }
+.modal .szp-auth-save-note{display:none!important}
 </style>
 </head>
 <body>
@@ -392,6 +393,7 @@ footer a{color:var(--green);font-weight:600}
 
 .rx-status{font-size:17px;text-align:center;color:var(--ink2,#9a907a);padding:5px 13px 12px}
 .rx-again{margin-left:6px;text-decoration:underline;font-size:17px;color:var(--gold,#c49050)}
+.modal .szp-auth-save-note{display:none!important}
 </style>
 
 <script>
@@ -1396,10 +1398,7 @@ function openEndFor(mode,idx){
     '<h2>'+(won?T.endW:T.endL)+'</h2>'+
     '<div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div>'+
       '<div class="reveal-code" id="revealCode">'+(g.reveal||"····")+'</div></div>'+
-    statsSummaryHtml(hist)+
-    distHtml(hist)+
     countdownHtml+
-    '<a class="cta" href="https://www.familock.pl" target="_blank" rel="noopener">'+T.cta+'</a>'+
     '<button class="btn share" id="shareBtn">'+T.share+'</button>'+
     '<div class="share-msg" id="shareMsg" aria-live="polite"></div>'+
     '<button class="btn ghost" id="closeBtn">'+T.again+'</button>';
@@ -1611,6 +1610,6 @@ else if(!localStorage.getItem(HELP_KEY)){
 }
 </script>
      <script src="klodka-auth-bridge.js?v=128"></script>
-     <script src="game-result-actions.js?v=126"></script>
+     <script src="game-result-actions.js?v=128"></script>
 </body>
 </html>

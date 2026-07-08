@@ -585,6 +585,7 @@ li .moveBtns{
   background:var(--correct,#3f8a5a);
   color:#fff;
 }
+.szp-result-account-note{display:none!important}
 </style>
 </head>
 <body>
@@ -1052,6 +1053,18 @@ function useHint(){
   function done(h){if(!h){toast(L().hintErr);renderHint();return;}hintData=h;persist();playSound("hint");renderList();renderHint();}
   rpc("zorta_daily_reveal",{p_day:currentDay}).then(function(rv){done(chooseHint(rv.kolejnosc));}).catch(function(){toast(L().hintErr);renderHint();});
 }
+function rajaCountdownText(){
+  var now=new Date(),nx=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  var s=Math.max(0,Math.floor((nx-now)/1000));
+  return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(function(x){return String(x).padStart(2,"0");}).join(":");
+}
+function startRajaResultCountdown(){
+  var src=$("resSrc");if(!src)return;
+  var label=lang==="sl"?"Nowo Raja za":"Nowa Raja za";
+  src.innerHTML='<div class="cd">'+label+' <b id="rajaResultCd">'+rajaCountdownText()+'</b></div>';
+  clearInterval(startRajaResultCountdown._t);
+  startRajaResultCountdown._t=setInterval(function(){var el=$("rajaResultCd");if(el)el.textContent=rajaCountdownText();else clearInterval(startRajaResultCountdown._t);},1000);
+}
 function showResult(won){
   $("attempts").style.display="none";$("checkBtn").style.display="none";
   var r=$("result");r.classList.add("show");
@@ -1065,7 +1078,7 @@ function showResult(won){
     li.innerHTML='<div class="rank">'+(i+1)+'</div><div class="name">'+name+'</div>'+val;
     ul.appendChild(li);
   });
-  $("resSrc").textContent="";
+  startRajaResultCountdown();
 }
 function check(){
   if(status!=="playing")return;
@@ -1132,7 +1145,7 @@ function finishUp(won){
   playSound(won?"win":"lose");
   syncGlobals();renderList();renderAttempts();showResult(won);
   recordLocalStats(won);
-  setTimeout(function(){renderStatsModal();$("statScrim").classList.add("show");},650);
+  startRajaResultCountdown();
   if(!IS_TESTER || currentDay<=TODAY_IDX){
     trackEvent({game:"zorta",puzzle_no:currentDay+1,puzzle_word:meta?meta.kategoria:"raja",won:won,tries:guessHistory.length,lang:lang,hint_used:!!hintData,mode:"daily"});
   }
@@ -1300,7 +1313,7 @@ console.info("Szpilplac raja/index.html v124 achievements audit fix");
 <script src="../coffee.js"></script>
 <script src="raja-auth-bridge.js?v=126"></script>
 <script src="../achievement-toast.js?v=125"></script>
-<script src="../game-result-actions.js?v=127"></script>
+<script src="../game-result-actions.js?v=128"></script>
 <script src="../daily-status.js?v=124"></script>
 <script src="../game-played.js?v=125"></script>
 <script src="../topbar-common.js?v=124"></script>

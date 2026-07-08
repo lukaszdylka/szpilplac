@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v126";
+  var VERSION = "v128";
   var MARK = "data-szp-result-actions";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var client = null;
@@ -61,11 +61,11 @@
     var st = document.createElement("style");
     st.id = "szpResultActionsStyle";
     st.textContent =
-      ".szp-result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}"+
+      ".szp-result-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:14px}"+
       ".szp-result-actions a{min-height:40px;display:flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line,#c9bfa6);background:var(--surface2,#f3ecda);color:var(--ink,#23201a);font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:900;text-decoration:none;text-align:center}"+
       ".szp-result-actions a:hover{background:var(--surface,#fbf7ee);color:var(--green,#2f4a39)}"+
       ".szp-result-actions a.primary{background:var(--green,#2f4a39);border-color:var(--green,#2f4a39);color:#fff}"+
-      ".szp-result-account-note{margin-top:10px;padding:9px 11px;border:1px dashed var(--line,#c9bfa6);border-radius:12px;background:rgba(191,138,58,.10);color:var(--ink2,#6a6150);font-size:12px;line-height:1.4;text-align:center}"+
+      ".szp-result-account-note{display:none!important}"+
       ".szp-cross-device-detail{margin-top:7px;padding-top:7px;border-top:1px dashed var(--line,#c9bfa6);font-size:12.5px;line-height:1.45}"+
       ".szp-cross-device-detail code{font-family:Oswald,monospace;font-size:18px;letter-spacing:.08em;color:var(--gold,#bf8a3a);background:transparent}"+
       ".szp-cross-device-order{margin:6px auto 0;padding-left:20px;text-align:left;display:inline-block;max-width:100%}.szp-cross-device-order li{margin:2px 0}"+
@@ -77,9 +77,57 @@
   function hasAccountSession(){
     try{var raw=localStorage.getItem(AUTH_STORAGE_KEY);if(!raw)return false;var data=JSON.parse(raw);var s=data.currentSession||data.session||data;return !!(s&&s.user);}catch(e){return false;}
   }
+  function plDayKey(){
+    try{
+      var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};
+      parts.forEach(function(p){if(p.type!=="literal")o[p.type]=p.value;});
+      return o.year+"-"+o.month+"-"+o.day;
+    }catch(e){return new Date().toISOString().slice(0,10);}
+  }
+  function dayIndexFrom(baseY,baseM0,baseD){
+    var k=plDayKey().split("-").map(Number);
+    return Math.max(0,Math.floor((Date.UTC(k[0],k[1]-1,k[2])-Date.UTC(baseY,baseM0,baseD))/86400000));
+  }
+  function readJson(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+  function isFinishedObj(x){
+    if(!x)return false;
+    if(x.game)x=x.game;
+    return !!(x && (x.status==="won"||x.status==="lost"));
+  }
+  function playedToday(key){
+    try{
+      if(key==="slowko"){
+        var sIdx=typeof window.TODAY_IDX==="number"?window.TODAY_IDX:dayIndexFrom(2026,5,23);
+        return isFinishedObj(readJson("slowko_d"+sIdx));
+      }
+      if(key==="klodka"){
+        var kNo=typeof window.TODAY_NO==="number"?window.TODAY_NO:(dayIndexFrom(2026,5,23)+1);
+        return isFinishedObj(readJson("klodka_daily_v1_d"+kNo))||isFinishedObj(readJson("klodka_daily_v1"));
+      }
+      if(key==="raja"){
+        var rIdx=typeof window.TODAY_IDX==="number"&&gameKey()==="raja"?window.TODAY_IDX:dayIndexFrom(2026,6,4);
+        return isFinishedObj(readJson("zorta_daily_d"+rIdx));
+      }
+    }catch(e){}
+    return false;
+  }
+  function nextGameLinks(){
+    var cur=gameKey();
+    var games=[
+      {key:"slowko",label:"Zagraj w Słōwko",href:root("slowko.html")},
+      {key:"klodka",label:"Zagraj w Kłōdkę",href:root("klodka.html")},
+      {key:"raja",label:"Zagraj w Raję",href:root("raja/")}
+    ];
+    return games.filter(function(g){
+      return g.key!==cur && !playedToday(g.key);
+    });
+  }
   function actionHtml(){
-    var logged = hasAccountSession();
-    return '<div class="szp-result-actions" '+MARK+'="1"><a class="primary" href="'+root("ranking.html")+'">Zobacz ranking</a><a href="'+root("index.html")+'">Zagraj w inną grę</a><a href="'+root("konto.html")+'">'+(logged?"Moje konto":"Załóż konto")+'</a><a href="https://familock.pl" target="_blank" rel="noopener">Familock</a></div><div class="szp-result-account-note" '+MARK+'="1">'+(logged?"Jeśli byłeś zalogowany przed końcem gry, wynik zapisał się automatycznie.":"Załóż konto, żeby kolejne wyniki zapisywały punkty, rangi i historię. Ten wynik zostaje lokalnie w tej przeglądarce.")+'</div>';
+    var links=nextGameLinks();
+    if(!links.length)return "";
+    return '<div class="szp-result-actions" '+MARK+'="1">'+links.map(function(g,i){
+      return '<a class="'+(i===0?'primary':'')+'" href="'+g.href+'">'+g.label+'</a>';
+    }).join("")+'</div>';
   }
   function loadScript(src,testFn){
     if(typeof testFn === "function" && testFn())return Promise.resolve();
