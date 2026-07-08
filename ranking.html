@@ -818,6 +818,90 @@ svg{
 .rank-name svg{display:none!important}.rank-name span{display:block!important}.login{line-height:1.05!important}
 @media(max-width:560px){.rank-row{grid-template-columns:34px 46px minmax(0,1fr) auto!important}.rank-avatar{width:46px!important;height:46px!important;min-width:46px!important;max-width:46px!important;min-height:46px!important;max-height:46px!important;padding:2px!important}.rank-name{font-size:10px!important;padding:3px 7px!important}}
 @media(max-width:390px){.rank-row{grid-template-columns:30px 42px minmax(0,1fr)!important}.rank-avatar{width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;min-height:42px!important;max-height:42px!important}}
+
+/* SZPILPLAC RANKING NO AVATARS v1 */
+.rank-row{
+  grid-template-columns:40px minmax(0,1fr) auto!important;
+  gap:12px!important;
+  align-items:center!important;
+}
+.rank-avatar{
+  display:none!important;
+}
+.player{
+  min-width:0!important;
+}
+.login{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex-wrap:wrap!important;
+  line-height:1.05!important;
+}
+.rank-name{
+  display:block!important;
+  width:auto!important;
+  max-width:100%!important;
+  margin-top:5px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--ink2)!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  letter-spacing:.04em!important;
+  text-transform:uppercase!important;
+  opacity:.9!important;
+}
+.rank-name svg{
+  display:none!important;
+}
+.rank-name span{
+  display:inline!important;
+}
+.details{
+  grid-column:2/4!important;
+  margin-top:3px!important;
+}
+.rank-kamrat-actions{
+  grid-column:2/4!important;
+  margin-top:8px!important;
+}
+.kamrat-rank-actions,
+.rank-row .rank-kamrat-actions{
+  grid-column:2/4!important;
+}
+@media(max-width:560px){
+  .rank-row{
+    grid-template-columns:34px minmax(0,1fr) auto!important;
+    gap:9px!important;
+  }
+  .details{
+    grid-column:2/4!important;
+  }
+  .rank-kamrat-actions,
+  .kamrat-rank-actions,
+  .rank-row .rank-kamrat-actions{
+    grid-column:2/4!important;
+  }
+}
+@media(max-width:390px){
+  .rank-row{
+    grid-template-columns:30px minmax(0,1fr)!important;
+  }
+  .points{
+    grid-column:2/3!important;
+    text-align:left!important;
+  }
+  .details,
+  .rank-kamrat-actions,
+  .kamrat-rank-actions,
+  .rank-row .rank-kamrat-actions{
+    grid-column:2/3!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1362,7 +1446,7 @@ async function boot(){
   await loadAccount();
   await loadRanking();
 }
-console.info("Szpilplac ranking.html v126 ui unified avatar rank");
+console.info("Szpilplac ranking.html v127 no avatars");
 boot();
 </script>
 <script>
