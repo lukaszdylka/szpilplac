@@ -164,7 +164,7 @@ summary{cursor:pointer;padding:13px 14px;font-weight:900;text-transform:uppercas
 <footer><a href="admin.html">Admin</a> · <a href="index.html">Szpilplac</a> · <a href="game-results-admin.html">Wyniki gier</a></footer>
 <script>
 "use strict";
-console.info("Szpilplac stats.html v16-optimized");
+console.info("Szpilplac stats.html v17-responsive");
 
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
@@ -230,5 +230,6 @@ document.getElementById("refreshBtn").addEventListener("click",function(){loadSt
 loadStats(false);
 </script>
 <script src="stats-players-vs-plays.js?v=1"></script>
+<script src="stats-responsive-fix.js?v=1"></script>
 </body>
 </html>

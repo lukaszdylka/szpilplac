@@ -1,0 +1,74 @@
+warning: in the working copy of 'kamraty.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'konto.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ranking.html', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/gracz.html b/gracz.html[m
+[1mindex c65c21e..59d9897 100644[m
+[1m--- a/gracz.html[m
+[1m+++ b/gracz.html[m
+[36m@@ -50,7 +50,7 @@[m [mfooter{margin-top:22px;color:var(--ink2);font-size:12px;text-align:center}.foote[m
+   document.getElementById("themeBtn").addEventListener("click",function(){localStorage.setItem(KEY,(localStorage.getItem(KEY)||"dark")==="dark"?"light":"dark");apply();});[m
+ })();[m
+ </script>[m
+[31m-<script src="kamraty.js?v=4"></script>[m
+[32m+[m[32m<script src="kamraty.js?v=5"></script>[m
+ <script src="kamraty-achievements-bridge.js?v=1"></script>[m
+ </body>[m
+ </html>[m
+[1mdiff --git a/kamraty.js b/kamraty.js[m
+[1mindex 578be3c..3cf8f09 100644[m
+[1m--- a/kamraty.js[m
+[1m+++ b/kamraty.js[m
+[36m@@ -11,7 +11,7 @@[m
+ (function(){[m
+   "use strict";[m
+ [m
+[31m-  var VERSION = "v4";[m
+[32m+[m[32m  var VERSION = "v5";[m
+   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";[m
+   var sb = null;[m
+   var currentUser = null;[m
+[36m@@ -401,9 +401,15 @@[m
+       new MutationObserver(function(){ensureKontoPanel();}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});[m
+     }[m
+     if(location.pathname.indexOf("ranking") !== -1){[m
+[31m-      setTimeout(enhanceRankingRows,800);[m
+[31m-      new MutationObserver(function(){setTimeout(enhanceRankingRows,120);}).observe(document.body,{childList:true,subtree:true});[m
+[31m-      document.addEventListener("click",function(e){if(e.target && e.target.closest && e.target.closest(".tab"))setTimeout(enhanceRankingRows,800);});[m
+[32m+[m[32m      setTimeout(enhanceRankingRows,500);[m
+[32m+[m[32m      setTimeout(enhanceRankingRows,1200);[m
+[32m+[m[32m      setTimeout(enhanceRankingRows,2500);[m
+[32m+[m[32m      document.addEventListener("click",function(e){[m
+[32m+[m[32m        if(e.target && e.target.closest && e.target.closest(".tab")){[m
+[32m+[m[32m          setTimeout(enhanceRankingRows,500);[m
+[32m+[m[32m          setTimeout(enhanceRankingRows,1200);[m
+[32m+[m[32m        }[m
+[32m+[m[32m      });[m
+     }[m
+     if(location.pathname.indexOf("gracz") !== -1)renderPublicProfilePage();[m
+   }[m
+[1mdiff --git a/konto.html b/konto.html[m
+[1mindex 1214a73..50e0cbc 100644[m
+[1m--- a/konto.html[m
+[1m+++ b/konto.html[m
+[36m@@ -2118,7 +2118,7 @@[m [mboot();[m
+ <script src="game-display-names.js?v=125"></script>[m
+ <script src="avatar-select.js?v=125"></script>[m
+ <script src="konto-dashboard.js?v=041"></script>[m
+[31m-<script src="kamraty.js?v=4"></script>[m
+[32m+[m[32m<script src="kamraty.js?v=5"></script>[m
+ <script src="kamraty-achievements-bridge.js?v=1"></script>[m
+ <script src="konto-delete-bridge.js?v=038"></script>[m
+ [m
+[1mdiff --git a/ranking.html b/ranking.html[m
+[1mindex 75fd1fc..5cf423b 100644[m
+[1m--- a/ranking.html[m
+[1m+++ b/ranking.html[m
+[36m@@ -1556,7 +1556,7 @@[m [mboot();[m
+ <script src="topbar-common.js?v=124"></script>[m
+ <script src="player-menu-common.js?v=124"></script>[m
+ <script src="footer-normalizer.js?v=124"></script>[m
+[31m-<script src="kamraty.js?v=4"></script>[m
+[32m+[m[32m<script src="kamraty.js?v=5"></script>[m
+ <script src="kamraty-achievements-bridge.js?v=1"></script>[m
+ </body>[m
+ </html>[m
