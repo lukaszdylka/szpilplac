@@ -14,3 +14,6 @@ apply-konto-drawers-fix.bat
 _backup_konto_profile_cleanup_*/
 apply-konto-profile-cleanup.py
 apply-konto-profile-cleanup.bat
+_backup_konto_cache_refresh_*/
+apply-konto-cache-refresh.py
+apply-konto-cache-refresh.bat
