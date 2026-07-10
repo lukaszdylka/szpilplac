@@ -7,3 +7,7 @@
 # Local patch backups
 _backup_*/
 *.bak
+# Szpilplac local apply helpers
+_backup_konto_drawers_fix_*/
+apply-konto-drawers-fix.py
+apply-konto-drawers-fix.bat
