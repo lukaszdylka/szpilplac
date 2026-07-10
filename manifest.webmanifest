@@ -1,0 +1,57 @@
+{
+  "name": "Szpilplac · Familock",
+  "short_name": "Szpilplac",
+  "description": "Codzienne familockowe gry i zagadki z Familocka.",
+  "lang": "pl-PL",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#161310",
+  "theme_color": "#2f4a39",
+  "categories": [
+    "games",
+    "education",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Słōwko",
+      "short_name": "Słōwko",
+      "url": "/slowko.html?source=pwa",
+      "description": "Zagraj w Słōwko"
+    },
+    {
+      "name": "Kłōdka",
+      "short_name": "Kłōdka",
+      "url": "/klodka.html?source=pwa",
+      "description": "Zagraj w Kłōdkę"
+    },
+    {
+      "name": "Raja",
+      "short_name": "Raja",
+      "url": "/raja/?source=pwa",
+      "description": "Zagraj w Raję"
+    },
+    {
+      "name": "Ranking",
+      "short_name": "Ranking",
+      "url": "/ranking.html?source=pwa",
+      "description": "Zobacz ranking"
+    }
+  ]
+}
