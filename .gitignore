@@ -11,3 +11,6 @@ _backup_*/
 _backup_konto_drawers_fix_*/
 apply-konto-drawers-fix.py
 apply-konto-drawers-fix.bat
+_backup_konto_profile_cleanup_*/
+apply-konto-profile-cleanup.py
+apply-konto-profile-cleanup.bat
