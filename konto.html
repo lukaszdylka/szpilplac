@@ -980,6 +980,94 @@ a.daily-chip:hover{
   .controls{justify-content:flex-start!important}
   .site-name,.brand,h1{word-break:keep-all}
 }
+
+/* v110 konto: natywne rozwijane sekcje w HTML, bez JS-przenoszenia */
+.konto-profile-primary-actions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin:14px 0;
+}
+.konto-profile-primary-actions .btn{
+  width:100%;
+}
+.konto-native-foldouts{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+.konto-native-foldout{
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--surface2);
+  overflow:hidden;
+}
+.konto-native-foldout > summary{
+  list-style:none;
+  cursor:pointer;
+  padding:13px 14px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  color:var(--ink);
+  font-family:Oswald,system-ui,sans-serif;
+  font-size:18px;
+  line-height:1.05;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  user-select:none;
+}
+.konto-native-foldout > summary::-webkit-details-marker{
+  display:none;
+}
+.konto-native-foldout > summary::after{
+  content:"›";
+  color:var(--gold);
+  font-size:25px;
+  line-height:1;
+  transform:rotate(90deg);
+}
+.konto-native-foldout[open] > summary::after{
+  transform:rotate(-90deg);
+}
+.konto-native-foldout > summary small{
+  display:block;
+  margin-top:3px;
+  color:var(--ink2);
+  font-family:Inter,system-ui,sans-serif;
+  font-size:11.5px;
+  line-height:1.35;
+  font-weight:800;
+  letter-spacing:0;
+  text-transform:none;
+}
+.konto-native-foldout-body{
+  padding:13px;
+  border-top:1px solid var(--line);
+  background:var(--surface);
+}
+.konto-native-foldout-body .sub-head:first-child{
+  margin-top:0;
+}
+.konto-profile-technical-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:12px;
+}
+.konto-profile-technical-actions .btn{
+  width:100%;
+}
+.konto-native-foldout-body #resultsBox .result{
+  padding:10px 0;
+}
+@media(max-width:560px){
+  .konto-profile-primary-actions{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 <meta name="theme-color" content="#2f4a39">
 </head>
@@ -1108,34 +1196,58 @@ a.daily-chip:hover{
         </div>
       </div>
     </section>
-    <div class="sub-head">Odznaki</div>
-    <div id="achievementsBox" class="achievements-box" aria-live="polite">
-      <div class="muted">Ładuję odznaki...</div>
-    </div>
-
-    <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
-    <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
-    <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
-    <div class="profile-row"><strong>Województwo</strong><span id="pVoivodeship">—</span></div>
-    <div class="profile-row"><strong>Miejscowość</strong><span id="pCity">—</span></div>
-
-    <div class="sub-head">Dane do statystyk</div>
-    <form id="locationForm">
-      <label class="field">Województwo<select id="profileVoivodeship"><option value="">Nie podaję</option></select></label>
-      <label class="field">Miejscowość<input id="profileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>
-      <button class="btn secondary" type="submit">Zapisz dane</button>
-    </form>
-
-    <div class="profile-actions">
-      <a class="btn secondary" href="index.html">Wróć do Szpilplaca</a>
+    <div class="profile-actions konto-profile-primary-actions">
+      <a class="btn secondary" href="index.html">Zagraj dzisiaj</a>
       <a class="btn gold" href="ranking.html">Ranking</a>
-      <button type="button" class="btn secondary" id="toggleRankingBtn">Ukryj mnie z rankingu</button>
-      <a class="btn secondary" id="deleteRequestBtn" href="mailto:kontakt@familock.pl?subject=Usuni%C4%99cie%20konta%20Szpilplac">Poproś o usunięcie konta</a>
       <button type="button" class="btn danger" id="logoutBtn">Wyloguj</button>
     </div>
 
-    <div class="sub-head">Ostatnie wyniki z konta</div>
-    <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
+    <section class="konto-native-foldouts" aria-label="Sekcje konta">
+      <details class="konto-native-foldout" id="kontoProfileDetails">
+        <summary>
+          <span>Profil i zgody<small>Dane konta, miejscowość, mailing i widoczność w rankingu.</small></span>
+        </summary>
+        <div class="konto-native-foldout-body">
+          <div class="profile-row"><strong>Login</strong><span id="pLogin"></span></div>
+          <div class="profile-row"><strong>E-mail</strong><span id="pEmail"></span></div>
+          <div class="profile-row"><strong>Ranking</strong><span id="pRanking"></span></div>
+          <div class="profile-row"><strong>Województwo</strong><span id="pVoivodeship">—</span></div>
+          <div class="profile-row"><strong>Miejscowość</strong><span id="pCity">—</span></div>
+
+          <div class="sub-head">Dane do statystyk</div>
+          <form id="locationForm">
+            <label class="field">Województwo<select id="profileVoivodeship"><option value="">Nie podaję</option></select></label>
+            <label class="field">Miejscowość<input id="profileCity" type="text" maxlength="80" placeholder="np. Chorzów"></label>
+            <button class="btn secondary" type="submit">Zapisz dane</button>
+          </form>
+
+          <div class="profile-actions konto-profile-technical-actions">
+            <button type="button" class="btn secondary" id="toggleRankingBtn">Ukryj mnie z rankingu</button>
+            <a class="btn secondary" id="deleteRequestBtn" href="mailto:kontakt@familock.pl?subject=Usuni%C4%99cie%20konta%20Szpilplac">Poproś o usunięcie konta</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="konto-native-foldout" id="kontoAchievementsDetails">
+        <summary>
+          <span>Odznaki<small>Cele, nagrody i postępy konta.</small></span>
+        </summary>
+        <div class="konto-native-foldout-body">
+          <div id="achievementsBox" class="achievements-box" aria-live="polite">
+            <div class="muted">Ładuję odznaki...</div>
+          </div>
+        </div>
+      </details>
+
+      <details class="konto-native-foldout" id="kontoHistoryDetails">
+        <summary>
+          <span>Historia wyników<small>Lista gier zapisanych na koncie.</small></span>
+        </summary>
+        <div class="konto-native-foldout-body">
+          <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
+        </div>
+      </details>
+    </section>
   </section>
 </main>
 
@@ -2119,7 +2231,7 @@ boot();
 <script src="konto-mailing-bridge.js?v=124"></script>
 <script src="game-display-names.js?v=125"></script>
 <script src="avatar-select.js?v=125"></script>
-<script src="konto-dashboard.js?v=061"></script>
+<script src="konto-dashboard.js?v=062"></script>
 <script src="konto-delete-bridge.js?v=038"></script>
 
 <script>
@@ -2202,6 +2314,6 @@ boot();
 <script src="kamraty.js?v=5"></script>
 <script src="kamraty-achievements-bridge.js?v=1"></script>
 <script src="kamraty-reaction-summary.js?v=1"></script>
-<script src="pwa-push.js?v=7"></script>
+<script src="pwa-push.js?v=8"></script>
 </body>
 </html>

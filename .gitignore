@@ -22,3 +22,6 @@ apply-konto-stop-flicker.py
 apply-konto-stop-flicker.bat
 _backup_konto_manual_fix_*/
 fix-konto-html-sw.py
+_backup_konto_native_html_foldouts_*/
+apply-konto-native-html-foldouts.py
+apply-konto-native-html-foldouts.bat
