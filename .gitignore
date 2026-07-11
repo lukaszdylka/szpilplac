@@ -20,3 +20,5 @@ apply-konto-cache-refresh.bat
 _backup_konto_stop_flicker_*/
 apply-konto-stop-flicker.py
 apply-konto-stop-flicker.bat
+_backup_konto_manual_fix_*/
+fix-konto-html-sw.py
