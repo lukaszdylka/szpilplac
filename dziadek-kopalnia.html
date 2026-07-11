@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Starzik w kopalni</title>
 <style>
   :root{
@@ -29,6 +30,7 @@
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
     overscroll-behavior:none;
+    touch-action:none;
   }
   #wrap{
     display:flex; flex-direction:column; align-items:center; gap:10px;
@@ -85,19 +87,38 @@
   @media (pointer:coarse){
     #touchControls{ display:flex; }
   }
-  .tc-group{ display:flex; gap:14px; pointer-events:auto; }
+  .tc-group{ display:flex; gap:16px; pointer-events:auto; }
   .tc-btn{
-    width:60px; height:60px; border-radius:50%;
+    width:76px; height:76px; border-radius:50%;
     background:rgba(237,229,208,0.14);
     border:2px solid rgba(237,229,208,0.35);
-    color:var(--cream); font-size:24px; font-family:Arial,sans-serif;
+    color:var(--cream); font-size:30px; font-family:Arial,sans-serif;
     display:flex; align-items:center; justify-content:center;
     -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none;
     padding:0;
   }
   .tc-btn:active{ background:rgba(237,229,208,0.3); }
-  #btnJump{ width:74px; height:74px; font-size:28px; background:rgba(74,154,106,0.22); border-color:var(--green); }
+  #btnJump{ width:92px; height:92px; font-size:36px; background:rgba(74,154,106,0.22); border-color:var(--green); }
   #btnAttack{ background:rgba(196,144,80,0.2); border-color:var(--gold); }
+  #btnFullscreen{
+    display:none; position:fixed; top:8px; right:8px; z-index:7;
+    width:40px; height:40px; border-radius:8px;
+    background:rgba(237,229,208,0.14); border:2px solid rgba(237,229,208,0.35);
+    color:var(--cream); font-size:19px; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent; padding:0;
+  }
+  @media (pointer:coarse){
+    #btnFullscreen{ display:flex; }
+    html,body{ height:100dvh; }
+    #wrap{ height:100dvh; max-width:none; width:100%; padding:4px; gap:4px; }
+    h1{ font-size:14px; margin:2px 0 0 0; }
+    #hud{ font-size:11px; gap:10px; }
+    #metanBarOuter{ width:80px; height:8px; }
+    canvas{
+      flex:1; min-height:0; width:100%; max-width:none;
+      object-fit:contain;
+    }
+  }
   .overlay{
     position:fixed; inset:0; background:rgba(10,9,7,0.93);
     display:none; align-items:center; justify-content:center;
@@ -139,6 +160,7 @@
 
 <div id="rideCaption">Winda jedzie na wiyrch…</div>
 <div id="rotateHint">Obróć telefon w poziom - lepiej widać trasę 🔄</div>
+<button id="btnFullscreen" title="Pełny ekran">⛶</button>
 
 <div id="touchControls">
   <div class="tc-group">
@@ -199,6 +221,27 @@ bindTouchButton('btnLeft','ArrowLeft');
 bindTouchButton('btnRight','ArrowRight');
 bindTouchButton('btnJump','ArrowUp');
 bindTouchButton('btnAttack','KeyX');
+
+document.getElementById('btnFullscreen').addEventListener('click', ()=>{
+  const el = document.documentElement;
+  const request = el.requestFullscreen || el.webkitRequestFullscreen;
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  try{
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      if(request) request.call(el);
+    } else {
+      if(exit) exit.call(document);
+    }
+  }catch(err){ /* Fullscreen API niedostępne (np. iOS Safari) - ignorujemy */ }
+});
+
+// dodatkowe zabezpieczenie przed przybliżeniem z podwójnego stuknięcia
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e=>{
+  const now = Date.now();
+  if(now - lastTouchEnd <= 350) e.preventDefault();
+  lastTouchEnd = now;
+}, {passive:false});
 
 // fixed background decor (generated once, not re-randomized each frame)
 const lamps = [];
