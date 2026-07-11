@@ -1068,6 +1068,20 @@ a.daily-chip:hover{
   }
 }
 
+
+
+/* v112 konto: dolne natywne schowki dla Kamratów i Powiadomień */
+.konto-bottom-foldouts{display:grid;gap:10px;margin-top:16px}
+.konto-bottom-foldout{border:1px solid var(--line);border-radius:15px;background:var(--surface2);overflow:hidden}
+.konto-bottom-foldout > summary{list-style:none;cursor:pointer;padding:13px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;color:var(--ink);font-family:Oswald,system-ui,sans-serif;font-size:18px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;user-select:none}
+.konto-bottom-foldout > summary::-webkit-details-marker{display:none}
+.konto-bottom-foldout > summary::after{content:'›';color:var(--gold);font-size:25px;line-height:1;transform:rotate(90deg)}
+.konto-bottom-foldout[open] > summary::after{transform:rotate(-90deg)}
+.konto-bottom-foldout > summary small{display:block;margin-top:3px;color:var(--ink2);font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.35;font-weight:800;letter-spacing:0;text-transform:none}
+.konto-bottom-foldout-body{padding:13px;border-top:1px solid var(--line);background:var(--surface)}
+.konto-bottom-foldout-body > .kamraty-panel,.konto-bottom-foldout-body > .szp-notify-card{margin:0!important;box-shadow:none!important}
+.konto-bottom-foldout-body .kamraty-panel,.konto-bottom-foldout-body .szp-notify-card{border-radius:13px}
+
 </style>
 <meta name="theme-color" content="#2f4a39">
 </head>
@@ -1245,6 +1259,22 @@ a.daily-chip:hover{
         </summary>
         <div class="konto-native-foldout-body">
           <div id="resultsBox" class="muted">Brak zapisanych wyników na koncie.</div>
+        </div>
+      </details>
+    </section>
+
+
+    <section class="konto-bottom-foldouts" id="kontoBottomFoldouts" aria-label="Kamraty i powiadomienia">
+      <details class="konto-bottom-foldout" id="kontoKamratyFoldout">
+        <summary><span>Kamraty z placu<small>Profil publiczny, reakcje i porównania z kamratami.</small></span></summary>
+        <div class="konto-bottom-foldout-body" id="kontoKamratySlot">
+          <div class="muted">Ładuję Kamratów z placu...</div>
+        </div>
+      </details>
+      <details class="konto-bottom-foldout" id="kontoNotificationsFoldout">
+        <summary><span>Powiadomienia<small>Ustawienia PWA, przypomnień i typów powiadomień.</small></span></summary>
+        <div class="konto-bottom-foldout-body" id="kontoNotificationsSlot">
+          <div class="muted">Ładuję powiadomienia...</div>
         </div>
       </details>
     </section>
@@ -2311,9 +2341,10 @@ boot();
 <script src="topbar-common.js?v=124"></script>
 <script src="player-menu-common.js?v=124"></script>
 <script src="footer-normalizer.js?v=124"></script>
-<script src="kamraty.js?v=5"></script>
+<script src="kamraty.js?v=6"></script>
 <script src="kamraty-achievements-bridge.js?v=1"></script>
 <script src="kamraty-reaction-summary.js?v=1"></script>
-<script src="pwa-push.js?v=8"></script>
+<script src="pwa-push.js?v=9"></script>
+<script src="konto-bottom-foldouts.js?v=1"></script>
 </body>
 </html>

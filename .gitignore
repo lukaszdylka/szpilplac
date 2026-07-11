@@ -25,3 +25,6 @@ fix-konto-html-sw.py
 _backup_konto_native_html_foldouts_*/
 apply-konto-native-html-foldouts.py
 apply-konto-native-html-foldouts.bat
+_backup_konto_bottom_foldouts_*/
+apply-konto-bottom-foldouts.py
+apply-konto-bottom-foldouts.bat
