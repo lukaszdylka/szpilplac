@@ -17,3 +17,6 @@ apply-konto-profile-cleanup.bat
 _backup_konto_cache_refresh_*/
 apply-konto-cache-refresh.py
 apply-konto-cache-refresh.bat
+_backup_konto_stop_flicker_*/
+apply-konto-stop-flicker.py
+apply-konto-stop-flicker.bat
