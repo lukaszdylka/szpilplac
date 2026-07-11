@@ -1,7 +1,7 @@
-/* Szpilplac player-menu-common.js v102 */
+/* Szpilplac player-menu-common.js v104 */
 (function(){
   "use strict";
-  var VERSION="v102";
+  var VERSION="v104";
   function addStyle(){
     if(document.getElementById("szp-player-menu-common-style"))return;
     var st=document.createElement("style"); st.id="szp-player-menu-common-style";
