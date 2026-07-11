@@ -87,7 +87,8 @@
   @media (pointer:coarse){
     #touchControls{ display:flex; }
   }
-  .tc-group{ display:flex; gap:16px; pointer-events:auto; }
+  .tc-group{ display:flex; flex-direction:column; align-items:center; gap:10px; pointer-events:auto; }
+  .tc-row{ display:flex; gap:16px; }
   .tc-btn{
     width:76px; height:76px; border-radius:50%;
     background:rgba(237,229,208,0.14);
@@ -172,12 +173,14 @@
 <button id="btnMute" title="Dźwięk">🔊</button>
 
 <div id="touchControls">
-  <div class="tc-group">
-    <button class="tc-btn" id="btnLeft">◀</button>
-    <button class="tc-btn" id="btnRight">▶</button>
-  </div>
-  <div class="tc-group">
+  <div class="tc-group tc-left">
     <button class="tc-btn" id="btnAttack">⛏️</button>
+    <div class="tc-row">
+      <button class="tc-btn" id="btnLeft">◀</button>
+      <button class="tc-btn" id="btnRight">▶</button>
+    </div>
+  </div>
+  <div class="tc-group tc-right">
     <button class="tc-btn" id="btnJump">⬆</button>
   </div>
 </div>
@@ -286,6 +289,7 @@ function sfxJump(){ beep(520, 0.09, 'triangle', 0.15, 300); }
 function sfxSwing(){ beep(140, 0.06, 'square', 0.12, 260); }
 function sfxCoal(){ beep(880, 0.09, 'square', 0.15); }
 function sfxOxygen(){ beep(600, 0.07, 'sine', 0.16); setTimeout(()=>beep(900,0.09,'sine',0.14), 70); }
+function sfxSandwich(){ beep(700, 0.06, 'triangle', 0.16); setTimeout(()=>beep(520,0.06,'triangle',0.14), 60); setTimeout(()=>beep(760,0.08,'triangle',0.16), 120); }
 function sfxStun(){ beep(220, 0.12, 'square', 0.2); }
 function sfxHit(){ beep(160, 0.18, 'sawtooth', 0.2, 320); }
 function sfxElevator(){ beep(90, 0.4, 'sine', 0.22, 60); }
@@ -351,6 +355,11 @@ function makeOxygen(){
   return spots.map(x=>({x, y:GROUND_Y-34, taken:false}));
 }
 
+function makeSandwiches(){
+  const spots = [1500,3000,4700];
+  return spots.map(x=>({x, y:GROUND_Y-32, taken:false}));
+}
+
 function makeBats(){
   // latające: patrolują w powietrzu, skrzydła cały czas rozwinięte
   const flyDefs = [
@@ -372,7 +381,7 @@ function makeBats(){
   return [...flying, ...hanging];
 }
 
-let platforms, coalList, oxyList, bats, player, camX, state, elevatorTimer, life, metan, invuln, frameT, elevatorBaseY, elevatorRiseNow;
+let platforms, coalList, oxyList, sandwichList, bats, player, camX, state, elevatorTimer, life, metan, invuln, frameT, elevatorBaseY, elevatorRiseNow;
 
 function updateLifeDisplay(){
   let html='';
@@ -392,6 +401,7 @@ function reset(){
   platforms = makePlatforms();
   coalList = makeCoal();
   oxyList = makeOxygen();
+  sandwichList = makeSandwiches();
   bats = makeBats();
   player = { x:40, y:GROUND_Y-42, w:26, h:42, vx:0, vy:0, onGround:false, facing:1, walk:0, attackTimer:0, attackCooldown:0 };
   camX = 0;
@@ -536,6 +546,18 @@ function update(dtScale){
         o.taken = true;
         metan = Math.max(0, metan-30);
         sfxOxygen();
+      }
+    }
+  }
+
+  for(const s of sandwichList){
+    if(!s.taken){
+      const sb={x:s.x-13,y:s.y-9,w:26,h:18};
+      const pb={x:player.x,y:player.y,w:player.w,h:player.h};
+      if(rectsOverlap(sb,pb)){
+        s.taken = true;
+        if(life<3){ life++; updateLifeDisplay(); }
+        sfxSandwich();
       }
     }
   }
@@ -725,6 +747,37 @@ function drawOxygen(x,y){
   ctx.restore();
 }
 
+function drawSandwich(x,y){
+  ctx.save();
+  ctx.translate(x,y);
+  // kromka chleba
+  ctx.fillStyle = '#e8c383';
+  ctx.strokeStyle = '#a8763f';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(-13,8);
+  ctx.lineTo(-13,-2);
+  ctx.quadraticCurveTo(-13,-9,-6,-9);
+  ctx.lineTo(6,-9);
+  ctx.quadraticCurveTo(13,-9,13,-2);
+  ctx.lineTo(13,8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // ser
+  ctx.fillStyle = '#f2c94c';
+  ctx.fillRect(-11,1,22,4);
+  // wedlina
+  ctx.fillStyle = '#c0504d';
+  ctx.beginPath();
+  ctx.ellipse(-4,-2,5,3.4,0.3,0,Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(5,-3,5,3.4,-0.2,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawBatFlying(x,y,t,phase){
   const wing = Math.sin(t*8+phase)*14;
   ctx.save();
@@ -886,6 +939,7 @@ function draw(){
 
   for(const c of coalList){ if(!c.taken) drawCoal(c.x, c.y); }
   for(const o of oxyList){ if(!o.taken) drawOxygen(o.x, o.y); }
+  for(const s of sandwichList){ if(!s.taken) drawSandwich(s.x, s.y); }
   for(const b of bats){
     ctx.save();
     if(b.stunned>0){
