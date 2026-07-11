@@ -28,12 +28,17 @@
     font-family:'Inter',Arial,sans-serif;
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
+    overscroll-behavior:none;
   }
-  #wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  #wrap{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    width:100%; max-width:820px; padding:0 10px;
+  }
   h1{
     font-family:'Oswald',Arial,sans-serif;
     font-weight:700; letter-spacing:1px; color:var(--gold);
     margin:0 0 4px 0; text-transform:uppercase; font-size:22px;
+    text-align:center;
   }
   #hud{
     display:flex; gap:16px; align-items:center; flex-wrap:wrap;
@@ -50,8 +55,11 @@
     height:100%; width:0%; background:var(--green);
     transition:width .15s linear, background .3s linear;
   }
-  canvas{ border:2px solid var(--footer); border-radius:6px; display:block; }
-  #hint{ font-size:12px; color:var(--muted); }
+  canvas{
+    border:2px solid var(--footer); border-radius:6px; display:block;
+    width:100%; max-width:800px; height:auto; touch-action:none;
+  }
+  #hint{ font-size:12px; color:var(--muted); text-align:center; }
   #rideCaption{
     position:fixed; top:20px; left:50%; transform:translateX(-50%);
     background:var(--footer); color:var(--gold); padding:6px 16px;
@@ -59,6 +67,37 @@
     letter-spacing:1px; font-size:14px; display:none; z-index:5;
   }
   #rideCaption.show{ display:block; }
+  #rotateHint{
+    display:none; position:fixed; top:8px; left:50%; transform:translateX(-50%);
+    background:var(--footer); color:var(--gold); padding:6px 14px;
+    border-radius:6px; font-size:12px; font-family:'Oswald',Arial,sans-serif;
+    letter-spacing:0.5px; z-index:6; pointer-events:none; text-align:center; max-width:90%;
+  }
+  @media (pointer:coarse) and (orientation:portrait){
+    #rotateHint{ display:block; }
+  }
+  #touchControls{
+    display:none; position:fixed; left:0; right:0; bottom:0;
+    padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+    justify-content:space-between; align-items:flex-end;
+    z-index:6; pointer-events:none;
+  }
+  @media (pointer:coarse){
+    #touchControls{ display:flex; }
+  }
+  .tc-group{ display:flex; gap:14px; pointer-events:auto; }
+  .tc-btn{
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(237,229,208,0.14);
+    border:2px solid rgba(237,229,208,0.35);
+    color:var(--cream); font-size:24px; font-family:Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none;
+    padding:0;
+  }
+  .tc-btn:active{ background:rgba(237,229,208,0.3); }
+  #btnJump{ width:74px; height:74px; font-size:28px; background:rgba(74,154,106,0.22); border-color:var(--green); }
+  #btnAttack{ background:rgba(196,144,80,0.2); border-color:var(--gold); }
   .overlay{
     position:fixed; inset:0; background:rgba(10,9,7,0.93);
     display:none; align-items:center; justify-content:center;
@@ -99,6 +138,18 @@
 </div>
 
 <div id="rideCaption">Winda jedzie na wiyrch…</div>
+<div id="rotateHint">Obróć telefon w poziom - lepiej widać trasę 🔄</div>
+
+<div id="touchControls">
+  <div class="tc-group">
+    <button class="tc-btn" id="btnLeft">◀</button>
+    <button class="tc-btn" id="btnRight">▶</button>
+  </div>
+  <div class="tc-group">
+    <button class="tc-btn" id="btnAttack">⛏️</button>
+    <button class="tc-btn" id="btnJump">⬆</button>
+  </div>
+</div>
 
 <div class="overlay" id="overlayWin">
   <h2>Na wiyrchu!</h2>
@@ -133,6 +184,21 @@ window.addEventListener('keydown', e=>{
   if(['ArrowLeft','ArrowRight','ArrowUp','Space'].includes(e.code)) e.preventDefault();
 });
 window.addEventListener('keyup', e=>{ keys[e.code]=false; });
+
+function bindTouchButton(id, code){
+  const el = document.getElementById(id);
+  const press = e=>{ e.preventDefault(); keys[code]=true; };
+  const release = e=>{ e.preventDefault(); keys[code]=false; };
+  el.addEventListener('pointerdown', press);
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointerleave', release);
+  el.addEventListener('pointercancel', release);
+  el.addEventListener('contextmenu', e=>e.preventDefault());
+}
+bindTouchButton('btnLeft','ArrowLeft');
+bindTouchButton('btnRight','ArrowRight');
+bindTouchButton('btnJump','ArrowUp');
+bindTouchButton('btnAttack','KeyX');
 
 // fixed background decor (generated once, not re-randomized each frame)
 const lamps = [];
