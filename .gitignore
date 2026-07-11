@@ -28,3 +28,6 @@ apply-konto-native-html-foldouts.bat
 _backup_konto_bottom_foldouts_*/
 apply-konto-bottom-foldouts.py
 apply-konto-bottom-foldouts.bat
+_backup_konto_bottom_foldouts_optimized_*/
+apply-konto-bottom-foldouts-optimized.py
+apply-konto-bottom-foldouts-optimized.bat

@@ -11,7 +11,7 @@
 (function(){
   "use strict";
 
-  var VERSION = "v5";
+  var VERSION = "v6";
   var AUTH_STORAGE_KEY = "szpilplac-auth-v05";
   var sb = null;
   var currentUser = null;
@@ -278,16 +278,53 @@
       });
     }
   }
+
+  function kontoFoldoutStyle(){
+    if(document.getElementById("konto-dynamic-foldout-style"))return;
+    var s=document.createElement("style");
+    s.id="konto-dynamic-foldout-style";
+    s.textContent=[
+      ".konto-extra-foldouts{display:grid;gap:10px;margin-top:14px}",
+      ".konto-native-foldout{border:1px solid var(--line,#c9bfa6);border-radius:15px;background:var(--surface2,#f3ecda);overflow:hidden}",
+      ".konto-native-foldout>summary{list-style:none;cursor:pointer;padding:13px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;color:var(--ink,#23201a);font-family:Oswald,system-ui,sans-serif;font-size:18px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;user-select:none}",
+      ".konto-native-foldout>summary::-webkit-details-marker{display:none}",
+      ".konto-native-foldout>summary:after{content:'›';color:var(--gold,#bf8a3a);font-size:25px;line-height:1;transform:rotate(90deg)}",
+      ".konto-native-foldout[open]>summary:after{transform:rotate(-90deg)}",
+      ".konto-native-foldout>summary small{display:block;margin-top:3px;color:var(--ink2,#6a6150);font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.35;font-weight:800;letter-spacing:0;text-transform:none}",
+      ".konto-native-foldout-body{padding:13px;border-top:1px solid var(--line,#c9bfa6);background:var(--surface,#fbf7ee)}",
+      ".konto-native-foldout-body .kamraty-panel,.konto-native-foldout-body .szp-notify-card{margin:0!important;border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important;border-radius:0!important}",
+      ".konto-native-foldout-body .kamraty-panel>.kamraty-head>div{display:none!important}"
+    ].join("\n");
+    document.head.appendChild(s);
+  }
+  function kontoExtraWrap(profile){
+    if(!profile)return null;
+    kontoFoldoutStyle();
+    var wrap=document.getElementById("kontoExtraFoldouts");
+    if(!wrap){wrap=document.createElement("section");wrap.id="kontoExtraFoldouts";wrap.className="konto-extra-foldouts";profile.appendChild(wrap);}
+    return wrap;
+  }
+  function kontoFoldoutBody(profile,id,title,sub){
+    var wrap=kontoExtraWrap(profile);
+    if(!wrap)return null;
+    var det=document.getElementById(id);
+    if(!det){
+      det=document.createElement("details");det.id=id;det.className="konto-native-foldout";
+      det.innerHTML='<summary><span>'+esc(title)+'<small>'+esc(sub||"")+'</small></span></summary><div class="konto-native-foldout-body"></div>';
+      wrap.appendChild(det);
+    }
+    return det.querySelector(".konto-native-foldout-body");
+  }
+
   function ensureKontoPanel(){
     var profile = document.getElementById("profileCard");
     if(!profile || document.getElementById("kamratyPanel"))return;
-    var progress = document.getElementById("profileProgress");
+    var body = kontoFoldoutBody(profile,"kontoKamratyFoldout","Kamraty z placu","Profil publiczny, reakcje i porównania.");
     var panel = document.createElement("section");
     panel.id = "kamratyPanel";
     panel.className = "kamraty-panel";
     panel.innerHTML = '<div class="kamrat-empty">Ładuję Kamratów z placu...</div>';
-    if(progress && progress.parentNode)progress.parentNode.insertBefore(panel,progress.nextSibling);
-    else profile.appendChild(panel);
+    if(body)body.appendChild(panel);else profile.appendChild(panel);
     renderKontoKamraty();
   }
 

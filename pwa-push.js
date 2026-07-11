@@ -1,7 +1,7 @@
 /* Szpilplac PWA + powiadomienia v1 */
 (function(){
 "use strict";
-var VERSION="v1";
+var VERSION="v2";
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null,installPrompt=null,cssDone=false;
 var TYPES=[
@@ -54,6 +54,52 @@ function prefs(card){var p={};TYPES.forEach(function(t){var i=card.querySelector
 function applyPrefs(card,p){TYPES.forEach(function(t){var i=card.querySelector('[data-szp-notify-type="'+t[0]+'"]');if(i)i.checked=!!p[t[0]];});}
 function support(){if(!("Notification" in window))return "Ta przeglądarka nie obsługuje powiadomień.";if(!("serviceWorker" in navigator))return "Ta przeglądarka nie obsługuje PWA.";if(!("PushManager" in window))return "Ta przeglądarka nie obsługuje web push.";if(!secure())return "Powiadomienia wymagają HTTPS.";return "";}
 async function enable(card){var se=await session();if(!se||!se.user)throw new Error("Zaloguj się, żeby włączyć powiadomienia.");var cfg=window.SZPILPLAC_CONFIG||{};if(!cfg.VAPID_PUBLIC_KEY)throw new Error("Brakuje VAPID_PUBLIC_KEY w config.js. PWA działa, ale push wymaga kluczy VAPID.");var perm=await Notification.requestPermission();if(perm!=="granted")throw new Error("Nie udzielono zgody na powiadomienia.");var r=await regSW();var old=await r.pushManager.getSubscription();if(old)await old.unsubscribe().catch(function(){});var sub=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(cfg.VAPID_PUBLIC_KEY)});await saveSub(sub);await savePrefs(prefs(card));}
+
+function kontoFoldoutStyle(){
+ if(document.getElementById("konto-dynamic-foldout-style"))return;
+ var s=document.createElement("style");
+ s.id="konto-dynamic-foldout-style";
+ s.textContent=[
+  ".konto-extra-foldouts{display:grid;gap:10px;margin-top:14px}",
+  ".konto-native-foldout{border:1px solid var(--line,#c9bfa6);border-radius:15px;background:var(--surface2,#f3ecda);overflow:hidden}",
+  ".konto-native-foldout>summary{list-style:none;cursor:pointer;padding:13px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;color:var(--ink,#23201a);font-family:Oswald,system-ui,sans-serif;font-size:18px;line-height:1.05;letter-spacing:.03em;text-transform:uppercase;user-select:none}",
+  ".konto-native-foldout>summary::-webkit-details-marker{display:none}",
+  ".konto-native-foldout>summary:after{content:'›';color:var(--gold,#bf8a3a);font-size:25px;line-height:1;transform:rotate(90deg)}",
+  ".konto-native-foldout[open]>summary:after{transform:rotate(-90deg)}",
+  ".konto-native-foldout>summary small{display:block;margin-top:3px;color:var(--ink2,#6a6150);font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.35;font-weight:800;letter-spacing:0;text-transform:none}",
+  ".konto-native-foldout-body{padding:13px;border-top:1px solid var(--line,#c9bfa6);background:var(--surface,#fbf7ee)}",
+  ".konto-native-foldout-body .szp-notify-card,.konto-native-foldout-body .kamraty-panel{margin:0!important;border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important;border-radius:0!important}",
+  ".konto-native-foldout-body .szp-notify-card>h2,.konto-native-foldout-body .szp-notify-card>p,.konto-native-foldout-body .kamraty-panel>.kamraty-head>div{display:none!important}"
+ ].join("\n");
+ document.head.appendChild(s);
+}
+function kontoExtraWrap(){
+ var profile=document.getElementById("profileCard");
+ if(!profile)return null;
+ kontoFoldoutStyle();
+ var wrap=document.getElementById("kontoExtraFoldouts");
+ if(!wrap){wrap=document.createElement("section");wrap.id="kontoExtraFoldouts";wrap.className="konto-extra-foldouts";profile.appendChild(wrap);}
+ return wrap;
+}
+function kontoFoldoutBody(id,title,sub){
+ var wrap=kontoExtraWrap();
+ if(!wrap)return null;
+ var det=document.getElementById(id);
+ if(!det){
+   det=document.createElement("details");det.id=id;det.className="konto-native-foldout";
+   det.innerHTML='<summary><span>'+esc(title)+'<small>'+esc(sub||"")+'</small></span></summary><div class="konto-native-foldout-body"></div>';
+   wrap.appendChild(det);
+ }
+ return det.querySelector(".konto-native-foldout-body");
+}
+function placeKontoNotify(card,target){
+ if(location.pathname.indexOf("konto")!==-1){
+   var body=kontoFoldoutBody("kontoNotifyFoldout","Powiadomienia","Telefon, PWA i typy powiadomień.");
+   if(body){body.appendChild(card);return;}
+ }
+ placeKontoNotify(card,target);
+}
+
 function renderCard(target){css();if(document.getElementById("szpNotifyCard"))return;var card=document.createElement("section");card.className="szp-notify-card";card.id="szpNotifyCard";card.innerHTML='<h2>Powiadomienia</h2><p>Wybierz, o czym Szpilplac może Ci przypominać. Na iPhonie najlepiej dodać stronę do ekranu początkowego i uruchamiać ją z ikonki.</p><div class="szp-notify-status">Sprawdzam ustawienia...</div><div class="szp-notify-list">'+TYPES.map(function(t){return '<label class="szp-notify-row"><input type="checkbox" data-szp-notify-type="'+esc(t[0])+'" checked><span><b>'+esc(t[1])+'</b><span>'+esc(t[2])+'</span></span></label>';}).join("")+'</div><div class="szp-notify-actions"><button type="button" class="szp-notify-btn" id="szpEnablePushBtn">Włącz powiadomienia</button><button type="button" class="szp-notify-btn secondary" id="szpSavePushPrefsBtn">Zapisz wybór</button><button type="button" class="szp-notify-btn secondary" id="szpDisablePushBtn">Wyłącz na tym urządzeniu</button></div>';
  if(target&&target.parentNode)target.parentNode.insertBefore(card,target.nextSibling);else (document.querySelector("main")||document.body).appendChild(card);
  var uns=support();if(uns)status(card,uns,"err");
