@@ -310,57 +310,6 @@ footer a{color:var(--green);font-weight:600}
 
   <div class="weekly-hint" id="weeklyHint" aria-live="polite"></div>
 
-     <!-- ════════════════════════════════════════════════════════════════════
-     PODPOWIEDŹ TYGODNIA — TEST REFLEKSU  (wklejka, samodzielny blok)
-     ────────────────────────────────────────────────────────────────────
-     GDZIE WKLEIĆ:
-     Zaraz PO tej linii w klodka.html:
-       <div class="weekly-hint" id="weeklyHint" aria-live="polite"></div>
-     (czyli jako kolejny element w <main>, tuż pod oryginalnym boxem)
-
-     TO JEST PODPOWIEDŹ TYLKO NA JEDEN, KONKRETNY TYDZIEŃ:
-     Blok sam się wyłącza (usuwa z DOM), gdy WEEK_NO na stronie nie
-     zgadza się z REFLEX_TARGET_WEEK (patrz <script> niżej). Dla
-     wszystkich innych tygodni #weeklyHint działa normalnie, jakby
-     tego bloku tu nie było. Numer aktualnego tygodnia widać wprost
-     na stronie w trybie tygodniowym (napis "Tydzień N" przy tytule)
-     — stamtąd bierz wartość do REFLEX_TARGET_WEEK.
-
-     ŻEBY ZAJĘŁO MIEJSCE OBECNEJ PODPOWIEDZI (tylko na tydzień docelowy):
-     W Supabase (klodka_weekly_hints) potrzebujesz WIERSZA dla tego
-     week_no z published=true i visible_hint = '' (pusty string, nie
-     brak wiersza — brak wiersza sprawi, że pokaże się domyślny trop
-     ">>> F12 <<<" z WEEKLY_HINT_DEFAULTS). Pusty visible_hint sprawia,
-     że oryginalny #weeklyHint chowa się sam (patrz updateWeeklyHint()),
-     a ten blok wchodzi na jego miejsce wizualnie. console_hint możesz
-     zostawić jak jest albo też wyczyścić — to osobna sprawa.
-
-     DLACZEGO NIE PRZEZ POLE visible_hint / CMS:
-     visible_hint trafia na stronę przez el.innerHTML = ... (patrz
-     updateWeeklyHint() w klodka.html). Przeglądarki NIE wykonują <script>
-     wstawionego przez innerHTML, więc gra by się nie odpaliła, gdyby
-     wkleić ten kod tam. Stąd wersja jako blok na stałe w pliku.
-
-     DLACZEGO CZEKA NA DOMContentLoaded:
-     Ten blok siedzi w HTML PRZED głównym <script> klodka.html (który
-     dopiero tam liczy WEEK_NO). Gdyby kod odpalił się od razu, WEEK_NO
-     jeszcze by nie istniał. DOMContentLoaded gwarantuje, że główny
-     skrypt już się wykonał.
-
-     KONFIG — do zmiany w każdej chwili:
-       REFLEX_TARGET_WEEK  (niżej w <script>) — na który tydzień to ma być
-       REFLEX_THRESHOLD_MS (niżej w <script>) — próg w ms
-       REFLEX_CODE          (niżej w <script>) — kod, który się odsłania
-
-     Blok korzysta z Twoich zmiennych motywu (--surface, --ink, --correct,
-     --wrong, --gold, --line, --ink2) — z fallbackami na wartości trybu
-     ciemnego, więc jeśli otworzysz ten plik osobno, wygląda sensownie,
-     ale docelowo ma dziedziczyć prawdziwe wartości z klodka.html.
-     Klasy .weekly-hint / .hint-kicker są celowo ponownie użyte z
-     klodka.html (nie duplikuję ich tutaj) — pasek karty i chowanie/
-     pokazywanie na tryb dzienny/tygodniowy działają przez nie.
-     ════════════════════════════════════════════════════════════════════ -->
-
 <div class="weekly-hint reflex-hint" id="weeklyHintGame">
   <span class="hint-kicker">Zagadka tygodnia</span>
   <button type="button" class="rx-stage" id="rxStage" aria-describedby="rxStatus">
