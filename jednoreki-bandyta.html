@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jednoręki Bandyta · Familock · Starzik</title>
+<meta name="description" content="Zakręć, złap cyfry wśród symboli, złóż kod.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;
+  --ink:#ede5d0;--ink2:#9a907a;--line:#3d3629;
+  --green:#4a9a6a;--gold:#c49050;--gold2:#e6b862;
+  --cw:clamp(58px,16vw,90px);
+}
+[data-theme=light]{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;
+  --ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;
+  --green:#2f4a39;--gold:#bf8a3a;--gold2:#d9a24a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 700px at 50% -10%,#211a13,var(--bg));
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  align-items:center;min-height:100vh;padding:0 12px 24px}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
+
+header{width:100%;max-width:640px;padding-top:16px;display:flex;
+  align-items:center;justify-content:space-between}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink2)}
+.eyebrow b{color:var(--gold)}
+.icon-btn{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);font-size:15px}
+.icon-btn:hover{background:var(--surface);color:var(--ink)}
+
+main{width:100%;max-width:640px;display:flex;flex-direction:column;
+  align-items:center;flex:1;justify-content:center;gap:18px;padding-top:18px}
+
+/* ====================== AUTOMAT ====================== */
+.machine{position:relative;width:min(94vw,560px);
+  background:linear-gradient(#332a1e,#241d15);
+  border:3px solid var(--gold);border-radius:26px;
+  padding:20px 22px 22px;
+  box-shadow:0 0 0 6px #1a140d,0 22px 60px rgba(0,0,0,.6),
+    inset 0 2px 0 rgba(255,255,255,.06);
+  transition:box-shadow .3s}
+.machine.win{box-shadow:0 0 0 6px #1a140d,0 0 60px rgba(196,144,80,.55),
+    0 22px 60px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.08)}
+
+.marquee{text-align:center;margin-bottom:16px}
+.marquee h1{margin:0;font-family:"Oswald";font-weight:700;
+  font-size:clamp(22px,6vw,34px);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gold2);text-shadow:0 2px 0 #1a140d,0 0 22px rgba(196,144,80,.35)}
+.marquee .sub{font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink2);margin-top:3px}
+
+.window{position:relative;display:flex;gap:8px;justify-content:center;
+  background:#0d0a07;border-radius:14px;padding:10px;
+  border:2px solid #6b4f27;box-shadow:inset 0 0 34px rgba(0,0,0,.85)}
+.reel{position:relative;width:var(--cw);height:calc(var(--cw)*3);
+  overflow:hidden;border-radius:8px;background:#efe7d4;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.25)}
+.reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:33%;
+  z-index:2;pointer-events:none}
+.reel::before{top:0;background:linear-gradient(#efe7d4,rgba(239,231,212,0))}
+.reel::after{bottom:0;background:linear-gradient(rgba(239,231,212,0),#efe7d4)}
+.reel.held{outline:3px solid var(--gold2);outline-offset:-3px}
+.reel.catch{outline:3px solid var(--green);outline-offset:-3px;
+  animation:catchpulse 1s ease-in-out infinite}
+@keyframes catchpulse{50%{outline-color:var(--gold2)}}
+.strip{display:flex;flex-direction:column;will-change:transform}
+.cell{width:var(--cw);height:var(--cw);display:flex;align-items:center;
+  justify-content:center;font-size:calc(var(--cw)*0.5);line-height:1;user-select:none}
+.cell.num{font-family:"Oswald";font-weight:700;font-size:calc(var(--cw)*0.66);
+  color:#8a5a1c;text-shadow:0 0 12px rgba(196,144,80,.35)}
+
+.payline{position:absolute;left:8px;right:8px;top:50%;height:var(--cw);
+  transform:translateY(-50%);z-index:3;pointer-events:none;border-radius:6px;
+  border-top:2px solid rgba(196,144,80,.5);border-bottom:2px solid rgba(196,144,80,.5)}
+.machine.win .payline{border-color:var(--gold2);
+  box-shadow:0 0 24px rgba(230,184,98,.6),inset 0 0 24px rgba(230,184,98,.25);
+  animation:flash .5s ease 2}
+@keyframes flash{50%{background:rgba(230,184,98,.18)}}
+
+.holds{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.hold{width:var(--cw);padding:7px 0;border-radius:8px;border:1px solid var(--line);
+  background:var(--surface2);color:var(--ink2);font-weight:800;font-size:11px;
+  letter-spacing:.02em;text-transform:uppercase;text-align:center;line-height:1.15}
+.hold:hover{color:var(--ink)}
+.hold.on{background:var(--gold);color:#1a140d;border-color:var(--gold);
+  box-shadow:0 0 14px rgba(196,144,80,.4)}
+.hold:disabled{opacity:.45;cursor:default}
+
+.result{min-height:30px;text-align:center;margin:16px 0 4px;
+  font-weight:800;font-size:15px;color:var(--ink2);transition:opacity .2s}
+.result.miss{color:var(--gold)}
+.result.win{color:var(--gold2);font-family:"Oswald";font-weight:700;
+  font-size:clamp(20px,6vw,30px);letter-spacing:.14em;
+  text-shadow:0 0 22px rgba(230,184,98,.5);animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+.spin{display:block;margin:6px auto 0;padding:14px 44px;border-radius:999px;
+  background:var(--green);color:#fff;font-weight:800;font-size:16px;
+  letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 6px 0 #2c5c3f,0 10px 18px rgba(0,0,0,.4);transition:transform .06s,box-shadow .06s}
+.spin:hover{filter:brightness(1.05)}
+.spin:active{transform:translateY(4px);box-shadow:0 2px 0 #2c5c3f}
+.spin:disabled{opacity:.5;cursor:default;box-shadow:0 6px 0 #2c5c3f}
+.spin.idle{animation:breathe 2.2s ease-in-out infinite}
+@keyframes breathe{50%{transform:translateY(-2px);box-shadow:0 8px 0 #2c5c3f,0 14px 26px rgba(74,154,106,.4)}}
+
+.lever{position:absolute;right:-30px;top:120px;width:22px;height:170px;
+  display:flex;flex-direction:column;align-items:center}
+.lever .track{position:absolute;top:22px;bottom:0;width:8px;border-radius:8px;
+  background:linear-gradient(#5a4527,#2a2015)}
+.lever .knob{position:relative;z-index:2;width:34px;height:34px;border-radius:999px;
+  background:radial-gradient(circle at 35% 30%,#ff7a6a,#b02a1f);
+  border:3px solid #7a1c14;box-shadow:0 4px 10px rgba(0,0,0,.5);
+  cursor:pointer;transition:transform .12s cubic-bezier(.2,1.5,.4,1)}
+.lever .knob:hover{filter:brightness(1.08)}
+.lever.pulled .knob{transform:translateY(120px)}
+@media(max-width:560px){.lever{display:none}}
+
+.foot{font-size:11px;color:var(--ink2);letter-spacing:.04em;text-align:center;
+  margin-top:6px;opacity:.7}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important}
+  .spin.idle{animation:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">FAMILOCK · <b>STARZIK</b></div>
+  <button class="icon-btn" id="mute" title="Dźwięk" aria-label="Włącz/wyłącz dźwięk">🔊</button>
+</header>
+
+<main>
+  <div class="machine" id="machine">
+    <div class="marquee">
+      <h1>Jednoręki Bandyta</h1>
+      <div class="sub">Złap cyfrę · przytrzymaj · dokręć resztę</div>
+    </div>
+
+    <div class="window" id="window">
+      <div class="reel"><div class="strip" id="r0"></div></div>
+      <div class="reel"><div class="strip" id="r1"></div></div>
+      <div class="reel"><div class="strip" id="r2"></div></div>
+      <div class="reel"><div class="strip" id="r3"></div></div>
+      <div class="payline"></div>
+    </div>
+
+    <div class="holds" id="holds">
+      <button class="hold" data-i="0">Trzymaj</button>
+      <button class="hold" data-i="1">Trzymaj</button>
+      <button class="hold" data-i="2">Trzymaj</button>
+      <button class="hold" data-i="3">Trzymaj</button>
+    </div>
+
+    <div class="result" id="result" role="status" aria-live="polite">Zakręć — złap cyfry i trzymaj je</div>
+
+    <button class="spin idle" id="spin">Zakręć</button>
+
+    <div class="lever" id="lever" aria-hidden="true">
+      <div class="track"></div>
+      <div class="knob"></div>
+    </div>
+  </div>
+  <div class="foot">Spacja = zakręć · klik „Trzymaj" blokuje bęben · R = reset dla nowej grupy</div>
+</main>
+
+<script>
+/* ====================== KONFIGURACJA ====================== */
+const KONFIG = {
+  KOD:          "0416",  // szukany kod; każda cyfra "mieszka" na swoim bębnie
+  SZANSA_CYFRY: 0.33,    // szansa, że kręcony bęben pokaże swoją cyfrę (reszta = symbole)
+  DZWIEK:       true,    // dźwięk domyślnie włączony
+};
+
+const TEKSTY = {
+  start:    "Zakręć — złap cyfry i trzymaj je",
+  spin:     "Kręci się…",
+  win:      "JEST! KOD " + KONFIG.KOD.split("").join(" "),
+  cyfra:    "Cyfra! Przytrzymaj ją i kręć dalej",
+  dalej:    "Kręć dalej…",
+  wszystkie:"Zwolnij któryś bęben",
+  trzymaj:  "Trzymaj",
+  trzymane: "🔒 Trzymane",
+};
+
+/* ====================== MECHANIKA ====================== */
+const SYMBOLE = ["🍒","🔔","💎","⭐","🍀","🐦","⛏️","🪙"];
+const KOD = KONFIG.KOD.split("");                  // ['0','4','1','6'] — cyfra bębna i
+const reelsEls = [0,1,2,3].map(i=>document.getElementById("r"+i));
+const holdEls  = [...document.querySelectorAll(".hold")];
+const machine  = document.getElementById("machine");
+const resultEl = document.getElementById("result");
+const spinBtn  = document.getElementById("spin");
+const lever    = document.getElementById("lever");
+
+let wartosc = [0,1,2,3].map(losSymbol);            // aktualne twarze na linii
+let held    = [false,false,false,false];
+let spinning=false, spinId=0, safetyTimer=null, won=false;
+
+function losSymbol(){ return SYMBOLE[Math.random()*SYMBOLE.length|0]; }
+function jestCyfra(f){ return /^[0-9]$/.test(f); }
+
+// klatka pośrednia bębna i: głównie symbole, czasem jego cyfra dla klimatu
+function losKlatka(i){ return Math.random()<0.15 ? KOD[i] : losSymbol(); }
+
+// twarz końcowa bębna i: z szansą SZANSA_CYFRY jego cyfra, inaczej symbol
+function celBebna(i){ return Math.random()<KONFIG.SZANSA_CYFRY ? KOD[i] : losSymbol(); }
+
+function klatkaHTML(f){ return `<div class="cell${jestCyfra(f)?" num":""}">${f}</div>`; }
+
+function budujStrip(el, i, finalFace, dodatkowe){
+  const cells=[]; const n=16+dodatkowe;
+  for(let j=0;j<n;j++) cells.push(losKlatka(i));
+  cells.push(losKlatka(i));  // nad linią
+  cells.push(finalFace);     // NA linii (środek)
+  cells.push(losKlatka(i));  // pod linią
+  el.innerHTML = cells.map(klatkaHTML).join("");
+  return cells.length;
+}
+
+function pokazStatyczny(el, face){
+  el.style.transition="none"; el.style.transform="translateY(0)";
+  el.innerHTML = klatkaHTML(face).repeat(3);
+}
+
+function odswiezStany(){
+  held.forEach((h,i)=>{
+    holdEls[i].classList.toggle("on",h);
+    holdEls[i].textContent = h ? TEKSTY.trzymane : TEKSTY.trzymaj;
+    const reel=reelsEls[i].parentElement;
+    reel.classList.toggle("held",h);
+    // podpowiedź: cyfra na linii, jeszcze nietrzymana → zielony puls „złap mnie"
+    reel.classList.toggle("catch", !h && jestCyfra(wartosc[i]));
+  });
+}
+
+function kreci(){
+  if(spinning || won) return;
+  const doKrec=[0,1,2,3].filter(i=>!held[i]);
+  if(doKrec.length===0){
+    resultEl.className="result miss"; resultEl.textContent=TEKSTY.wszystkie; return;
+  }
+  spinning=true;
+  const myId=++spinId;
+  clearTimeout(safetyTimer);
+  spinBtn.disabled=true; spinBtn.classList.remove("idle");
+  holdEls.forEach(b=>b.disabled=true);
+  machine.classList.remove("win");
+  reelsEls.forEach((el,i)=>{ if(!held[i]) el.parentElement.classList.remove("catch"); });
+  resultEl.className="result"; resultEl.textContent=TEKSTY.spin;
+
+  lever.classList.add("pulled");
+  setTimeout(()=>lever.classList.remove("pulled"),260);
+  dzwiekLewar();
+
+  const cw = reelsEls[0].parentElement.clientHeight/3;
+  let done=0;
+
+  doKrec.forEach((i,k)=>{
+    const el=reelsEls[i];
+    const target=celBebna(i); wartosc[i]=target;
+    const len=budujStrip(el,i,target,k*4);
+    el.style.transition="none"; el.style.transform="translateY(0)";
+    el.getBoundingClientRect();
+    const dur=1.4+k*0.4;
+    requestAnimationFrame(()=>{
+      el.style.transition=`transform ${dur}s cubic-bezier(.16,.84,.24,1)`;
+      el.style.transform=`translateY(${-(len-3)*cw}px)`;
+    });
+    el.addEventListener("transitionend",function d(e){
+      if(e.propertyName!=="transform") return;
+      el.removeEventListener("transitionend",d);
+      if(myId!==spinId) return;
+      dzwiekTik();
+      if(++done===doKrec.length) koniec(myId);
+    });
+  });
+
+  safetyTimer=setTimeout(()=>koniec(myId),4200);
+}
+
+function koniec(id){
+  if(id!==spinId || !spinning) return;
+  clearTimeout(safetyTimer);
+  spinning=false;
+  spinBtn.disabled=false;
+  holdEls.forEach(b=>b.disabled=false);
+  odswiezStany();
+
+  const wygrana = wartosc.every((c,i)=>c===KOD[i]);
+  if(wygrana){
+    won=true;
+    holdEls.forEach(b=>b.disabled=true);
+    machine.classList.add("win");
+    resultEl.className="result win"; resultEl.textContent=TEKSTY.win;
+    dzwiekWin();
+  }else{
+    const zlapana = wartosc.some((c,i)=>!held[i] && jestCyfra(c)); // nowa cyfra do wzięcia
+    resultEl.className="result miss";
+    resultEl.textContent = zlapana ? TEKSTY.cyfra : TEKSTY.dalej;
+    spinBtn.classList.add("idle");
+  }
+}
+
+function toggleHold(i){
+  if(spinning || won) return;
+  held[i]=!held[i];
+  odswiezStany();
+}
+
+function reset(){
+  spinning=false; won=false;
+  spinId++; clearTimeout(safetyTimer);
+  held=[false,false,false,false];
+  wartosc=[0,1,2,3].map(losSymbol);
+  spinBtn.disabled=false; spinBtn.classList.add("idle");
+  holdEls.forEach(b=>b.disabled=false);
+  machine.classList.remove("win");
+  resultEl.className="result"; resultEl.textContent=TEKSTY.start;
+  reelsEls.forEach((el,i)=>pokazStatyczny(el,wartosc[i]));
+  odswiezStany();
+}
+
+/* ====================== DŹWIĘK ====================== */
+let ac=null, dzwiekOn=KONFIG.DZWIEK;
+function ctx(){ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); return ac; }
+function ton(f,t,d,typ="square",g=0.06){
+  if(!dzwiekOn) return;
+  const c=ctx(),o=c.createOscillator(),ga=c.createGain();
+  o.type=typ;o.frequency.value=f;o.connect(ga);ga.connect(c.destination);
+  ga.gain.setValueAtTime(g,t);ga.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.start(t);o.stop(t+d);
+}
+function dzwiekTik(){ if(!dzwiekOn)return; ton(320+Math.random()*80,ctx().currentTime,0.05); }
+function dzwiekLewar(){ if(!dzwiekOn)return; const t=ctx().currentTime;
+  const o=ctx().createOscillator(),ga=ctx().createGain();
+  o.type="sawtooth";o.frequency.setValueAtTime(180,t);o.frequency.exponentialRampToValueAtTime(60,t+.25);
+  ga.gain.setValueAtTime(.05,t);ga.gain.exponentialRampToValueAtTime(.0001,t+.25);
+  o.connect(ga);ga.connect(ctx().destination);o.start(t);o.stop(t+.25);}
+function dzwiekWin(){ if(!dzwiekOn)return; const t=ctx().currentTime;
+  [523,659,784,1047].forEach((f,i)=>ton(f,t+i*0.11,0.22,"triangle",0.09)); }
+
+/* ====================== STEROWANIE ====================== */
+spinBtn.addEventListener("click",()=>{ ctx().resume&&ctx().resume(); kreci(); });
+lever.querySelector(".knob").addEventListener("click",()=>{ ctx().resume&&ctx().resume(); kreci(); });
+holdEls.forEach(b=>b.addEventListener("click",()=>toggleHold(+b.dataset.i)));
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space"){ e.preventDefault(); ctx().resume&&ctx().resume(); kreci(); }
+  if(e.key==="r"||e.key==="R"){ reset(); }
+});
+document.getElementById("mute").addEventListener("click",e=>{
+  dzwiekOn=!dzwiekOn; e.currentTarget.textContent=dzwiekOn?"🔊":"🔇";
+});
+
+try{ const th=localStorage.getItem("szpilplac_theme"); document.documentElement.dataset.theme=th||"dark"; }
+catch(_){ document.documentElement.dataset.theme="dark"; }
+
+reset();
+</script>
+</body>
+</html>
