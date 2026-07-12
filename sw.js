@@ -1,7 +1,7 @@
-/* Szpilplac PWA Service Worker v9 */
+/* Szpilplac PWA Service Worker v10 */
 "use strict";
 
-const CACHE_NAME = "szpilplac-pwa-v9";
+const CACHE_NAME = "szpilplac-pwa-v10";
 const CORE_ASSETS = [
   "/",
   "/index.html",
