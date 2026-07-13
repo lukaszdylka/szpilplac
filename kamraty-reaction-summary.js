@@ -1,10 +1,10 @@
-/* Szpilplac kamraty-reaction-summary.js v4-css-only
-   TEST: wyciszenie społecznościowych reakcji i opcji powiadomień bez ruszania logiki konta.
-   Tylko CSS + pojedyncze kosmetyczne zmiany tekstu. Bez MutationObserver, bez usuwania DOM, bez RPC.
+/* Szpilplac kamraty-reaction-summary.js v5-css-only
+   Wyciszenie społecznościowych reakcji oraz całego panelu Powiadomienia w koncie.
+   Tylko CSS + pojedyncza kosmetyczna zmiana tekstu. Bez MutationObserver, bez usuwania DOM, bez RPC.
 */
 (function(){
   "use strict";
-  var VERSION = "v4-css-only-no-notifications";
+  var VERSION = "v5-css-only-no-notifications";
 
   function injectStyle(){
     if(document.getElementById("kamratReactionHideStyle"))return;
@@ -19,6 +19,7 @@
       "[data-kr-summary='1']{display:none!important}",
       "[data-szp-notify-type='kamrat_reactions']{display:none!important}",
       "#kontoNotificationsFoldout{display:none!important}",
+      "details#kontoNotificationsFoldout{display:none!important}",
       "#kontoNotificationsSlot{display:none!important}",
       "#szpNotifyCard{display:none!important}",
       ".szp-notify-card{display:none!important}"
