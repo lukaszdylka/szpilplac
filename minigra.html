@@ -29,7 +29,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
 </head>
 <body>
 <nav class="bar" aria-label="Nawigacja gierki">
-  <a class="back" href="gierki.html">← Gierki</a>
+  <a class="back" href="gierki.html" id="backToGames">← Gierki</a>
   <div class="title" id="gameTitle">Ładowanie gierki...</div>
   <button class="btn" id="fullscreenBtn" type="button" title="Pełny ekran">⛶ <span>Pełny ekran</span></button>
 </nav>
@@ -174,11 +174,15 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
     else el.requestFullscreen&&el.requestFullscreen();
   });
 
-  if(new URLSearchParams(location.search).get("fs")==="1"){
-    document.addEventListener("pointerdown",function(){
-      if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(function(){});
-    },{once:true,capture:true});
-  }
+  document.addEventListener("click",function(e){
+    var link=e.target.closest&&e.target.closest('a.back[href="gierki.html"]');
+    if(!link)return;
+    e.preventDefault();
+    function back(){location.href=link.href;}
+    if(document.fullscreenElement&&document.exitFullscreen){
+      Promise.resolve(document.exitFullscreen()).then(back,back);
+    }else back();
+  });
 
   load();
 })();

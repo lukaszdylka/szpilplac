@@ -88,7 +88,7 @@ footer a{color:var(--zielony);font-weight:700}
 
 /* ══ LISTA GIEREK — dopisujesz tu nową i tyle ══════════════════════════
    plik      — nazwa pliku w repo
-   pelny     — true: otwiera się od razu na pełnym ekranie (po pierwszym dotknięciu)
+   pelny     — true: pokazuje plakietkę informującą o trybie pełnoekranowym
    wynik     — co pokazuje plakietka (rekord trzymany w localStorage danej gry)
    ukryta    — true: nie pokazuje się na liście, ale link działa (tablet w roomie)
 */
@@ -112,6 +112,12 @@ var GRY = [
 
 /* ══ opcjonalnie: dociąga też gierki wrzucone przez panel admina ══ */
 var Z_BAZY = true;
+
+/* Opisy awaryjne dla gier, które mają jeszcze puste pole opisu w bazie. */
+var OPISY_BAZOWE = {
+  "skok-do-nieba":"Skacz po dachach familoka, zbieraj wyngiel i uważaj na ptoki. Steruj dotykiem albo przechyłem i pnij się jak najwyżej.",
+  "zeflik":"Machaj skrzydłami Zeflika, przelatuj między familokami i zbieraj kołocz. Każdy minięty familok daje punkt, a kołocz dorzuca bonus."
+};
 
 /* ───────────────────────────────────────────────────────────────── */
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){
@@ -138,7 +144,6 @@ function ikonaSvg(ikona,slug){
 
 function kafelek(g){
   var href = g.plik;
-  if(g.pelny) href += (href.indexOf("?")>=0 ? "&" : "?")+"fs=1";
   return '<a class="karta" href="'+esc(href)+'">'+
     '<div class="ico">'+ikonaSvg(g.ikona,g.slug)+'</div>'+
     '<div class="txt"><h2>'+esc(g.tytul)+'</h2><p>'+esc(g.opis||"")+'</p>'+
@@ -163,7 +168,7 @@ if(Z_BAZY){
         document.getElementById("siatka").insertAdjacentHTML("beforeend",
           rows.map(function(r){
             return kafelek({ slug:r.slug, plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
-                             ikona:r.ikona, tytul:r.tytul, opis:r.opis, pelny:!!r.pelny });
+                             ikona:r.ikona, tytul:r.tytul, opis:r.opis||OPISY_BAZOWE[r.slug]||"", pelny:!!r.pelny });
           }).join(""));
       }).catch(function(){});
   }
