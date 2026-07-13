@@ -47,7 +47,9 @@ h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;le
 .karta::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(90deg,transparent 70%,rgba(212,160,74,.05))}
 .ico{flex:none;width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  font-size:29px;background:#0f0d0a;border:1px solid var(--linia)}
+  color:var(--zloty);background:#0f0d0a;border:1px solid var(--linia)}
+.ico svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
 .txt{flex:1;min-width:0}
 .txt h2{font-family:Oswald;font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 3px;line-height:1.1}
 .txt p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.4}
@@ -58,10 +60,6 @@ h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;le
 .pill.prop{color:var(--zloty);border-color:var(--zloty)}
 .graj{flex:none;align-self:center;font-family:Oswald;font-size:13px;text-transform:uppercase;letter-spacing:.06em;
   padding:8px 14px;border-radius:999px;background:var(--zielony);color:#fff}
-
-.sep{display:flex;align-items:center;gap:10px;margin:22px 0 12px;color:var(--ink2);
-  font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--linia)}
 
 footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.9}
 footer a{color:var(--zielony);font-weight:700}
@@ -78,7 +76,6 @@ footer a{color:var(--zielony);font-weight:700}
 
 <main>
   <div class="siatka" id="siatka"></div>
-  <div id="zBazy"></div>
 </main>
 
 <footer>
@@ -96,19 +93,19 @@ footer a{color:var(--zielony);font-weight:700}
    ukryta    — true: nie pokazuje się na liście, ale link działa (tablet w roomie)
 */
 var GRY = [
-  { plik:"kopalnia.html",  ikona:"⛏️", tytul:"Starzik w kopalni",
+  { plik:"kopalnia.html",  ikona:"kopalnia", tytul:"Starzik w kopalni",
     opis:"Zbierz cały wyngiel, wal kilofem we fledermausy, pilnuj metanu i wjedź szolą na wiyrch. Liczy się czas szychty.",
     wynik:"Rekord czasu", pelny:true },
 
-  { plik:"na-wiyrch.html", ikona:"🏚️", tytul:"Na Wiyrch",
+  { plik:"na-wiyrch.html", ikona:"familok", tytul:"Na Wiyrch",
     opis:"Skacz po balkonach familoka coraz wyżej. Combo, przyspieszenie, jeden fałszywy krok i lecisz w dół.",
     wynik:"Rekord punktów", pelny:true },
 
-  { plik:"bandyta.html",   ikona:"🎰", tytul:"Jednoręki bandyta",
+  { plik:"bandyta.html",   ikona:"automat", tytul:"Jednoręki bandyta",
     opis:"Pięć rund po trzy kręcenia. Trzymaj powtórki i składaj układy — sztyry take same to setka.",
     wynik:"Rekord punktów", pelny:true },
 
-  { plik:"pong.html",      ikona:"🏓", tytul:"Pong",
+  { plik:"pong.html",      ikona:"pong", tytul:"Pong",
     opis:"Klasyk do trzech punktów. Wygrywaj pod rząd i bij rekord serii.",
     wynik:"Rekord serii", pelny:true }
 ];
@@ -120,11 +117,30 @@ var Z_BAZY = true;
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 
+function ikonaSvg(ikona,slug){
+  var id=(String(slug||"")+" "+String(ikona||"")).toLowerCase();
+  var body;
+  if(id.indexOf("zeflik")>=0 || id.indexOf("ptak")>=0 || id.indexOf("bird")>=0){
+    body='<path d="M4 14c4-1 6-4 7-8 2 3 4 5 8 6-2 5-6 8-11 7"/><path d="M11 12c-3 0-5 1-7 3"/><path d="M17 12l3-1-2 3"/>';
+  }else if(id.indexOf("kopal")>=0 || id.indexOf("kilof")>=0 || id.indexOf("mine")>=0){
+    body='<path d="M5 5c5-3 11-2 15 2"/><path d="M12 5l-2 4"/><path d="M11 8l8 12"/><path d="M6 20L17 9"/>';
+  }else if(id.indexOf("wiyrch")>=0 || id.indexOf("familok")>=0 || id.indexOf("dom")>=0){
+    body='<path d="M4 21V7h16v14"/><path d="M3 7h18"/><path d="M8 11h3v3H8zM14 11h3v3h-3zM9 21v-4h6v4"/>';
+  }else if(id.indexOf("bandyt")>=0 || id.indexOf("automat")>=0 || id.indexOf("slot")>=0){
+    body='<rect x="4" y="4" width="14" height="17" rx="2"/><path d="M7 8h8v6H7z"/><circle cx="9" cy="11" r=".7"/><circle cx="13" cy="11" r=".7"/><path d="M18 8h2v6h-2M20 8V6"/><path d="M8 18h6"/>';
+  }else if(id.indexOf("pong")>=0 || id.indexOf("palet")>=0){
+    body='<path d="M5 6v12M19 6v12"/><circle cx="12" cy="12" r="2"/><path d="M9 9l6 6"/>';
+  }else{
+    body='<path d="M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4Z"/><path d="M7 13h4M9 11v4"/><circle cx="16" cy="12" r=".7"/><circle cx="18" cy="14" r=".7"/>';
+  }
+  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+body+'</svg>';
+}
+
 function kafelek(g){
   var href = g.plik;
   if(g.pelny) href += (href.indexOf("?")>=0 ? "&" : "?")+"fs=1";
   return '<a class="karta" href="'+esc(href)+'">'+
-    '<div class="ico">'+esc(g.ikona||"🎮")+'</div>'+
+    '<div class="ico">'+ikonaSvg(g.ikona,g.slug)+'</div>'+
     '<div class="txt"><h2>'+esc(g.tytul)+'</h2><p>'+esc(g.opis||"")+'</p>'+
       '<div class="meta">'+(g.wynik?'<span class="pill gra">'+esc(g.wynik)+'</span>':'')+
       (g.pelny?'<span class="pill">Pełny ekran</span>':'')+'</div></div>'+
@@ -144,12 +160,11 @@ if(Z_BAZY){
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
         if(!rows || !rows.length) return;
-        document.getElementById("zBazy").innerHTML =
-          +
+        document.getElementById("siatka").insertAdjacentHTML("beforeend",
           rows.map(function(r){
-            return kafelek({ plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
+            return kafelek({ slug:r.slug, plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
                              ikona:r.ikona, tytul:r.tytul, opis:r.opis, pelny:!!r.pelny });
-          }).join("")+'</div>';
+          }).join(""));
       }).catch(function(){});
   }
 }
