@@ -1,10 +1,10 @@
-/* Szpilplac kamraty-reaction-summary.js v3-css-only
-   TEST: wyciszenie społecznościowych reakcji bez ruszania logiki konta.
-   Tylko CSS + pojedyncza kosmetyczna zmiana tekstu. Bez MutationObserver, bez usuwania DOM, bez RPC.
+/* Szpilplac kamraty-reaction-summary.js v4-css-only
+   TEST: wyciszenie społecznościowych reakcji i opcji powiadomień bez ruszania logiki konta.
+   Tylko CSS + pojedyncze kosmetyczne zmiany tekstu. Bez MutationObserver, bez usuwania DOM, bez RPC.
 */
 (function(){
   "use strict";
-  var VERSION = "v3-css-only";
+  var VERSION = "v4-css-only-no-notifications";
 
   function injectStyle(){
     if(document.getElementById("kamratReactionHideStyle"))return;
@@ -17,7 +17,11 @@
       ".reaction-counts{display:none!important}",
       ".kr-summary{display:none!important}",
       "[data-kr-summary='1']{display:none!important}",
-      "[data-szp-notify-type='kamrat_reactions']{display:none!important}"
+      "[data-szp-notify-type='kamrat_reactions']{display:none!important}",
+      "#kontoNotificationsFoldout{display:none!important}",
+      "#kontoNotificationsSlot{display:none!important}",
+      "#szpNotifyCard{display:none!important}",
+      ".szp-notify-card{display:none!important}"
     ].join("\n");
     document.head.appendChild(st);
   }
@@ -36,7 +40,7 @@
     console.info("Szpilplac kamraty-reaction-summary.js "+VERSION);
   }
 
-  window.SZP_KAMRAT_REACTION_SUMMARY = {version:VERSION,cssOnly:true};
+  window.SZP_KAMRAT_REACTION_SUMMARY = {version:VERSION,cssOnly:true,notificationsHidden:true};
   if(document.readyState === "loading")document.addEventListener("DOMContentLoaded",boot);
   else boot();
 })();
