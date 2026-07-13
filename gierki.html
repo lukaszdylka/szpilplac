@@ -10,6 +10,7 @@
 <meta property="og:title" content="Gierki · Szpilplac">
 <meta property="og:description" content="Familockowe gierki — zagraj od ręki.">
 <meta property="og:image" content="https://szpilplac.familock.pl/og-image.svg">
+<script src="config.js?v=13"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
@@ -64,6 +65,7 @@ h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;le
 
 footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.9}
 footer a{color:var(--zielony);font-weight:700}
+.made{opacity:.6}
 </style>
 </head>
 <body>
@@ -81,7 +83,7 @@ footer a{color:var(--zielony);font-weight:700}
 
 <footer>
   <a href="index.html">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br>
-  <span style="opacity:.6">Made in Świyntochłowice</span>
+  <span class="made">Made in Świyntochłowice</span>
 </footer>
 
 <script>
@@ -112,14 +114,15 @@ var GRY = [
 ];
 
 /* ══ opcjonalnie: dociąga też gierki wrzucone przez panel admina ══ */
-var Z_BAZY = false;   // ustaw true, jeśli używasz minigry-admin.html + Supabase
+var Z_BAZY = true;
 
 /* ───────────────────────────────────────────────────────────────── */
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 
 function kafelek(g){
-  var href = g.plik + (g.pelny ? "?fs=1" : "");
+  var href = g.plik;
+  if(g.pelny) href += (href.indexOf("?")>=0 ? "&" : "?")+"fs=1";
   return '<a class="karta" href="'+esc(href)+'">'+
     '<div class="ico">'+esc(g.ikona||"🎮")+'</div>'+
     '<div class="txt"><h2>'+esc(g.tytul)+'</h2><p>'+esc(g.opis||"")+'</p>'+
@@ -136,7 +139,7 @@ if(Z_BAZY){
   var URL_  = (window.SZPILPLAC_CONFIG && window.SZPILPLAC_CONFIG.SUPABASE_URL) || "";
   var ANON_ = (window.SZPILPLAC_CONFIG && window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY) || "";
   if(URL_ && ANON_){
-    fetch(URL_+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url&opublikowana=eq.true&order=kolejnosc.asc",
+    fetch(URL_+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny&opublikowana=eq.true&order=kolejnosc.asc",
       { headers:{ apikey:ANON_, Authorization:"Bearer "+ANON_ } })
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
@@ -144,8 +147,8 @@ if(Z_BAZY){
         document.getElementById("zBazy").innerHTML =
           '<div class="sep">Świeżo wrzucone</div><div class="siatka">'+
           rows.map(function(r){
-            return kafelek({ plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+r.slug),
-                             ikona:r.ikona, tytul:r.tytul, opis:r.opis, pelny:false });
+            return kafelek({ plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
+                             ikona:r.ikona, tytul:r.tytul, opis:r.opis, pelny:!!r.pelny });
           }).join("")+'</div>';
       }).catch(function(){});
   }
