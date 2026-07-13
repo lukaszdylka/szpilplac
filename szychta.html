@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Szychta · Szpilplac · Familock</title>
+<meta name="description" content="Szychta to śląska gra idle o prowadzeniu kopalni. Fedruj, rozwijaj brygadę i pilnuj wąskich gardeł.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;600;700;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<style>
+:root{
+  --bg:#eee6d2;--surface:#fbf7ed;--surface2:#f2ead7;--ink:#241f18;--ink2:#6d6251;
+  --line:#c9bda2;--green:#2f4a39;--green2:#42684f;--gold:#bb8435;--rust:#88483d;
+  --danger:#a63f36;--good:#3e8257;--coal:#242424;--blue:#496c88;--shadow:0 15px 40px -28px rgba(27,22,15,.65);
+}
+[data-theme=dark]{
+  --bg:#141210;--surface:#211d18;--surface2:#2a241d;--ink:#eee6d3;--ink2:#aaa08d;
+  --line:#40382d;--green:#4d7d5b;--green2:#5a8f69;--gold:#d39a45;--rust:#b26151;
+  --danger:#d06055;--good:#58a36e;--coal:#090909;--blue:#6e91aa;--shadow:0 18px 45px -25px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;background:
+  radial-gradient(circle at 50% -20%,rgba(187,132,53,.12),transparent 35%),
+  linear-gradient(180deg,var(--bg),var(--bg));color:var(--ink);font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.shell{width:min(1180px,100%);margin:0 auto;padding:14px 14px 36px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--green)}
+.back:hover{text-decoration:underline}
+.top-actions{display:flex;align-items:center;gap:7px}
+.icon-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:var(--surface2);display:grid;place-items:center;padding:0}
+.icon-btn:hover{background:var(--surface)}
+.test-badge{display:none;border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:5px 9px}
+.test-badge.on{display:inline-flex}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--surface);box-shadow:var(--shadow);padding:22px 22px 19px;margin-bottom:14px}
+.hero:after{content:"";position:absolute;inset:auto -90px -120px auto;width:320px;height:320px;border-radius:50%;background:rgba(47,74,57,.1);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:20px;align-items:center}
+.eyebrow{display:flex;align-items:center;gap:9px;color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;margin-bottom:5px}
+.eyebrow:before{content:"";width:28px;height:2px;background:currentColor}
+h1{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:clamp(42px,7vw,72px);line-height:.92;letter-spacing:.015em;margin:0 0 8px}
+.lead{max-width:620px;color:var(--ink2);font-size:14px;line-height:1.55;margin:0 0 16px}
+.rank-row{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.rank-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:white;border-radius:99px;padding:8px 13px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.rank-track{width:min(260px,100%);height:7px;border-radius:9px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.rank-track span{display:block;height:100%;background:var(--gold);width:0;transition:width .35s}
+.rank-next{font-size:11px;color:var(--ink2)}
+.mine-visual{position:relative;min-height:210px;border-radius:18px;background:linear-gradient(180deg,#d9c7a6 0 29%,#6d4b35 29% 40%,#2b2520 40%);border:1px solid var(--line);overflow:hidden}
+[data-theme=dark] .mine-visual{background:linear-gradient(180deg,#312a20 0 29%,#4a3327 29% 40%,#151310 40%)}
+.mine-visual svg{width:100%;height:100%;display:block;position:absolute;inset:0}
+.mine-visual.working .cart{animation:cartMove 3.6s ease-in-out infinite}
+.mine-visual.working .lamp-glow{animation:pulse 1.25s ease-in-out infinite}
+.mine-visual.resting .lamp-glow{opacity:.25}
+@keyframes cartMove{0%,100%{transform:translateX(-7px)}50%{transform:translateX(18px)}}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+.shift-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
+.shift-chip{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:9px 10px;min-width:0}
+.shift-chip.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold);background:color-mix(in srgb,var(--surface2) 86%,var(--gold))}
+.shift-chip .sn{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.shift-chip .sh{font-size:10px;color:var(--ink2);margin-top:2px}
+.shift-time{display:flex;align-items:baseline;gap:9px;margin-top:12px}
+.shift-time .clock{font-family:"Oswald";font-size:29px;letter-spacing:.04em}
+.shift-time .until{font-size:11px;color:var(--ink2)}
+.resources{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.resource{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:13px 14px;box-shadow:var(--shadow)}
+.resource .label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--ink2)}
+.resource .value{font-family:"Oswald";font-size:27px;line-height:1.1;margin-top:4px}
+.resource .sub{font-size:10.5px;color:var(--ink2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.resource svg{position:absolute;right:8px;top:8px;width:28px;height:28px;color:var(--line);opacity:.85}
+.meter{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:8px;border:1px solid var(--line)}
+.meter span{display:block;height:100%;background:var(--good);width:0;transition:width .25s}
+.meter.stock span{background:var(--coal)}
+.meter.condition span.low{background:var(--danger)}
+.game-grid{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(330px,.78fr);gap:14px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:15px 16px 12px;border-bottom:1px solid var(--line)}
+.panel-head h2{font-family:"Oswald";font-size:22px;text-transform:uppercase;letter-spacing:.03em;margin:0}
+.panel-head p{font-size:11px;color:var(--ink2);line-height:1.4;margin:3px 0 0}
+.panel-body{padding:15px 16px 16px}
+.production-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mine-card{border:1px solid var(--line);border-radius:15px;background:var(--surface2);padding:14px}
+.level-tag{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 9px;background:var(--coal);color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.mine-name{font-family:"Oswald";font-size:28px;text-transform:uppercase;margin:8px 0 2px}
+.mine-meta{font-size:11px;color:var(--ink2)}
+.pick-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:15px;padding:13px;background:linear-gradient(160deg,var(--surface2),var(--surface));min-height:190px;text-align:center}
+.pick-btn{width:126px;height:126px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;box-shadow:0 12px 25px -20px rgba(0,0,0,.8);transition:transform .08s,border-color .15s,background .15s;touch-action:manipulation}
+.pick-btn:hover{border-color:var(--gold)}
+.pick-btn:active{transform:scale(.95) rotate(-3deg)}
+.pick-btn:disabled{opacity:.45;cursor:not-allowed}
+.pick-btn svg{width:70px;height:70px}
+.pick-count{font-size:11px;color:var(--ink2);margin-top:9px}
+.pick-gain{font-weight:800;color:var(--gold)}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.flow-item{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px;min-width:0}
+.flow-item.bottleneck{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+.flow-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);font-weight:800}
+.flow-value{font-family:"Oswald";font-size:20px;margin-top:3px}
+.flow-note{font-size:9.5px;color:var(--ink2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bottleneck-box{display:flex;gap:11px;align-items:flex-start;margin-top:10px;border-radius:13px;padding:12px 13px;background:color-mix(in srgb,var(--danger) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--danger) 55%,var(--line))}
+.bottleneck-box.good{background:color-mix(in srgb,var(--good) 10%,var(--surface));border-color:color-mix(in srgb,var(--good) 55%,var(--line))}
+.bottleneck-icon{width:25px;height:25px;flex:none;color:var(--danger)}
+.bottleneck-box.good .bottleneck-icon{color:var(--good)}
+.bottleneck-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.bottleneck-text{font-size:11px;color:var(--ink2);line-height:1.42;margin-top:2px}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:10px 13px;font-size:11px;font-weight:800;letter-spacing:.035em;text-transform:uppercase}
+.btn:hover{filter:brightness(1.04)}
+.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.gold{background:var(--gold);color:#fff;border-color:var(--gold)}
+.btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.worker-list{display:flex;flex-direction:column;gap:9px}
+.worker{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);padding:11px}
+.worker-icon{width:42px;height:42px;border-radius:11px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--green)}
+.worker-icon svg{width:27px;height:27px}
+.worker-name{font-size:12px;font-weight:800}
+.worker-effect{font-size:10.5px;color:var(--ink2);margin-top:2px}
+.worker-count{font-family:"Oswald";font-size:21px;text-align:right}
+.worker-buy{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.worker-buy .btn{padding:8px 10px}
+.pending{font-size:9px;color:var(--gold);font-weight:800;text-transform:uppercase}
+.office-note{font-size:10.5px;color:var(--ink2);line-height:1.45;margin-top:9px}
+.sale-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.field label{display:block;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);margin:0 0 5px}
+select,input[type=number]{width:100%;border:1px solid var(--line);border-radius:9px;background:var(--surface2);padding:9px 10px;font-size:12px}
+.threshold-row{display:none;margin-top:8px}.threshold-row.on{display:block}
+.price-box{border:1px solid var(--line);border-radius:13px;padding:12px;background:var(--surface2);margin-bottom:10px}
+.price-line{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.price-line span:first-child{font-size:10.5px;color:var(--ink2)}
+.price-line strong{font-family:"Oswald";font-size:22px}
+.level-card{border:1px solid var(--line);border-radius:14px;background:var(--surface2);padding:13px}
+.level-card + .level-card{margin-top:9px}
+.level-card.locked{opacity:.86}
+.level-title{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.level-title h3{font-family:"Oswald";text-transform:uppercase;font-size:19px;margin:0}
+.level-title span{font-size:10px;color:var(--ink2)}
+.level-desc{font-size:10.5px;color:var(--ink2);line-height:1.45;margin:5px 0 10px}
+.level-req{font-size:10px;font-weight:700;color:var(--rust);margin-bottom:8px}
+.log-list{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow:auto;padding-right:2px}
+.log-item{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:7px}
+.log-item:last-child{border-bottom:0}
+.log-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:5px}
+.log-dot.warn{background:var(--gold)}.log-dot.bad{background:var(--danger)}
+.log-text{font-size:10.5px;line-height:1.45;color:var(--ink2)}
+.log-text strong{color:var(--ink)}
+.empty{font-size:11px;color:var(--ink2);text-align:center;padding:16px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,18px);background:var(--ink);color:var(--bg);border-radius:99px;padding:10px 15px;font-size:11px;font-weight:800;opacity:0;pointer-events:none;transition:.2s;z-index:80;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:90}
+.scrim.open{display:flex}
+.modal{width:min(430px,100%);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 30px 80px -35px #000}
+.modal h2{font-family:"Oswald";text-transform:uppercase;font-size:27px;margin:0 0 8px}
+.modal p{font-size:12px;line-height:1.55;color:var(--ink2);margin:0 0 13px}
+.modal-visual{height:110px;border-radius:13px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:14px;color:var(--gold)}
+.modal-visual svg{width:78px;height:78px}
+.choice-list{display:flex;flex-direction:column;gap:8px}
+.choice{width:100%;text-align:left;border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:11px 12px}
+.choice:hover{border-color:var(--gold)}
+.choice strong{display:block;font-size:11.5px}
+.choice span{display:block;font-size:10px;color:var(--ink2);margin-top:3px;line-height:1.4}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.help-list{font-size:12px;line-height:1.55;color:var(--ink2);padding-left:19px}.help-list li{margin:6px 0}
+footer{text-align:center;color:var(--ink2);font-size:10.5px;padding:20px 0 0;line-height:1.8}footer a{color:var(--green);font-weight:700}
+@media(max-width:880px){.hero-grid,.game-grid{grid-template-columns:1fr}.mine-visual{min-height:190px}.resources{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){
+  .shell{padding:10px 9px 26px}.hero{padding:17px 14px 14px;border-radius:17px}.hero-grid{gap:13px}.mine-visual{min-height:170px}
+  .resources{gap:7px}.resource{padding:11px;border-radius:13px}.resource .value{font-size:23px}.game-grid,.stack{gap:10px}.panel{border-radius:15px}
+  .panel-head{padding:13px 13px 10px}.panel-body{padding:12px 13px 13px}.production-grid{grid-template-columns:1fr}.pick-wrap{min-height:172px}.pick-btn{width:108px;height:108px}
+  .flow{grid-template-columns:1fr}.flow-item{display:grid;grid-template-columns:1fr auto;gap:4px}.flow-note{grid-column:1/-1}.worker{grid-template-columns:auto 1fr}.worker-buy{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}.shift-chip{padding:8px 7px}.shift-chip .sh{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.mine-visual.working .cart,.mine-visual.working .lamp-glow{animation:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <a class="back" href="index.html" aria-label="Wróć do Szpilplacu">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg>
+      Szpilplac
+    </a>
+    <div class="top-actions">
+      <span class="test-badge" id="testBadge">Tryb testowy</span>
+      <button class="icon-btn" id="helpBtn" title="Jak grać" aria-label="Jak grać">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="7"/><path d="M6.9 7a2.2 2.2 0 1 1 3.2 2c-.7.4-1.1 1-1.1 1.8"/><circle cx="9" cy="13" r=".8" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="Zmień motyw" aria-label="Zmień motyw"></button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Kopalniany engine-builder</div>
+        <h1>Szychta</h1>
+        <p class="lead">Prowadź brygadę, pilnuj hałdy i usuwaj wąskie gardła. Tu nie wygrywa najszybsze klikanie, tylko dobra decyzja.</p>
+        <div class="rank-row">
+          <span class="rank-badge" id="rankBadge"></span>
+          <div>
+            <div class="rank-track"><span id="rankProgress"></span></div>
+            <div class="rank-next" id="rankNext"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mine-visual working" id="mineVisual" aria-hidden="true">
+          <svg viewBox="0 0 500 230" fill="none">
+            <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" color="var(--ink)">
+              <path d="M55 92h120M75 92l27-62 28 62M102 30v62M88 54h29M67 92v44M159 92v44"/>
+              <path d="M31 136h183M48 136v29M196 136v29" opacity=".7"/>
+              <path d="M370 40v114M335 54h70M346 54l24-36 24 36M353 79h34M341 154h58"/>
+            </g>
+            <path d="M0 93h500" stroke="var(--line)" stroke-width="2"/>
+            <path d="M0 140c77-14 126 11 198 0 82-13 135-5 302 7v83H0Z" fill="rgba(0,0,0,.2)"/>
+            <g class="cart" transform="translate(240 159)">
+              <path d="M0 0h72l-9 37H13Z" fill="var(--rust)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>
+              <path d="m12 1 10-17h35L69 1" fill="var(--coal)"/>
+              <circle cx="20" cy="43" r="8" fill="var(--ink)"/><circle cx="56" cy="43" r="8" fill="var(--ink)"/>
+            </g>
+            <path d="M216 211h126" stroke="var(--line)" stroke-width="4" stroke-linecap="round"/>
+            <path d="M229 199v23M263 199v23M297 199v23M331 199v23" stroke="var(--line)" stroke-width="3"/>
+            <g transform="translate(126 154)" stroke="var(--gold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <circle class="lamp-glow" cx="30" cy="-8" r="18" fill="rgba(211,154,69,.22)" stroke="none"/>
+              <path d="M24 0c7-8 16-8 23 0M35 1v14M24 15h22M35 15v26M18 69l17-28 19 28M14 27l21 15 18-18"/>
+              <path d="m52 25 19-17M64 2l9 9"/>
+            </g>
+            <g transform="translate(414 149)" fill="var(--coal)"><circle cx="10" cy="18" r="13"/><circle cx="28" cy="9" r="17"/><circle cx="46" cy="19" r="14"/><circle cx="28" cy="26" r="21"/></g>
+          </svg>
+        </div>
+        <div class="shift-strip" id="shiftStrip"></div>
+        <div class="shift-time"><span class="clock" id="shiftClock">00:00</span><span class="until" id="shiftUntil"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="resources" aria-label="Zasoby">
+    <article class="resource">
+      <div class="label">Gelt</div><div class="value" id="geltValue">0 G</div><div class="sub" id="payrollSub">Wypłata</div>
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="11"/><path d="M20 11.5c-1.1-1.2-2.3-1.7-4-1.7-2.3 0-4 1.2-4 3 0 4.7 8.4 1.6 8.4 6.1 0 2-1.8 3.4-4.4 3.4-1.9 0-3.4-.7-4.6-2M16 7v18"/></svg>
+    </article>
+    <article class="resource">
+      <div class="label">Wyngiel na hałdzie</div><div class="value" id="stockValue">0 t</div><div class="sub" id="stockSub">0 / 150 t</div><div class="meter stock"><span id="stockMeter"></span></div>
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 24 5-9 6 3 4-9 7 15Z"/><path d="M3 25h26"/></svg>
+    </article>
+    <article class="resource">
+      <div class="label">Kondycja brygady</div><div class="value" id="conditionValue">80%</div><div class="sub" id="conditionSub">Wydobycie ×1,00</div><div class="meter condition"><span id="conditionMeter"></span></div>
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 26S5 20 5 12.5C5 8.8 7.5 6 11 6c2.1 0 4 1.1 5 3 1-1.9 2.9-3 5-3 3.5 0 6 2.8 6 6.5C27 20 16 26 16 26Z"/></svg>
+    </article>
+    <article class="resource">
+      <div class="label">Cena kupca</div><div class="value" id="priceValue">20 G/t</div><div class="sub" id="priceSub">Kupiec przyjeżdża rano</div>
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 23h22M8 23V12h16v11M11 12V8h10v4M13 17h6"/><circle cx="11" cy="25" r="2"/><circle cx="22" cy="25" r="2"/></svg>
+    </article>
+  </section>
+
+  <main class="game-grid">
+    <div class="stack">
+      <section class="panel">
+        <div class="panel-head"><div><h2>Przodek</h2><p>Produkcja rośnie przez całą szychtę. Klikanie jest tylko dodatkiem.</p></div><span class="level-tag" id="levelTag"></span></div>
+        <div class="panel-body">
+          <div class="production-grid">
+            <div class="mine-card">
+              <div class="level-tag" id="coalTag"></div>
+              <div class="mine-name" id="mineName"></div>
+              <div class="mine-meta" id="mineMeta"></div>
+              <div class="flow" id="flow"></div>
+            </div>
+            <div class="pick-wrap">
+              <button class="pick-btn" id="pickBtn" aria-label="Fedruj kilofem">
+                <svg viewBox="0 0 84 84" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 22c17-13 37-13 52 0-8-2-14 0-20 7L28 57"/><path d="m25 55 7 7-8 8-7-7Z"/><path d="M50 29 65 44"/></svg>
+              </button>
+              <div class="pick-count"><span class="pick-gain">+0,4 t</span> za klik · <span id="clicksLeft">30</span> kliknięć</div>
+            </div>
+          </div>
+          <div class="bottleneck-box" id="bottleneckBox">
+            <svg class="bottleneck-icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3 2.8 23h22.4Z"/><path d="M14 10v6M14 20h.01"/></svg>
+            <div><div class="bottleneck-title" id="bottleneckTitle"></div><div class="bottleneck-text" id="bottleneckText"></div></div>
+          </div>
+          <div class="actions-row">
+            <button class="btn" id="restNowBtn">Daj wolne teraz</button>
+            <button class="btn" id="restNextBtn">Następna: praca</button>
+            <button class="btn gold" id="soupBtn">Żur dla brygady · 120 G</button>
+            <button class="btn" id="forceEventBtn" hidden>Wymuś zdarzenie</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h2>Brygada</h2><p>Zatrudnienie jednego człowieka może usunąć zator albo stworzyć nowy.</p></div></div>
+        <div class="panel-body">
+          <div class="worker-list" id="workerList"></div>
+          <div class="office-note" id="officeNote"></div>
+          <div class="actions-row"><button class="btn danger" id="cancelOrdersBtn">Anuluj zlecenia</button></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="stack">
+      <section class="panel">
+        <div class="panel-head"><div><h2>Kupiec i hałda</h2><p>Rano sprzedajesz ręcznie albo wykonuje się stałe zlecenie.</p></div></div>
+        <div class="panel-body">
+          <div class="price-box">
+            <div class="price-line"><span>Dzisiejsza cena</span><strong id="todayPrice"></strong></div>
+            <div class="price-line"><span>Wartość całej hałdy</span><strong id="stockWorth"></strong></div>
+          </div>
+          <div class="sale-grid">
+            <div class="field"><label for="saleMode">Stałe zlecenie</label><select id="saleMode"><option value="all">Sprzedaj wszystko</option><option value="threshold">Sprzedaj powyżej ceny</option><option value="hold">Nie sprzedawaj</option></select></div>
+            <button class="btn primary" id="sellBtn">Sprzedaj teraz</button>
+          </div>
+          <div class="threshold-row" id="thresholdRow"><div class="field"><label for="saleThreshold">Minimalna cena G/t</label><input id="saleThreshold" type="number" min="1" max="999" step="1"></div></div>
+          <div class="actions-row"><button class="btn" id="stockUpgradeBtn">Większa hałda · 5 000 G</button></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h2>Schodzenie w dół</h2><p>Głębszy poziom daje lepszy wyngiel, ale wymaga gotowej brygady.</p></div></div>
+        <div class="panel-body" id="levelsList"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h2>Raporty</h2><p>Ostatnie zmiany, sprzedaże i zdarzenia na grubie.</p></div></div>
+        <div class="panel-body"><div class="log-list" id="logList"></div></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer><a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a> · escape room <span>Starzik</span>, Świyntochłowice</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<script>
+"use strict";
+
+var TEST_MODE=new URLSearchParams(location.search).get("test")==="1";
+var KONFIG={
+  VERSION:"mvp-2026-07-14",
+  STORAGE_KEY:"szychta_v1",
+  THEME_KEY:"szpilplac_theme",
+  SZYCHTA_MS:TEST_MODE?30000:20*60*1000,
+  AUTOSAVE_MS:2000,
+  CLICK_TONS:.4,
+  MAX_CLICKS:30,
+  START_GELT:700,
+  START_CONDITION:80,
+  EVENT_CHANCE:TEST_MODE?.48:.16,
+  SOUP_COST:120,
+  SOUP_CONDITION:20,
+  STOCK_UPGRADE_COST:5000,
+  STOCK_CAPS:[150,600],
+  SHIFTS:[
+    {name:"Ranna",hours:"6–14",mult:1,condition:-2,note:"Biuro i kupiec"},
+    {name:"Popołudniowa",hours:"14–22",mult:1,condition:-3,note:"Praca i remonty"},
+    {name:"Nocka",hours:"22–6",mult:1.3,condition:-8,note:"Tylko fedrowanie"}
+  ],
+  WORKERS:{
+    cutter:{name:"Rębacz",base:250,wage:90,capacity:8,effect:"+8 t fedrowania na szychtę"},
+    loader:{name:"Ładowacz",base:200,wage:70,capacity:15,effect:"+15 t transportu na szychtę"}
+  },
+  LEVELS:[
+    {id:1,name:"Biedaszyb",depth:"0 m",coal:"miał",price:20,cost:0,requires:0,desc:"Płytko i skromnie. Tu zaczyna się każda historia."},
+    {id:2,name:"Sztolnia Zeflika",depth:"80 m",coal:"groszek",price:35,cost:3000,requires:3,desc:"Lepszy pokład i wyższa cena, ale bez trzech rębaczy nie ma sensu schodzić niżej."}
+  ],
+  RANKS:[
+    {name:"Gorol",at:0},{name:"Bajtel",at:100},{name:"Karlus",at:500},{name:"Chop",at:2000},{name:"Grubiorz",at:5000},{name:"Hajer",at:15000},{name:"Przodowy",at:50000},{name:"Sztajger",at:150000},{name:"Zeflik",at:500000}
+  ],
+  STATS_URL:"https://xyivrakegwybwhmmcawq.supabase.co",
+  STATS_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo"
+};
+
+var ICONS={
+  cutter:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="8" r="4"/><path d="M6 27c1-7 3-11 7-11 5 0 7 4 8 11M10 17l5 6M19 16l8-8M23 6l4 4"/></svg>',
+  loader:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h18l-3 11H8Z"/><circle cx="10" cy="23" r="3"/><circle cx="20" cy="23" r="3"/><path d="M22 8h4l2 15"/></svg>',
+  event:'<svg viewBox="0 0 84 84" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 61c7-18 17-29 28-33 12-4 22 1 25 13-9-6-17-5-24 2-8 8-13 17-16 28"/><circle cx="42" cy="23" r="8"/><path d="M39 20h.01M46 20h.01M40 26c2 2 4 2 6 0"/></svg>'
+};
+
+var state=null;
+var lastTick=Date.now();
+var lastSave=0;
+var toastTimer=0;
+
+function freshState(){
+  var now=Date.now();
+  var idx=0;
+  return {
+    version:KONFIG.VERSION,t0:now,lastSeen:now,seed:Math.floor(Math.random()*99999999),
+    gelt:KONFIG.START_GELT,stock:0,stockLevel:0,condition:KONFIG.START_CONDITION,level:1,
+    workers:{cutter:1,loader:1},pending:{cutter:0,loader:0,level2:false},
+    sale:{mode:"all",threshold:30},restNext:false,nextBuff:1,nextTransportBuff:1,
+    payroll:{worked:0,debt:0,deadlineWorked:null,defaulted:false},
+    lifetimeTons:0,totalSold:0,totalClicks:0,lastSunday:-1,lastMorning:-1,
+    shift:newShift(idx,false,0),logs:[],pendingEvent:null,startedTracked:false
+  };
+}
+
+function newShift(idx,rest,stockBase){
+  return {idx:idx,clicks:0,manual:0,delivered:0,stockBase:Number(stockBase)||0,rest:!!rest,buff:1,transportBuff:1,startedAt:Date.now()};
+}
+
+function loadState(){
+  try{
+    var raw=localStorage.getItem(KONFIG.STORAGE_KEY);
+    if(!raw)return freshState();
+    var parsed=JSON.parse(raw);
+    if(!parsed||!parsed.t0)return freshState();
+    var base=freshState();
+    var merged=Object.assign(base,parsed);
+    merged.workers=Object.assign(base.workers,parsed.workers||{});
+    merged.pending=Object.assign(base.pending,parsed.pending||{});
+    merged.sale=Object.assign(base.sale,parsed.sale||{});
+    merged.payroll=Object.assign(base.payroll,parsed.payroll||{});
+    merged.logs=Array.isArray(parsed.logs)?parsed.logs.slice(0,30):[];
+    return merged;
+  }catch(e){return freshState()}
+}
+
+function saveState(force){
+  var now=Date.now();
+  if(!force&&now-lastSave<KONFIG.AUTOSAVE_MS)return;
+  state.lastSeen=now;
+  localStorage.setItem(KONFIG.STORAGE_KEY,JSON.stringify(state));
+  lastSave=now;
+}
+
+function currentShiftIdx(now){return Math.max(0,Math.floor((now-state.t0)/KONFIG.SZYCHTA_MS))}
+function phaseFor(idx){return ((idx%3)+3)%3}
+function dayFor(idx){return Math.floor(idx/3)}
+function levelData(){return KONFIG.LEVELS[state.level-1]}
+function stockCap(){return KONFIG.STOCK_CAPS[state.stockLevel]}
+function round1(n){return Math.round((Number(n)||0)*10)/10}
+function fmt(n,d){return Number(n||0).toLocaleString("pl-PL",{minimumFractionDigits:d||0,maximumFractionDigits:d==null?0:d})}
+function fmtT(n){return fmt(round1(n),1)+" t"}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function money(n){return Math.round(n).toLocaleString("pl-PL")+" G"}
+
+function seeded(seed){
+  var x=Math.sin(seed*12.9898+78.233)*43758.5453;
+  return x-Math.floor(x);
+}
+
+function priceForDay(day){
+  var base=levelData().price;
+  return Math.max(1,Math.round(base*(.85+seeded(day+state.seed)*.3)));
+}
+
+function conditionMult(){
+  if(state.condition>=85)return 1.1;
+  if(state.condition>=60)return 1;
+  if(state.condition>=30)return .9;
+  if(state.condition>0)return .7;
+  return 0;
+}
+
+function isStrike(){return state.condition<=0||state.payroll.defaulted}
+
+function fullCapacities(idx){
+  var shift=KONFIG.SHIFTS[phaseFor(idx)];
+  var fed=state.workers.cutter*KONFIG.WORKERS.cutter.capacity*shift.mult*conditionMult()*(state.shift.buff||1);
+  var transport=state.workers.loader*KONFIG.WORKERS.loader.capacity*(state.shift.transportBuff||1);
+  if(state.shift.rest||isStrike()){fed=0;transport=0}
+  return {fed:fed,transport:transport};
+}
+
+function shiftProgress(now){
+  var start=state.t0+state.shift.idx*KONFIG.SZYCHTA_MS;
+  return clamp((now-start)/KONFIG.SZYCHTA_MS,0,1);
+}
+
+function updateProduction(now,forceFull){
+  if(!state.shift||state.shift.idx!==currentShiftIdx(now)&&!forceFull)return;
+  var p=forceFull?1:shiftProgress(now);
+  var caps=fullCapacities(state.shift.idx);
+  var fedSoFar=caps.fed*p+state.shift.manual;
+  var availableStorage=Math.max(0,stockCap()-state.shift.stockBase);
+  var target=Math.min(fedSoFar,caps.transport,availableStorage);
+  if(target>state.shift.delivered){
+    var add=target-state.shift.delivered;
+    state.shift.delivered=target;
+    state.stock=clamp(state.stock+add,0,stockCap());
+    state.lifetimeTons+=add;
+  }
+}
+
+function payrollCost(){
+  return state.workers.cutter*KONFIG.WORKERS.cutter.wage+state.workers.loader*KONFIG.WORKERS.loader.wage;
+}
+
+function workerCost(type,extra){
+  var count=state.workers[type]+(extra||0);
+  return Math.round(KONFIG.WORKERS[type].base*Math.pow(1.12,count));
+}
+
+function queuedCost(type){
+  var sum=0;
+  for(var i=0;i<state.pending[type];i++)sum+=workerCost(type,i);
+  return sum;
+}
+
+function addLog(text,tone){
+  state.logs.unshift({time:Date.now(),text:text,tone:tone||""});
+  state.logs=state.logs.slice(0,30);
+}
+
+function trackEvent(word,won,tries){
+  if(!KONFIG.STATS_URL||!KONFIG.STATS_KEY)return;
+  fetch(KONFIG.STATS_URL+"/rest/v1/szpilplac_events",{
+    method:"POST",headers:{"Content-Type":"application/json","apikey":KONFIG.STATS_KEY,"Authorization":"Bearer "+KONFIG.STATS_KEY,"Prefer":"return=minimal"},
+    body:JSON.stringify({game:"szychta",puzzle_no:state.level,puzzle_word:word||"mvp",won:won!==false,tries:tries||0,lang:"pl"})
+  }).catch(function(){});
+}
+
+function beginShift(idx){
+  var rest=!!state.restNext;
+  state.restNext=false;
+  state.shift=newShift(idx,rest,state.stock);
+  state.shift.buff=state.nextBuff||1;
+  state.shift.transportBuff=state.nextTransportBuff||1;
+  state.nextBuff=1;state.nextTransportBuff=1;
+  if(phaseFor(idx)===0)processMorning(idx);
+  if(rest)addLog("Brygada dostała wolne na "+KONFIG.SHIFTS[phaseFor(idx)].name.toLowerCase()+".","warn");
+}
+
+function finishShift(){
+  updateProduction(Date.now(),true);
+  var idx=state.shift.idx;
+  var shift=KONFIG.SHIFTS[phaseFor(idx)];
+  var caps=fullCapacities(idx);
+  var possible=Math.min(caps.fed+state.shift.manual,caps.transport,Math.max(0,stockCap()-state.shift.stockBase));
+  var delivered=state.shift.delivered;
+  if(state.shift.rest){
+    state.condition=clamp(state.condition+12,0,100);
+    addLog("Wolna szychta. Kondycja brygady wzrosła o 12.","warn");
+  }else if(isStrike()){
+    addLog("Strajk zatrzymał wydobycie na całej szychcie.","bad");
+  }else{
+    state.condition=clamp(state.condition+shift.condition,0,100);
+    state.payroll.worked++;
+    addLog(""+shift.name+": na hałdę trafiło "+fmtT(delivered)+".",delivered>0?"":"warn");
+    if(possible-delivered>.15)addLog("Część urobku została w przodku. Sprawdź wąskie gardło.","warn");
+    if(state.payroll.worked>0&&state.payroll.worked%21===0)runPayroll();
+  }
+  maybeEvent(idx,delivered);
+}
+
+function runPayroll(){
+  var due=payrollCost();
+  if(state.gelt>=due){
+    state.gelt-=due;
+    addLog("Geltag: wypłacono brygadzie "+money(due)+".","");
+  }else{
+    var paid=Math.max(0,state.gelt);
+    state.gelt=0;
+    state.payroll.debt+=due-paid;
+    state.payroll.deadlineWorked=state.payroll.worked+9;
+    state.payroll.defaulted=false;
+    addLog("Brakuje "+money(state.payroll.debt)+" na wypłatę. Masz 3 doby pracy na spłatę.","bad");
+  }
+}
+
+function checkDebt(){
+  if(state.payroll.debt<=0){state.payroll.defaulted=false;return}
+  if(state.gelt>=state.payroll.debt){
+    var debt=state.payroll.debt;
+    state.gelt-=debt;state.payroll.debt=0;state.payroll.deadlineWorked=null;state.payroll.defaulted=false;
+    addLog("Zaległa wypłata "+money(debt)+" została uregulowana.","");
+    return;
+  }
+  if(state.payroll.deadlineWorked!=null&&state.payroll.worked>=state.payroll.deadlineWorked&&!state.payroll.defaulted){
+    state.payroll.defaulted=true;
+    state.condition=0;
+    var loseC=Math.floor(state.workers.cutter*.2),loseL=Math.floor(state.workers.loader*.2);
+    state.workers.cutter=Math.max(1,state.workers.cutter-loseC);
+    state.workers.loader=Math.max(1,state.workers.loader-loseL);
+    addLog("Brak wypłaty wywołał strajk. Część brygady odeszła.","bad");
+  }
+}
+
+function processMorning(idx){
+  var day=dayFor(idx);
+  if(state.lastMorning!==day){
+    state.lastMorning=day;
+    executeOrders();
+    autoSell(day);
+    if(day%7===6&&state.lastSunday!==day){
+      state.lastSunday=day;state.condition=clamp(state.condition+15,0,100);
+      addLog("Niedziela. Brygada odpoczęła, kondycja +15.","warn");
+    }
+  }
+}
+
+function executeOrders(){
+  ["cutter","loader"].forEach(function(type){
+    var done=0;
+    while(state.pending[type]>0){
+      var cost=workerCost(type);
+      if(state.gelt<cost)break;
+      state.gelt-=cost;state.workers[type]++;state.pending[type]--;done++;
+    }
+    if(done)addLog("Biuro zatrudniło: "+done+" × "+KONFIG.WORKERS[type].name.toLowerCase()+".","");
+    if(state.pending[type]>0)addLog("Nie zrealizowano całego zlecenia na "+KONFIG.WORKERS[type].name.toLowerCase()+"ów. Brakuje gelta.","warn");
+  });
+  if(state.pending.level2&&state.level<2){
+    if(canOpenLevel2())openLevel2();
+    else addLog("Zlecenie otwarcia sztolni czeka. Warunki nadal nie są spełnione.","warn");
+  }
+}
+
+function autoSell(day){
+  var price=priceForDay(day),mode=state.sale.mode;
+  if(mode==="hold")return;
+  if(mode==="threshold"&&price<Number(state.sale.threshold||0))return;
+  sellStock(true);
+}
+
+function sellStock(auto){
+  var idx=currentShiftIdx(Date.now());
+  if(phaseFor(idx)!==0&&!auto){toast("Kupiec jest tylko na rannej szychcie.");return}
+  if(state.stock<=.01){if(!auto)toast("Hałda jest pusta.");return}
+  var tons=state.stock,price=priceForDay(dayFor(idx)),gain=Math.round(tons*price);
+  state.stock=0;state.gelt+=gain;state.totalSold+=tons;
+  state.shift.stockBase=Math.max(0,state.shift.stockBase-tons);
+  addLog("Kupiec zabrał "+fmtT(tons)+" za "+money(gain)+".","");
+  if(!auto)toast("Sprzedano za "+money(gain));
+  checkDebt();
+}
+
+function hire(type){
+  var phase=phaseFor(currentShiftIdx(Date.now()));
+  if(phase===0){
+    var cost=workerCost(type);
+    if(state.gelt<cost){toast("Brakuje "+money(cost-state.gelt)+".");return}
+    state.gelt-=cost;state.workers[type]++;
+    addLog("Zatrudniono: "+KONFIG.WORKERS[type].name+".","");
+  }else{
+    state.pending[type]++;
+    addLog("Zlecenie zapisane. Biuro zatrudni rano: "+KONFIG.WORKERS[type].name+".","warn");
+    toast("Zlecenie trafiło do biura.");
+  }
+  render();saveState(true);
+}
+
+function cancelOrders(){
+  var any=state.pending.cutter+state.pending.loader+(state.pending.level2?1:0);
+  state.pending.cutter=0;state.pending.loader=0;state.pending.level2=false;
+  if(any){addLog("Anulowano wszystkie niezrealizowane zlecenia.","warn");toast("Zlecenia anulowane.")}
+  else toast("Nie ma zleceń do anulowania.");
+  render();saveState(true);
+}
+
+function canOpenLevel2(){return state.level===1&&state.workers.cutter>=KONFIG.LEVELS[1].requires&&state.gelt>=KONFIG.LEVELS[1].cost}
+function requestLevel2(){
+  if(state.level>=2)return;
+  if(phaseFor(currentShiftIdx(Date.now()))===0){
+    if(!canOpenLevel2()){toast("Najpierw 3 rębaczy i 3 000 G.");return}
+    openLevel2();
+  }else{
+    state.pending.level2=true;addLog("Zlecono otwarcie Sztolni Zeflika. Decyzja zapadnie rano.","warn");toast("Zlecenie zapisane.");
+  }
+  render();saveState(true);
+}
+function openLevel2(){
+  var lvl=KONFIG.LEVELS[1];
+  if(!canOpenLevel2())return false;
+  state.gelt-=lvl.cost;state.level=2;state.pending.level2=false;
+  addLog("Otwarto poziom 2: "+lvl.name+". Teraz fedrujesz "+lvl.coal+".","");
+  trackEvent("level_2",true,0);toast("Sztolnia Zeflika otwarta!");return true;
+}
+
+function upgradeStock(){
+  if(state.stockLevel>=1){toast("To największa hałda w MVP.");return}
+  if(state.gelt<KONFIG.STOCK_UPGRADE_COST){toast("Brakuje "+money(KONFIG.STOCK_UPGRADE_COST-state.gelt)+".");return}
+  state.gelt-=KONFIG.STOCK_UPGRADE_COST;state.stockLevel=1;
+  addLog("Rozbudowano hałdę do 600 t.","");toast("Hałda rozbudowana.");render();saveState(true);
+}
+
+function takeRestNow(){
+  var p=shiftProgress(Date.now());
+  if(state.shift.rest){toast("Ta szychta już jest wolna.");return}
+  if(state.shift.clicks>0||state.shift.delivered>.1||p>.18){toast("Brygada już pracuje. Wolne ustaw na następną szychtę.");return}
+  state.shift.rest=true;state.shift.manual=0;state.shift.clicks=0;
+  addLog("Zjazd odwołany. Brygada odpoczywa do końca szychty.","warn");render();saveState(true);
+}
+
+function buySoup(){
+  if(state.gelt<KONFIG.SOUP_COST){toast("Brakuje gelta na żur.");return}
+  if(state.condition>=100){toast("Brygada jest już w pełni sił.");return}
+  state.gelt-=KONFIG.SOUP_COST;state.condition=clamp(state.condition+KONFIG.SOUP_CONDITION,0,100);
+  if(state.payroll.defaulted&&state.payroll.debt<=0&&state.condition>=40)state.payroll.defaulted=false;
+  addLog("Kantyna wydała żur. Kondycja +20.","");toast("Kondycja brygady wzrosła.");render();saveState(true);
+}
+
+function manualMine(){
+  if(state.shift.rest){toast("Brygada ma wolne.");return}
+  if(isStrike()){toast("Trwa strajk. Odbuduj kondycję i spłać wypłatę.");return}
+  if(state.shift.clicks>=KONFIG.MAX_CLICKS){toast("Limit kilofa na tę szychtę wykorzystany.");return}
+  if(state.stock>=stockCap()-.01){toast("Hałda jest pełna.");return}
+  state.shift.clicks++;state.shift.manual+=KONFIG.CLICK_TONS;state.totalClicks++;
+  updateProduction(Date.now(),false);
+  render();saveState();
+}
+
+function maybeEvent(idx,delivered){
+  if(state.pendingEvent)return;
+  if(seeded(idx+state.seed*3) > KONFIG.EVENT_CHANCE)return;
+  var eligible=["control"];
+  if(phaseFor(idx)===2)eligible.push("utopiec");
+  if(state.level>=2)eligible.push("collapse");
+  var type=eligible[Math.floor(seeded(idx*7+state.seed)*eligible.length)];
+  state.pendingEvent={type:type,idx:idx,delivered:delivered};
+  setTimeout(showPendingEvent,120);
+}
+
+function forceEvent(){
+  if(!TEST_MODE)return;
+  var types=state.level>=2?["utopiec","control","collapse"]:["utopiec","control"];
+  state.pendingEvent={type:types[Math.floor(Math.random()*types.length)],idx:state.shift.idx,delivered:Math.max(5,state.shift.delivered)};
+  showPendingEvent();
+}
+
+function eventCopy(type){
+  if(type==="utopiec")return {title:"Utopek na nocce",text:"W ciemnym chodniku ktoś przesunął lampę. Utopek patrzy na urobek i czeka na Twój ruch."};
+  if(type==="collapse")return {title:"Zawał w chodniku",text:"Strop puścił tuż za przodkiem. Możesz ratować sprzęt kosztem kolejnej szychty albo zapłacić ekipie awaryjnej."};
+  return {title:"Kontrola z dyrekcji",text:"Kontrolerzy zeszli bez zapowiedzi. Kondycja brygady i nocki nie wyglądają najlepiej w papierach."};
+}
+
+function showPendingEvent(){
+  if(!state.pendingEvent)return;
+  var ev=state.pendingEvent,c=eventCopy(ev.type),choices="";
+  if(ev.type==="utopiec"){
+    choices='<button class="choice" data-choice="cake"><strong>Zostaw kołocz · 120 G</strong><span>Utopek pokaże lepszą żyłę. Następna szychta dostanie +35% fedrowania.</span></button><button class="choice" data-choice="chase"><strong>Przegoń go z chodnika</strong><span>Ryzyko 50/50: ukradnie część urobku albo pokaże ukrytą żyłę.</span></button>';
+  }else if(ev.type==="collapse"){
+    choices='<button class="choice" data-choice="rescue"><strong>Ratuj własnymi siłami</strong><span>Następna szychta będzie wolna, ale brygada odzyska 8 kondycji.</span></button><button class="choice" data-choice="service" '+(state.gelt<400?'disabled':'')+'><strong>Wezwij ekipę awaryjną · 400 G</strong><span>Produkcja ruszy bez przerwy.</span></button>';
+  }else{
+    choices='<button class="choice" data-choice="stop"><strong>Wstrzymaj następną szychtę</strong><span>Bez kary. Brygada odpocznie i odzyska kondycję.</span></button><button class="choice" data-choice="risk"><strong>Fedruj dalej</strong><span>Możliwa premia 250 G albo kara 350 G.</span></button>';
+  }
+  openModal('<div class="modal-visual">'+ICONS.event+'</div><h2>'+c.title+'</h2><p>'+c.text+'</p><div class="choice-list">'+choices+'</div>',false);
+  Array.prototype.forEach.call(document.querySelectorAll(".choice[data-choice]"),function(btn){btn.addEventListener("click",function(){if(!btn.disabled)resolveEvent(btn.dataset.choice)})});
+}
+
+function resolveEvent(choice){
+  var ev=state.pendingEvent;if(!ev)return;
+  if(ev.type==="utopiec"){
+    if(choice==="cake"){
+      if(state.gelt<120){toast("Brakuje gelta.");return}
+      state.gelt-=120;state.nextBuff=1.35;addLog("Utopek dostał kołocz. Następna szychta: +35% fedrowania.","warn");
+    }else{
+      if(seeded(ev.idx+state.seed+99)<.5){
+        var lost=Math.min(state.stock,ev.delivered*.3);state.stock-=lost;addLog("Utopek ukradł "+fmtT(lost)+" urobku.","bad");
+      }else{
+        var bonus=Math.min(stockCap()-state.stock,ev.delivered*.5);state.stock+=bonus;state.lifetimeTons+=bonus;addLog("Utopek pokazał żyłę. Bonus "+fmtT(bonus)+".","");
+      }
+    }
+  }else if(ev.type==="collapse"){
+    if(choice==="rescue"){state.restNext=true;state.condition=clamp(state.condition+8,0,100);addLog("Brygada ratuje sprzęt. Następna szychta wolna, kondycja +8.","warn")}
+    else{if(state.gelt<400){toast("Brakuje gelta.");return}state.gelt-=400;addLog("Ekipa awaryjna usunęła zawał za 400 G.","")}
+  }else{
+    if(choice==="stop"){state.restNext=true;addLog("Kontrola zakończona bez kary. Następna szychta będzie wolna.","warn")}
+    else if(seeded(ev.idx+state.seed+44)<(state.condition<50?.62:.38)){
+      var fine=Math.min(350,state.gelt);state.gelt-=fine;addLog("Kontrola nałożyła karę "+money(fine)+".","bad");
+    }else{state.gelt+=250;addLog("Kontrola przyznała premię 250 G za dobry wynik.","")}
+  }
+  state.pendingEvent=null;closeModal();render();saveState(true);
+}
+
+function ensureCurrentShift(){
+  var now=Date.now(),idx=currentShiftIdx(now);
+  if(!state.shift||typeof state.shift.idx!=="number")state.shift=newShift(idx,false,state.stock);
+  if(idx<state.shift.idx){
+    state.t0=now;idx=0;state.shift=newShift(0,false,state.stock);addLog("Wykryto cofnięcie zegara. Czas gry został bezpiecznie ustawiony od nowa.","warn");
+  }
+  if(idx>state.shift.idx){
+    var diff=idx-state.shift.idx;
+    if(diff>12){
+      state.shift=newShift(idx,false,state.stock);
+      addLog("Brygada nie fedrowała offline. Do automatyzacji będzie potrzebny sztygar.","warn");
+      if(phaseFor(idx)===0)processMorning(idx);
+    }else{
+      while(state.shift.idx<idx){finishShift();beginShift(state.shift.idx+1)}
+    }
+  }
+  updateProduction(now,false);checkDebt();
+}
+
+function currentBottleneck(){
+  var caps=fullCapacities(state.shift.idx);
+  var storage=Math.max(0,stockCap()-state.shift.stockBase);
+  var values=[{key:"fed",label:"Fedrowanie",value:caps.fed+state.shift.manual},{key:"transport",label:"Transport",value:caps.transport},{key:"stock",label:"Hałda",value:storage}];
+  values.sort(function(a,b){return a.value-b.value});
+  return {min:values[0],all:values,caps:caps,storage:storage};
+}
+
+function rankInfo(){
+  var ranks=KONFIG.RANKS,current=ranks[0],next=null;
+  for(var i=0;i<ranks.length;i++){if(state.lifetimeTons>=ranks[i].at)current=ranks[i];else{next=ranks[i];break}}
+  var progress=100;
+  if(next)progress=clamp((state.lifetimeTons-current.at)/(next.at-current.at)*100,0,100);
+  return {current:current,next:next,progress:progress};
+}
+
+function render(){
+  var now=Date.now(),idx=currentShiftIdx(now),phase=phaseFor(idx),shift=KONFIG.SHIFTS[phase],day=dayFor(idx),lvl=levelData(),price=priceForDay(day);
+  var cap=stockCap(),cm=conditionMult(),b=currentBottleneck(),rank=rankInfo();
+  document.documentElement.dataset.theme=localStorage.getItem(KONFIG.THEME_KEY)||"light";
+  document.getElementById("testBadge").classList.toggle("on",TEST_MODE);
+  document.getElementById("forceEventBtn").hidden=!TEST_MODE;
+  document.getElementById("rankBadge").innerHTML='<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m10 2 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 7.2l5-.7Z"/></svg>'+rank.current.name;
+  document.getElementById("rankProgress").style.width=rank.progress+"%";
+  document.getElementById("rankNext").textContent=rank.next?"Do rangi „"+rank.next.name+"”: "+fmtT(rank.next.at-state.lifetimeTons):"Najwyższa ranga zdobyta";
+  var strip="";KONFIG.SHIFTS.forEach(function(s,i){strip+='<div class="shift-chip '+(i===phase?'active':'')+'"><div class="sn">'+s.name+'</div><div class="sh">'+s.hours+' · '+s.note+'</div></div>'});
+  document.getElementById("shiftStrip").innerHTML=strip;
+  var remaining=Math.max(0,state.t0+(idx+1)*KONFIG.SZYCHTA_MS-now),mm=Math.floor(remaining/60000),ss=Math.floor(remaining%60000/1000);
+  document.getElementById("shiftClock").textContent=String(mm).padStart(2,"0")+":"+String(ss).padStart(2,"0");
+  document.getElementById("shiftUntil").textContent=state.shift.rest?"Brygada odpoczywa":"Do końca szychty · doba "+(day+1);
+  document.getElementById("mineVisual").classList.toggle("working",!state.shift.rest&&!isStrike());
+  document.getElementById("mineVisual").classList.toggle("resting",state.shift.rest||isStrike());
+
+  document.getElementById("geltValue").textContent=money(state.gelt);
+  var payText=state.payroll.debt>0?"Zaległa wypłata: "+money(state.payroll.debt):"Do wypłaty: "+money(payrollCost())+" · "+(21-state.payroll.worked%21)+" szycht";
+  document.getElementById("payrollSub").textContent=payText;
+  document.getElementById("stockValue").textContent=fmtT(state.stock);
+  document.getElementById("stockSub").textContent=fmtT(state.stock)+" / "+fmtT(cap);
+  document.getElementById("stockMeter").style.width=clamp(state.stock/cap*100,0,100)+"%";
+  document.getElementById("conditionValue").textContent=Math.round(state.condition)+"%";
+  document.getElementById("conditionSub").textContent=isStrike()?"Strajk · wydobycie 0":"Wydobycie ×"+fmt(cm,2);
+  var cond=document.getElementById("conditionMeter");cond.style.width=state.condition+"%";cond.classList.toggle("low",state.condition<30);
+  document.getElementById("priceValue").textContent=money(price)+"/t";
+  document.getElementById("priceSub").textContent=phase===0?"Kupiec czeka przy bramie":"Kupiec wróci rano";
+
+  document.getElementById("levelTag").textContent="Poziom "+state.level;
+  document.getElementById("coalTag").textContent=lvl.coal;
+  document.getElementById("mineName").textContent=lvl.name;
+  document.getElementById("mineMeta").textContent=lvl.depth+" · cena bazowa "+money(lvl.price)+"/t · wydobyto łącznie "+fmtT(state.lifetimeTons);
+  document.getElementById("clicksLeft").textContent=Math.max(0,KONFIG.MAX_CLICKS-state.shift.clicks);
+  var pick=document.getElementById("pickBtn");pick.disabled=state.shift.clicks>=KONFIG.MAX_CLICKS||state.shift.rest||isStrike()||state.stock>=cap-.01;
+  var flowData=[
+    {key:"fed",label:"Fedrowanie",value:b.caps.fed+state.shift.manual,note:state.workers.cutter+" rębaczy + kilof"},
+    {key:"transport",label:"Transport",value:b.caps.transport,note:state.workers.loader+" ładowaczy"},
+    {key:"stock",label:"Wolna hałda",value:b.storage,note:fmtT(state.stock)+" zajęte"}
+  ];
+  document.getElementById("flow").innerHTML=flowData.map(function(x){return '<div class="flow-item '+(x.key===b.min.key?'bottleneck':'')+'"><div class="flow-label">'+x.label+'</div><div class="flow-value">'+fmtT(x.value)+'</div><div class="flow-note">'+x.note+'</div></div>'}).join("");
+  var box=document.getElementById("bottleneckBox"),title=document.getElementById("bottleneckTitle"),text=document.getElementById("bottleneckText");
+  if(state.shift.rest){box.classList.add("good");title.textContent="Wolna szychta";text.textContent="Brygada odzyska 12 punktów kondycji."}
+  else if(isStrike()){box.classList.remove("good");title.textContent="Strajk";text.textContent=state.payroll.defaulted?"Spłać zaległą wypłatę i podnieś kondycję do 40.":"Podnieś kondycję brygady do 40, aby wrócić do pracy."}
+  else{
+    box.classList.remove("good");title.textContent="Wąskie gardło: "+b.min.label;
+    if(b.min.key==="fed")text.textContent="Transport czeka na urobek. Zatrudnij rębacza albo użyj kilofa.";
+    else if(b.min.key==="transport")text.textContent="Rębacze mogą wyfedrować więcej, niż ładowacze wywiozą. Przyda się ładowacz.";
+    else text.textContent="Hałda ogranicza produkcję. Sprzedaj wyngiel albo rozbuduj magazyn.";
+  }
+  document.getElementById("restNowBtn").disabled=state.shift.rest||state.shift.clicks>0||state.shift.delivered>.1||shiftProgress(now)>.18;
+  document.getElementById("restNextBtn").textContent="Następna: "+(state.restNext?"wolne":"praca");
+  document.getElementById("soupBtn").disabled=state.gelt<KONFIG.SOUP_COST||state.condition>=100;
+
+  renderWorkers(phase);
+  document.getElementById("officeNote").textContent=phase===0?"Biuro jest otwarte. Zatrudnienie realizuje się od razu.":"Biuro jest zamknięte. Zlecenia możesz składać teraz, a zostaną wykonane rano.";
+  document.getElementById("cancelOrdersBtn").disabled=!(state.pending.cutter||state.pending.loader||state.pending.level2);
+
+  document.getElementById("todayPrice").textContent=money(price)+"/t";
+  document.getElementById("stockWorth").textContent=money(state.stock*price);
+  document.getElementById("sellBtn").disabled=phase!==0||state.stock<=.01;
+  document.getElementById("saleMode").value=state.sale.mode;
+  document.getElementById("saleThreshold").value=state.sale.threshold;
+  document.getElementById("thresholdRow").classList.toggle("on",state.sale.mode==="threshold");
+  var up=document.getElementById("stockUpgradeBtn");up.disabled=state.stockLevel>=1||state.gelt<KONFIG.STOCK_UPGRADE_COST;up.textContent=state.stockLevel>=1?"Hałda 600 t odblokowana":"Większa hałda · 5 000 G";
+  renderLevels(phase);renderLogs();renderThemeIcon();
+}
+
+function renderWorkers(phase){
+  var html="";
+  ["cutter","loader"].forEach(function(type){
+    var w=KONFIG.WORKERS[type],cost=workerCost(type),queued=state.pending[type];
+    html+='<div class="worker"><div class="worker-icon">'+ICONS[type]+'</div><div><div class="worker-name">'+w.name+'</div><div class="worker-effect">'+w.effect+' · pensja '+money(w.wage)+'</div></div><div class="worker-buy"><div><div class="worker-count">×'+state.workers[type]+'</div>'+(queued?'<div class="pending">rano +'+queued+' · '+money(queuedCost(type))+'</div>':'')+'</div><button class="btn" data-hire="'+type+'">'+(phase===0?'Zatrudnij':'Zleć')+' · '+money(cost)+'</button></div></div>';
+  });
+  document.getElementById("workerList").innerHTML=html;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-hire]"),function(btn){btn.addEventListener("click",function(){hire(btn.dataset.hire)})});
+}
+
+function renderLevels(phase){
+  var html="";
+  KONFIG.LEVELS.forEach(function(l){
+    var open=state.level>=l.id,queued=l.id===2&&state.pending.level2;
+    html+='<div class="level-card '+(open?'':'locked')+'"><div class="level-title"><h3>'+l.name+'</h3><span>'+l.depth+'</span></div><div class="level-desc">'+l.desc+'</div>';
+    if(open)html+='<div class="level-req">Aktywny poziom · '+l.coal+' · '+money(l.price)+'/t</div>';
+    else html+='<div class="level-req">Wymaga '+l.requires+' rębaczy · koszt '+money(l.cost)+'</div><button class="btn primary" id="level2Btn">'+(queued?'Zlecenie czeka':(phase===0?'Otwórz poziom':'Zleć otwarcie'))+'</button>';
+    html+='</div>';
+  });
+  document.getElementById("levelsList").innerHTML=html;
+  var btn=document.getElementById("level2Btn");if(btn){btn.disabled=!!state.pending.level2;btn.addEventListener("click",requestLevel2)}
+}
+
+function renderLogs(){
+  var el=document.getElementById("logList");
+  if(!state.logs.length){el.innerHTML='<div class="empty">Pierwszy raport pojawi się po zakończeniu szychty.</div>';return}
+  el.innerHTML=state.logs.slice(0,12).map(function(l){var t=new Date(l.time).toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});return '<div class="log-item"><span class="log-dot '+(l.tone||'')+'"></span><div class="log-text"><strong>'+t+'</strong> · '+l.text+'</div></div>'}).join("");
+}
+
+function toast(msg){
+  var el=document.getElementById("toast");el.textContent=msg;el.classList.add("on");clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove("on")},2300);
+}
+
+function openModal(html,closable){
+  document.getElementById("modal").innerHTML=html+(closable===false?'':'<div class="modal-actions"><button class="btn primary" id="modalClose">Zamknij</button></div>');
+  document.getElementById("scrim").classList.add("open");
+  var close=document.getElementById("modalClose");if(close)close.addEventListener("click",closeModal);
+}
+function closeModal(){document.getElementById("scrim").classList.remove("open");document.getElementById("modal").innerHTML=""}
+
+function showHelp(){
+  openModal('<h2>Jak grać?</h2><p>Szychta to gra ciągła o rozwijaniu kopalni. Najważniejsze nie jest klikanie, lecz równowaga między etapami produkcji.</p><ol class="help-list"><li>Rębacze wyznaczają zdolność fedrowania, ładowacze transport.</li><li>Na hałdę trafia tylko najmniejsza z wartości: fedrowanie, transport i wolne miejsce.</li><li>Kilof daje maksymalnie 30 dodatkowych kliknięć na szychtę.</li><li>Rano działa biuro i przyjeżdża kupiec. W pozostałych porach składasz zlecenia na rano.</li><li>Co 21 przepracowanych szycht wypłacasz brygadzie geltag.</li><li>Bez sztygara gra nie nalicza wydobycia po zamknięciu karty.</li></ol>');
+}
+
+function showReset(){
+  openModal('<h2>Zacząć od nowa?</h2><p>Usuniesz cały zapis Szychty: gelt, brygadę, poziom i raporty. Tej operacji nie da się cofnąć.</p><div class="modal-actions"><button class="btn" id="resetCancel">Anuluj</button><button class="btn danger" id="resetConfirm">Usuń zapis</button></div>',false);
+  document.getElementById("resetCancel").addEventListener("click",closeModal);
+  document.getElementById("resetConfirm").addEventListener("click",function(){localStorage.removeItem(KONFIG.STORAGE_KEY);state=freshState();closeModal();addLog("Rozpoczęto nową Szychtę.","");render();saveState(true);trackEvent("start",true,0)});
+}
+
+function renderThemeIcon(){
+  var dark=document.documentElement.dataset.theme==="dark";
+  document.getElementById("themeBtn").innerHTML=dark?'<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="3.2"/><path d="M9 1.5v2M9 14.5v2M1.5 9h2M14.5 9h2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M14.3 3.7l-1.4 1.4M5.1 12.9l-1.4 1.4"/></svg>':'<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 11.5A6.5 6.5 0 0 1 6.5 3 6.5 6.5 0 1 0 15 11.5Z"/></svg>';
+}
+
+function bind(){
+  document.getElementById("pickBtn").addEventListener("click",manualMine);
+  document.getElementById("restNowBtn").addEventListener("click",takeRestNow);
+  document.getElementById("restNextBtn").addEventListener("click",function(){state.restNext=!state.restNext;render();saveState(true)});
+  document.getElementById("soupBtn").addEventListener("click",buySoup);
+  document.getElementById("cancelOrdersBtn").addEventListener("click",cancelOrders);
+  document.getElementById("sellBtn").addEventListener("click",function(){sellStock(false);render();saveState(true)});
+  document.getElementById("stockUpgradeBtn").addEventListener("click",upgradeStock);
+  document.getElementById("saleMode").addEventListener("change",function(e){state.sale.mode=e.target.value;render();saveState(true)});
+  document.getElementById("saleThreshold").addEventListener("change",function(e){state.sale.threshold=clamp(Number(e.target.value)||1,1,999);render();saveState(true)});
+  document.getElementById("helpBtn").addEventListener("click",showHelp);
+  document.getElementById("forceEventBtn").addEventListener("click",forceEvent);
+  document.getElementById("themeBtn").addEventListener("click",function(){var next=document.documentElement.dataset.theme==="dark"?"light":"dark";localStorage.setItem(KONFIG.THEME_KEY,next);document.documentElement.dataset.theme=next;renderThemeIcon()});
+  document.getElementById("themeBtn").addEventListener("contextmenu",function(e){e.preventDefault();showReset()});
+  document.getElementById("scrim").addEventListener("click",function(e){if(e.target.id==="scrim"&&!state.pendingEvent)closeModal()});
+  document.addEventListener("visibilitychange",function(){if(!document.hidden){lastTick=Date.now();ensureCurrentShift();render()}saveState(true)});
+  window.addEventListener("beforeunload",function(){saveState(true)});
+}
+
+function loop(){
+  var now=Date.now();
+  if(now<state.lastSeen){state.t0=now;state.shift=newShift(0,false,state.stock);addLog("Zegar urządzenia został cofnięty. Nie naliczono dodatkowej produkcji.","warn")}
+  ensureCurrentShift();
+  if(now-lastTick>5000)lastTick=now;else lastTick=now;
+  render();saveState(false);
+}
+
+state=loadState();
+var now=Date.now(),idx=currentShiftIdx(now);
+if(!state.shift||state.shift.idx!==idx){
+  state.shift=newShift(idx,false,state.stock);
+  addLog("Brygada nie fedrowała offline. Wróciła na aktualną szychtę.","warn");
+  if(phaseFor(idx)===0)processMorning(idx);
+}
+if(!state.logs.length)addLog("Zaczynasz w Biedaszybie z jednym rębaczem i jednym ładowaczem.","");
+if(!state.startedTracked){state.startedTracked=true;trackEvent("start",true,0)}
+bind();ensureCurrentShift();render();saveState(true);
+if(state.pendingEvent)setTimeout(showPendingEvent,200);
+setInterval(loop,1000);
+</script>
+</body>
+</html>
