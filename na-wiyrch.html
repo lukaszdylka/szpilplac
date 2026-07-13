@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Na Wiyrch — Familok</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --tlo:#161310;
+    --zielony:#4a9a6a;
+    --zloty:#c49050;
+    --krem:#ede5d0;
+    --przygaszony:#9a907a;
+    --stopka:#3d3629;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:var(--tlo);color:var(--krem);
+    font-family:Inter,system-ui,-apple-system,sans-serif;
+    overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none}
+  #scena{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #wrap{position:relative}
+  canvas{display:block;background:#0f0d0b;border-radius:6px;box-shadow:0 0 0 2px var(--stopka),0 20px 60px rgba(0,0,0,.6)}
+
+  /* ---- sterowanie dotykowe ---- */
+  #pad{position:absolute;inset:0;display:none}
+  #pad.on{display:block}
+  .btn{position:absolute;bottom:3.5%;width:22%;aspect-ratio:1/1;border-radius:50%;
+    background:rgba(237,229,208,.10);border:2px solid rgba(237,229,208,.28);
+    display:flex;align-items:center;justify-content:center;
+    font-family:Oswald,sans-serif;font-size:clamp(18px,5vw,30px);color:var(--krem);
+    backdrop-filter:blur(2px)}
+  .btn.wcisniety{background:rgba(196,144,80,.35);border-color:var(--zloty)}
+  #bLewo{left:3%} #bPrawo{left:27%}
+  #bSkok{right:3%;width:30%;border-color:rgba(74,154,106,.5);background:rgba(74,154,106,.16);font-size:clamp(12px,3.2vw,18px);letter-spacing:.08em}
+
+  /* ---- ekrany ---- */
+  .ekran{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;text-align:center;padding:24px;border-radius:6px;
+    background:radial-gradient(120% 80% at 50% 30%,rgba(22,19,16,.86),rgba(10,9,7,.97))}
+  .ekran.schowany{display:none}
+  h1{font-family:Oswald,sans-serif;font-size:clamp(34px,9vw,52px);line-height:.95;letter-spacing:.02em;color:var(--krem)}
+  h1 em{display:block;font-style:normal;font-size:.42em;letter-spacing:.28em;color:var(--zloty);margin-top:10px}
+  h2{font-family:Oswald,sans-serif;font-size:clamp(26px,7vw,38px);color:var(--zloty)}
+  p{font-size:clamp(13px,3.6vw,15px);color:var(--przygaszony);max-width:30ch;line-height:1.5}
+  .klawisze{font-size:12px;color:var(--stopka);color:#7a705e;line-height:1.7}
+  .klawisze b{color:var(--przygaszony);font-weight:600}
+  button.akcja{margin-top:6px;padding:14px 30px;border:0;border-radius:999px;cursor:pointer;
+    background:var(--zielony);color:#0f1a13;font-family:Oswald,sans-serif;font-size:20px;letter-spacing:.06em}
+  button.akcja:active{transform:translateY(1px)}
+  .wynik{display:flex;gap:26px;margin:4px 0 2px}
+  .wynik div{display:flex;flex-direction:column;gap:2px}
+  .wynik span{font-size:11px;letter-spacing:.14em;color:var(--przygaszony);text-transform:uppercase}
+  .wynik strong{font-family:Oswald,sans-serif;font-size:30px;color:var(--krem);font-weight:700}
+  .kod{margin-top:8px;padding:10px 20px;border:1px dashed var(--zloty);border-radius:8px;
+    font-family:Oswald,sans-serif;font-size:30px;letter-spacing:.35em;color:var(--zloty)}
+  .kod small{display:block;font-family:Inter,sans-serif;font-size:10px;letter-spacing:.12em;color:var(--przygaszony)}
+  #peln{position:absolute;top:8px;right:8px;background:none;border:0;color:#6b6252;font-size:18px;cursor:pointer;padding:6px}
+</style>
+</head>
+<body>
+<div id="scena">
+  <div id="wrap">
+    <canvas id="c"></canvas>
+
+    <div id="pad">
+      <div class="btn" id="bLewo">◀</div>
+      <div class="btn" id="bPrawo">▶</div>
+      <div class="btn" id="bSkok">SKOK</div>
+    </div>
+
+    <div class="ekran" id="ekranStart">
+      <h1>NA WIYRCH<em>FAMILOK</em></h1>
+      <p>Rozpyndz sie, odbij od muru i skocz. Im gibcij lecisz, tym wyżyj wyskoczysz. Nie dej sie zjechać na dole.</p>
+      <button class="akcja" id="bStart">GRAMY</button>
+      <div class="klawisze"><b>←</b> <b>→</b> ruch &nbsp;·&nbsp; <b>spacja</b> skok</div>
+    </div>
+
+    <div class="ekran schowany" id="ekranKoniec">
+      <h2 id="naglowekKoniec">SZLUS</h2>
+      <div class="wynik">
+        <div><span>Piyntro</span><strong id="wPiyntro">0</strong></div>
+        <div><span>Punkty</span><strong id="wPunkty">0</strong></div>
+        <div><span>Wyngiel</span><strong id="wWyngiel">0</strong></div>
+      </div>
+      <p id="rekordTxt">Rekord: 0</p>
+      <button class="akcja" id="bZnowu">JESZCZE RAZ</button>
+    </div>
+
+    <button id="peln" title="Pełny ekran">⛶</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   NA WIYRCH — mini-gra w stylu Icy Tower, osadzona w familoku.
+   Samodzielny plik: Canvas 2D + Web Audio, zero zależności.
+   ========================================================================= */
+
+const KONFIG = {
+  // scena
+  SZER: 400,
+  WYS: 720,
+  WYS_PIYNTRA: 62,          // odstęp między balkonami (px)
+
+  // fizyka (wartości "na klatkę" przy 60 fps — skalowane delta-time)
+  GRAWITACJA: 0.55,
+  SKOK_BAZA: 11.2,          // siła skoku w miejscu
+  SKOK_OD_PYNDKOSCI: 0.95,  // ile dokłada rozpęd (kluczowe dla combo)
+  MAX_VX: 8.2,
+  PRZYSPIESZENIE: 0.62,
+  TARCIE_ZIEMIA: 0.22,
+  TARCIE_POWIETRZE: 0.02,
+  ODBICIE_OD_MURU: 0.86,    // odbicie od ściany szybu — buduje rozpęd
+  COYOTE: 6,                // klatki tolerancji na skok po zejściu z balkonu
+
+  // presja czasu (ekran jedzie do góry)
+  SCROLL_OD_PIYNTRA: 3,
+  SCROLL_BAZA: 0.35,
+  SCROLL_PRZYROST: 0.022,   // na każde zdobyte piętro
+  SCROLL_MAX: 3.8,
+
+  // zawartość
+  WYNGIEL_SZANSA: 0.26,
+  PKT_PIYNTRO: 10,
+  PKT_WYNGIEL: 50,
+
+  DZWIYNK: true,
+
+};
+
+// Teksty (śląskie — DO WERYFIKACJI przez Łukasza)
+const TEKSTY = {
+  combo: [
+    { min: 2, txt: 'DOBRE!' },
+    { min: 3, txt: 'GIBKO!' },
+    { min: 4, txt: 'FAJNIE!' },
+    { min: 5, txt: 'EKSTRA!' },
+    { min: 6, txt: 'PIERONIE!' },
+    { min: 8, txt: 'MOCKA TEGO!' },
+  ],
+  konieckKod: 'POWODZYNIA!',
+  koniec: 'SZLUS',
+};
+
+// ---------------------------------------------------------------- canvas
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const wrap = document.getElementById('wrap');
+const W = KONFIG.SZER, H = KONFIG.WYS;
+
+function dopasuj() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const marg = 8;
+  const skala = Math.min((window.innerWidth - marg) / W, (window.innerHeight - marg) / H);
+  const cssW = Math.floor(W * skala), cssH = Math.floor(H * skala);
+  wrap.style.width = cssW + 'px';
+  wrap.style.height = cssH + 'px';
+  c.style.width = cssW + 'px';
+  c.style.height = cssH + 'px';
+  c.width = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
+  ctx.setTransform(cssW * dpr / W, 0, 0, cssH * dpr / H, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+}
+window.addEventListener('resize', dopasuj);
+dopasuj();
+
+// ---------------------------------------------------------------- dźwięk
+let ac = null;
+function audio() { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); return ac; }
+function ton(f1, f2, dt, typ = 'square', gl = 0.06) {
+  if (!KONFIG.DZWIYNK) return;
+  try {
+    const a = audio(), o = a.createOscillator(), g = a.createGain();
+    o.type = typ;
+    o.frequency.setValueAtTime(f1, a.currentTime);
+    o.frequency.exponentialRampToValueAtTime(Math.max(f2, 1), a.currentTime + dt);
+    g.gain.setValueAtTime(gl, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dt);
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + dt);
+  } catch (e) {}
+}
+const dzw = {
+  skok:   () => ton(320, 620, 0.10, 'square', 0.05),
+  laduj:  () => ton(180, 110, 0.07, 'triangle', 0.05),
+  mur:    () => ton(140, 90, 0.06, 'sawtooth', 0.04),
+  wyngiel:() => { ton(880, 1320, 0.09, 'triangle', 0.06); setTimeout(() => ton(1320, 1760, 0.08, 'triangle', 0.05), 60); },
+  combo:  (n) => ton(440 + n * 90, 880 + n * 120, 0.14, 'square', 0.06),
+  szlus:  () => { ton(260, 120, 0.35, 'sawtooth', 0.07); setTimeout(() => ton(160, 60, 0.5, 'sawtooth', 0.06), 140); },
+};
+
+// ---------------------------------------------------------------- stan gry
+const GRACZ_W = 24, GRACZ_H = 34;
+const MUR = 10; // grubość ścian szybu
+
+let gracz, balkony, wyngle, czastki, kamY, scroll, piyntro, punkty, wyngielIle,
+    comboLancuch, comboTxt, comboTimer, stan, coyote, startTakeoff, wstrzas;
+
+let rekord = +(localStorage.getItem('familok_nawiyrch_rekord') || 0);
+
+function hash(a, b) {
+  let h = (a * 73856093) ^ (b * 19349663);
+  h = (h ^ (h >>> 13)) >>> 0;
+  return (h % 1000) / 1000;
+}
+
+function nowaGra() {
+  gracz = { x: W / 2 - GRACZ_W / 2, y: 0, vx: 0, vy: 0, naZiemi: true, kier: 1, krok: 0, piyntro: 0 };
+  balkony = [{ x: MUR, w: W - MUR * 2, y: 0, nr: 0, typ: 'ziymia' }];
+  wyngle = [];
+  czastki = [];
+  kamY = -40;
+  scroll = 0;
+  piyntro = 0; punkty = 0; wyngielIle = 0;
+  comboLancuch = 0; comboTxt = null; comboTimer = 0;
+  coyote = 0; startTakeoff = 0; wstrzas = 0;
+  for (let f = 1; f <= 16; f++) dodajPiyntro(f);
+  stan = 'gra';
+}
+
+function dodajPiyntro(f) {
+  const szerBal = Math.max(64, 168 - f * 0.9) * (0.8 + hash(f, 7) * 0.35);
+  const w = Math.min(szerBal, W - MUR * 2 - 20);
+  const x = MUR + 10 + hash(f, 3) * (W - MUR * 2 - 20 - w);
+  const typ = ['balkon', 'sznur', 'daszek'][Math.floor(hash(f, 11) * 3)];
+  const b = { x, w, y: f * KONFIG.WYS_PIYNTRA, nr: f, typ };
+  balkony.push(b);
+  if (f > 2 && hash(f, 23) < KONFIG.WYNGIEL_SZANSA) {
+    wyngle.push({ x: b.x + b.w / 2, y: b.y + 16, wziynty: false, faza: hash(f, 31) * 6.28 });
+  }
+}
+
+// ---------------------------------------------------------------- wejście
+const klaw = { lewo: false, prawo: false, skok: false };
+let skokBuf = 0;
+
+addEventListener('keydown', e => {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space', 'KeyA', 'KeyD', 'KeyW'].includes(e.code)) e.preventDefault();
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') klaw.lewo = true;
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') klaw.prawo = true;
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { klaw.skok = true; skokBuf = 8; }
+  if (e.code === 'Enter' && stan !== 'gra') restart();
+});
+addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') klaw.lewo = false;
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') klaw.prawo = false;
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') klaw.skok = false;
+});
+
+// dotyk
+const pad = document.getElementById('pad');
+const dotyk = matchMedia('(pointer: coarse)').matches;
+if (dotyk) pad.classList.add('on');
+
+function przycisk(id, on, off) {
+  const el = document.getElementById(id);
+  const start = e => { e.preventDefault(); el.classList.add('wcisniety'); on(); };
+  const stop = e => { e.preventDefault(); el.classList.remove('wcisniety'); off(); };
+  el.addEventListener('pointerdown', start);
+  el.addEventListener('pointerup', stop);
+  el.addEventListener('pointercancel', stop);
+  el.addEventListener('pointerleave', stop);
+}
+przycisk('bLewo', () => klaw.lewo = true, () => klaw.lewo = false);
+przycisk('bPrawo', () => klaw.prawo = true, () => klaw.prawo = false);
+przycisk('bSkok', () => { klaw.skok = true; skokBuf = 8; }, () => klaw.skok = false);
+
+// ---------------------------------------------------------------- logika
+function skacz() {
+  const rozped = Math.abs(gracz.vx);
+  gracz.vy = KONFIG.SKOK_BAZA + rozped * KONFIG.SKOK_OD_PYNDKOSCI;
+  gracz.naZiemi = false;
+  coyote = 0;
+  skokBuf = 0;
+  startTakeoff = gracz.piyntro;
+  dzw.skok();
+  for (let i = 0; i < 5; i++) pyl(gracz.x + GRACZ_W / 2, gracz.y, 1);
+}
+
+function pyl(x, y, si = 1) {
+  czastki.push({
+    x, y, vx: (Math.random() - 0.5) * 2.4 * si, vy: Math.random() * 1.6 * si,
+    zyc: 20 + Math.random() * 14, max: 34, r: 1 + Math.random() * 2
+  });
+}
+
+function update(dt) {
+  if (stan !== 'gra') return;
+
+  // ruch poziomy
+  const t = gracz.naZiemi ? KONFIG.TARCIE_ZIEMIA : KONFIG.TARCIE_POWIETRZE;
+  if (klaw.lewo)  { gracz.vx -= KONFIG.PRZYSPIESZENIE * dt; gracz.kier = -1; }
+  if (klaw.prawo) { gracz.vx += KONFIG.PRZYSPIESZENIE * dt; gracz.kier = 1; }
+  if (!klaw.lewo && !klaw.prawo) gracz.vx -= gracz.vx * t * dt;
+  gracz.vx = Math.max(-KONFIG.MAX_VX, Math.min(KONFIG.MAX_VX, gracz.vx));
+
+  // skok (z buforem + coyote time)
+  if (skokBuf > 0) skokBuf -= dt;
+  if ((gracz.naZiemi || coyote > 0) && skokBuf > 0) skacz();
+  if (!gracz.naZiemi && coyote > 0) coyote -= dt;
+
+  // grawitacja
+  gracz.vy -= KONFIG.GRAWITACJA * dt;
+  if (gracz.vy < -22) gracz.vy = -22;
+
+  const poprzD = gracz.y;
+  gracz.x += gracz.vx * dt;
+  gracz.y += gracz.vy * dt;
+
+  // mury szybu — odbicie
+  if (gracz.x < MUR) { gracz.x = MUR; gracz.vx = -gracz.vx * KONFIG.ODBICIE_OD_MURU; if (Math.abs(gracz.vx) > 2) dzw.mur(); }
+  if (gracz.x + GRACZ_W > W - MUR) { gracz.x = W - MUR - GRACZ_W; gracz.vx = -gracz.vx * KONFIG.ODBICIE_OD_MURU; if (Math.abs(gracz.vx) > 2) dzw.mur(); }
+
+  // lądowanie (tylko gdy spada)
+  const byloNaZiemi = gracz.naZiemi;
+  gracz.naZiemi = false;
+  if (gracz.vy <= 0) {
+    for (const b of balkony) {
+      if (poprzD >= b.y - 0.5 && gracz.y <= b.y &&
+          gracz.x + GRACZ_W > b.x + 2 && gracz.x < b.x + b.w - 2) {
+        gracz.y = b.y;
+        gracz.vy = 0;
+        gracz.naZiemi = true;
+        coyote = KONFIG.COYOTE;
+        if (!byloNaZiemi) laduj(b);   // dźwięk/combo tylko przy realnym lądowaniu
+        break;
+      }
+    }
+  }
+
+  // wyngiel
+  for (const wg of wyngle) {
+    if (wg.wziynty) continue;
+    if (Math.abs(wg.x - (gracz.x + GRACZ_W / 2)) < 20 && Math.abs(wg.y - (gracz.y + GRACZ_H / 2)) < 24) {
+      wg.wziynty = true;
+      wyngielIle++;
+      punkty += KONFIG.PKT_WYNGIEL;
+      dzw.wyngiel();
+      for (let i = 0; i < 8; i++) pyl(wg.x, wg.y, 1.4);
+    }
+  }
+
+  // przewijanie ekranu
+  const celKam = gracz.y - H * 0.42;
+  if (celKam > kamY) kamY += (celKam - kamY) * Math.min(1, 0.18 * dt);
+  if (piyntro >= KONFIG.SCROLL_OD_PIYNTRA) {
+    scroll = Math.min(KONFIG.SCROLL_MAX, KONFIG.SCROLL_BAZA + (piyntro - KONFIG.SCROLL_OD_PIYNTRA) * KONFIG.SCROLL_PRZYROST);
+    kamY += scroll * dt;
+  }
+
+  // dosypywanie pięter
+  const najwyzsze = balkony[balkony.length - 1].nr;
+  const trzeba = Math.ceil((kamY + H + 260) / KONFIG.WYS_PIYNTRA);
+  for (let f = najwyzsze + 1; f <= trzeba; f++) dodajPiyntro(f);
+  // sprzątanie tego, co zjechało w dół
+  if (balkony.length > 60) balkony = balkony.filter(b => b.y > kamY - 200);
+  wyngle = wyngle.filter(wg => !wg.wziynty && wg.y > kamY - 200);
+
+  // koniec — zjechany na dole
+  if (gracz.y + GRACZ_H < kamY - 10) koniec();
+
+  // czastki
+  for (const p of czastki) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy -= 0.08 * dt; p.zyc -= dt; }
+  czastki = czastki.filter(p => p.zyc > 0);
+
+  if (comboTimer > 0) comboTimer -= dt;
+  if (wstrzas > 0) wstrzas -= dt;
+}
+
+function laduj(b) {
+  const skok = b.nr - startTakeoff;
+  if (b.nr > gracz.piyntro) {
+    if (b.nr > piyntro) {
+      punkty += (b.nr - piyntro) * KONFIG.PKT_PIYNTRO;
+      piyntro = b.nr;
+    }
+  }
+  gracz.piyntro = b.nr;
+
+  if (skok >= 2) {
+    comboLancuch++;
+    const bonus = skok * skok * 10 * Math.min(comboLancuch, 5);
+    punkty += bonus;
+    let txt = TEKSTY.combo[0].txt;
+    for (const k of TEKSTY.combo) if (skok >= k.min) txt = k.txt;
+    comboTxt = { txt, bonus, lancuch: comboLancuch };
+    comboTimer = 70;
+    wstrzas = 6;
+    dzw.combo(Math.min(skok, 8));
+  } else {
+    comboLancuch = 0;
+    dzw.laduj();
+  }
+  startTakeoff = b.nr;
+  for (let i = 0; i < 4; i++) pyl(gracz.x + GRACZ_W / 2 + (Math.random() - 0.5) * 16, b.y, 0.7);
+}
+
+function koniec() {
+  stan = 'koniec';
+  dzw.szlus();
+  if (punkty > rekord) { rekord = punkty; localStorage.setItem('familok_nawiyrch_rekord', rekord); }
+  document.getElementById('wPiyntro').textContent = piyntro;
+  document.getElementById('wPunkty').textContent = punkty;
+  document.getElementById('wWyngiel').textContent = wyngielIle;
+  document.getElementById('rekordTxt').textContent = 'Rekord: ' + rekord;
+  const nowyRekord = punkty >= rekord && punkty > 0;
+  document.getElementById('naglowekKoniec').textContent = nowyRekord ? 'NOJLEPSZY WYNIK!' : TEKSTY.koniec;
+  document.getElementById('ekranKoniec').classList.remove('schowany');
+}
+
+// ---------------------------------------------------------------- rysowanie
+function ekr(y) { return H - (y - kamY); } // świat -> ekran (y rośnie w górę)
+
+function tlo() {
+  ctx.fillStyle = '#1b1612';
+  ctx.fillRect(0, 0, W, H);
+
+  // cegły
+  const cegW = 34, cegH = 15;
+  const off = ((kamY % cegH) + cegH) % cegH;
+  ctx.strokeStyle = 'rgba(0,0,0,.35)';
+  ctx.lineWidth = 1;
+  for (let y = -cegH; y < H + cegH; y += cegH) {
+    const rz = Math.floor((kamY + (H - y)) / cegH);
+    const sh = (rz % 2) * (cegW / 2);
+    const yy = y + off;
+    ctx.fillStyle = rz % 7 === 0 ? '#221a15' : '#241d17';
+    ctx.fillRect(0, yy, W, cegH - 1);
+    ctx.beginPath();
+    for (let x = -cegW; x < W + cegW; x += cegW) {
+      ctx.moveTo(x + sh, yy);
+      ctx.lineTo(x + sh, yy + cegH);
+    }
+    ctx.moveTo(0, yy + cegH - 0.5); ctx.lineTo(W, yy + cegH - 0.5);
+    ctx.stroke();
+  }
+
+  // okna familoka — co drugie piętro, deterministycznie zapalone
+  const odP = Math.floor(kamY / KONFIG.WYS_PIYNTRA) - 1;
+  const doP = odP + Math.ceil(H / KONFIG.WYS_PIYNTRA) + 2;
+  for (let f = Math.max(0, odP); f <= doP; f++) {
+    if (f % 2) continue;
+    for (let i = 0; i < 3; i++) {
+      const ox = 40 + i * 120, oy = ekr(f * KONFIG.WYS_PIYNTRA + 40);
+      const swiatlo = hash(f, i + 41) > 0.55;
+      ctx.fillStyle = '#0d0a08';
+      ctx.fillRect(ox, oy, 44, 52);
+      ctx.fillStyle = swiatlo ? 'rgba(196,144,80,.55)' : 'rgba(120,140,150,.10)';
+      ctx.fillRect(ox + 3, oy + 3, 38, 46);
+      if (swiatlo) {
+        ctx.fillStyle = 'rgba(196,144,80,.06)';
+        ctx.fillRect(ox - 12, oy - 10, 68, 76);
+      }
+      ctx.strokeStyle = 'rgba(20,16,12,.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(ox + 22, oy + 3); ctx.lineTo(ox + 22, oy + 49);
+      ctx.moveTo(ox + 3, oy + 26); ctx.lineTo(ox + 41, oy + 26);
+      ctx.stroke();
+    }
+  }
+
+  // mury szybu (rynny)
+  ctx.fillStyle = '#12100d';
+  ctx.fillRect(0, 0, MUR, H);
+  ctx.fillRect(W - MUR, 0, MUR, H);
+  ctx.fillStyle = 'rgba(196,144,80,.10)';
+  ctx.fillRect(MUR - 2, 0, 2, H);
+  ctx.fillRect(W - MUR, 0, 2, H);
+}
+
+function rysBalkon(b) {
+  const y = ekr(b.y);
+  if (y < -60 || y > H + 60) return;
+
+  if (b.typ === 'ziymia') {
+    ctx.fillStyle = '#2e2820';
+    ctx.fillRect(b.x, y, b.w, H - y);
+    ctx.fillStyle = '#3d3629';
+    ctx.fillRect(b.x, y, b.w, 6);
+    return;
+  }
+
+  if (b.typ === 'sznur') {
+    // sznur z praniem
+    ctx.strokeStyle = '#9a907a';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(b.x, y); ctx.lineTo(b.x + b.w, y); ctx.stroke();
+    ctx.fillStyle = '#4a9a6a';
+    ctx.fillRect(b.x, y, b.w, 4);
+    const kolory = ['#ede5d0', '#c49050', '#9a907a'];
+    for (let i = 0; i < Math.floor(b.w / 26); i++) {
+      const px = b.x + 8 + i * 26;
+      ctx.fillStyle = kolory[Math.floor(hash(b.nr, i) * 3)];
+      ctx.globalAlpha = .75;
+      ctx.fillRect(px, y + 4, 14, 12 + hash(b.nr, i + 9) * 8);
+      ctx.globalAlpha = 1;
+    }
+    return;
+  }
+
+  if (b.typ === 'daszek') {
+    // daszek nad komórką
+    ctx.fillStyle = '#c49050';
+    ctx.fillRect(b.x, y, b.w, 5);
+    ctx.fillStyle = '#7a5c33';
+    ctx.fillRect(b.x, y + 5, b.w, 4);
+    ctx.fillStyle = 'rgba(196,144,80,.18)';
+    ctx.beginPath(); ctx.moveTo(b.x, y + 9); ctx.lineTo(b.x + b.w, y + 9); ctx.lineTo(b.x + b.w - 8, y + 20); ctx.lineTo(b.x + 8, y + 20); ctx.closePath(); ctx.fill();
+    return;
+  }
+
+  // balkon
+  ctx.fillStyle = '#3d3629';
+  ctx.fillRect(b.x, y, b.w, 8);
+  ctx.fillStyle = '#4a9a6a';
+  ctx.fillRect(b.x, y, b.w, 3);
+  ctx.strokeStyle = 'rgba(154,144,122,.55)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(b.x + 1, y + 8); ctx.lineTo(b.x + 1, y + 20);
+  ctx.moveTo(b.x + b.w - 1, y + 8); ctx.lineTo(b.x + b.w - 1, y + 20);
+  for (let i = 6; i < b.w; i += 11) { ctx.moveTo(b.x + i, y + 8); ctx.lineTo(b.x + i, y + 19); }
+  ctx.moveTo(b.x, y + 19); ctx.lineTo(b.x + b.w, y + 19);
+  ctx.stroke();
+}
+
+function rysWyngiel(wg, t) {
+  const y = ekr(wg.y) + Math.sin(t / 320 + wg.faza) * 3;
+  if (y < -30 || y > H + 30) return;
+  ctx.save();
+  ctx.translate(wg.x, y);
+  ctx.fillStyle = '#0b0a09';
+  ctx.beginPath();
+  ctx.moveTo(-8, 3); ctx.lineTo(-5, -6); ctx.lineTo(4, -8); ctx.lineTo(9, -1); ctx.lineTo(5, 7); ctx.lineTo(-4, 8);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(237,229,208,.35)';
+  ctx.beginPath(); ctx.moveTo(-3, -3); ctx.lineTo(1, -5); ctx.lineTo(2, -1); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(196,144,80,.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(0, 0, 13, 0, 6.28); ctx.stroke();
+  ctx.restore();
+}
+
+function rysGracz(t) {
+  const x = Math.round(gracz.x), y = ekr(gracz.y);
+  const bieg = Math.abs(gracz.vx) > 0.6 && gracz.naZiemi;
+  if (bieg) gracz.krok += Math.abs(gracz.vx) * 0.06;
+  const noga = bieg ? Math.sin(gracz.krok) * 4 : 0;
+  const wLocie = !gracz.naZiemi;
+
+  ctx.save();
+  ctx.translate(x + GRACZ_W / 2, y);
+  ctx.scale(gracz.kier, 1);
+
+  // cień
+  if (gracz.naZiemi) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(0, 1, 12, 3, 0, 0, 6.28); ctx.fill(); }
+
+  // nogi
+  ctx.fillStyle = '#2e2820';
+  ctx.fillRect(-8, -10, 6, 10 + (wLocie ? -2 : noga));
+  ctx.fillRect(2, -10, 6, 10 + (wLocie ? -2 : -noga));
+  // buty
+  ctx.fillStyle = '#12100d';
+  ctx.fillRect(-9, -2 + (wLocie ? -2 : noga), 8, 3);
+  ctx.fillRect(1, -2 + (wLocie ? -2 : -noga), 8, 3);
+  // kurtka
+  ctx.fillStyle = '#4a9a6a';
+  ctx.fillRect(-9, -25, 18, 16);
+  ctx.fillStyle = 'rgba(0,0,0,.18)';
+  ctx.fillRect(-9, -25, 5, 16);
+  // ręka
+  ctx.fillStyle = '#3d7d55';
+  if (wLocie) ctx.fillRect(5, -31, 5, 10);
+  else ctx.fillRect(5, -24, 5, 11 + noga);
+  // głowa
+  ctx.fillStyle = '#ede5d0';
+  ctx.fillRect(-7, -34, 14, 10);
+  ctx.fillStyle = '#12100d';
+  ctx.fillRect(2, -31, 2, 2);
+  // czapka (bergmoncka)
+  ctx.fillStyle = '#c49050';
+  ctx.fillRect(-8, -38, 16, 5);
+  ctx.fillRect(2, -34, 8, 2);
+  ctx.restore();
+}
+
+function hud(t) {
+  ctx.save();
+  ctx.font = '700 13px Oswald, sans-serif';
+  ctx.textBaseline = 'top';
+
+  // pasek
+  const g = ctx.createLinearGradient(0, 0, 0, 54);
+  g.addColorStop(0, 'rgba(15,13,11,.92)');
+  g.addColorStop(1, 'rgba(15,13,11,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, 54);
+
+  ctx.fillStyle = '#9a907a';
+  ctx.font = '600 9px Inter, sans-serif';
+  ctx.fillText('PIYNTRO', 14, 10);
+  ctx.fillText('PUNKTY', 130, 10);
+  ctx.fillText('WYNGIEL', 300, 10);
+
+  ctx.fillStyle = '#ede5d0';
+  ctx.font = '700 24px Oswald, sans-serif';
+  ctx.fillText(String(piyntro), 14, 20);
+  ctx.fillText(String(punkty), 130, 20);
+  ctx.fillStyle = '#c49050';
+  ctx.fillText(String(wyngielIle), 300, 20);
+
+  // combo
+  if (comboTimer > 0 && comboTxt) {
+    const a = Math.min(1, comboTimer / 25);
+    const sk = 1 + (1 - Math.min(1, (70 - comboTimer) / 12)) * 0.35;
+    ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.save();
+    ctx.translate(W / 2, 150 - (70 - comboTimer) * 0.35);
+    ctx.scale(sk, sk);
+    ctx.fillStyle = '#c49050';
+    ctx.font = '700 30px Oswald, sans-serif';
+    ctx.fillText(comboTxt.txt, 0, 0);
+    ctx.fillStyle = '#4a9a6a';
+    ctx.font = '800 14px Inter, sans-serif';
+    ctx.fillText('+' + comboTxt.bonus + (comboTxt.lancuch > 1 ? '  ×' + comboTxt.lancuch : ''), 0, 32);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+  }
+
+  // ostrzeżenie: gracz blisko dołu
+  const zapas = (gracz.y - kamY) / H;
+  if (stan === 'gra' && zapas < 0.18) {
+    const p = 0.35 + Math.sin(t / 90) * 0.25;
+    ctx.fillStyle = `rgba(180,60,40,${(0.18 - zapas) * 3 * p})`;
+    ctx.fillRect(0, H - 90, W, 90);
+  }
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- pętla
+let ostatni = performance.now();
+function klatka(t) {
+  const dtMs = Math.min(50, t - ostatni);
+  ostatni = t;
+  const dt = (dtMs / 1000) * 60; // dtScale — 1.0 przy 60 fps
+
+  update(dt);
+
+  ctx.save();
+  if (wstrzas > 0) ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+  tlo();
+  for (const b of balkony) rysBalkon(b);
+  for (const wg of wyngle) rysWyngiel(wg, t);
+  for (const p of czastki) {
+    ctx.globalAlpha = p.zyc / p.max;
+    ctx.fillStyle = '#9a907a';
+    ctx.fillRect(p.x, ekr(p.y), p.r, p.r);
+  }
+  ctx.globalAlpha = 1;
+  if (stan === 'gra') rysGracz(t);
+  ctx.restore();
+  hud(t);
+
+  requestAnimationFrame(klatka);
+}
+requestAnimationFrame(klatka);
+
+// ---------------------------------------------------------------- ekrany
+function restart() {
+  document.getElementById('ekranStart').classList.add('schowany');
+  document.getElementById('ekranKoniec').classList.add('schowany');
+  try { audio().resume(); } catch (e) {}
+  nowaGra();
+}
+document.getElementById('bStart').addEventListener('click', restart);
+document.getElementById('bZnowu').addEventListener('click', restart);
+
+document.getElementById('peln').addEventListener('click', () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+  else document.exitFullscreen?.();
+});
+
+nowaGra();
+stan = 'menu';
+</script>
+
+<!-- ── pasek Gierek (powrót + pełny ekran) ── -->
+<style>
+#gp-bar{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;z-index:2147483000;
+  display:flex;gap:6px;font-family:system-ui,-apple-system,sans-serif;opacity:.55;transition:opacity .2s}
+#gp-bar:hover,#gp-bar:active{opacity:1}
+#gp-bar a,#gp-bar button{display:flex;align-items:center;justify-content:center;height:32px;min-width:32px;
+  padding:0 9px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(20,18,14,.72);
+  color:#ede5d0;font-size:14px;font-weight:700;line-height:1;text-decoration:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+</style>
+<div id="gp-bar">
+  <a href="gierki.html" title="Wróć do gierek">&#8592;</a>
+  <button id="gp-fs" type="button" title="Pełny ekran">&#9974;</button>
+</div>
+<script>
+(function(){
+  var el=document.documentElement;
+  function pelny(){
+    var f=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+    } else if(f){ try{ f.call(el,{navigationUI:"hide"}); }catch(e){ try{ f.call(el); }catch(e2){} } }
+  }
+  document.getElementById("gp-fs").addEventListener("click",function(e){ e.stopPropagation(); pelny(); });
+  if(/[?&]fs=1/.test(location.search)){
+    var raz=function(){ document.removeEventListener("pointerdown",raz,true); if(!document.fullscreenElement) pelny(); };
+    document.addEventListener("pointerdown",raz,true);
+  }
+})();
+</script>
+
+</body>
+</html>

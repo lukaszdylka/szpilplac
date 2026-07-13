@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gierki admin · Szpilplac</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="config.js?v=13"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--muted:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--red:#b5482f;--shadow:0 20px 55px -38px rgba(35,32,26,.75)}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--muted:#aaa18d;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--red:#d76a4f;--shadow:0 20px 55px -38px #000}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:radial-gradient(circle at 0 0,rgba(191,138,58,.16),transparent 32%),var(--bg);padding:0 16px 48px}
+a{color:inherit;text-decoration:none}
+button,input,textarea,select{font:inherit;color:inherit}
+header,main,footer{width:100%;max-width:1180px;margin-inline:auto}
+header{padding-top:20px}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+h1,h2,h3{font-family:Oswald,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;line-height:1;margin:0}
+h1{font-size:clamp(36px,7vw,58px)}h2{font-size:25px}h3{font-size:19px}
+.sub,.muted{color:var(--muted);font-size:13px;line-height:1.5}.sub{margin-top:6px;max-width:760px}
+.controls,.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nav,.btn{min-height:40px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:9px 13px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;cursor:pointer}
+.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.gold{background:var(--gold);border-color:var(--gold);color:#1a140c}.btn.danger{color:var(--red);border-color:var(--red)}
+.btn:disabled{opacity:.55;cursor:wait}.nav:hover,.btn:hover{filter:brightness(1.06)}
+main{display:grid;gap:14px}
+.card{background:var(--surface);background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.hidden{display:none!important}.msg{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface2);color:var(--muted);font-size:13px;line-height:1.5;white-space:pre-line}.msg.ok{color:var(--ok);border-color:var(--ok)}.msg.err{color:var(--red);border-color:var(--red)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.kpi{border:1px solid var(--line);border-radius:15px;background:var(--surface2);padding:13px;min-width:0}.kpi span{display:block;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.kpi strong{display:block;margin-top:5px;font:700 30px/1 Oswald,sans-serif}.kpi small{color:var(--muted);font-size:10.5px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start}
+.chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding-top:20px;overflow-x:auto}.day{height:100%;min-width:38px;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.bars{height:145px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px}.bar{width:9px;min-height:2px;border-radius:5px 5px 2px 2px;background:var(--green)}.bar.finish{background:var(--gold)}.day label{font-size:9px;color:var(--muted);white-space:nowrap}.legend{display:flex;gap:12px;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:var(--green)}.dot.finish{background:var(--gold)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}table{width:100%;border-collapse:collapse;background:var(--surface2);font-size:12px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em}td.num,th.num{text-align:right}tr:last-child td{border-bottom:0}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.game{display:grid;grid-template-columns:auto 1fr;gap:11px;border:1px solid var(--line);border-radius:16px;background:var(--surface2);padding:13px}.game.off{opacity:.68}.game .ico{width:46px;height:46px;border:1px solid var(--line);border-radius:13px;background:var(--surface);display:grid;place-items:center;font-size:25px}.game h3{margin:2px 0 4px}.game p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.4}.game .actions{grid-column:1/-1}.pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px 7px;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase}.pill.on{color:var(--ok);border-color:var(--ok)}
+.editor{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.82fr);gap:16px}.form-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}.field{display:grid;gap:5px}.field.wide{grid-column:1/-1}.field label{font-size:10.5px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.05em}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:11px;background:var(--surface2);padding:10px 11px;outline:0}.field input:focus,.field textarea:focus{border-color:var(--gold)}.field textarea{min-height:88px;resize:vertical}.field textarea.code{min-height:360px;font:12px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}.checks{display:flex;gap:15px;flex-wrap:wrap;margin:11px 0;color:var(--muted);font-size:12px;font-weight:800}.checks label{display:flex;align-items:center;gap:7px}.upload{border:1px dashed var(--gold);border-radius:14px;padding:13px;background:rgba(191,138,58,.07);margin-bottom:10px}.upload input{width:100%;margin-top:7px}.code-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10.5px;margin-top:5px}
+.preview{position:sticky;top:12px}.preview-frame{height:520px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0e0c0a}.preview-frame iframe{width:100%;height:100%;border:0;background:white}.help{margin-top:10px;border:1px solid var(--line);border-radius:13px;padding:11px;background:var(--surface2);color:var(--muted);font-size:11.5px;line-height:1.5}.help code{color:var(--ink);font-size:11px}.empty{padding:13px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px}.section-gap{margin-bottom:12px}.compact-note{margin-top:6px}.actions.after{margin-top:12px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}.split,.editor{grid-template-columns:1fr}.preview{position:static}.preview-frame{height:440px}}
+@media(max-width:680px){body{padding-inline:11px}.top{display:block}.top .controls{margin-top:12px}.card{padding:14px;border-radius:16px}.kpis{grid-template-columns:repeat(2,1fr)}.games{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.wide{grid-column:auto}.btn,.nav{min-height:44px}.preview-frame{height:68vh}table{min-width:760px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div><h1>Gierki admin</h1><div class="sub">Dodawanie minigier z kodu HTML, publikowanie, podgląd i statystyki użycia.</div></div>
+    <div class="controls"><a class="nav" href="admin.html">Admin</a><a class="nav" href="gierki.html">Gierki</a><button class="nav" id="themeBtn" type="button">◐</button></div>
+  </div>
+</header>
+
+<main>
+  <div class="msg" id="msg">Sprawdzam dostęp administratora...</div>
+  <section class="card hidden" id="loginCard"><h2>Dostęp tylko dla admina</h2><p class="muted">Zaloguj się kontem administratora Szpilplaca, a potem wróć do tego panelu.</p><div class="actions"><a class="btn primary" href="konto.html">Zaloguj się</a></div></section>
+
+  <section class="card hidden" id="statsCard">
+    <div class="section-head"><div><h2>Statystyki</h2><div class="muted">Dane wszystkich gierek, również czterech zapisanych jako osobne pliki.</div></div><button class="btn" id="refreshBtn" type="button">Odśwież</button></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section class="split hidden" id="chartsSection">
+    <section class="card"><div class="section-head"><h2>Ostatnie 14 dni</h2><div class="legend"><span><i class="dot"></i>wejścia</span><span><i class="dot finish"></i>ukończenia</span></div></div><div class="chart" id="dailyChart"></div></section>
+    <section class="card"><h2 class="section-gap">Najaktywniejsze</h2><div id="topGames"></div></section>
+  </section>
+
+  <section class="card hidden" id="tableCard"><div class="section-head"><h2>Wyniki według gry</h2><span class="muted">Otwarcie → rozpoczęcie → ukończenie</span></div><div id="statsTable"></div></section>
+
+  <section class="card hidden" id="gamesCard"><div class="section-head"><div><h2>Gry z bazy</h2><div class="muted">Tu są gry wklejone lub przesłane przez ten panel.</div></div><button class="btn primary" id="newBtn" type="button">Dodaj grę</button></div><div class="games" id="gamesList"></div></section>
+
+  <section class="card hidden" id="editorCard">
+    <div class="section-head"><div><h2 id="editorTitle">Nowa gra</h2><div class="muted">Wklej kompletny kod albo wybierz pojedynczy plik HTML.</div></div><button class="btn" id="closeEditorBtn" type="button">Zamknij</button></div>
+    <div class="editor">
+      <div>
+        <div class="form-grid">
+          <div class="field"><label for="titleInput">Nazwa gry</label><input id="titleInput" type="text" maxlength="90" placeholder="np. Starzik na grubie"></div>
+          <div class="field"><label for="slugInput">Identyfikator</label><input id="slugInput" type="text" maxlength="60" placeholder="starzik-na-grubie"></div>
+          <div class="field"><label for="iconInput">Ikona</label><input id="iconInput" type="text" maxlength="16" value="🎮"></div>
+          <div class="field"><label for="categoryInput">Kategoria</label><input id="categoryInput" type="text" maxlength="50" value="Gierka"></div>
+          <div class="field"><label for="orderInput">Kolejność</label><input id="orderInput" type="number" value="100"></div>
+          <div class="field wide"><label for="descInput">Opis na kafelku</label><textarea id="descInput" maxlength="500" placeholder="Krótko wyjaśnij, na czym polega gra."></textarea></div>
+        </div>
+        <div class="checks"><label><input id="publishedInput" type="checkbox"> Opublikowana</label><label><input id="fullscreenInput" type="checkbox" checked> Pełny ekran</label></div>
+        <div class="upload"><label for="fileInput">Prześlij plik HTML</label><input id="fileInput" type="file" accept=".html,.htm,text/html"><div class="muted compact-note">Maksymalnie 2 MB. Wybrany plik zastąpi kod w polu poniżej.</div></div>
+        <div class="field"><label for="htmlInput">Kod HTML</label><textarea class="code" id="htmlInput" spellcheck="false" placeholder="<!DOCTYPE html>..."></textarea><div class="code-meta"><span id="codeInfo">0 znaków</span><span>Limit: 2 000 000 znaków</span></div></div>
+        <div class="actions after"><button class="btn gold" id="previewBtn" type="button">Odśwież podgląd</button><button class="btn primary" id="saveBtn" type="button">Zapisz grę</button><button class="btn" id="clearBtn" type="button">Wyczyść</button></div>
+      </div>
+      <aside class="preview">
+        <div class="preview-frame"><iframe id="previewFrame" title="Podgląd gry" sandbox="allow-scripts allow-forms allow-modals allow-pointer-lock"></iframe></div>
+        <div class="help">Gra jest uruchamiana w izolacji. Nie ma dostępu do logowania ani panelu admina. Jeśli chcesz zapisać ukończenie gry w statystykach, wywołaj w jej kodzie:<br><code>window.SZPILPLAC_MINIGRA.finish({won:true, score:100});</code></div>
+      </aside>
+    </div>
+  </section>
+</main>
+<footer>Szpilplac · Familock · panel minigier</footer>
+
+<script>
+(function(){
+  "use strict";
+  var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+  var sb=null,games=[],stats=[],daily=[],editingSlug=null,slugTouched=false;
+  var $=function(id){return document.getElementById(id);};
+
+  function show(id){$(id)&&$(id).classList.remove("hidden");}
+  function hide(id){$(id)&&$(id).classList.add("hidden");}
+  function setMsg(text,type){$("msg").textContent=text;$("msg").className="msg"+(type?" "+type:"");show("msg");}
+  function hideMsg(){hide("msg");}
+  function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function n(v){v=Number(v);return Number.isFinite(v)?v:0;}
+  function fmt(v){return new Intl.NumberFormat("pl-PL").format(n(v));}
+  function date(v){return v?new Date(v).toLocaleString("pl-PL"):"—";}
+  function time(ms){ms=n(ms);if(!ms)return "—";var s=Math.round(ms/1000);return s<60?s+" s":Math.floor(s/60)+" min "+(s%60)+" s";}
+  function slugify(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ł/g,"l").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60);}
+
+  function initTheme(){var t=localStorage.getItem("szpilplac_theme")||"light";function apply(){document.documentElement.dataset.theme=t;}apply();$("themeBtn").onclick=function(){t=t==="light"?"dark":"light";localStorage.setItem("szpilplac_theme",t);apply();};}
+  function initSupabase(){var c=window.SZPILPLAC_CONFIG||{};if(!c.SUPABASE_URL||!c.SUPABASE_ANON_KEY||!window.supabase)throw new Error("Brakuje config.js albo biblioteki Supabase.");sb=window.supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});}
+  async function requireAdmin(){var session=await sb.auth.getSession();if(!session.data||!session.data.session)return false;var r=await sb.rpc("is_szpilplac_admin");if(r.error)throw r.error;return r.data===true;}
+
+  async function loadData(manual){
+    try{
+      if(manual)setMsg("Odświeżam dane...");
+      var res=await Promise.all([
+        sb.from("szpilplac_minigry").select("*").order("kolejnosc",{ascending:true}).order("tytul",{ascending:true}),
+        sb.rpc("szpilplac_admin_minigry_stats"),
+        sb.rpc("szpilplac_admin_minigry_daily",{p_days:14})
+      ]);
+      res.forEach(function(r){if(r.error)throw r.error;});
+      games=res[0].data||[];stats=res[1].data||[];daily=res[2].data||[];
+      renderAll();hideMsg();["statsCard","chartsSection","tableCard","gamesCard"].forEach(show);
+    }catch(e){setMsg("Nie udało się pobrać danych. Najpierw uruchom plik minigry-supabase.sql w Supabase.\n\n"+(e.message||e),"err");}
+  }
+
+  function kpi(label,value,note){return '<div class="kpi"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong><small>'+esc(note||"")+'</small></div>';}
+  function renderKpis(){
+    var total=function(k){return stats.reduce(function(a,x){return a+n(x[k]);},0);};
+    $("kpis").innerHTML=[
+      kpi("Wszystkie gry",stats.length,games.length+" z panelu"),
+      kpi("Opublikowane",games.filter(function(g){return g.opublikowana;}).length,"gry z bazy"),
+      kpi("Otwarcia",fmt(total("otwarcia")),"łącznie"),
+      kpi("Ostatnie 7 dni",fmt(total("otwarcia_7d")),"otwarcia"),
+      kpi("Rozpoczęcia",fmt(total("starty")),"pierwsza interakcja"),
+      kpi("Ukończenia",fmt(total("ukonczenia")),"zapisane końce")
+    ].join("");
+  }
+
+  function renderChart(){
+    var map={};daily.forEach(function(x){map[String(x.dzien).slice(0,10)]=x;});
+    var rows=[],now=new Date();for(var i=13;i>=0;i--){var d=new Date(now);d.setDate(now.getDate()-i);var key=d.toLocaleDateString("en-CA",{timeZone:"Europe/Warsaw"});rows.push(Object.assign({dzien:key,otwarcia:0,ukonczenia:0},map[key]||{}));}
+    var max=Math.max(1,...rows.map(function(x){return Math.max(n(x.otwarcia),n(x.ukonczenia));}));
+    $("dailyChart").innerHTML=rows.map(function(x){var label=new Date(x.dzien+"T12:00:00").toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"});return '<div class="day" title="'+esc(label)+': '+fmt(x.otwarcia)+' wejść, '+fmt(x.ukonczenia)+' ukończeń"><div class="bars"><i class="bar" style="height:'+Math.max(2,Math.round(n(x.otwarcia)/max*100))+'%"></i><i class="bar finish" style="height:'+Math.max(2,Math.round(n(x.ukonczenia)/max*100))+'%"></i></div><label>'+esc(label)+'</label></div>';}).join("");
+    var top=stats.slice().sort(function(a,b){return n(b.otwarcia_7d)-n(a.otwarcia_7d);}).slice(0,5);
+    $("topGames").innerHTML=top.length?top.map(function(x){return '<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px"><span>'+esc(x.tytul)+'</span><span style="color:var(--muted)">'+fmt(x.otwarcia_7d)+' / 7 dni</span></div>';}).join(""):'<div class="empty">Brak danych.</div>';
+  }
+
+  function renderStatsTable(){
+    if(!stats.length){$("statsTable").innerHTML='<div class="empty">Brak danych.</div>';return;}
+    $("statsTable").innerHTML='<div class="table-wrap"><table><thead><tr><th>Gra</th><th>Źródło</th><th class="num">Otwarcia</th><th class="num">Starty</th><th class="num">Ukończ.</th><th class="num">Wygrane</th><th class="num">Unikalni</th><th class="num">7 dni</th><th class="num">Śr. wynik</th><th>Śr. czas</th><th>Ostatnio</th></tr></thead><tbody>'+stats.map(function(x){return '<tr><td>'+esc(x.tytul)+'</td><td>'+esc(x.zrodlo)+'</td><td class="num">'+fmt(x.otwarcia)+'</td><td class="num">'+fmt(x.starty)+'</td><td class="num">'+fmt(x.ukonczenia)+'</td><td class="num">'+fmt(x.wygrane)+'</td><td class="num">'+fmt(x.unikalni_gracze)+'</td><td class="num">'+fmt(x.otwarcia_7d)+'</td><td class="num">'+(x.sredni_wynik==null?'—':fmt(x.sredni_wynik))+'</td><td>'+time(x.sredni_czas_ms)+'</td><td>'+esc(date(x.ostatnie_zdarzenie))+'</td></tr>';}).join("")+'</tbody></table></div>';
+  }
+
+  function renderGames(){
+    $("gamesList").innerHTML=games.length?games.map(function(g){return '<article class="game '+(g.opublikowana?'':'off')+'"><div class="ico">'+esc(g.ikona||"🎮")+'</div><div><h3>'+esc(g.tytul)+'</h3><p>'+esc(g.opis||"Bez opisu")+'</p><div style="margin-top:7px"><span class="pill '+(g.opublikowana?'on':'')+'">'+(g.opublikowana?'opublikowana':'ukryta')+'</span> <span class="pill">'+esc(g.slug)+'</span></div></div><div class="actions"><button class="btn" data-edit="'+esc(g.slug)+'">Edytuj</button><button class="btn" data-preview="'+esc(g.slug)+'">Podgląd</button><button class="btn" data-toggle="'+esc(g.slug)+'" data-next="'+(g.opublikowana?'0':'1')+'">'+(g.opublikowana?'Ukryj':'Opublikuj')+'</button><button class="btn danger" data-delete="'+esc(g.slug)+'">Usuń</button></div></article>';}).join(""):'<div class="empty">Nie dodano jeszcze żadnej gry przez panel.</div>';
+    $("gamesList").querySelectorAll("[data-edit]").forEach(function(b){b.onclick=function(){editGame(b.dataset.edit);};});
+    $("gamesList").querySelectorAll("[data-preview]").forEach(function(b){b.onclick=function(){editGame(b.dataset.preview);preview();};});
+    $("gamesList").querySelectorAll("[data-toggle]").forEach(function(b){b.onclick=function(){toggleGame(b.dataset.toggle,b.dataset.next==="1");};});
+    $("gamesList").querySelectorAll("[data-delete]").forEach(function(b){b.onclick=function(){deleteGame(b.dataset.delete);};});
+  }
+  function renderAll(){renderKpis();renderChart();renderStatsTable();renderGames();}
+
+  function clearForm(){editingSlug=null;slugTouched=false;$("editorTitle").textContent="Nowa gra";$("titleInput").value="";$("slugInput").value="";$("slugInput").disabled=false;$("iconInput").value="🎮";$("categoryInput").value="Gierka";$("orderInput").value="100";$("descInput").value="";$("publishedInput").checked=false;$("fullscreenInput").checked=true;$("htmlInput").value="";$("fileInput").value="";$("previewFrame").srcdoc="";codeInfo();show("editorCard");$("editorCard").scrollIntoView({behavior:"smooth",block:"start"});}
+  function editGame(slug){var g=games.find(function(x){return x.slug===slug;});if(!g)return;editingSlug=slug;slugTouched=true;$("editorTitle").textContent="Edytuj: "+g.tytul;$("titleInput").value=g.tytul||"";$("slugInput").value=g.slug;$("slugInput").disabled=true;$("iconInput").value=g.ikona||"🎮";$("categoryInput").value=g.kategoria||"Gierka";$("orderInput").value=g.kolejnosc==null?100:g.kolejnosc;$("descInput").value=g.opis||"";$("publishedInput").checked=!!g.opublikowana;$("fullscreenInput").checked=g.pelny!==false;$("htmlInput").value=g.html||"";$("fileInput").value="";codeInfo();show("editorCard");$("editorCard").scrollIntoView({behavior:"smooth",block:"start"});}
+  function codeInfo(){var len=$("htmlInput").value.length;$("codeInfo").textContent=fmt(len)+" znaków";$("codeInfo").style.color=len>2000000?"var(--red)":"";}
+  function preview(){var html=$("htmlInput").value;if(!html.trim()){setMsg("Najpierw wklej kod HTML albo wybierz plik.","err");return;}var base='<base href="'+location.origin.replace(/"/g,"")+'/">';if(/<head[^>]*>/i.test(html))html=html.replace(/<head([^>]*)>/i,"<head$1>"+base);else html=base+html;$("previewFrame").srcdoc=html;}
+
+  async function saveGame(){
+    var payload={slug:editingSlug||slugify($("slugInput").value||$("titleInput").value),tytul:$("titleInput").value.trim(),opis:$("descInput").value.trim(),ikona:$("iconInput").value.trim()||"🎮",kategoria:$("categoryInput").value.trim()||"Gierka",typ:"html",html:$("htmlInput").value,url:null,pelny:$("fullscreenInput").checked,opublikowana:$("publishedInput").checked,kolejnosc:parseInt($("orderInput").value||"100",10)};
+    if(!/^[a-z0-9][a-z0-9-]{1,59}$/.test(payload.slug)){setMsg("Identyfikator musi mieć 2–60 znaków: małe litery, cyfry i łączniki.","err");return;}
+    if(["kopalnia","na-wiyrch","bandyta","pong"].indexOf(payload.slug)!==-1){setMsg("Ten identyfikator jest zarezerwowany dla gierki zapisanej jako osobny plik.","err");return;}
+    if(!payload.tytul){setMsg("Podaj nazwę gry.","err");return;}
+    if(payload.html.trim().length<20){setMsg("Wklej kod HTML albo wybierz plik.","err");return;}
+    if(payload.html.length>2000000){setMsg("Kod jest większy niż 2 000 000 znaków.","err");return;}
+    $("saveBtn").disabled=true;setMsg("Zapisuję grę...");
+    try{var r=await sb.from("szpilplac_minigry").upsert(payload,{onConflict:"slug"});if(r.error)throw r.error;setMsg("Gra została zapisana.","ok");hide("editorCard");await loadData(false);}catch(e){setMsg("Nie udało się zapisać gry.\n"+(e.message||e),"err");}finally{$("saveBtn").disabled=false;}
+  }
+  async function toggleGame(slug,next){setMsg(next?"Publikuję grę...":"Ukrywam grę...");var r=await sb.from("szpilplac_minigry").update({opublikowana:next}).eq("slug",slug);if(r.error){setMsg(r.error.message,"err");return;}await loadData(false);}
+  async function deleteGame(slug){var g=games.find(function(x){return x.slug===slug;});if(!confirm("Usunąć grę „"+(g?g.tytul:slug)+"”? Statystyki pozostaną w bazie."))return;setMsg("Usuwam grę...");var r=await sb.from("szpilplac_minigry").delete().eq("slug",slug);if(r.error){setMsg(r.error.message,"err");return;}if(editingSlug===slug)hide("editorCard");await loadData(false);}
+
+  function readFile(file){if(!file)return;if(file.size>2000000){setMsg("Plik jest większy niż 2 MB.","err");$("fileInput").value="";return;}var rd=new FileReader();rd.onload=function(){var html=String(rd.result||"");$("htmlInput").value=html;codeInfo();if(!$("titleInput").value.trim()){var m=html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);$("titleInput").value=m?m[1].replace(/<[^>]+>/g,"").trim():file.name.replace(/\.html?$/i,"");}if(!editingSlug&&!slugTouched)$("slugInput").value=slugify(file.name.replace(/\.html?$/i,""));preview();setMsg("Plik wczytany. Sprawdź podgląd i zapisz grę.","ok");};rd.onerror=function(){setMsg("Nie udało się odczytać pliku.","err");};rd.readAsText(file,"UTF-8");}
+
+  async function boot(){initTheme();try{initSupabase();var ok=await requireAdmin();if(!ok){setMsg("Nie jesteś zalogowany jako administrator.","err");show("loginCard");return;}await loadData(false);}catch(e){setMsg("Nie udało się uruchomić panelu.\n"+(e.message||e),"err");show("loginCard");}}
+
+  $("refreshBtn").onclick=function(){loadData(true);};$("newBtn").onclick=clearForm;$("closeEditorBtn").onclick=function(){hide("editorCard");};$("clearBtn").onclick=clearForm;$("previewBtn").onclick=preview;$("saveBtn").onclick=saveGame;$("htmlInput").addEventListener("input",codeInfo);$("fileInput").addEventListener("change",function(){readFile(this.files&&this.files[0]);});$("titleInput").addEventListener("input",function(){if(!editingSlug&&!slugTouched)$("slugInput").value=slugify(this.value);});$("slugInput").addEventListener("input",function(){slugTouched=true;this.value=slugify(this.value);});
+  boot();
+})();
+</script>
+</body>
+</html>
