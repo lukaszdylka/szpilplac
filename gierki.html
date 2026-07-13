@@ -145,7 +145,7 @@ if(Z_BAZY){
       .then(function(rows){
         if(!rows || !rows.length) return;
         document.getElementById("zBazy").innerHTML =
-          '<div class="sep">Świeżo wrzucone</div><div class="siatka">'+
+          +
           rows.map(function(r){
             return kafelek({ plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
                              ikona:r.ikona, tytul:r.tytul, opis:r.opis, pelny:!!r.pelny });
