@@ -51,6 +51,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
   var startSent=false;
   var lastFinish=0;
   var VISITOR_KEY="szpilplac_minigry_visitor_v1";
+  var GAME_STORE_KEY="szpilplac_minigra_store_v1:"+slug;
 
   function visitorId(){
     try{
@@ -88,14 +89,34 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
     }).catch(function(){});
   }
 
+  function readGameStorage(){
+    var data={};
+    try{
+      data=JSON.parse(localStorage.getItem(GAME_STORE_KEY)||"{}")||{};
+      if(typeof data!=="object"||Array.isArray(data))data={};
+      if(data.szpilplac_theme==null){
+        var theme=localStorage.getItem("szpilplac_theme");
+        if(theme)data.szpilplac_theme=theme;
+      }
+    }catch(e){data={};}
+    return data;
+  }
+
+  function saveGameStorage(data){
+    try{
+      var raw=JSON.stringify(data||{});
+      if(raw.length<=200000)localStorage.setItem(GAME_STORE_KEY,raw);
+    }catch(e){}
+  }
+
   function bridgeHtml(html){
     var base='<base href="'+location.origin.replace(/"/g,"")+'/">';
-    var bridge='<script>(function(){"use strict";var begun=Date.now(),sent=false;function post(type,data){parent.postMessage({source:"szpilplac-minigra",type:type,data:data||{}},"*");}function start(){if(sent)return;sent=true;begun=Date.now();post("start");}window.SZPILPLAC_MINIGRA={start:start,finish:function(data){data=data||{};if(data.duration_ms==null)data.duration_ms=Date.now()-begun;post("finish",data);}};addEventListener("pointerdown",start,{once:true,capture:true});addEventListener("keydown",start,{once:true,capture:true});post("ready");})();<\/script>';
+    var initial=JSON.stringify(readGameStorage()).replace(/</g,"\\u003c");
+    var bridge='<script>(function(){"use strict";var begun=Date.now(),sent=false,memory='+initial+';function post(type,data){parent.postMessage({source:"szpilplac-minigra",type:type,data:data||{}},"*");}var storage={get length(){return Object.keys(memory).length;},key:function(i){var keys=Object.keys(memory);return keys[i]==null?null:keys[i];},getItem:function(k){k=String(k);return Object.prototype.hasOwnProperty.call(memory,k)?memory[k]:null;},setItem:function(k,v){k=String(k);v=String(v);memory[k]=v;post("storage",{action:"set",key:k,value:v});},removeItem:function(k){k=String(k);delete memory[k];post("storage",{action:"remove",key:k});},clear:function(){memory={};post("storage",{action:"clear"});}};try{Object.defineProperty(window,"localStorage",{value:storage,configurable:true});}catch(e){}function start(){if(sent)return;sent=true;begun=Date.now();post("start");}window.SZPILPLAC_MINIGRA={start:start,storage:storage,finish:function(data){data=data||{};if(data.duration_ms==null)data.duration_ms=Date.now()-begun;post("finish",data);}};addEventListener("pointerdown",start,{once:true,capture:true});addEventListener("keydown",start,{once:true,capture:true});post("ready");})();<\/script>';
     html=String(html||"");
-    if(/<head[^>]*>/i.test(html))html=html.replace(/<head([^>]*)>/i,"<head$1>"+base);
-    else html=base+html;
-    if(/<\/body\s*>/i.test(html))return html.replace(/<\/body\s*>/i,bridge+"</body>");
-    return html+bridge;
+    if(/<head[^>]*>/i.test(html))html=html.replace(/<head([^>]*)>/i,"<head$1>"+base+bridge);
+    else html=base+bridge+html;
+    return html;
   }
 
   function load(){
@@ -124,8 +145,20 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
     if(e.source!==frame.contentWindow)return;
     var m=e.data||{};
     if(m.source!=="szpilplac-minigra")return;
+    if(m.type==="storage"){
+      var action=m.data&&m.data.action;
+      var memory=readGameStorage();
+      if(action==="clear")memory={};
+      if(action==="remove"&&m.data.key!=null)delete memory[String(m.data.key)];
+      if(action==="set"&&m.data.key!=null&&String(m.data.key).length<=200){
+        memory[String(m.data.key)]=String(m.data.value==null?"":m.data.value);
+      }
+      saveGameStorage(memory);
+      return;
+    }
     if(m.type==="start"&&!startSent){startSent=true;startedAt=Date.now();track("start");}
     if(m.type==="finish"){
+      if(!startSent)return;
       var now=Date.now();
       if(now-lastFinish<800)return;
       lastFinish=now;
