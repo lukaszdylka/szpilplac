@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gierka · Szpilplac</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<script src="config.js?v=13"></script>
+<style>
+:root{--bg:#12100d;--surface:#1e1a15;--ink:#ede5d0;--muted:#a79d88;--line:#3d3629;--green:#4a9a6a;--red:#d76a4f}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+body{display:grid;grid-template-rows:auto 1fr}
+.bar{min-height:48px;display:flex;align-items:center;gap:10px;padding:7px max(10px,env(safe-area-inset-right)) 7px max(10px,env(safe-area-inset-left));background:rgba(18,16,13,.96);border-bottom:1px solid var(--line);z-index:3}
+.back,.btn{min-height:34px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:var(--surface);color:var(--ink);text-decoration:none;font:800 12px/1 Inter,system-ui,sans-serif;cursor:pointer}
+.back{color:var(--green)}
+.title{min-width:0;flex:1;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage{position:relative;min-height:0}
+iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
+.state{position:absolute;inset:0;z-index:2;display:grid;place-items:center;padding:24px;text-align:center;background:radial-gradient(circle at 50% 25%,#272118,var(--bg) 68%)}
+.state.hidden{display:none}
+.box{max-width:520px;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:22px;box-shadow:0 22px 60px -36px #000}
+.box h1{margin:0 0 8px;font:700 28px/1 Oswald,Inter,sans-serif;text-transform:uppercase}
+.box p{margin:0;color:var(--muted);font-size:13px;line-height:1.55;white-space:pre-line}
+.box .back{margin-top:15px}
+@media(max-width:560px){.bar{min-height:46px}.btn{width:38px;padding:0}.btn span{display:none}}
+</style>
+</head>
+<body>
+<nav class="bar" aria-label="Nawigacja gierki">
+  <a class="back" href="gierki.html">← Gierki</a>
+  <div class="title" id="gameTitle">Ładowanie gierki...</div>
+  <button class="btn" id="fullscreenBtn" type="button" title="Pełny ekran">⛶ <span>Pełny ekran</span></button>
+</nav>
+<main class="stage">
+  <div class="state" id="state"><div class="box"><h1>Momencik</h1><p id="stateText">Pobieram kod gierki.</p></div></div>
+  <iframe id="gameFrame" title="Gierka" sandbox="allow-scripts allow-forms allow-modals allow-pointer-lock" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  var frame=document.getElementById("gameFrame");
+  var state=document.getElementById("state");
+  var stateText=document.getElementById("stateText");
+  var title=document.getElementById("gameTitle");
+  var slug=String(new URLSearchParams(location.search).get("g")||"").toLowerCase().trim();
+  var startedAt=Date.now();
+  var startSent=false;
+  var lastFinish=0;
+  var VISITOR_KEY="szpilplac_minigry_visitor_v1";
+
+  function visitorId(){
+    try{
+      var id=localStorage.getItem(VISITOR_KEY);
+      if(id)return id;
+      id=(crypto&&crypto.randomUUID)?crypto.randomUUID():("v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+      localStorage.setItem(VISITOR_KEY,id);
+      return id;
+    }catch(e){return "v-"+Math.random().toString(36).slice(2);}
+  }
+
+  function showError(text){
+    state.classList.remove("hidden");
+    state.querySelector("h1").textContent="Nie udało się otworzyć";
+    stateText.textContent=text;
+    if(!state.querySelector("a"))state.querySelector(".box").insertAdjacentHTML("beforeend",'<a class="back" href="gierki.html">Wróć do gierek</a>');
+  }
+
+  function track(type,data){
+    data=data||{};
+    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return Promise.resolve();
+    return fetch(cfg.SUPABASE_URL+"/rest/v1/rpc/szpilplac_minigry_track",{
+      method:"POST",
+      keepalive:true,
+      headers:{"Content-Type":"application/json",apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY},
+      body:JSON.stringify({
+        p_slug:slug,
+        p_event_type:type,
+        p_visitor_id:visitorId(),
+        p_won:data.won===true?true:(data.won===false?false:null),
+        p_score:Number.isFinite(Number(data.score))?Number(data.score):null,
+        p_duration_ms:Number.isFinite(Number(data.duration_ms))?Math.max(0,Math.round(Number(data.duration_ms))):null,
+        p_meta:data.meta&&typeof data.meta==="object"?data.meta:{}
+      })
+    }).catch(function(){});
+  }
+
+  function bridgeHtml(html){
+    var base='<base href="'+location.origin.replace(/"/g,"")+'/">';
+    var bridge='<script>(function(){"use strict";var begun=Date.now(),sent=false;function post(type,data){parent.postMessage({source:"szpilplac-minigra",type:type,data:data||{}},"*");}function start(){if(sent)return;sent=true;begun=Date.now();post("start");}window.SZPILPLAC_MINIGRA={start:start,finish:function(data){data=data||{};if(data.duration_ms==null)data.duration_ms=Date.now()-begun;post("finish",data);}};addEventListener("pointerdown",start,{once:true,capture:true});addEventListener("keydown",start,{once:true,capture:true});post("ready");})();<\/script>';
+    html=String(html||"");
+    if(/<head[^>]*>/i.test(html))html=html.replace(/<head([^>]*)>/i,"<head$1>"+base);
+    else html=base+html;
+    if(/<\/body\s*>/i.test(html))return html.replace(/<\/body\s*>/i,bridge+"</body>");
+    return html+bridge;
+  }
+
+  function load(){
+    if(!/^[a-z0-9][a-z0-9-]{1,59}$/.test(slug)){showError("Link do gierki jest nieprawidłowy.");return;}
+    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){showError("Brakuje konfiguracji Supabase w pliku config.js.");return;}
+    var select="slug,tytul,opis,html,pelny,typ,url";
+    var url=cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select="+select+"&slug=eq."+encodeURIComponent(slug)+"&opublikowana=eq.true&limit=1";
+    fetch(url,{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}})
+      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+      .then(function(rows){
+        var game=rows&&rows[0];
+        if(!game)throw new Error("Ta gierka nie istnieje albo jest jeszcze ukryta.");
+        if(game.typ==="link"&&game.url){location.replace(game.url);return;}
+        if(!game.html)throw new Error("Gierka nie ma zapisanego kodu HTML.");
+        document.title=game.tytul+" · Szpilplac";
+        title.textContent=game.tytul;
+        startedAt=Date.now();
+        frame.srcdoc=bridgeHtml(game.html);
+        frame.addEventListener("load",function(){state.classList.add("hidden");},{once:true});
+        track("open");
+      })
+      .catch(function(e){showError(e&&e.message||"Nieznany błąd.");});
+  }
+
+  window.addEventListener("message",function(e){
+    if(e.source!==frame.contentWindow)return;
+    var m=e.data||{};
+    if(m.source!=="szpilplac-minigra")return;
+    if(m.type==="start"&&!startSent){startSent=true;startedAt=Date.now();track("start");}
+    if(m.type==="finish"){
+      var now=Date.now();
+      if(now-lastFinish<800)return;
+      lastFinish=now;
+      var d=m.data&&typeof m.data==="object"?m.data:{};
+      if(d.duration_ms==null)d.duration_ms=now-startedAt;
+      track("finish",d);
+    }
+  });
+
+  document.getElementById("fullscreenBtn").addEventListener("click",function(){
+    var el=document.documentElement;
+    if(document.fullscreenElement)document.exitFullscreen&&document.exitFullscreen();
+    else el.requestFullscreen&&el.requestFullscreen();
+  });
+
+  if(new URLSearchParams(location.search).get("fs")==="1"){
+    document.addEventListener("pointerdown",function(){
+      if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(function(){});
+    },{once:true,capture:true});
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
