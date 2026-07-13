@@ -118,6 +118,7 @@
   <button onclick="restart()">Zagrej jeszcze roz</button>
 </div>
 
+<script src="minigry-stats.js?v=1" data-game="kopalnia"></script>
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -276,6 +277,13 @@ function triggerDeath(reason){
     text.textContent = 'Nietoperze Cię pokonały. Odskakuj w bok, żeby ich unikać.';
   }
   document.getElementById('overlayDead').classList.add('show');
+  if(window.SZPILPLAC_MINIGRA_STATS){
+    window.SZPILPLAC_MINIGRA_STATS.finish({
+      won:false,
+      score:coalList.filter(c=>c.taken).length,
+      meta:{reason:reason,score_type:'zebrany_wyngiel'}
+    });
+  }
 }
 
 /* ── wynik: czas szychty + rekord (localStorage) ── */
@@ -305,6 +313,9 @@ function showWin(){
   document.getElementById('wRekord').textContent = czasTxt(nowy ? sek : rekord);
   document.getElementById('nowyRek').classList.toggle('show', nowy && rekord !== 0);
   document.getElementById('overlayWin').classList.add('show');
+  if(window.SZPILPLAC_MINIGRA_STATS){
+    window.SZPILPLAC_MINIGRA_STATS.finish({won:true,score:sek,duration_ms:sek*1000,meta:{score_type:'czas_w_sekundach'}});
+  }
 }
 
 function update(){

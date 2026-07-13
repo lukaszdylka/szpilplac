@@ -188,6 +188,7 @@ main{width:100%;max-width:640px;display:flex;flex-direction:column;
   <div class="foot" id="foot">Spacja = zakręć · „Trzymaj" blokuje bęben · R = nowa gra</div>
 </main>
 
+<script src="minigry-stats.js?v=1" data-game="bandyta"></script>
 <script>
 /* ====================== KONFIGURACJA ====================== */
 const KONFIG = {
@@ -386,6 +387,9 @@ function pokazKoniec(){
   spinBtn.classList.add("idle");
   holdEls.forEach(b=>b.disabled=true);
   odswiezHud();
+  if(window.SZPILPLAC_MINIGRA_STATS){
+    window.SZPILPLAC_MINIGRA_STATS.finish({score:punkty,meta:{nowy_rekord:nowy}});
+  }
 }
 
 function toggleHold(i){

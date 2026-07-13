@@ -93,6 +93,7 @@
   </div>
 </div>
 
+<script src="minigry-stats.js?v=1" data-game="na-wiyrch"></script>
 <script>
 /* =========================================================================
    NA WIYRCH — mini-gra w stylu Icy Tower, osadzona w familoku.
@@ -410,6 +411,9 @@ function koniec() {
   const nowyRekord = punkty >= rekord && punkty > 0;
   document.getElementById('naglowekKoniec').textContent = nowyRekord ? 'NOJLEPSZY WYNIK!' : TEKSTY.koniec;
   document.getElementById('ekranKoniec').classList.remove('schowany');
+  if(window.SZPILPLAC_MINIGRA_STATS){
+    window.SZPILPLAC_MINIGRA_STATS.finish({score:punkty,meta:{piyntro:piyntro,wyngiel:wyngielIle}});
+  }
 }
 
 // ---------------------------------------------------------------- rysowanie
