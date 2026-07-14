@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#11151d">
-<title>Fedrunek — kopalniany clicker v2.5.3</title>
+<title>Fedrunek — klikej w wyngiel</title>
 <style>
 :root{
   --bg:#10131a;
@@ -514,6 +514,65 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
   .skillIcon{display:grid}
 }
 
+
+/* AUTOMATYCZNE KILOFY WOKÓŁ BRYŁY */
+#autoPickaxes{
+  position:absolute;z-index:6;inset:-13%;border-radius:50%;pointer-events:none;
+  overflow:visible;contain:layout style;
+}
+.autoPick{
+  position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);
+  transform:translate(-50%,-50%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.65));
+  opacity:.92;will-change:transform;
+}
+.autoPick svg{
+  display:block;width:100%;height:100%;overflow:visible;
+  transform-origin:58% 76%;
+  animation:autoPickHit var(--speed) cubic-bezier(.55,.05,.35,1) infinite;
+  animation-delay:var(--delay);
+}
+.autoPick .pickMetal{stroke:#d1d8e4;stroke-width:2.3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.autoPick .pickWood{stroke:#9b6839;stroke-width:2.6;fill:none;stroke-linecap:round}
+.autoPick.spark::after{
+  content:"";position:absolute;left:56%;top:67%;width:4px;height:4px;border-radius:50%;
+  background:var(--amber2);box-shadow:0 0 8px var(--amber);opacity:0;
+  animation:autoPickSpark var(--speed) linear infinite;animation-delay:var(--delay);
+}
+@keyframes autoPickHit{
+  0%,52%,100%{transform:rotate(calc(var(--face) - 38deg)) translateY(0)}
+  66%{transform:rotate(calc(var(--face) + 15deg)) translateY(1px)}
+  72%{transform:rotate(calc(var(--face) + 5deg)) translateY(0)}
+}
+@keyframes autoPickSpark{0%,64%,78%,100%{opacity:0;transform:scale(.4)}68%{opacity:1;transform:scale(1.5)}}
+#autoPickaxes.off{display:none}
+
+/* OPCJE */
+.optionsOverlay{
+  position:fixed;z-index:300;inset:0;display:grid;place-items:center;padding:20px;
+  background:rgba(5,7,10,.72);backdrop-filter:blur(8px);
+}
+.optionsOverlay[hidden]{display:none}
+.optionsCard{
+  width:min(430px,94vw);border:1px solid var(--line);border-radius:18px;
+  background:linear-gradient(180deg,#222a39,#171d28);box-shadow:0 24px 80px rgba(0,0,0,.62);overflow:hidden;
+}
+.optionsHead{display:flex;align-items:center;justify-content:space-between;padding:16px 17px;border-bottom:1px solid var(--line)}
+.optionsHead h2{margin:0;font-size:18px}.optionsClose{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:#141923;font-size:20px}
+.optionsBody{padding:14px 16px 17px}.optionRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 0}
+.optionRow+.optionRow{border-top:1px solid rgba(255,255,255,.06)}
+.optionName{font-size:13px;font-weight:900}.optionDesc{margin-top:4px;color:var(--muted);font-size:11px;line-height:1.4}
+.switch{position:relative;width:48px;height:28px;border-radius:999px;background:#30394c;border:1px solid #46526d;padding:0;transition:.18s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#aab3c2;transition:.18s}
+.switch.on{background:#7c5822;border-color:var(--amber)}.switch.on::after{left:23px;background:var(--amber2)}
+.optionFoot{margin-top:8px;padding:10px 12px;border-radius:11px;background:#141923;color:var(--muted);font-size:10px;line-height:1.45}
+
+@media(max-width:820px){
+  #autoPickaxes{inset:-9%}.autoPick{opacity:.82}
+}
+@media(prefers-reduced-motion:reduce){
+  .autoPick svg,.autoPick.spark::after{animation:none}
+}
+
 #analyticsBadge{cursor:pointer}
 #analyticsBadge:hover{border-color:var(--amber);color:var(--amber2)}
 </style>
@@ -522,15 +581,16 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 <div id="app">
   <main id="mineSide">
     <header class="topbar">
-      <div class="brand">FEDRUNEK<small>kopalniany clicker</small></div>
+      <div class="brand">FEDRUNEK<small>klikej w wyngiel</small></div>
       <div class="resource">
         <div id="coalCount">0</div>
         <div class="resourceLabel">WYNGLA</div>
         <div id="rateLine">0 /s · klik +1</div>
-        <div class="hudStatus"><span class="statusDot"></span><span id="nextUnlockLine">Następne odblokowanie: Grubiorz</span></div>
+        <div class="hudStatus"><span class="statusDot"></span><span id="nextUnlockLine">Następne odblokowanie: Kilof</span></div>
       </div>
       <div class="topActions">
         <button class="iconBtn" id="soundBtn" title="Dźwięk" aria-label="Dźwięk">🔊</button>
+        <button class="iconBtn" id="settingsBtn" title="Opcje" aria-label="Opcje">⚙</button>
         <button class="iconBtn" id="helpBtn" title="Pomoc" aria-label="Pomoc">?</button>
       </div>
     </header>
@@ -539,6 +599,7 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 
     <section id="mineScene" aria-label="Strefa fedrowania">
       <button id="coalButton" aria-label="Kliknij w bryłę węgla">
+        <span id="autoPickaxes" aria-hidden="true"></span>
         <span id="rockWrap">
           <svg id="rockSvg" viewBox="0 0 360 360" aria-hidden="true">
             <defs>
@@ -630,6 +691,22 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
     </div>
   </aside>
 </div>
+<div class="optionsOverlay" id="optionsOverlay" hidden>
+  <section class="optionsCard" role="dialog" aria-modal="true" aria-labelledby="optionsTitle">
+    <header class="optionsHead"><h2 id="optionsTitle">Opcje gry</h2><button class="optionsClose" id="optionsClose" aria-label="Zamknij">×</button></header>
+    <div class="optionsBody">
+      <div class="optionRow">
+        <div><div class="optionName">Animowane kilofy</div><div class="optionDesc">Każdy kupiony kilof pojawia się wokół bryły i automatycznie w nią uderza.</div></div>
+        <button class="switch on" id="pickaxeToggle" role="switch" aria-checked="true" aria-label="Animowane kilofy"></button>
+      </div>
+      <div class="optionRow">
+        <div><div class="optionName">Dźwięki</div><div class="optionDesc">Efekty kliknięć, zakupów i aktywnych umiejętności.</div></div>
+        <button class="switch on" id="soundToggle" role="switch" aria-checked="true" aria-label="Dźwięki"></button>
+      </div>
+      <div class="optionFoot">Animacje można wyłączyć bez wpływu na produkcję. Kilofy nadal będą wydobywać wyngiel w tle.</div>
+    </div>
+  </section>
+</div>
 <div id="fxLayer"></div><div id="toasts"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -640,7 +717,7 @@ const CFG={
   saveKey:'fedrunek_classic_v2', oldSaveKey:'fedrunek_v1', priceScale:1.15, autosave:5000,
   offlineMax:8*3600, goldenMin:45, goldenMax:105, goldenLife:10,
   dynamiteCd:30, rushCd:45, rushDuration:15,
-  version:'2.5.3', analyticsHeartbeat:30,
+  version:'2.6.0', analyticsHeartbeat:30,
   supabaseUrl:'https://xyivrakegwybwhmmcawq.supabase.co',
   supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo'
 };
@@ -663,6 +740,7 @@ const ICONS={
 };
 
 const WORKERS=[
+  {id:'kilof',name:'Kilof',desc:'Sam uderza w bryłę. Każdy kupiony pojawia się przy wynglu.',base:5,cps:.05,icon:'pick',unlock:0},
   {id:'hawiyrz',name:'Grubiorz',desc:'Fedruje pomału, ale durch.',base:15,cps:.2,icon:'pick',unlock:0},
   {id:'karlus',name:'Karlus z kilofym',desc:'Młody, gibki i coraz sprawniejszy.',base:100,cps:1.2,icon:'hammer',unlock:30},
   {id:'wozek',name:'Ładowacz wózków',desc:'Dba, żeby urobek nie zalegał.',base:1100,cps:9,icon:'cart',unlock:400},
@@ -723,7 +801,7 @@ const ACHIEVEMENTS=[
 
 const freshState=()=>({
   coal:0,lifetime:0,allTime:0,clicks:0,workers:{},upgrades:[],tasks:[],achievements:[],
-  prestige:0,resets:0,goldenClicks:0,buyMode:'1',muted:false,last:Date.now(),
+  prestige:0,resets:0,goldenClicks:0,buyMode:'1',muted:false,pickaxeAnimations:true,last:Date.now(),
   combo:0,lastClick:0,buffs:[],cooldowns:{dynamite:0,rush:0},activeSeconds:0
 });
 let S=freshState();
@@ -785,7 +863,7 @@ function clickRock(x,y){
   animateRock(crit);floatingNumber(x,y,'+'+fmt(amount),crit);particles(x,y,crit?11:6);soundClick(crit);checkProgress();
 }
 
-function buyWorker(w){const amount=selectedAmount(w);if(amount<1)return;const cost=priceMany(w,amount);if(!spend(cost))return;analyticsStart('first_purchase');const before=S.workers[w.id]||0;S.workers[w.id]=before+amount;const after=S.workers[w.id];analyticsEvent('worker_bought',w.id,amount,{amount,cost,owned:after});for(const milestone of [10,25,50,100,200])if(before<milestone&&after>=milestone)analyticsEvent('worker_milestone',w.id,milestone,{milestone,owned:after});soundBuy();toast('Kupiono: '+w.name+' ×'+amount);save();checkProgress();renderShop();}
+function buyWorker(w){const amount=selectedAmount(w);if(amount<1)return;const cost=priceMany(w,amount);if(!spend(cost))return;analyticsStart('first_purchase');const before=S.workers[w.id]||0;S.workers[w.id]=before+amount;const after=S.workers[w.id];analyticsEvent('worker_bought',w.id,amount,{amount,cost,owned:after});for(const milestone of [10,25,50,100,200])if(before<milestone&&after>=milestone)analyticsEvent('worker_milestone',w.id,milestone,{milestone,owned:after});soundBuy();toast('Kupiono: '+w.name+' ×'+amount);save();checkProgress();renderShop();if(w.id==='kilof')renderAutoPickaxes(true);}
 function buyUpgrade(u){if(hasUpgrade(u.id)||!u.unlock(S)||!spend(u.price))return;analyticsStart('first_purchase');S.upgrades.push(u.id);analyticsEvent('upgrade_bought',u.id,u.price,{name:u.name,price:u.price});soundBuy();toast('Ulepszenie: '+u.name);save();renderAll(true);analyticsCheckProgress();}
 function claimTask(t){if(S.tasks.includes(t.id)||!t.done(S))return;S.tasks.push(t.id);addCoal(t.reward);analyticsEvent('task_claimed',t.id,t.reward,{name:t.name,reward:t.reward});soundBuy();toast('Nagroda za zadanie: +'+fmt(t.reward));save();renderGoals();}
 
@@ -806,7 +884,7 @@ function doPrestige(){
   const gain=prestigeGain();if(gain<1)return;
   if(!confirm('Rozpocząć nową szychtę za '+gain+' znaków sztygara? Zwykły postęp zostanie wyzerowany.'))return;
   analyticsStart('prestige');analyticsEvent('prestige',String(gain),gain,{gain,lifetime:S.lifetime,prestigeBefore:S.prestige,resetsBefore:S.resets});
-  const keep={prestige:S.prestige+gain,resets:S.resets+1,achievements:[...S.achievements],goldenClicks:S.goldenClicks,allTime:S.allTime,muted:S.muted,activeSeconds:S.activeSeconds};
+  const keep={prestige:S.prestige+gain,resets:S.resets+1,achievements:[...S.achievements],goldenClicks:S.goldenClicks,allTime:S.allTime,muted:S.muted,pickaxeAnimations:S.pickaxeAnimations,activeSeconds:S.activeSeconds};
   S=freshState();Object.assign(S,keep);S.last=Date.now();toast('Nowa szychta rozpoczęta. Stała premia rośnie.');save();renderAll(true);checkProgress();
 }
 
@@ -852,6 +930,39 @@ function renderGoals(){
   $('#achievementList').innerHTML=ACHIEVEMENTS.map(a=>{const got=S.achievements.includes(a.id);return `<div class="task ${got?'done':''}"><div><div class="taskName">${got?'✓ ':'○ '}${a.name}</div><div class="taskText">${a.text}</div></div><div class="taskReward">${got?'+1%':'Ukryte'}</div></div>`}).join('');
 }
 
+
+let renderedPickaxeCount=-1,renderedPickaxeEnabled=null;
+function pickaxeSvg(){return '<svg viewBox="0 0 32 32" aria-hidden="true"><path class="pickMetal" d="M5 10c7-5 15-5 22 0"/><path class="pickWood" d="M16 8v19"/><path class="pickMetal" d="m12 27 4-4 4 4"/></svg>';}
+function renderAutoPickaxes(force=false){
+  const root=$('#autoPickaxes');if(!root)return;
+  const count=Math.max(0,Math.floor(S.workers.kilof||0));
+  const enabled=S.pickaxeAnimations!==false;
+  if(!force&&count===renderedPickaxeCount&&enabled===renderedPickaxeEnabled)return;
+  renderedPickaxeCount=count;renderedPickaxeEnabled=enabled;
+  root.classList.toggle('off',!enabled||count===0);
+  if(!enabled||count===0){root.innerHTML='';return;}
+  const visible=Math.min(count,200),rings=[20,28,36,48,68],parts=[];
+  for(let i=0;i<visible;i++){
+    let ring=0,slot=i;
+    while(ring<rings.length-1&&slot>=rings[ring]){slot-=rings[ring];ring++;}
+    const cap=rings[ring],angle=(slot/cap)*Math.PI*2+(ring%2?0.085:0),radius=34+ring*8.2;
+    const x=50+Math.cos(angle)*radius,y=50+Math.sin(angle)*radius;
+    const face=(angle*180/Math.PI)+90;
+    const size=Math.max(14,24-ring*1.6),speed=(.82+(i%7)*.055).toFixed(2),delay=(-((i*0.137)%1.1)).toFixed(2);
+    parts.push(`<span class="autoPick ${i%5===0?'spark':''}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%;--face:${face.toFixed(1)}deg;--size:${size.toFixed(1)}px;--speed:${speed}s;--delay:${delay}s">${pickaxeSvg()}</span>`);
+  }
+  root.innerHTML=parts.join('');
+}
+function syncOptionsUi(){
+  const pick=$('#pickaxeToggle'),sound=$('#soundToggle');
+  const picksOn=S.pickaxeAnimations!==false,soundOn=!S.muted;
+  pick?.classList.toggle('on',picksOn);pick?.setAttribute('aria-checked',String(picksOn));
+  sound?.classList.toggle('on',soundOn);sound?.setAttribute('aria-checked',String(soundOn));
+  if($('#soundBtn'))$('#soundBtn').textContent=S.muted?'🔇':'🔊';
+}
+function openOptions(){syncOptionsUi();$('#optionsOverlay').hidden=false;}
+function closeOptions(){$('#optionsOverlay').hidden=true;}
+
 function formatLongTime(sec){sec=Math.max(0,Math.round(sec));const d=Math.floor(sec/86400);sec%=86400;const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);if(d)return d+' d '+h+' h';if(h)return h+' h '+m+' min';return m+' min';}
 
 function renderShift(){
@@ -876,7 +987,7 @@ function renderMain(){
 }
 function renderSkill(btn,bar,unlocked,until,cd,now){const left=Math.max(0,(until-now)/1000);btn.disabled=!unlocked||left>0;bar.style.transform='scaleX('+(left/cd)+')';const desc=btn.querySelector('.skillDesc');if(!unlocked)desc.textContent='Wymaga ulepszenia';else if(left>0)desc.textContent='Za '+formatTime(left);else desc.textContent=btn.id==='dynamiteBtn'?'Duży urobek':'×3 / 15 s';}
 function renderShop(){renderWorkers();renderUpgrades();}
-function renderAll(force=false){renderMain();renderShop();renderGoals();renderShift();}
+function renderAll(force=false){renderMain();renderShop();renderGoals();renderShift();renderAutoPickaxes(force);}
 
 function animateRock(crit){const b=$('#coalButton');b.classList.remove('pop','crit');void b.offsetWidth;b.classList.add(crit?'crit':'pop');setTimeout(()=>b.classList.remove('pop','crit'),240);}
 function floatingNumber(x,y,text,crit){const d=document.createElement('div');d.className='popnum'+(crit?' critical':'');d.textContent=(crit?'KRYTYK! ':'')+text;d.style.left=x+'px';d.style.top=y+'px';$('#fxLayer').appendChild(d);setTimeout(()=>d.remove(),900);}
@@ -1019,12 +1130,18 @@ $('#analyticsBadge').addEventListener('click',async()=>{
   await analyticsInit();
   if(ANALYTICS.ready){await analyticsSync();toast('Połączenie ze statystykami działa.');}
 });
-$('#soundBtn').addEventListener('click',()=>{S.muted=!S.muted;$('#soundBtn').textContent=S.muted?'🔇':'🔊';save();});
+$('#soundBtn').addEventListener('click',()=>{S.muted=!S.muted;syncOptionsUi();save();});
+$('#settingsBtn').addEventListener('click',openOptions);
+$('#optionsClose').addEventListener('click',closeOptions);
+$('#optionsOverlay').addEventListener('pointerdown',e=>{if(e.target===$('#optionsOverlay'))closeOptions();});
+$('#pickaxeToggle').addEventListener('click',()=>{S.pickaxeAnimations=S.pickaxeAnimations===false;syncOptionsUi();renderAutoPickaxes(true);save();});
+$('#soundToggle').addEventListener('click',()=>{S.muted=!S.muted;syncOptionsUi();save();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#optionsOverlay').hidden)closeOptions();});
 $('#helpBtn').addEventListener('click',()=>toast('Klikaj bryłę po lewej. Po prawej kupuj brygadę, maszyny i ulepszenia. Kamienie milowe przy 10, 25, 50, 100 i 200 sztukach podwajają wydajność.'));
 document.addEventListener('contextmenu',e=>{if(e.target.closest('#mineScene'))e.preventDefault()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();analyticsSync();}else{S.last=Date.now()}});window.addEventListener('pagehide',()=>{save();analyticsSync();});
 
-load();$('#soundBtn').textContent=S.muted?'🔇':'🔊';setBuyMode(S.buyMode||'1');renderAll(true);checkProgress();scheduleGolden();setInterval(save,CFG.autosave);setTimeout(analyticsInit,150);setInterval(analyticsSync,CFG.analyticsHeartbeat*1000);setInterval(()=>{renderShop();const tab=$('.tab.active')?.dataset.tab;if(tab==='goals')renderGoals();if(tab==='shift')renderShift();},2000);requestAnimationFrame(loop);
+load();syncOptionsUi();setBuyMode(S.buyMode||'1');renderAll(true);checkProgress();scheduleGolden();setInterval(save,CFG.autosave);setTimeout(analyticsInit,150);setInterval(analyticsSync,CFG.analyticsHeartbeat*1000);setInterval(()=>{renderShop();const tab=$('.tab.active')?.dataset.tab;if(tab==='goals')renderGoals();if(tab==='shift')renderShift();},2000);requestAnimationFrame(loop);
 </script>
 </body>
 </html>
