@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#11151d">
-<title>Fedrunek — klikej w wyngiel</title>
+<title>Fedrunek — klikej wyngiel</title>
 <style>
 :root{
   --bg:#10131a;
@@ -121,6 +121,7 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .shopBody::-webkit-scrollbar{width:8px}.shopBody::-webkit-scrollbar-thumb{background:#3b455c;border-radius:9px}.shopBody::-webkit-scrollbar-track{background:transparent}
 .tabPanel{display:none}.tabPanel.active{display:block}
 .sectionLabel{margin:7px 5px 10px;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}
+.workerCategory{margin:14px 5px 8px;padding-top:10px;border-top:1px solid rgba(75,86,111,.35);color:#c7cfdd;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.14em}.workerCategory:first-child{margin-top:2px;padding-top:0;border-top:0}
 
 .shopItem{position:relative;width:100%;display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:11px;margin-bottom:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--panel2),#1c2230);text-align:left;overflow:hidden}
 .shopItem:hover:not(:disabled){background:linear-gradient(180deg,#2a3244,#222a39);border-color:#47536e;transform:translateY(-1px)}
@@ -586,7 +587,7 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
         <div id="coalCount">0</div>
         <div class="resourceLabel">WYNGLA</div>
         <div id="rateLine">0 /s · klik +1</div>
-        <div class="hudStatus"><span class="statusDot"></span><span id="nextUnlockLine">Następne odblokowanie: Kilof</span></div>
+        <div class="hudStatus"><span class="statusDot"></span><span id="nextUnlockLine">Kopalnia czeka na pierwsze odkrycia</span></div>
       </div>
       <div class="topActions">
         <button class="iconBtn" id="soundBtn" title="Dźwięk" aria-label="Dźwięk">🔊</button>
@@ -630,8 +631,6 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
         <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,3 81,18 98,51 82,83 48,98 16,80 3,47 21,16" fill="#d89a36" stroke="#ffe39f" stroke-width="4"/><polygon points="50,3 81,18 67,48 37,38" fill="#ffe29b"/><polygon points="81,18 98,51 67,48" fill="#ebb64e"/><polygon points="98,51 82,83 58,68 67,48" fill="#dca33b"/><polygon points="82,83 48,98 58,68" fill="#bd7c22"/><polygon points="48,98 16,80 35,63 58,68" fill="#e7b44e"/><polygon points="16,80 3,47 35,63" fill="#f2c66b"/><polygon points="3,47 21,16 37,38 35,63" fill="#d99631"/><polygon points="21,16 50,3 37,38" fill="#fff0c2"/></svg>
         <span>Skarbnik</span>
       </button>
-
-      <div class="clickHint" aria-hidden="true"><span>⛏</span> Klikaj w bryłę</div>
 
       <div class="mineHud">
         <aside id="depthCard">
@@ -677,12 +676,12 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
           <div class="prestigeMark">✦</div>
           <div class="prestigeNumber" id="prestigeGain">0</div>
           <div class="prestigeLabel">znaków sztygara za nową szychtę</div>
-          <div class="infoText" id="prestigeInfo">Pierwszy znak otrzymasz po wydobyciu 1 mln wyngla w tej kopalni.</div>
+          <div class="infoText" id="prestigeInfo">Pierwszy znak otrzymasz po wydobyciu 100 mln wyngla w tej kopalni.</div>
           <button class="prestigeBtn" id="prestigeBtn" disabled>Rozpocznij nową szychtę</button>
         </div>
         <div class="infoCard" style="margin-top:10px">
           <div class="infoTitle"><span>Stała premia</span><span id="prestigeBonus">+0%</span></div>
-          <div class="infoText">Każdy znak sztygara zwiększa wszystkie przyszłe zyski o 10%. Nowa szychta zeruje wyngiel, brygadę i zwykłe ulepszenia.</div>
+          <div class="infoText">Każdy znak sztygara zwiększa wszystkie przyszłe zyski o 4%. Nowa szychta zeruje wyngiel, brygadę i zwykłe ulepszenia.</div>
         </div>
         <div class="sectionLabel statsLabel"><span>Statystyki</span><span class="badgeGroup"><span class="localBadge">ZAPIS LOKALNY</span><span class="localBadge onlineBadge connecting" id="analyticsBadge">STATYSTYKI ŁĄCZĄ…</span></span></div>
         <div class="statsGrid" id="statsGrid"></div>
@@ -714,10 +713,10 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 'use strict';
 
 const CFG={
-  saveKey:'fedrunek_classic_v2', oldSaveKey:'fedrunek_v1', priceScale:1.15, autosave:5000,
-  offlineMax:8*3600, goldenMin:45, goldenMax:105, goldenLife:10,
-  dynamiteCd:30, rushCd:45, rushDuration:15,
-  version:'2.6.0', analyticsHeartbeat:30,
+  saveKey:'fedrunek_classic_v2', oldSaveKey:'fedrunek_v1', priceScale:1.16, autosave:5000,
+  offlineMax:8*3600, goldenMin:180, goldenMax:420, goldenLife:7,
+  dynamiteCd:180, rushCd:300, rushDuration:10,
+  version:'2.8.0', analyticsHeartbeat:30,
   supabaseUrl:'https://xyivrakegwybwhmmcawq.supabase.co',
   supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo'
 };
@@ -736,55 +735,95 @@ const ICONS={
   dynamite:'<svg viewBox="0 0 24 24"><path d="M5 8h5v12H5zM12 8h5v12h-5z"/><path d="M8 8V5h6V3h4"/><path d="m19 2 1-1m0 4 2 1m-4 0-1 2"/></svg>',
   shield:'<svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6z"/><path d="m8 12 3 3 5-6"/></svg>',
   hand:'<svg viewBox="0 0 24 24"><path d="M7 12V7a2 2 0 0 1 4 0v4-6a2 2 0 0 1 4 0v6-4a2 2 0 0 1 4 0v7c0 5-3 7-7 7-3 0-5-2-7-5l-2-3a2 2 0 0 1 3-2z"/></svg>',
+  pump:'<svg viewBox="0 0 24 24"><path d="M5 20V9h8v11"/><path d="M9 9V5h7l3 3v5"/><path d="M4 20h16"/><circle cx="9" cy="14" r="2"/></svg>',
+  train:'<svg viewBox="0 0 24 24"><path d="M5 4h12a2 2 0 0 1 2 2v10H5z"/><path d="M8 8h8M7 16l-2 4m12-4 2 4M7 20h10"/><circle cx="8" cy="14" r="1"/><circle cx="16" cy="14" r="1"/></svg>',
+  fan:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 10c-1-5 2-7 5-5 2 2 0 5-3 6M14 12c5-1 7 2 5 5-2 2-5 0-6-3M12 14c1 5-2 7-5 5-2-2 0-5 3-6M10 12c-5 1-7-2-5-5 2-2 5 0 6 3"/></svg>',
+  crusher:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-3 6H7zM7 11l2 8h6l2-8"/><path d="m9 13 2 2 2-2 2 2"/><path d="M6 21h12"/></svg>',
+  control:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 21h10M12 18v3M7 9h3m4 0h3M7 13h6"/><circle cx="17" cy="13" r="1"/></svg>',
+  processing:'<svg viewBox="0 0 24 24"><path d="M3 21V9l5 3V8l5 4V5h5v16z"/><path d="M6 16h2m3 0h2m3 0h2M16 5V2h3v3"/></svg>',
+  skip:'<svg viewBox="0 0 24 24"><path d="M7 3h10v5l-2 8H9L7 8z"/><path d="M12 16v5M8 21h8M9 8h6"/></svg>',
+  complex:'<svg viewBox="0 0 24 24"><path d="M3 21V8h6v13M9 21V4h6v17M15 21V10h6v11"/><path d="M5 12h2m4-4h2m4 6h2M2 21h20"/></svg>',
   star:'<svg viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>'
 };
 
 const WORKERS=[
-  {id:'kilof',name:'Kilof',desc:'Sam uderza w bryłę. Każdy kupiony pojawia się przy wynglu.',base:5,cps:.05,icon:'pick',unlock:0},
-  {id:'hawiyrz',name:'Grubiorz',desc:'Fedruje pomału, ale durch.',base:15,cps:.2,icon:'pick',unlock:0},
-  {id:'karlus',name:'Karlus z kilofym',desc:'Młody, gibki i coraz sprawniejszy.',base:100,cps:1.2,icon:'hammer',unlock:30},
-  {id:'wozek',name:'Ładowacz wózków',desc:'Dba, żeby urobek nie zalegał.',base:1100,cps:9,icon:'cart',unlock:400},
-  {id:'szola',name:'Szola',desc:'Wyciąga wyngiel na wiyrch.',base:12000,cps:52,icon:'lift',unlock:5000},
-  {id:'kombajn',name:'Kombajn ścianowy',desc:'Maszina za całą brygadę.',base:135000,cps:290,icon:'gear',unlock:60000},
-  {id:'tasma',name:'Taśmociąg',desc:'Urobek jedzie bez postoju.',base:1500000,cps:1650,icon:'belt',unlock:700000},
-  {id:'sortownia',name:'Sortownia',desc:'Odzyskuje wartość z każdej tony.',base:22000000,cps:9400,icon:'factory',unlock:9000000},
-  {id:'szyb',name:'Nowy szyb',desc:'Otwiera kolejne pokłady kopalni.',base:340000000,cps:56000,icon:'tower',unlock:130000000},
-  {id:'gruba',name:'Cołko gruba',desc:'Pełny zakład pracujący bez przerwy.',base:5500000000,cps:340000,icon:'factory',unlock:1900000000}
+  {id:'kilof',name:'Kilof',desc:'Sam uderza w bryłę. Każdy kupiony pojawia się przy wynglu.',base:5,cps:.05,icon:'pick',unlock:0,cat:'Narzędzia'},
+  {id:'hawiyrz',name:'Grubiorz',desc:'Fedruje pomału, ale durch.',base:20,cps:.2,icon:'pick',unlock:0,cat:'Brygada'},
+  {id:'karlus',name:'Karlus z kilofym',desc:'Młody, gibki i coraz sprawniejszy.',base:140,cps:1.1,icon:'hammer',unlock:80,cat:'Brygada'},
+  {id:'wozek',name:'Ładowacz wózków',desc:'Dba, żeby urobek nie zalegał.',base:1500,cps:7,icon:'cart',unlock:1500,cat:'Transport'},
+  {id:'pompa',name:'Pompa odwadniająca',desc:'Usuwa wodę i pozwala fedrować bez przestojów.',base:16000,cps:42,icon:'pump',unlock:25000,cat:'Infrastruktura'},
+  {id:'szola',name:'Szola',desc:'Wyciąga wyngiel na wiyrch.',base:180000,cps:250,icon:'lift',unlock:400000,cat:'Transport'},
+  {id:'lokomotywa',name:'Lokomotywa dołowa',desc:'Przewozi całe składy urobku.',base:2200000,cps:1500,icon:'train',unlock:6000000,cat:'Transport'},
+  {id:'wentylator',name:'Wentylator główny',desc:'Dostarcza świeże powietrze do kolejnych rejonów.',base:28000000,cps:9000,icon:'fan',unlock:90000000,cat:'Infrastruktura'},
+  {id:'kombajn',name:'Kombajn ścianowy',desc:'Maszina za całą brygadę.',base:380000000,cps:56000,icon:'gear',unlock:1200000000,cat:'Maszyny'},
+  {id:'tasma',name:'Taśmociąg',desc:'Urobek jedzie bez postoju.',base:5200000000,cps:350000,icon:'belt',unlock:18000000000,cat:'Transport'},
+  {id:'kruszarka',name:'Kruszarka',desc:'Rozdrabnia urobek jeszcze pod ziemią.',base:75000000000,cps:2200000,icon:'crusher',unlock:250000000000,cat:'Maszyny'},
+  {id:'sortownia',name:'Sortownia',desc:'Oddziela najlepszy urobek od skały płonnej.',base:1100000000000,cps:14000000,icon:'factory',unlock:3500000000000,cat:'Zakład'},
+  {id:'skip',name:'Skip wydobywczy',desc:'Wielkie naczynie wyciągowe pracujące bez przerwy.',base:17000000000000,cps:90000000,icon:'skip',unlock:50000000000000,cat:'Transport'},
+  {id:'zaklad',name:'Zakład przeróbczy',desc:'Czyści, wzbogaca i przygotowuje urobek.',base:260000000000000,cps:580000000,icon:'processing',unlock:700000000000000,cat:'Zakład'},
+  {id:'dyspozytornia',name:'Dyspozytornia',desc:'Koordynuje ludzi, transport i maszyny.',base:4000000000000000,cps:3800000000,icon:'control',unlock:10000000000000000,cat:'Infrastruktura'},
+  {id:'szyb',name:'Nowy szyb',desc:'Otwiera kolejne rejony kopalni.',base:65000000000000000,cps:25000000000,icon:'tower',unlock:150000000000000000,cat:'Infrastruktura'},
+  {id:'kompleks',name:'Kompleks ścianowy',desc:'Zautomatyzowany front wydobywczy wielkiej skali.',base:1100000000000000000,cps:165000000000,icon:'complex',unlock:2000000000000000000,cat:'Maszyny'},
+  {id:'gruba',name:'Cołko gruba',desc:'Pełny zakład pracujący bez przerwy.',base:19000000000000000000,cps:1100000000000,icon:'factory',unlock:30000000000000000000,cat:'Zakład'}
 ];
 
 const UPGRADES=[
-  {id:'kilof1',name:'Ostry kilof',desc:'Moc kliknięcia ×2.',price:100,icon:'pick',unlock:s=>s.lifetime>=40,effect:{click:2}},
-  {id:'lamp',name:'Lampa karbidowa',desc:'Całe wydobycie ×1,5.',price:1800,icon:'lamp',unlock:s=>s.lifetime>=500,effect:{all:1.5}},
-  {id:'kilof2',name:'Stalowy kilof',desc:'Moc kliknięcia ×2.',price:7000,icon:'hammer',unlock:s=>s.lifetime>=2000,effect:{click:2}},
-  {id:'norma',name:'Dobra norma',desc:'Grubiorze i karlusy pracują ×2.',price:26000,icon:'star',unlock:s=>(s.workers.hawiyrz||0)>=10,effect:{worker:['hawiyrz','karlus'],mult:2}},
-  {id:'wentylacja',name:'Nowa wentylacja',desc:'Całe wydobycie ×2.',price:90000,icon:'gear',unlock:s=>s.lifetime>=30000,effect:{all:2}},
-  {id:'dynamit',name:'Skład dynamitu',desc:'Odblokowuje aktywny dynamit.',price:180000,icon:'dynamite',unlock:s=>s.lifetime>=70000,effect:{ability:'dynamite'}},
-  {id:'sztygar',name:'Dobry sztygar',desc:'Produkcja brygady ×2.',price:650000,icon:'shield',unlock:s=>totalWorkers(s)>=35,effect:{all:2}},
-  {id:'rynka',name:'Bergmańsko rynka',desc:'Klik otrzymuje 1% spokojnej produkcji.',price:1800000,icon:'hand',unlock:s=>s.lifetime>=700000,effect:{clickCps:.01}},
-  {id:'prond',name:'Elektryfikacyjo',desc:'Maszyny od szoli wzwyż pracują ×3.',price:8500000,icon:'bolt',unlock:s=>(s.workers.kombajn||0)>=5,effect:{worker:['szola','kombajn','tasma','sortownia','szyb','gruba'],mult:3}},
-  {id:'zryw',name:'Zryw brygady',desc:'Odblokowuje czasową produkcję ×3.',price:28000000,icon:'star',unlock:s=>s.lifetime>=10000000,effect:{ability:'rush'}},
-  {id:'kilof3',name:'Kilof z węglika',desc:'Moc kliknięcia ×5.',price:95000000,icon:'pick',unlock:s=>s.lifetime>=40000000,effect:{click:5}},
-  {id:'automatyka',name:'Automatyka szybu',desc:'Całe wydobycie ×3.',price:780000000,icon:'gear',unlock:s=>s.lifetime>=300000000,effect:{all:3}}
+  {id:'kilof1',name:'Ostry kilof',desc:'Moc kliknięcia ×2.',price:120,icon:'pick',unlock:s=>s.lifetime>=50,effect:{click:2}},
+  {id:'lamp',name:'Lampa karbidowa',desc:'Całe wydobycie ×1,25.',price:3000,icon:'lamp',unlock:s=>s.lifetime>=1000,effect:{all:1.25}},
+  {id:'kilof2',name:'Stalowy kilof',desc:'Moc kliknięcia ×2.',price:16000,icon:'hammer',unlock:s=>s.lifetime>=6000,effect:{click:2}},
+  {id:'norma',name:'Dobra norma',desc:'Grubiorze i karlusy pracują ×1,6.',price:70000,icon:'star',unlock:s=>(s.workers.hawiyrz||0)>=10,effect:{worker:['hawiyrz','karlus'],mult:1.6}},
+  {id:'odwadnianie',name:'Sprawne odwadnianie',desc:'Pompy i transport pracują ×1,5.',price:320000,icon:'pump',unlock:s=>(s.workers.pompa||0)>=5,effect:{worker:['pompa','szola','lokomotywa'],mult:1.5}},
+  {id:'wentylacja',name:'Nowa wentylacja',desc:'Całe wydobycie ×1,35.',price:900000,icon:'fan',unlock:s=>s.lifetime>=350000,effect:{all:1.35}},
+  {id:'dynamit',name:'Skład dynamitu',desc:'Odblokowuje aktywny dynamit wymagający serii kliknięć.',price:3500000,icon:'dynamite',unlock:s=>s.lifetime>=1500000,effect:{ability:'dynamite'}},
+  {id:'smarowanie',name:'Smarowanie maszyn',desc:'Transport i maszyny pracują ×1,5.',price:15000000,icon:'gear',unlock:s=>(s.workers.lokomotywa||0)>=5,effect:{worker:['szola','lokomotywa','kombajn','tasma','kruszarka'],mult:1.5}},
+  {id:'sztygar',name:'Dobry sztygar',desc:'Całe wydobycie ×1,4.',price:65000000,icon:'shield',unlock:s=>totalWorkers(s)>=60,effect:{all:1.4}},
+  {id:'radio',name:'Łączność radiowa',desc:'Całe wydobycie ×1,25.',price:240000000,icon:'control',unlock:s=>(s.workers.wentylator||0)>=5,effect:{all:1.25}},
+  {id:'rynka',name:'Bergmańsko rynka',desc:'Klik otrzymuje 0,3% spokojnej produkcji.',price:900000000,icon:'hand',unlock:s=>s.lifetime>=350000000,effect:{clickCps:.003}},
+  {id:'prond',name:'Elektryfikacyjo',desc:'Maszyny od kombajnu wzwyż pracują ×1,8.',price:4200000000,icon:'bolt',unlock:s=>(s.workers.kombajn||0)>=10,effect:{worker:['kombajn','tasma','kruszarka','sortownia','skip','zaklad','dyspozytornia','szyb','kompleks','gruba'],mult:1.8}},
+  {id:'rozjazdy',name:'Automatyczne rozjazdy',desc:'Cały transport pracuje ×1,6.',price:18000000000,icon:'train',unlock:s=>(s.workers.tasma||0)>=5,effect:{worker:['wozek','szola','lokomotywa','tasma','skip'],mult:1.6}},
+  {id:'zryw',name:'Zryw brygady',desc:'Odblokowuje krótki, rzadki zryw produkcji.',price:85000000000,icon:'star',unlock:s=>s.lifetime>=30000000000,effect:{ability:'rush'}},
+  {id:'kilof3',name:'Kilof z węglika',desc:'Moc kliknięcia ×3.',price:380000000000,icon:'pick',unlock:s=>s.lifetime>=120000000000,effect:{click:3}},
+  {id:'obudowa',name:'Wzmocniona obudowa',desc:'Całe wydobycie ×1,5.',price:1800000000000,icon:'shield',unlock:s=>(s.workers.kruszarka||0)>=5,effect:{all:1.5}},
+  {id:'zdalne',name:'Sterowanie zdalne',desc:'Późne maszyny pracują ×1,8.',price:9000000000000,icon:'control',unlock:s=>(s.workers.sortownia||0)>=5,effect:{worker:['sortownia','skip','zaklad','dyspozytornia','szyb','kompleks','gruba'],mult:1.8}},
+  {id:'automatyka',name:'Automatyka szybu',desc:'Całe wydobycie ×1,6.',price:48000000000000,icon:'gear',unlock:s=>(s.workers.skip||0)>=5,effect:{all:1.6}},
+  {id:'geologia',name:'Dokładne mapy pokładów',desc:'Całe wydobycie ×1,5.',price:260000000000000,icon:'tower',unlock:s=>s.lifetime>=90000000000000,effect:{all:1.5}},
+  {id:'flotacja',name:'Nowoczesna flotacja',desc:'Zakład przeróbczy i sortownia pracują ×1,8.',price:1400000000000000,icon:'processing',unlock:s=>(s.workers.zaklad||0)>=5,effect:{worker:['sortownia','zaklad'],mult:1.8}},
+  {id:'centrum',name:'Centrum dyspozytorskie',desc:'Całe wydobycie ×1,5.',price:8000000000000000,icon:'control',unlock:s=>(s.workers.dyspozytornia||0)>=5,effect:{all:1.5}},
+  {id:'roboty',name:'Roboty inspekcyjne',desc:'Całe wydobycie ×1,5.',price:48000000000000000,icon:'gear',unlock:s=>s.lifetime>=15000000000000000,effect:{all:1.5}},
+  {id:'pelnaAutomatyka',name:'Pełna automatyzacja',desc:'Całe wydobycie ×1,8.',price:320000000000000000,icon:'complex',unlock:s=>(s.workers.szyb||0)>=5,effect:{all:1.8}},
+  {id:'przyszlosc',name:'Gruba przyszłości',desc:'Całe wydobycie ×2.',price:6500000000000000000,icon:'factory',unlock:s=>(s.workers.kompleks||0)>=5,effect:{all:2}}
 ];
 
 const DEPTHS=[
   {name:'Poziom 320 m',at:0,mult:1},
-  {name:'Poziom 500 m',at:5000,mult:1.25},
-  {name:'Poziom 700 m',at:50000,mult:1.55},
-  {name:'Poziom 900 m',at:500000,mult:1.95},
-  {name:'Poziom 1100 m',at:5000000,mult:2.5},
-  {name:'Poziom 1300 m',at:50000000,mult:3.25},
-  {name:'Pokład Skarbnika',at:500000000,mult:4.3},
-  {name:'Czarny pokład',at:5000000000,mult:5.8}
+  {name:'Poziom 500 m',at:10000,mult:1.12},
+  {name:'Poziom 700 m',at:150000,mult:1.25},
+  {name:'Poziom 900 m',at:2500000,mult:1.4},
+  {name:'Poziom 1100 m',at:40000000,mult:1.57},
+  {name:'Poziom 1300 m',at:650000000,mult:1.76},
+  {name:'Poziom 1500 m',at:10000000000,mult:1.98},
+  {name:'Poziom 1700 m',at:160000000000,mult:2.22},
+  {name:'Pokład Skarbnika',at:2500000000000,mult:2.5},
+  {name:'Czarny pokład',at:40000000000000,mult:2.82},
+  {name:'Pokład metanowy',at:600000000000000,mult:3.18},
+  {name:'Stara sztolnia',at:10000000000000000,mult:3.6},
+  {name:'Głębia bez światła',at:2000000000000000000,mult:4.1},
+  {name:'Najgłębszy pokład',at:100000000000000000000,mult:4.7}
 ];
 
 const TASKS=[
   {id:'t1',name:'Pierwsze uderzenia',text:'Kliknij 25 razy.',reward:80,done:s=>s.clicks>=25},
-  {id:'t2',name:'Pierwsza brygada',text:'Zatrudnij 10 osób i maszyn.',reward:600,done:s=>totalWorkers(s)>=10},
-  {id:'t3',name:'Ruch na grubie',text:'Osiągnij 50 wyngla na sekundę.',reward:5000,done:s=>getCps(s)>=50},
-  {id:'t4',name:'Głęboka szychta',text:'Wydobądź 100 tys. wyngla.',reward:25000,done:s=>s.lifetime>=100000},
-  {id:'t5',name:'Mechanizacja',text:'Kup 10 kombajnów.',reward:1000000,done:s=>(s.workers.kombajn||0)>=10},
-  {id:'t6',name:'Milionowa norma',text:'Osiągnij 1 mln wyngla na sekundę.',reward:100000000,done:s=>getCps(s)>=1000000}
+  {id:'t2',name:'Pierwsza brygada',text:'Zatrudnij 10 osób i maszyn.',reward:700,done:s=>totalWorkers(s)>=10},
+  {id:'t3',name:'Ruch na grubie',text:'Osiągnij 50 wyngla na sekundę.',reward:6000,done:s=>getCps(s)>=50},
+  {id:'t4',name:'Głęboka szychta',text:'Wydobądź 1 mln wyngla.',reward:180000,done:s=>s.lifetime>=1000000},
+  {id:'t5',name:'Mechanizacja',text:'Kup 10 kombajnów.',reward:2500000000,done:s=>(s.workers.kombajn||0)>=10},
+  {id:'t6',name:'Milionowa norma',text:'Osiągnij 10 mln wyngla na sekundę.',reward:1500000000000,done:s=>getCps(s)>=10000000},
+  {id:'t7',name:'Kontrolowany odstrzał',text:'Użyj dynamitu 3 razy.',reward:12000000000,done:s=>s.dynamiteUses>=3},
+  {id:'t8',name:'Pełny transport',text:'Kup łącznie 50 elementów transportu.',reward:85000000000,done:s=>['wozek','szola','lokomotywa','tasma','skip'].reduce((a,id)=>a+(s.workers[id]||0),0)>=50},
+  {id:'t9',name:'Wielka załoga',text:'Kup 250 elementów kopalni.',reward:25000000000000,done:s=>totalWorkers(s)>=250},
+  {id:'t10',name:'Skarbnik widziany',text:'Złap złoty wyngiel 5 razy.',reward:180000000000000,done:s=>s.goldenClicks>=5},
+  {id:'t11',name:'Nowa szychta',text:'Wykonaj pierwszy reset prestiżowy.',reward:1200000000000000,done:s=>s.resets>=1},
+  {id:'t12',name:'Kopalnia kompletna',text:'Kup przynajmniej jeden egzemplarz każdego elementu kopalni.',reward:5000000000000000000,done:s=>WORKERS.every(w=>(s.workers[w.id]||0)>=1)}
 ];
 
 const ACHIEVEMENTS=[
@@ -796,12 +835,33 @@ const ACHIEVEMENTS=[
   {id:'a6',name:'Skarbnik przaje',text:'Kliknięty złoty wyngiel.',done:s=>s.goldenClicks>=1},
   {id:'a7',name:'Nowa szychta',text:'Pierwszy reset prestiżowy.',done:s=>s.resets>=1},
   {id:'a8',name:'Cołko gruba',text:'Kup pierwszy pełny zakład.',done:s=>(s.workers.gruba||0)>=1},
-  {id:'a9',name:'Stary wyga',text:'Zdobądź 25 znaków sztygara.',done:s=>s.prestige>=25}
+  {id:'a9',name:'Stary wyga',text:'Zdobądź 25 znaków sztygara.',done:s=>s.prestige>=25},
+  {id:'a10',name:'Kilof nie stygnie',text:'1000 kliknięć.',done:s=>s.clicks>=1000},
+  {id:'a11',name:'Fedrowanie bez końca',text:'10 000 kliknięć.',done:s=>s.clicks>=10000},
+  {id:'a12',name:'Pełna seria',text:'Osiągnij serię 50 kliknięć.',done:s=>s.combo>=50},
+  {id:'a13',name:'Twarda skała',text:'Wykonaj 100 trafień krytycznych.',done:s=>s.crits>=100},
+  {id:'a14',name:'Zmiana pełna ludzi',text:'100 elementów kopalni.',done:s=>totalWorkers(s)>=100},
+  {id:'a15',name:'Przemysłowa skala',text:'250 elementów kopalni.',done:s=>totalWorkers(s)>=250},
+  {id:'a16',name:'Miliardowa gruba',text:'1 mld wydobytego wyngla.',done:s=>s.lifetime>=1000000000},
+  {id:'a17',name:'Bilion pod ziemią',text:'1 bln wydobytego wyngla.',done:s=>s.lifetime>=1000000000000},
+  {id:'a18',name:'Maszyna ruszyła',text:'1 mln wyngla na sekundę.',done:s=>getCps(s)>=1000000},
+  {id:'a19',name:'Potęga przemysłu',text:'1 mld wyngla na sekundę.',done:s=>getCps(s)>=1000000000},
+  {id:'a20',name:'Łowca Skarbnika',text:'10 złotych wyngli.',done:s=>s.goldenClicks>=10},
+  {id:'a21',name:'Kontrolowany huk',text:'Użyj dynamitu 10 razy.',done:s=>s.dynamiteUses>=10},
+  {id:'a22',name:'Wszyscy na stanowiska',text:'Uruchom Zryw brygady 10 razy.',done:s=>s.rushUses>=10},
+  {id:'a23',name:'Pierwsza godzina',text:'Spędź aktywnie godzinę w kopalni.',done:s=>s.activeSeconds>=3600},
+  {id:'a24',name:'Cała zmiana',text:'Spędź aktywnie 8 godzin w kopalni.',done:s=>s.activeSeconds>=28800},
+  {id:'a25',name:'Doświadczony sztygar',text:'5 nowych szycht.',done:s=>s.resets>=5},
+  {id:'a26',name:'Legenda gruby',text:'Zdobądź 100 znaków sztygara.',done:s=>s.prestige>=100},
+  {id:'a27',name:'Wszystko pracuje',text:'Kup co najmniej jeden egzemplarz każdego elementu kopalni.',done:s=>WORKERS.every(w=>(s.workers[w.id]||0)>=1)},
+  {id:'a28',name:'Kolekcjoner maszyn',text:'Kup po 10 egzemplarzy każdego elementu kopalni.',done:s=>WORKERS.every(w=>(s.workers[w.id]||0)>=10)},
+  {id:'a29',name:'Pełne wyposażenie',text:'Kup wszystkie ulepszenia.',done:s=>UPGRADES.every(u=>s.upgrades.includes(u.id))},
+  {id:'a30',name:'Najgłębsza szychta',text:'Odkryj ostatni pokład.',done:s=>depthIndex(s)>=DEPTHS.length-1}
 ];
 
 const freshState=()=>({
   coal:0,lifetime:0,allTime:0,clicks:0,workers:{},upgrades:[],tasks:[],achievements:[],
-  prestige:0,resets:0,goldenClicks:0,buyMode:'1',muted:false,pickaxeAnimations:true,last:Date.now(),
+  prestige:0,resets:0,goldenClicks:0,dynamiteUses:0,rushUses:0,crits:0,buyMode:'1',muted:false,pickaxeAnimations:true,last:Date.now(),
   combo:0,lastClick:0,buffs:[],cooldowns:{dynamite:0,rush:0},activeSeconds:0
 });
 let S=freshState();
@@ -822,12 +882,12 @@ const formatTime=s=>{s=Math.max(0,Math.ceil(s));const m=Math.floor(s/60),r=s%60;
 
 function depthIndex(s=S){let idx=0;for(let i=0;i<DEPTHS.length;i++)if(s.lifetime>=DEPTHS[i].at)idx=i;return idx;}
 function depthMult(s=S){return DEPTHS[depthIndex(s)].mult;}
-function milestoneMult(n){let m=1;for(const t of [10,25,50,100,200])if(n>=t)m*=2;return m;}
+function milestoneMult(n){let m=1;for(const t of [10,25,50,100,200])if(n>=t)m*=1.6;return m;}
 function nextMilestone(n){return [10,25,50,100,200].find(x=>x>n)||null;}
 function totalWorkers(s=S){return Object.values(s.workers).reduce((a,b)=>a+b,0);}
 function hasUpgrade(id,s=S){return s.upgrades.includes(id);}
 function achievementMult(s=S){return 1+s.achievements.length*.01;}
-function prestigeMult(s=S){return 1+s.prestige*.10;}
+function prestigeMult(s=S){return 1+s.prestige*.04;}
 function upgradeAllMult(s=S){let m=1;for(const u of UPGRADES)if(hasUpgrade(u.id,s)&&u.effect.all)m*=u.effect.all;return m;}
 function workerUpgradeMult(id,s=S){let m=1;for(const u of UPGRADES)if(hasUpgrade(u.id,s)&&u.effect.worker&&u.effect.worker.includes(id))m*=u.effect.mult;return m;}
 function buffMult(type,s=S){const now=Date.now();let m=1;s.buffs=s.buffs.filter(b=>b.until>now);for(const b of s.buffs)if(b.type===type)m*=b.mult;return m;}
@@ -847,7 +907,7 @@ function nextUnlockData(s=S){
   const candidates=[];
   for(const w of WORKERS)if((s.workers[w.id]||0)===0&&s.lifetime<w.unlock)candidates.push({at:w.unlock,label:w.name,type:'brygada'});
   for(const d of DEPTHS)if(s.lifetime<d.at)candidates.push({at:d.at,label:d.name,type:'pokład'});
-  const byLife={kilof1:40,lamp:500,kilof2:2000,wentylacja:30000,dynamit:70000,rynka:700000,zryw:10000000,kilof3:40000000,automatyka:300000000};
+  const byLife={kilof1:40,lamp:800,kilof2:4000,wentylacja:100000,dynamit:300000,rynka:5000000,zryw:150000000,kilof3:800000000,automatyka:10000000000,geologia:50000000000,pelnaAutomatyka:150000000000};
   for(const u of UPGRADES)if(!hasUpgrade(u.id,s)&&byLife[u.id]&&s.lifetime<byLife[u.id])candidates.push({at:byLife[u.id],label:u.name,type:'ulepszenie'});
   candidates.sort((a,b)=>a.at-b.at);
   return candidates[0]||null;
@@ -859,7 +919,7 @@ function spend(v){if(S.coal+1e-9<v)return false;S.coal-=v;return true;}
 function clickRock(x,y){
   analyticsStart('first_click');
   const now=Date.now();S.combo=now-S.lastClick<900?Math.min(50,S.combo+1):1;S.lastClick=now;
-  const crit=Math.random()<.055;const amount=getClickPower()* (crit?5:1);addCoal(amount);S.clicks++;
+  const crit=Math.random()<.055;if(crit)S.crits++;const amount=getClickPower()* (crit?5:1);addCoal(amount);S.clicks++;
   animateRock(crit);floatingNumber(x,y,'+'+fmt(amount),crit);particles(x,y,crit?11:6);soundClick(crit);checkProgress();
 }
 
@@ -870,21 +930,24 @@ function claimTask(t){if(S.tasks.includes(t.id)||!t.done(S))return;S.tasks.push(
 function useDynamite(){
   if(!hasUpgrade('dynamit')){toast('Najpierw kup skład dynamitu.');return;}
   const now=Date.now();if((S.cooldowns.dynamite||0)>now)return;
-  S.cooldowns.dynamite=now+CFG.dynamiteCd*1000;const gain=Math.max(getClickPower()*70,getCps()*10,500);addCoal(gain);soundBoom();toast('Dynamit! +'+fmt(gain));
-  const r=$('#coalButton').getBoundingClientRect();particles(r.left+r.width/2,r.top+r.height/2,28);checkProgress();
+  if(S.combo<20){toast('Dynamit wymaga serii 20 kliknięć.');return;}
+  S.combo=0;S.dynamiteUses++;S.cooldowns.dynamite=now+CFG.dynamiteCd*1000;
+  const gain=Math.max(getClickPower()*40,getCps()*5,1000);addCoal(gain);analyticsEvent('ability_used','dynamite',gain,{uses:S.dynamiteUses});soundBoom();toast('Kontrolowany odstrzał: +'+fmt(gain));
+  const r=$('#coalButton').getBoundingClientRect();particles(r.left+r.width/2,r.top+r.height/2,24);checkProgress();save();
 }
 function useRush(){
   if(!hasUpgrade('zryw')){toast('Najpierw kup ulepszenie Zryw brygady.');return;}
   const now=Date.now();if((S.cooldowns.rush||0)>now)return;
-  S.cooldowns.rush=now+CFG.rushCd*1000;S.buffs.push({type:'cps',mult:3,until:now+CFG.rushDuration*1000,label:'Zryw brygady ×3'});soundBuy();toast('Brygada rusza pełną parą przez 15 sekund.');
+  if(totalWorkers(S)<100){toast('Zryw wymaga co najmniej 100 elementów kopalni.');return;}
+  S.rushUses++;S.cooldowns.rush=now+CFG.rushCd*1000;S.buffs.push({type:'cps',mult:2.5,until:now+CFG.rushDuration*1000,label:'Zryw brygady ×2,5'});analyticsEvent('ability_used','rush',CFG.rushDuration,{uses:S.rushUses});soundBuy();toast('Brygada przyspiesza na 10 sekund.');checkProgress();save();
 }
 
-function prestigeGain(){return Math.floor(Math.sqrt(S.lifetime/1000000));}
+function prestigeGain(){return S.lifetime<100000000?0:Math.floor(Math.pow(S.lifetime/100000000,.38));}
 function doPrestige(){
   const gain=prestigeGain();if(gain<1)return;
   if(!confirm('Rozpocząć nową szychtę za '+gain+' znaków sztygara? Zwykły postęp zostanie wyzerowany.'))return;
   analyticsStart('prestige');analyticsEvent('prestige',String(gain),gain,{gain,lifetime:S.lifetime,prestigeBefore:S.prestige,resetsBefore:S.resets});
-  const keep={prestige:S.prestige+gain,resets:S.resets+1,achievements:[...S.achievements],goldenClicks:S.goldenClicks,allTime:S.allTime,muted:S.muted,pickaxeAnimations:S.pickaxeAnimations,activeSeconds:S.activeSeconds};
+  const keep={prestige:S.prestige+gain,resets:S.resets+1,achievements:[...S.achievements],goldenClicks:S.goldenClicks,dynamiteUses:S.dynamiteUses,rushUses:S.rushUses,crits:S.crits,allTime:S.allTime,muted:S.muted,pickaxeAnimations:S.pickaxeAnimations,activeSeconds:S.activeSeconds};
   S=freshState();Object.assign(S,keep);S.last=Date.now();toast('Nowa szychta rozpoczęta. Stała premia rośnie.');save();renderAll(true);checkProgress();
 }
 
@@ -899,15 +962,16 @@ function setTab(name){$$('.tab').forEach(b=>b.classList.toggle('active',b.datase
 function setBuyMode(mode){S.buyMode=mode;$$('.buyMode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));renderWorkers();save();}
 
 function renderWorkers(){
-  const root=$('#workerList');let html='';
+  const root=$('#workerList');let html='',lastCat='';
   for(const w of WORKERS){
+    if(w.cat!==lastCat){html+=`<div class="workerCategory">${w.cat}</div>`;lastCat=w.cat;}
     const n=S.workers[w.id]||0,unlocked=S.lifetime>=w.unlock||n>0,amount=selectedAmount(w),cost=amount?priceMany(w,amount):priceOne(w,n),next=nextMilestone(n);
     const can=unlocked&&amount>0&&S.coal>=cost;
     html+=`<button class="shopItem ${can?'affordable':''} ${unlocked?'':'locked'}" data-worker="${w.id}" ${unlocked?'':'disabled'}>
       <span class="itemIcon">${ICONS[w.icon]}</span>
-      <span class="itemMain"><span class="itemName">${w.name}<span class="itemCount">×${n}</span></span><span class="itemDesc">${w.desc}</span><span class="itemMilestone">${next?'Następny kamień milowy: '+next+' szt. · wydajność ×2':'Wszystkie kamienie milowe zdobyte'}</span></span>
-      <span class="itemRight"><span class="itemPrice">${amount?fmt(cost):'Za drogo'}</span><span class="itemOutput">${fmt(workerUnitOutput(w)*Math.max(1,amount||1))} /s</span><span class="itemOwned">${fmt(n*w.cps*milestoneMult(n))} bazowo</span></span>
-      ${unlocked?'':`<span class="lockMask">Odblokowanie po ${fmt(w.unlock)} wydobytego wyngla</span>`}
+      <span class="itemMain"><span class="itemName">${unlocked?w.name:'Nieodkryty element'}<span class="itemCount">×${n}</span></span><span class="itemDesc">${unlocked?w.desc:'Fedruj i rozbudowuj kopalnię, aby odkryć kolejny element.'}</span><span class="itemMilestone">${unlocked?(next?'Następny kamień milowy: '+next+' szt. · wydajność ×1,6':'Wszystkie kamienie milowe zdobyte'):''}</span></span>
+      <span class="itemRight"><span class="itemPrice">${unlocked?(amount?fmt(cost):'Za drogo'):'???'}</span><span class="itemOutput">${unlocked?fmt(workerUnitOutput(w)*Math.max(1,amount||1))+' /s':''}</span><span class="itemOwned">${unlocked?fmt(n*w.cps*milestoneMult(n))+' bazowo':''}</span></span>
+      ${unlocked?'':`<span class="lockMask">Nieodkryty element kopalni</span>`}
     </button>`;
   }
   root.innerHTML=html;root.querySelectorAll('[data-worker]').forEach(el=>el.addEventListener('click',()=>buyWorker(WORKERS.find(w=>w.id===el.dataset.worker))));
@@ -967,7 +1031,7 @@ function formatLongTime(sec){sec=Math.max(0,Math.round(sec));const d=Math.floor(
 
 function renderShift(){
   const gain=prestigeGain();$('#prestigeGain').textContent=fmt(gain);$('#prestigeBtn').disabled=gain<1;
-  $('#prestigeInfo').textContent=gain?`Po restarcie otrzymasz ${gain} znaków. Łączna premia wzrośnie do +${Math.round((S.prestige+gain)*10)}%.`:`Do pierwszego znaku brakuje ${fmt(Math.max(0,1000000-S.lifetime))} wyngla.`;
+  $('#prestigeInfo').textContent=gain?`Po restarcie otrzymasz ${gain} znaków. Łączna premia wzrośnie do +${Math.round((S.prestige+gain)*4)}%.`:`Nowa szychta odblokuje się po dalszej rozbudowie kopalni.`;
   $('#prestigeBonus').textContent='+'+Math.round((prestigeMult()-1)*100)+'%';
   const stats=[['Wydobycie w tej kopalni',fmt(S.lifetime)],['Łącznie od początku',fmt(S.allTime)],['Kliknięcia',fmt(S.clicks)],['Brygada i maszyny',fmt(totalWorkers())],['Znaki sztygara',fmt(S.prestige)],['Nowe szychty',fmt(S.resets)]];
   $('#statsGrid').innerHTML=stats.map(([n,v])=>`<div class="stat"><div class="statName">${n}</div><div class="statValue">${v}</div></div>`).join('');
@@ -976,16 +1040,22 @@ function renderShift(){
 function renderMain(){
   $('#coalCount').textContent=fmt(S.coal);$('#rateLine').textContent=fmt(getCps())+' /s · klik +'+fmt(getClickPower());
   $('#achievementBonus').textContent='Premia osiągnięć +'+S.achievements.length+'%';
-  const nextHud=nextUnlockData();$('#nextUnlockLine').textContent=nextHud?'Następne: '+nextHud.label+' · '+fmt(Math.max(0,nextHud.at-S.lifetime)):'Wszystkie główne progi odkryte';
+  const discovered=WORKERS.filter(w=>S.lifetime>=w.unlock||(S.workers[w.id]||0)>0).length;$('#nextUnlockLine').textContent=discovered<WORKERS.length?'Odkryte elementy kopalni: '+discovered:'Odkryto wszystkie elementy kopalni';
   const comboShown=S.combo>=10?(Math.round(S.combo*10)/10).toFixed(1).replace('.',','):String(Math.max(0,Math.floor(S.combo)));$('#comboText').textContent=comboShown+' · ×'+comboMult().toFixed(1).replace('.',',');$('#comboFill').style.width=(Math.max(0,Math.min(50,S.combo))/50*100)+'%';
   const idx=depthIndex(),cur=DEPTHS[idx],next=DEPTHS[idx+1];$('#depthName').textContent=cur.name;$('#depthBonus').textContent='×'+cur.mult.toFixed(2).replace('.',',');
-  if(next){const p=clamp((S.lifetime-cur.at)/(next.at-cur.at),0,1);$('#depthFill').style.width=(p*100)+'%';$('#depthSub').textContent='Do kolejnego poziomu: '+fmt(Math.max(0,next.at-S.lifetime));}else{$('#depthFill').style.width='100%';$('#depthSub').textContent='Najgłębszy odkryty pokład';}
+  if(next){const p=clamp((S.lifetime-cur.at)/(next.at-cur.at),0,1);$('#depthFill').style.width=(p*100)+'%';$('#depthSub').textContent='Eksploracja kolejnego pokładu: '+Math.floor(p*100)+'%';}else{$('#depthFill').style.width='100%';$('#depthSub').textContent='Najgłębszy odkryty pokład';}
   const now=Date.now();
   renderSkill($('#dynamiteBtn'),$('#dynamiteCool'),hasUpgrade('dynamit'),S.cooldowns.dynamite||0,CFG.dynamiteCd,now);
   renderSkill($('#rushBtn'),$('#rushCool'),hasUpgrade('zryw'),S.cooldowns.rush||0,CFG.rushCd,now);
   const buffs=S.buffs.filter(b=>b.until>now);$('#buffBar').innerHTML=buffs.map(b=>`<span class="buff">${b.label} · ${formatTime((b.until-now)/1000)}</span>`).join('');$('#mineScene').classList.toggle('frenzy',buffs.some(b=>b.type==='cps'));
 }
-function renderSkill(btn,bar,unlocked,until,cd,now){const left=Math.max(0,(until-now)/1000);btn.disabled=!unlocked||left>0;bar.style.transform='scaleX('+(left/cd)+')';const desc=btn.querySelector('.skillDesc');if(!unlocked)desc.textContent='Wymaga ulepszenia';else if(left>0)desc.textContent='Za '+formatTime(left);else desc.textContent=btn.id==='dynamiteBtn'?'Duży urobek':'×3 / 15 s';}
+function renderSkill(btn,bar,unlocked,until,cd,now){
+  const left=Math.max(0,(until-now)/1000);btn.disabled=!unlocked||left>0;bar.style.transform='scaleX('+(left/cd)+')';const desc=btn.querySelector('.skillDesc');
+  if(!unlocked)desc.textContent='Wymaga ulepszenia';
+  else if(left>0)desc.textContent='Za '+formatTime(left);
+  else if(btn.id==='dynamiteBtn')desc.textContent=S.combo>=20?'Gotowy do odstrzału':'Wymaga serii 20';
+  else desc.textContent=totalWorkers(S)>=100?'×2,5 / 10 s':'Wymaga 100 jednostek';
+}
 function renderShop(){renderWorkers();renderUpgrades();}
 function renderAll(force=false){renderMain();renderShop();renderGoals();renderShift();renderAutoPickaxes(force);}
 
@@ -1004,7 +1074,13 @@ function soundBoom(){tone(72,.25,'sawtooth',.09);tone(45,.35,'square',.06,.06);}
 function scheduleGolden(){clearTimeout(goldenTimer);goldenTimer=setTimeout(showGolden,rand(CFG.goldenMin,CFG.goldenMax)*1000);}
 function showGolden(){if(document.hidden){scheduleGolden();return;}const el=$('#goldenCoal');el.style.left=rand(14,76)+'%';el.style.top=rand(18,63)+'%';el.classList.add('visible');goldenExpiry=Date.now()+CFG.goldenLife*1000;tone(620,.12,'sine',.045);tone(820,.15,'sine',.04,.12);}
 function hideGolden(){const el=$('#goldenCoal');el.classList.remove('visible');goldenExpiry=0;scheduleGolden();}
-function clickGolden(e){e.stopPropagation();S.goldenClicks++;const r=Math.random();if(r<.45){S.buffs.push({type:'cps',mult:7,until:Date.now()+30000,label:'Fedrunek ×7'});toast('Skarbnik przaje: produkcja ×7 przez 30 sekund.');}else if(r<.72){S.buffs.push({type:'click',mult:10,until:Date.now()+15000,label:'Kilof Skarbnika ×10'});toast('Kilof Skarbnika: klik ×10 przez 15 sekund.');}else{const gain=Math.max(getCps()*60,500);addCoal(gain);toast('Bogata żyła: +'+fmt(gain));}soundAchievement();hideGolden();checkProgress();save();}
+function clickGolden(e){
+  e.stopPropagation();S.goldenClicks++;const r=Math.random();
+  if(r<.45){S.buffs.push({type:'cps',mult:5,until:Date.now()+20000,label:'Fedrunek ×5'});toast('Skarbnik przaje: produkcja ×5 przez 20 sekund.');}
+  else if(r<.72){S.buffs.push({type:'click',mult:7,until:Date.now()+12000,label:'Kilof Skarbnika ×7'});toast('Kilof Skarbnika: klik ×7 przez 12 sekund.');}
+  else{const gain=Math.max(getCps()*30,1000);addCoal(gain);toast('Bogata żyła: +'+fmt(gain));}
+  soundAchievement();hideGolden();checkProgress();save();
+}
 
 function save(){try{S.last=Date.now();localStorage.setItem(CFG.saveKey,JSON.stringify(S));}catch(e){}}
 function load(){
@@ -1137,7 +1213,7 @@ $('#optionsOverlay').addEventListener('pointerdown',e=>{if(e.target===$('#option
 $('#pickaxeToggle').addEventListener('click',()=>{S.pickaxeAnimations=S.pickaxeAnimations===false;syncOptionsUi();renderAutoPickaxes(true);save();});
 $('#soundToggle').addEventListener('click',()=>{S.muted=!S.muted;syncOptionsUi();save();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#optionsOverlay').hidden)closeOptions();});
-$('#helpBtn').addEventListener('click',()=>toast('Klikaj bryłę po lewej. Po prawej kupuj brygadę, maszyny i ulepszenia. Kamienie milowe przy 10, 25, 50, 100 i 200 sztukach podwajają wydajność.'));
+$('#helpBtn').addEventListener('click',()=>toast('Po lewej wydobywasz wyngiel. Po prawej rozwijasz ludzi, transport, maszyny, infrastrukturę i ulepszenia. Kamienie milowe zwiększają wydajność każdego elementu.'));
 document.addEventListener('contextmenu',e=>{if(e.target.closest('#mineScene'))e.preventDefault()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();analyticsSync();}else{S.last=Date.now()}});window.addEventListener('pagehide',()=>{save();analyticsSync();});
 
