@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#11151d">
+<title>Fedrunek — kopalniany clicker v2.5.1</title>
+<style>
+:root{
+  --bg:#10131a;
+  --bg2:#171c27;
+  --panel:#171c27;
+  --panel2:#202736;
+  --panel3:#282f40;
+  --line:#313a4f;
+  --text:#f1ecdf;
+  --muted:#9da7b9;
+  --amber:#eaa941;
+  --amber2:#ffd37d;
+  --green:#6fcf97;
+  --red:#ef7a79;
+  --blue:#79a9ef;
+  --shadow:0 18px 55px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;min-height:0;background:var(--bg);color:var(--text);overflow:hidden}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.hidden{display:none!important}
+
+#app{width:100%;height:100vh;height:100dvh;min-height:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(390px,.85fr);background:
+  radial-gradient(circle at 20% 8%,rgba(234,169,65,.08),transparent 28%),
+  linear-gradient(135deg,#0e1117,#171c27 54%,#11151d)}
+
+/* LEWA STRONA */
+#mineSide{position:relative;min-width:0;min-height:0;height:100%;max-height:100%;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--line)}
+#mineSide::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),
+  linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,black,transparent 72%)}
+
+.topbar{position:relative;z-index:5;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:18px 24px 12px;background:linear-gradient(180deg,rgba(10,13,18,.88),rgba(10,13,18,.15));backdrop-filter:blur(8px)}
+.brand{font-size:17px;font-weight:900;letter-spacing:.24em;color:var(--amber);white-space:nowrap}
+.brand small{display:block;margin-top:3px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.resource{text-align:center;min-width:240px}
+#coalCount{font-size:clamp(36px,4.6vw,66px);line-height:.92;font-weight:900;color:var(--amber2);text-shadow:0 0 28px rgba(234,169,65,.22);font-variant-numeric:tabular-nums}
+.resourceLabel{margin-top:7px;font-size:11px;font-weight:800;letter-spacing:.28em;color:var(--muted)}
+#rateLine{margin-top:6px;font-size:13px;font-weight:700;color:#cad1dd;font-variant-numeric:tabular-nums}
+.topActions{display:flex;justify-content:flex-end;gap:8px}
+.iconBtn{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);border-radius:12px;background:rgba(31,38,53,.7);font-size:18px}
+.iconBtn:hover{background:var(--panel3)}
+
+#buffBar{position:relative;z-index:5;min-height:34px;display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;padding:0 22px}
+.buff{padding:6px 12px;border-radius:999px;background:linear-gradient(180deg,var(--amber2),var(--amber));color:#241a08;font-size:12px;font-weight:900;box-shadow:0 5px 18px rgba(234,169,65,.2)}
+
+#mineScene{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#mineScene::before{content:"";position:absolute;inset:6% 6% 8%;border-radius:44% 44% 22% 22%/30% 30% 18% 18%;background:
+  radial-gradient(ellipse at center,rgba(40,48,61,.52),rgba(13,16,22,.96) 70%),
+  repeating-linear-gradient(102deg,rgba(255,255,255,.02) 0 3px,transparent 3px 28px);box-shadow:inset 0 0 120px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.025)}
+#mineScene.frenzy::before{animation:frenzyGlow .8s ease-in-out infinite alternate;box-shadow:inset 0 0 100px rgba(234,169,65,.22),0 0 80px rgba(234,169,65,.12)}
+@keyframes frenzyGlow{to{box-shadow:inset 0 0 70px rgba(234,169,65,.34),0 0 100px rgba(234,169,65,.18)}}
+
+.timber{position:absolute;z-index:1;background:linear-gradient(90deg,#3f2c1e,#765237 45%,#3c291d);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.4)}
+.timber.left{left:10%;top:8%;bottom:6%;width:28px;transform:rotate(-2deg)}
+.timber.right{right:10%;top:8%;bottom:6%;width:28px;transform:rotate(2deg)}
+.timber.top{left:8%;right:8%;top:10%;height:30px;border-radius:7px}
+.rail{position:absolute;z-index:1;bottom:6%;height:5px;width:62%;background:#5d6470;box-shadow:0 12px 0 #5d6470;transform:perspective(180px) rotateX(25deg)}
+.rail::before{content:"";position:absolute;left:5%;right:5%;top:-10px;height:30px;background:repeating-linear-gradient(90deg,transparent 0 28px,#4e3b2a 28px 35px,transparent 35px 58px)}
+
+#coalButton{position:relative;z-index:4;width:min(42vw,48vh,420px);min-width:230px;aspect-ratio:1;background:transparent;border-radius:50%;display:grid;place-items:center;filter:drop-shadow(0 24px 26px rgba(0,0,0,.6));animation:floatRock 4.8s ease-in-out infinite;-webkit-touch-callout:none}
+#coalButton:hover{filter:drop-shadow(0 25px 34px rgba(234,169,65,.16)) drop-shadow(0 24px 26px rgba(0,0,0,.6))}
+#coalButton.pop #rockWrap{animation:rockPop .14s ease-out}
+#coalButton.crit #rockWrap{animation:rockCrit .22s ease-out}
+@keyframes floatRock{50%{transform:translateY(-8px)}}
+@keyframes rockPop{45%{transform:scale(.925) rotate(-1deg)}to{transform:scale(1)}}
+@keyframes rockCrit{35%{transform:scale(.86) rotate(3deg)}70%{transform:scale(1.07) rotate(-2deg)}to{transform:scale(1)}}
+#rockWrap{width:100%;display:block}
+#rockSvg{display:block;width:100%;height:auto}
+
+#goldenCoal{position:absolute;z-index:9;width:92px;display:none;background:transparent;filter:drop-shadow(0 0 20px rgba(255,211,125,.75));animation:goldPulse .85s ease-in-out infinite alternate}
+#goldenCoal.visible{display:block}
+#goldenCoal svg{display:block;width:100%}
+#goldenCoal span{display:block;margin-top:-3px;font-size:10px;font-weight:900;text-align:center;text-transform:uppercase;letter-spacing:.12em;color:var(--amber2);text-shadow:0 2px 5px #000}
+@keyframes goldPulse{to{transform:scale(1.13) rotate(3deg)}}
+
+.comboBox{position:absolute;z-index:5;left:50%;bottom:12%;transform:translateX(-50%);width:min(360px,54%);text-align:center}
+.comboHead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+#comboText{white-space:nowrap;font-variant-numeric:tabular-nums}
+.comboTrack{height:9px;border-radius:999px;background:#0d1016;border:1px solid var(--line);overflow:hidden}
+#comboFill{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--amber2));box-shadow:0 0 12px rgba(234,169,65,.45);transition:width .12s}
+
+#depthCard{position:absolute;z-index:5;left:24px;bottom:24px;width:250px;padding:14px;border:1px solid var(--line);border-radius:15px;background:rgba(22,27,38,.86);backdrop-filter:blur(8px);box-shadow:var(--shadow)}
+.depthTitle{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:900}
+.depthTitle span:last-child{color:var(--amber2)}
+.depthSub{margin-top:5px;color:var(--muted);font-size:11px}
+.progress{height:7px;margin-top:10px;background:#0e1117;border-radius:999px;overflow:hidden}
+#depthFill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--amber))}
+
+#skills{position:absolute;z-index:5;right:24px;bottom:24px;display:flex;gap:10px}
+.skill{position:relative;width:112px;height:62px;padding:9px 10px;border-radius:14px;border:1px solid var(--line);background:rgba(22,27,38,.9);text-align:left;overflow:hidden}
+.skill:hover:not(:disabled){background:var(--panel3);border-color:#47536e}
+.skill:disabled{opacity:.46;cursor:not-allowed}
+.skillName{display:block;font-size:12px;font-weight:900;line-height:1.05}
+.skillDesc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.1;word-break:break-word}
+.skillCool{position:absolute;inset:auto 0 0;height:3px;background:var(--amber);transform-origin:left}
+
+/* PRAWA STRONA */
+#shopSide{min-width:0;min-height:0;height:100%;max-height:100%;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#191f2b,#141923);box-shadow:-20px 0 70px rgba(0,0,0,.25)}
+.shopHeader{flex:none;padding:18px 18px 12px;border-bottom:1px solid var(--line);background:rgba(24,30,42,.96)}
+.shopTitle{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.shopTitle h1{margin:0;font-size:19px;letter-spacing:.02em}
+#achievementBonus{font-size:11px;color:var(--green);font-weight:800}
+.buyModes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px;padding:4px;border-radius:12px;background:#10141c;border:1px solid var(--line)}
+.buyMode{padding:8px;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:900}
+.buyMode.active{background:var(--panel3);color:var(--amber2);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tabs{flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#151a24}
+.tab{padding:13px 4px 11px;background:transparent;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border-bottom:3px solid transparent}
+.tab.active{color:var(--amber2);border-bottom-color:var(--amber)}
+.tab:hover{background:rgba(255,255,255,.025)}
+.shopBody{flex:1;min-height:0;overflow-y:auto;padding:12px 12px 24px;scrollbar-color:#3b455c transparent;scrollbar-width:thin}
+.shopBody::-webkit-scrollbar{width:8px}.shopBody::-webkit-scrollbar-thumb{background:#3b455c;border-radius:9px}.shopBody::-webkit-scrollbar-track{background:transparent}
+.tabPanel{display:none}.tabPanel.active{display:block}
+.sectionLabel{margin:7px 5px 10px;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}
+
+.shopItem{position:relative;width:100%;display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:11px;margin-bottom:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--panel2),#1c2230);text-align:left;overflow:hidden}
+.shopItem:hover:not(:disabled){background:linear-gradient(180deg,#2a3244,#222a39);border-color:#47536e;transform:translateY(-1px)}
+.shopItem:disabled{opacity:.44;cursor:not-allowed}
+.shopItem.locked{filter:saturate(.4)}
+.shopItem.affordable{box-shadow:inset 3px 0 0 var(--amber)}
+.itemIcon{width:44px;height:44px;display:grid;place-items:center;border:1px solid #3b455d;border-radius:12px;background:#121720;color:var(--amber2)}
+.itemIcon svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.itemMain{min-width:0}
+.itemName{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itemCount{padding:2px 6px;border-radius:999px;background:#111620;color:var(--muted);font-size:10px}
+.itemDesc{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.25}
+.itemMilestone{display:block;margin-top:6px;color:#bdc6d6;font-size:10px}
+.itemRight{text-align:right;min-width:85px}
+.itemPrice{display:block;font-size:13px;font-weight:900;color:var(--amber2);font-variant-numeric:tabular-nums}
+.itemOutput{display:block;margin-top:4px;color:var(--green);font-size:10px;font-weight:800;font-variant-numeric:tabular-nums}
+.itemOwned{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+.lockMask{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(15,18,25,.77);backdrop-filter:blur(2px);font-size:12px;font-weight:900;color:#d0d5df;text-align:center}
+
+.upgradeCard{width:100%;display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px;margin-bottom:8px;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);text-align:left}
+.upgradeCard:hover:not(:disabled){background:var(--panel3);border-color:#47536e}.upgradeCard:disabled{opacity:.44}
+.upgradeCard.bought{opacity:.52;cursor:default}.upgradeCard .itemIcon{width:40px;height:40px}
+
+.infoCard{margin-bottom:10px;padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}
+.infoTitle{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:900}
+.infoText{margin-top:7px;color:var(--muted);font-size:11px;line-height:1.45}
+.task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-bottom:8px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#1c2230}
+.taskName{font-size:12px;font-weight:900}.taskText{margin-top:3px;color:var(--muted);font-size:10px}.taskReward{color:var(--amber2);font-size:11px;font-weight:900}
+.task.done{opacity:.58}.claimBtn{padding:7px 9px;border-radius:9px;background:var(--amber);color:#221808;font-size:10px;font-weight:900}.claimBtn:disabled{background:#303849;color:#788397}
+
+.prestigeHero{text-align:center;padding:18px 14px;border:1px solid #5b4930;border-radius:18px;background:radial-gradient(circle at 50% 0,rgba(234,169,65,.18),transparent 50%),#1d2230}
+.prestigeMark{width:74px;height:74px;margin:0 auto 10px;display:grid;place-items:center;border:2px solid var(--amber);border-radius:50%;color:var(--amber2);font-size:30px;box-shadow:0 0 30px rgba(234,169,65,.18)}
+.prestigeNumber{font-size:30px;font-weight:900;color:var(--amber2)}
+.prestigeLabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.13em;font-weight:900}
+.prestigeBtn{width:100%;margin-top:13px;padding:12px;border-radius:11px;background:linear-gradient(180deg,var(--amber2),var(--amber));color:#211706;font-weight:950}
+.prestigeBtn:disabled{filter:grayscale(1);opacity:.45;cursor:not-allowed}
+
+.statsGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.stat{padding:10px;border:1px solid var(--line);border-radius:11px;background:#161b25}.statName{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.08em}.statValue{margin-top:4px;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+.smallActions{display:flex;gap:7px;margin-top:10px}.smallBtn{flex:1;padding:9px;border:1px solid var(--line);border-radius:10px;background:#171c27;color:var(--muted);font-size:10px;font-weight:900}.smallBtn:hover{background:var(--panel3)}
+
+/* EFEKTY */
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.popnum{position:fixed;transform:translate(-50%,-50%);font-size:21px;font-weight:950;color:var(--amber2);text-shadow:0 3px 8px #000;animation:floatNum .85s ease-out forwards}
+.popnum.critical{font-size:30px;color:#fff3bd}
+@keyframes floatNum{to{transform:translate(-50%,calc(-50% - 86px)) scale(1.04);opacity:0}}
+.particle{position:fixed;width:7px;height:7px;border-radius:2px;background:#303746;animation:particle .65s ease-in forwards}
+.particle.spark{width:5px;height:5px;border-radius:50%;background:var(--amber2)}
+@keyframes particle{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+#toasts{position:fixed;z-index:120;left:50%;bottom:18px;width:min(440px,92vw);transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 14px;border:1px solid #6c5730;border-radius:12px;background:#2a2314;color:#ffe9bc;box-shadow:var(--shadow);font-size:12px;font-weight:850;animation:toastIn .22s ease-out}
+@keyframes toastIn{from{transform:translateY(12px);opacity:0}}
+
+@media(max-width:1100px){
+  #app{grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr)}
+  .topbar{grid-template-columns:minmax(105px,1fr) auto minmax(82px,1fr);gap:10px;padding-left:16px;padding-right:16px}
+  .resource{min-width:170px}
+  .brand{font-size:14px;letter-spacing:.18em}
+  .brand small{font-size:9px}
+  #coalButton{width:min(43vw,46vh,350px)}
+  #depthCard{left:15px;bottom:15px;width:220px}#skills{right:15px}
+}
+
+/* Niższe ekrany laptopów i widok przy powiększeniu systemowym 125–150% */
+@media (min-width:821px) and (max-height:820px){
+  .topbar{padding-top:10px;padding-bottom:6px}
+  .brand{font-size:14px}
+  .brand small{margin-top:1px;font-size:9px}
+  .resource{min-width:185px}
+  #coalCount{font-size:clamp(38px,4vw,52px)}
+  .resourceLabel{margin-top:4px;font-size:10px}
+  #rateLine{margin-top:3px;font-size:12px}
+  .iconBtn{width:36px;height:36px;border-radius:10px;font-size:16px}
+  #buffBar{min-height:25px;padding:0 16px}
+  .buff{padding:4px 10px;font-size:10px}
+  #mineScene::before{inset:3% 5% 5%}
+  #coalButton{width:min(38vw,43vh,330px);top:-18px}
+  .timber.left,.timber.right{top:5%;bottom:4%;width:23px}
+  .timber.top{top:7%;height:25px}
+  .rail{bottom:4%}
+  .comboBox{bottom:82px;width:min(300px,42%)}
+  #depthCard{left:12px;bottom:10px;width:205px;padding:10px 11px}
+  .depthSub{display:none}
+  #skills{right:12px;bottom:10px;gap:7px}
+  .skill{width:96px;height:54px;padding:7px 8px}
+  .skillDesc{font-size:9px}
+  .shopHeader{padding:11px 14px 8px}
+  .shopTitle h1{font-size:17px}
+  .buyModes{margin-top:8px}
+  .buyMode{padding:7px}
+  .tab{padding-top:10px;padding-bottom:8px}
+  .shopBody{padding-top:9px}
+}
+@media (min-width:821px) and (max-height:680px){
+  .topbar{padding-top:7px;padding-bottom:4px}
+  .brand small{display:none}
+  #coalCount{font-size:40px}
+  #buffBar{min-height:20px}
+  #coalButton{width:min(35vw,40vh,280px);top:-20px}
+  .comboBox{bottom:68px;width:260px}
+  #depthCard{width:180px;padding:8px 9px}
+  .depthTitle{font-size:10px}
+  #skills{gap:5px}
+  .skill{width:82px;height:48px;padding:6px 7px}
+  .skillDesc{display:none}
+  .shopHeader{padding-top:8px}
+  .shopTitle h1{font-size:16px}
+  .buyModes{margin-top:6px}
+  .tab{padding-top:8px;padding-bottom:7px;font-size:10px}
+}
+
+@media(max-width:820px){
+  html,body{height:auto;min-height:100%;overflow:auto}
+  #app{height:auto;min-height:100dvh;max-height:none;overflow:visible;display:block}
+  #mineSide{height:72vh;min-height:620px;max-height:none;border-right:0;border-bottom:1px solid var(--line)}
+  #shopSide{height:auto;min-height:760px;max-height:none;overflow:visible}
+  .shopBody{overflow:visible}
+  .topbar{padding:14px 14px 8px}.brand{font-size:14px}.topActions{gap:5px}.iconBtn{width:36px;height:36px}
+  #coalButton{width:min(64vw,360px)}
+  #depthCard{left:12px;bottom:12px;width:190px}.depthSub{display:none}
+  #skills{right:12px;bottom:12px}.skill{width:94px;height:58px}.skillDesc{font-size:9px}
+}
+@media(max-width:520px){
+  #mineSide{height:78vh;min-height:580px}
+  .topbar{grid-template-columns:1fr auto;gap:8px}.resource{min-width:0}.brand small{display:none}
+  #coalCount{font-size:42px}
+  #mineScene::before{inset:5% 1% 7%}
+  #coalButton{width:min(78vw,350px)}
+  .timber.left{left:3%}.timber.right{right:3%}.timber.top{left:1%;right:1%}
+  .comboBox{bottom:20%;width:66%}
+  #depthCard{bottom:9px;left:9px;width:155px;padding:10px}.depthTitle{font-size:10px}.progress{margin-top:7px}
+  #skills{bottom:9px;right:9px;gap:6px}.skill{width:78px;height:55px;padding:7px}.skillDesc{display:none}
+  .tabs .tab{font-size:9px;letter-spacing:.03em}
+  .shopHeader{padding:14px 12px 10px}.shopBody{padding:10px 8px 20px}
+}
+@media(prefers-reduced-motion:reduce){#coalButton,#goldenCoal,#mineScene.frenzy::before{animation:none}.shopItem:hover{transform:none}}
+
+
+/* v2.3: spójniejsza kopalnia, lżejsze UI i jeden dolny HUD */
+#mineSide{
+  background:
+    radial-gradient(circle at 48% 38%,rgba(234,169,65,.055),transparent 32%),
+    linear-gradient(180deg,#0d1118 0%,#111620 44%,#0d121a 100%);
+}
+#mineSide::before{
+  opacity:.45;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px),
+    linear-gradient(rgba(255,255,255,.01) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:linear-gradient(to bottom,black 0,rgba(0,0,0,.65) 54%,transparent 92%);
+}
+.topbar{
+  padding:16px 24px 10px;
+  background:linear-gradient(180deg,rgba(9,12,17,.94),rgba(9,12,17,.5) 72%,transparent);
+  backdrop-filter:none;
+}
+#buffBar{min-height:30px;padding:0 18px 4px}
+#mineScene{
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse at 50% 43%,rgba(56,66,84,.20),transparent 34%),
+    radial-gradient(ellipse at 50% 66%,rgba(5,8,12,.16),rgba(5,8,12,.72) 76%),
+    linear-gradient(180deg,rgba(17,22,31,.4),rgba(8,11,16,.78));
+}
+#mineScene::before{
+  inset:4% 5% 4%;
+  border-radius:44% 44% 28% 28% / 30% 30% 20% 20%;
+  background:
+    radial-gradient(ellipse at 50% 44%,rgba(43,52,67,.50),rgba(12,16,23,.94) 64%),
+    repeating-linear-gradient(164deg,rgba(255,255,255,.018) 0 2px,transparent 2px 28px),
+    repeating-linear-gradient(12deg,rgba(0,0,0,.12) 0 18px,transparent 18px 42px);
+  box-shadow:
+    inset 0 0 120px rgba(0,0,0,.92),
+    inset 0 -36px 70px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.025);
+}
+#mineScene::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:12%;right:12%;bottom:0;height:34%;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 50% 100%,rgba(234,169,65,.055),transparent 58%),
+    linear-gradient(180deg,transparent,rgba(3,5,8,.32));
+  mask-image:linear-gradient(to top,black,transparent);
+}
+#coalButton{
+  width:min(39vw,48vh,390px);
+  min-width:205px;
+  margin-bottom:66px;
+  transform:translateZ(0);
+  will-change:transform;
+}
+#coalButton:hover{filter:drop-shadow(0 20px 28px rgba(234,169,65,.14)) drop-shadow(0 24px 26px rgba(0,0,0,.55))}
+.clickHint{
+  position:absolute;z-index:5;left:50%;bottom:146px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:7px;padding:6px 11px;
+  border:1px solid rgba(255,255,255,.07);border-radius:999px;
+  background:rgba(14,18,25,.72);color:#9ba6b8;
+  font-size:10px;font-weight:850;letter-spacing:.09em;text-transform:uppercase;
+  opacity:.76;pointer-events:none;
+}
+.clickHint span{color:var(--amber2);font-size:13px}
+.mineHud{
+  position:absolute;z-index:7;left:18px;right:18px;bottom:16px;
+  display:grid;grid-template-columns:minmax(180px,235px) minmax(240px,360px) auto;
+  justify-content:space-between;align-items:end;gap:12px;
+}
+#depthCard,.comboBox,#skills{position:static;left:auto;right:auto;bottom:auto;transform:none;width:auto}
+#depthCard{
+  padding:12px 13px;border:1px solid rgba(75,86,111,.62);border-radius:14px;
+  background:rgba(17,22,31,.92);backdrop-filter:none;box-shadow:0 10px 30px rgba(0,0,0,.24);
+}
+.comboBox{
+  align-self:center;min-width:0;width:min(360px,100%);padding:10px 12px;border:1px solid rgba(75,86,111,.52);
+  border-radius:14px;background:rgba(17,22,31,.86);box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+.comboHead{margin-bottom:7px}
+#skills{display:grid;grid-template-columns:repeat(2,118px);gap:8px}
+.skill{
+  width:118px;height:64px;padding:8px 9px;border-color:rgba(75,86,111,.62);
+  background:rgba(17,22,31,.92);box-shadow:0 10px 30px rgba(0,0,0,.22);
+}
+.skill:hover:not(:disabled){transform:translateY(-1px)}
+
+/* Czytelniejszy i lżejszy panel rozbudowy */
+#shopSide{background:linear-gradient(180deg,#181e29,#121720)}
+.shopHeader{padding:15px 16px 11px;background:#181e29}
+.shopTitle h1{font-size:18px}
+.tabs{background:#141923}
+.shopBody{padding:11px 10px 22px;overscroll-behavior:contain}
+.shopItem,.upgradeCard,.infoCard,.task,.stat{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 78px;
+}
+.shopItem{
+  grid-template-columns:42px minmax(0,1fr) auto;gap:10px;margin-bottom:7px;padding:10px 11px;
+  border-radius:13px;background:#1d2432;transition:background .16s,border-color .16s,transform .16s;
+}
+.shopItem:hover:not(:disabled){background:#252e3e}
+.itemIcon{width:40px;height:40px;border-radius:11px;background:#111720}
+.itemIcon svg{width:23px;height:23px}
+.itemName{font-size:13px}
+.itemDesc{font-size:10.5px}
+.itemMilestone{margin-top:4px;font-size:9.5px}
+.itemRight{min-width:78px}
+.lockMask{
+  justify-content:flex-start;padding-left:64px;
+  background:linear-gradient(90deg,rgba(15,19,27,.96),rgba(15,19,27,.88));
+  backdrop-filter:none;color:#9ca6b8;font-size:10.5px;text-align:left;
+}
+.upgradeCard{padding:10px 11px;background:#1d2432}
+.buyModes{margin-top:11px}
+.buyMode{padding:7px}
+.tab{padding:11px 4px 9px}
+.buff{box-shadow:none}
+
+/* Mniej kosztownych efektów na słabszych urządzeniach */
+.particle{will-change:transform,opacity}
+@media(max-width:1100px){
+  .mineHud{left:12px;right:12px;bottom:10px;grid-template-columns:182px minmax(190px,300px) auto;gap:8px}
+  #skills{grid-template-columns:repeat(2,102px)}
+  .skill{width:102px;height:60px}
+  #coalButton{width:min(39vw,45vh,330px);margin-bottom:62px}
+  .clickHint{bottom:135px}
+}
+@media (min-width:821px) and (max-height:820px){
+  #coalButton{top:auto;width:min(35vw,42vh,305px);margin-bottom:52px}
+  .mineHud{bottom:8px;grid-template-columns:172px minmax(170px,250px) auto}
+  #depthCard{width:auto;padding:9px 10px}
+  .comboBox{width:min(250px,100%);padding:8px 10px}
+  #skills{right:auto;bottom:auto;grid-template-columns:repeat(2,96px);gap:6px}
+  .skill{width:96px;height:54px;padding:6px 7px}
+  .clickHint{bottom:112px}
+}
+@media (min-width:821px) and (max-height:680px){
+  #coalButton{width:min(32vw,38vh,260px);margin-bottom:44px}
+  .mineHud{grid-template-columns:160px minmax(150px,220px) auto}
+  #depthCard{width:auto}
+  .comboBox{width:min(220px,100%)}
+  #skills{grid-template-columns:repeat(2,88px)}
+  .skill{width:88px;height:48px}
+  .clickHint{display:none}
+}
+@media(max-width:820px){
+  #mineScene::before{inset:4% 2% 4%}
+  #coalButton{width:min(62vw,350px);margin-bottom:96px}
+  .mineHud{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr;gap:8px}
+  #depthCard{grid-column:1}
+  .comboBox{grid-column:2}
+  #skills{grid-column:1 / -1;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .skill{width:auto}
+  .clickHint{bottom:176px}
+}
+@media(max-width:520px){
+  #coalButton{width:min(72vw,320px);margin-bottom:114px}
+  .mineHud{grid-template-columns:1fr 1fr}
+  #depthCard,.comboBox{padding:9px}
+  .depthSub{display:none}
+  .clickHint{bottom:194px}
+}
+@media(prefers-reduced-motion:reduce){
+  #coalButton{will-change:auto}
+  .shopItem,.skill{transition:none}
+}
+
+
+/* v2.4 — dopracowany HUD i panel administracyjny */
+.topbar{
+  min-height:112px;
+  border-bottom:1px solid rgba(71,83,110,.34);
+  background:linear-gradient(180deg,rgba(9,12,17,.96),rgba(12,16,23,.76));
+  box-shadow:0 14px 35px rgba(0,0,0,.16);
+}
+.resource{
+  min-width:285px;padding:9px 26px 10px;border:1px solid rgba(68,80,106,.44);
+  border-radius:18px;background:linear-gradient(180deg,rgba(28,34,46,.74),rgba(15,19,27,.62));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 14px 36px rgba(0,0,0,.2);
+}
+#coalCount{letter-spacing:-.035em}
+#rateLine{color:#c8d0de}
+.hudStatus{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:7px;color:#8f9bad;font-size:10px;font-weight:750;white-space:nowrap}
+.statusDot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(111,207,151,.7)}
+.iconBtn{transition:background .16s,border-color .16s,transform .16s}
+.iconBtn:hover{transform:translateY(-1px);border-color:#485571}
+
+#mineScene::before{inset:5.5% 5% 7%;border:1px solid rgba(255,255,255,.025)}
+#coalButton{filter:drop-shadow(0 22px 30px rgba(0,0,0,.57))}
+.clickHint{border-color:rgba(78,90,117,.45);background:rgba(15,19,27,.82);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.mineHud{align-items:stretch}
+#depthCard,.comboBox,#skills .skill{
+  border-color:rgba(72,85,112,.62);
+  background:linear-gradient(180deg,rgba(26,32,44,.95),rgba(15,20,29,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 28px rgba(0,0,0,.24);
+}
+#depthCard{display:flex;flex-direction:column;justify-content:center}
+.depthTitle{font-size:11px;letter-spacing:.02em}
+.depthSub{font-size:10px}
+.progress,.comboTrack{background:#0a0e14;border-color:rgba(74,87,114,.56)}
+.comboBox{display:flex;flex-direction:column;justify-content:center;width:min(330px,100%)}
+.comboHead span:first-child{display:flex;align-items:center;gap:7px}
+.comboHead span:first-child::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(234,169,65,.62)}
+#skills{grid-template-columns:repeat(2,126px)}
+.skill{
+  width:126px;height:64px;display:grid;grid-template-columns:30px minmax(0,1fr);align-items:center;gap:7px;
+  text-align:left;transition:transform .16s,border-color .16s,background .16s;
+}
+.skillIcon{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(82,96,124,.52);border-radius:9px;background:#101620;font-size:16px;line-height:1}
+.skillCopy{min-width:0;display:block}
+.skillName{white-space:normal}
+.skillDesc{font-size:9px;color:#919cad}
+.skill:disabled .skillIcon{filter:grayscale(1);opacity:.65}
+.skillCool{height:4px;background:linear-gradient(90deg,var(--amber),var(--amber2))}
+
+.shopHeader{box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.shopTitle h1{letter-spacing:-.01em}
+#achievementBonus{padding:5px 8px;border:1px solid rgba(111,207,151,.2);border-radius:999px;background:rgba(111,207,151,.07)}
+.tabs{position:relative;z-index:2}
+.tab{transition:background .15s,color .15s}
+.shopItem,.upgradeCard,.task,.infoCard,.stat{box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
+.shopItem.affordable{border-color:rgba(234,169,65,.38);box-shadow:inset 3px 0 0 var(--amber),inset 0 1px 0 rgba(255,255,255,.025)}
+
+.statsLabel{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.badgeGroup{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.localBadge{padding:3px 6px;border:1px solid rgba(121,169,239,.22);border-radius:999px;background:rgba(121,169,239,.07);color:#91baf3;font-size:8px;letter-spacing:.08em;white-space:nowrap}
+.onlineBadge{border-color:rgba(111,207,151,.28);background:rgba(111,207,151,.08);color:#83d9a7}
+.onlineBadge.connecting{border-color:rgba(234,169,65,.28);background:rgba(234,169,65,.08);color:var(--amber2)}
+.onlineBadge.offline{border-color:rgba(239,122,121,.25);background:rgba(239,122,121,.07);color:#ef9a99}
+/* Lokalna diagnostyka jest dostępna wyłącznie z parametrem ?debug=1. */
+.adminToggle{display:none}
+body.debugMode .adminToggle{display:flex}
+.statsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stat{position:relative;overflow:hidden;background:linear-gradient(180deg,#1b2230,#151b26)}
+.stat::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);opacity:.5}
+.statValue{font-size:15px}
+.adminToggle{width:100%;margin-top:10px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,#202837,#171d29);text-align:left}
+.adminToggle:hover{border-color:#485571;background:#252e3f}
+.adminToggle b{display:block;font-size:12px}.adminToggle small{display:block;margin-top:3px;color:var(--muted);font-size:9px}
+.adminChevron{font-size:20px;color:var(--amber2);transition:transform .18s}.adminToggle[aria-expanded="true"] .adminChevron{transform:rotate(180deg)}
+.adminPanel{margin-top:8px;padding:12px;border:1px solid #3d485f;border-radius:14px;background:linear-gradient(180deg,#1a2130,#121823)}
+.adminLead{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:900}.adminLead span:last-child{color:var(--amber2)}
+.adminProgress{height:7px;margin-top:8px;border:1px solid #313b4f;border-radius:999px;background:#0d1118;overflow:hidden}
+#adminProgressFill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--amber));transition:width .2s}
+.adminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
+.adminMetric{padding:9px;border:1px solid rgba(61,72,95,.7);border-radius:10px;background:#151b26}.adminMetric small{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.07em}.adminMetric b{display:block;margin-top:4px;font-size:12px;font-variant-numeric:tabular-nums}
+.adminNext{margin-top:8px;padding:9px 10px;border-left:3px solid var(--amber);border-radius:8px;background:#171d29;color:#aeb7c6;font-size:9px;line-height:1.45}
+.adminSectionTitle{margin-top:12px;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.12em}
+.adminActions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}.adminBtn{padding:8px 5px;border:1px solid #3a455c;border-radius:9px;background:#1d2533;color:#cbd3df;font-size:9px;font-weight:900}.adminBtn:hover{border-color:#55627e;background:#273143;color:var(--amber2)}
+.adminNote{margin-top:8px;color:#788497;font-size:8px;line-height:1.4}
+
+@media(max-width:1200px){
+  .resource{min-width:230px;padding-left:18px;padding-right:18px}
+  #skills{grid-template-columns:repeat(2,108px)}
+  .skill{width:108px}
+  .skillIcon{display:none}
+  .skill{grid-template-columns:1fr}
+}
+@media (min-width:821px) and (max-height:820px){
+  .topbar{min-height:92px}
+  .resource{padding-top:6px;padding-bottom:7px;border-radius:14px}
+  .hudStatus{margin-top:4px;font-size:9px}
+  #skills{grid-template-columns:repeat(2,100px)}
+  .skill{width:100px;height:56px}
+}
+@media(max-width:820px){
+  .resource{min-width:0;padding:7px 12px}
+  .hudStatus{display:none}
+  #skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .skill{width:auto;grid-template-columns:30px minmax(0,1fr)}
+  .skillIcon{display:grid}
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <main id="mineSide">
+    <header class="topbar">
+      <div class="brand">FEDRUNEK<small>kopalniany clicker</small></div>
+      <div class="resource">
+        <div id="coalCount">0</div>
+        <div class="resourceLabel">WYNGLA</div>
+        <div id="rateLine">0 /s · klik +1</div>
+        <div class="hudStatus"><span class="statusDot"></span><span id="nextUnlockLine">Następne odblokowanie: Grubiorz</span></div>
+      </div>
+      <div class="topActions">
+        <button class="iconBtn" id="soundBtn" title="Dźwięk" aria-label="Dźwięk">🔊</button>
+        <button class="iconBtn" id="helpBtn" title="Pomoc" aria-label="Pomoc">?</button>
+      </div>
+    </header>
+
+    <div id="buffBar"></div>
+
+    <section id="mineScene" aria-label="Strefa fedrowania">
+      <button id="coalButton" aria-label="Kliknij w bryłę węgla">
+        <span id="rockWrap">
+          <svg id="rockSvg" viewBox="0 0 360 360" aria-hidden="true">
+            <defs>
+              <radialGradient id="aura" cx="50%" cy="48%" r="52%"><stop offset="0" stop-color="#eaa941" stop-opacity=".28"/><stop offset="1" stop-color="#eaa941" stop-opacity="0"/></radialGradient>
+              <linearGradient id="facet1" x1="0" x2="1"><stop stop-color="#3c4558"/><stop offset="1" stop-color="#202632"/></linearGradient>
+            </defs>
+            <circle cx="180" cy="184" r="170" fill="url(#aura)"/>
+            <g>
+              <polygon points="180,32 272,69 326,160 290,270 191,327 82,298 31,194 63,84" fill="#11151c" stroke="#343d4f" stroke-width="3"/>
+              <polygon points="180,32 272,69 246,151 161,127" fill="url(#facet1)"/>
+              <polygon points="272,69 326,160 246,151" fill="#1b202a"/>
+              <polygon points="326,160 290,270 221,237 246,151" fill="#272e3b"/>
+              <polygon points="290,270 191,327 221,237" fill="#171b23"/>
+              <polygon points="191,327 82,298 125,222 221,237" fill="#222833"/>
+              <polygon points="82,298 31,194 125,222" fill="#2c3340"/>
+              <polygon points="31,194 63,84 150,137 125,222" fill="#1d222c"/>
+              <polygon points="63,84 180,32 161,127 150,137" fill="#394356"/>
+              <polygon points="161,127 246,151 221,237 125,222 150,137" fill="#171c25"/>
+              <polygon points="92,97 158,72 147,119 98,135" fill="#697891" opacity=".72"/>
+              <polygon points="106,98 142,86 135,105" fill="#aab5ca" opacity=".75"/>
+              <circle cx="260" cy="189" r="4" fill="#eaa941"/><circle cx="151" cy="258" r="3.5" fill="#eaa941"/><circle cx="280" cy="135" r="3" fill="#ffd37d"/>
+            </g>
+          </svg>
+        </span>
+      </button>
+
+      <button id="goldenCoal" aria-label="Złoty wyngiel">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,3 81,18 98,51 82,83 48,98 16,80 3,47 21,16" fill="#d89a36" stroke="#ffe39f" stroke-width="4"/><polygon points="50,3 81,18 67,48 37,38" fill="#ffe29b"/><polygon points="81,18 98,51 67,48" fill="#ebb64e"/><polygon points="98,51 82,83 58,68 67,48" fill="#dca33b"/><polygon points="82,83 48,98 58,68" fill="#bd7c22"/><polygon points="48,98 16,80 35,63 58,68" fill="#e7b44e"/><polygon points="16,80 3,47 35,63" fill="#f2c66b"/><polygon points="3,47 21,16 37,38 35,63" fill="#d99631"/><polygon points="21,16 50,3 37,38" fill="#fff0c2"/></svg>
+        <span>Skarbnik</span>
+      </button>
+
+      <div class="clickHint" aria-hidden="true"><span>⛏</span> Klikaj w bryłę</div>
+
+      <div class="mineHud">
+        <aside id="depthCard">
+          <div class="depthTitle"><span id="depthName">Poziom 320 m</span><span id="depthBonus">×1,00</span></div>
+          <div class="depthSub" id="depthSub">Do kolejnego poziomu: 5 tys.</div>
+          <div class="progress"><div id="depthFill"></div></div>
+        </aside>
+
+        <div class="comboBox">
+          <div class="comboHead"><span>Seria kliknięć</span><span id="comboText">0 · ×1,0</span></div>
+          <div class="comboTrack"><div id="comboFill"></div></div>
+        </div>
+
+        <div id="skills">
+          <button class="skill" id="dynamiteBtn"><span class="skillIcon">🧨</span><span class="skillCopy"><span class="skillName">Dynamit</span><span class="skillDesc">Natychmiastowy urobek</span></span><span class="skillCool" id="dynamiteCool"></span></button>
+          <button class="skill" id="rushBtn"><span class="skillIcon">⚡</span><span class="skillCopy"><span class="skillName">Zryw brygady</span><span class="skillDesc">Produkcja ×3 przez 15 s</span></span><span class="skillCool" id="rushCool"></span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="shopSide">
+    <div class="shopHeader">
+      <div class="shopTitle"><h1>Rozbudowa kopalni</h1><span id="achievementBonus">Premia osiągnięć +0%</span></div>
+      <div class="buyModes" aria-label="Liczba kupowanych obiektów">
+        <button class="buyMode active" data-mode="1">Kup 1</button>
+        <button class="buyMode" data-mode="10">Kup 10</button>
+        <button class="buyMode" data-mode="max">MAX</button>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="crew">Brygada</button>
+      <button class="tab" data-tab="upgrades">Ulepszenia</button>
+      <button class="tab" data-tab="goals">Cele</button>
+      <button class="tab" data-tab="shift">Szychta</button>
+    </nav>
+    <div class="shopBody">
+      <section class="tabPanel active" id="panel-crew"><div class="sectionLabel">Automatyczne wydobycie</div><div id="workerList"></div></section>
+      <section class="tabPanel" id="panel-upgrades"><div class="sectionLabel">Stałe ulepszenia tej kopalni</div><div id="upgradeList"></div></section>
+      <section class="tabPanel" id="panel-goals"><div class="sectionLabel">Zadania</div><div id="taskList"></div><div class="sectionLabel">Osiągnięcia</div><div id="achievementList"></div></section>
+      <section class="tabPanel" id="panel-shift">
+        <div class="prestigeHero">
+          <div class="prestigeMark">✦</div>
+          <div class="prestigeNumber" id="prestigeGain">0</div>
+          <div class="prestigeLabel">znaków sztygara za nową szychtę</div>
+          <div class="infoText" id="prestigeInfo">Pierwszy znak otrzymasz po wydobyciu 1 mln wyngla w tej kopalni.</div>
+          <button class="prestigeBtn" id="prestigeBtn" disabled>Rozpocznij nową szychtę</button>
+        </div>
+        <div class="infoCard" style="margin-top:10px">
+          <div class="infoTitle"><span>Stała premia</span><span id="prestigeBonus">+0%</span></div>
+          <div class="infoText">Każdy znak sztygara zwiększa wszystkie przyszłe zyski o 10%. Nowa szychta zeruje wyngiel, brygadę i zwykłe ulepszenia.</div>
+        </div>
+        <div class="sectionLabel statsLabel"><span>Statystyki</span><span class="badgeGroup"><span class="localBadge">ZAPIS LOKALNY</span><span class="localBadge onlineBadge connecting" id="analyticsBadge">STATYSTYKI ŁĄCZĄ…</span></span></div>
+        <div class="statsGrid" id="statsGrid"></div>
+        <button class="adminToggle" id="adminToggle" aria-expanded="false"><span><b>Panel admina</b><small>Ekonomia, postęp i narzędzia testowe</small></span><span class="adminChevron">⌄</span></button>
+        <section class="adminPanel hidden" id="adminPanel">
+          <div class="adminLead"><span>Podgląd bieżącej gry</span><span id="adminCompletion">0%</span></div>
+          <div class="adminProgress"><div id="adminProgressFill"></div></div>
+          <div class="adminGrid" id="adminGrid"></div>
+          <div class="adminNext" id="adminNext"></div>
+          <div class="adminSectionTitle">Narzędzia testowe</div>
+          <div class="adminActions">
+            <button class="adminBtn" id="adminAdd1m">+1 mln</button>
+            <button class="adminBtn" id="adminAdd1b">+1 mld</button>
+            <button class="adminBtn" id="adminReportBtn">Kopiuj raport</button>
+          </div>
+          <div class="adminNote">Narzędzia działają tylko na lokalnym zapisie tej przeglądarki.</div>
+        </section>
+        <div class="smallActions"><button class="smallBtn" id="exportBtn">Eksport zapisu</button><button class="smallBtn" id="importBtn">Import zapisu</button><button class="smallBtn" id="resetBtn">Reset</button></div>
+      </section>
+    </div>
+  </aside>
+</div>
+<div id="fxLayer"></div><div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+
+const CFG={
+  saveKey:'fedrunek_classic_v2', oldSaveKey:'fedrunek_v1', priceScale:1.15, autosave:5000,
+  offlineMax:8*3600, goldenMin:45, goldenMax:105, goldenLife:10,
+  dynamiteCd:30, rushCd:45, rushDuration:15,
+  version:'2.5.1', analyticsHeartbeat:60,
+  supabaseUrl:'https://xyivrakegwybwhmmcawq.supabase.co',
+  supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo'
+};
+
+const ICONS={
+  pick:'<svg viewBox="0 0 24 24"><path d="M4 6c5-4 11-4 16 0"/><path d="M12 4v16"/><path d="m9 20 3-3 3 3"/></svg>',
+  hammer:'<svg viewBox="0 0 24 24"><path d="m14 5 5 5"/><path d="m12 7 5 5"/><path d="M3 21 14 10"/><path d="m13 4 3-1 5 5-1 3"/></svg>',
+  cart:'<svg viewBox="0 0 24 24"><path d="M3 6h17l-2 9H6z"/><path d="m7 6-2-3"/><circle cx="8" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>',
+  lift:'<svg viewBox="0 0 24 24"><path d="M6 21V3h12v18"/><path d="M9 8h6v8H9z"/><path d="m10 6 2-2 2 2"/><path d="m10 18 2 2 2-2"/></svg>',
+  gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1-2-4-2 1a7 7 0 0 0-2-1l-.3-2h-5L9 6a7 7 0 0 0-2 1L5 6 3 10l2 1a7 7 0 0 0 0 2l-2 1 2 4 2-1a7 7 0 0 0 2 1l.3 2h5l.5-2a7 7 0 0 0 2-1l2 1 2-4-2-1a7 7 0 0 0 .2-1z"/></svg>',
+  belt:'<svg viewBox="0 0 24 24"><path d="M4 8h15l2 8H6z"/><circle cx="8" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M7 8V5h3v3m3 0V4h3v4"/></svg>',
+  factory:'<svg viewBox="0 0 24 24"><path d="M3 21V10l6 3V9l6 4V6h4v15z"/><path d="M7 17h2m3 0h2m3 0h2"/></svg>',
+  tower:'<svg viewBox="0 0 24 24"><path d="m6 21 5-18h2l5 18"/><path d="M8 15h8M9 10h6M10 6h4"/><circle cx="12" cy="3" r="2"/></svg>',
+  lamp:'<svg viewBox="0 0 24 24"><path d="M8 11a4 4 0 1 1 8 0v8H8z"/><path d="M6 21h12M10 7V4h4v3"/><path d="M11 14h2"/></svg>',
+  bolt:'<svg viewBox="0 0 24 24"><path d="m13 2-8 12h7l-1 8 8-12h-7z"/></svg>',
+  dynamite:'<svg viewBox="0 0 24 24"><path d="M5 8h5v12H5zM12 8h5v12h-5z"/><path d="M8 8V5h6V3h4"/><path d="m19 2 1-1m0 4 2 1m-4 0-1 2"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6z"/><path d="m8 12 3 3 5-6"/></svg>',
+  hand:'<svg viewBox="0 0 24 24"><path d="M7 12V7a2 2 0 0 1 4 0v4-6a2 2 0 0 1 4 0v6-4a2 2 0 0 1 4 0v7c0 5-3 7-7 7-3 0-5-2-7-5l-2-3a2 2 0 0 1 3-2z"/></svg>',
+  star:'<svg viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>'
+};
+
+const WORKERS=[
+  {id:'hawiyrz',name:'Grubiorz',desc:'Fedruje pomału, ale durch.',base:15,cps:.2,icon:'pick',unlock:0},
+  {id:'karlus',name:'Karlus z kilofym',desc:'Młody, gibki i coraz sprawniejszy.',base:100,cps:1.2,icon:'hammer',unlock:30},
+  {id:'wozek',name:'Ładowacz wózków',desc:'Dba, żeby urobek nie zalegał.',base:1100,cps:9,icon:'cart',unlock:400},
+  {id:'szola',name:'Szola',desc:'Wyciąga wyngiel na wiyrch.',base:12000,cps:52,icon:'lift',unlock:5000},
+  {id:'kombajn',name:'Kombajn ścianowy',desc:'Maszina za całą brygadę.',base:135000,cps:290,icon:'gear',unlock:60000},
+  {id:'tasma',name:'Taśmociąg',desc:'Urobek jedzie bez postoju.',base:1500000,cps:1650,icon:'belt',unlock:700000},
+  {id:'sortownia',name:'Sortownia',desc:'Odzyskuje wartość z każdej tony.',base:22000000,cps:9400,icon:'factory',unlock:9000000},
+  {id:'szyb',name:'Nowy szyb',desc:'Otwiera kolejne pokłady kopalni.',base:340000000,cps:56000,icon:'tower',unlock:130000000},
+  {id:'gruba',name:'Cołko gruba',desc:'Pełny zakład pracujący bez przerwy.',base:5500000000,cps:340000,icon:'factory',unlock:1900000000}
+];
+
+const UPGRADES=[
+  {id:'kilof1',name:'Ostry kilof',desc:'Moc kliknięcia ×2.',price:100,icon:'pick',unlock:s=>s.lifetime>=40,effect:{click:2}},
+  {id:'lamp',name:'Lampa karbidowa',desc:'Całe wydobycie ×1,5.',price:1800,icon:'lamp',unlock:s=>s.lifetime>=500,effect:{all:1.5}},
+  {id:'kilof2',name:'Stalowy kilof',desc:'Moc kliknięcia ×2.',price:7000,icon:'hammer',unlock:s=>s.lifetime>=2000,effect:{click:2}},
+  {id:'norma',name:'Dobra norma',desc:'Grubiorze i karlusy pracują ×2.',price:26000,icon:'star',unlock:s=>(s.workers.hawiyrz||0)>=10,effect:{worker:['hawiyrz','karlus'],mult:2}},
+  {id:'wentylacja',name:'Nowa wentylacja',desc:'Całe wydobycie ×2.',price:90000,icon:'gear',unlock:s=>s.lifetime>=30000,effect:{all:2}},
+  {id:'dynamit',name:'Skład dynamitu',desc:'Odblokowuje aktywny dynamit.',price:180000,icon:'dynamite',unlock:s=>s.lifetime>=70000,effect:{ability:'dynamite'}},
+  {id:'sztygar',name:'Dobry sztygar',desc:'Produkcja brygady ×2.',price:650000,icon:'shield',unlock:s=>totalWorkers(s)>=35,effect:{all:2}},
+  {id:'rynka',name:'Bergmańsko rynka',desc:'Klik otrzymuje 1% spokojnej produkcji.',price:1800000,icon:'hand',unlock:s=>s.lifetime>=700000,effect:{clickCps:.01}},
+  {id:'prond',name:'Elektryfikacyjo',desc:'Maszyny od szoli wzwyż pracują ×3.',price:8500000,icon:'bolt',unlock:s=>(s.workers.kombajn||0)>=5,effect:{worker:['szola','kombajn','tasma','sortownia','szyb','gruba'],mult:3}},
+  {id:'zryw',name:'Zryw brygady',desc:'Odblokowuje czasową produkcję ×3.',price:28000000,icon:'star',unlock:s=>s.lifetime>=10000000,effect:{ability:'rush'}},
+  {id:'kilof3',name:'Kilof z węglika',desc:'Moc kliknięcia ×5.',price:95000000,icon:'pick',unlock:s=>s.lifetime>=40000000,effect:{click:5}},
+  {id:'automatyka',name:'Automatyka szybu',desc:'Całe wydobycie ×3.',price:780000000,icon:'gear',unlock:s=>s.lifetime>=300000000,effect:{all:3}}
+];
+
+const DEPTHS=[
+  {name:'Poziom 320 m',at:0,mult:1},
+  {name:'Poziom 500 m',at:5000,mult:1.25},
+  {name:'Poziom 700 m',at:50000,mult:1.55},
+  {name:'Poziom 900 m',at:500000,mult:1.95},
+  {name:'Poziom 1100 m',at:5000000,mult:2.5},
+  {name:'Poziom 1300 m',at:50000000,mult:3.25},
+  {name:'Pokład Skarbnika',at:500000000,mult:4.3},
+  {name:'Czarny pokład',at:5000000000,mult:5.8}
+];
+
+const TASKS=[
+  {id:'t1',name:'Pierwsze uderzenia',text:'Kliknij 25 razy.',reward:80,done:s=>s.clicks>=25},
+  {id:'t2',name:'Pierwsza brygada',text:'Zatrudnij 10 osób i maszyn.',reward:600,done:s=>totalWorkers(s)>=10},
+  {id:'t3',name:'Ruch na grubie',text:'Osiągnij 50 wyngla na sekundę.',reward:5000,done:s=>getCps(s)>=50},
+  {id:'t4',name:'Głęboka szychta',text:'Wydobądź 100 tys. wyngla.',reward:25000,done:s=>s.lifetime>=100000},
+  {id:'t5',name:'Mechanizacja',text:'Kup 10 kombajnów.',reward:1000000,done:s=>(s.workers.kombajn||0)>=10},
+  {id:'t6',name:'Milionowa norma',text:'Osiągnij 1 mln wyngla na sekundę.',reward:100000000,done:s=>getCps(s)>=1000000}
+];
+
+const ACHIEVEMENTS=[
+  {id:'a1',name:'Pierwszy fedrunek',text:'Pierwsze kliknięcie.',done:s=>s.clicks>=1},
+  {id:'a2',name:'Rynka boli',text:'100 kliknięć.',done:s=>s.clicks>=100},
+  {id:'a3',name:'Brygada rośnie',text:'25 pracowników i maszyn.',done:s=>totalWorkers(s)>=25},
+  {id:'a4',name:'Pierwszy milion',text:'1 mln wydobytego wyngla.',done:s=>s.lifetime>=1000000},
+  {id:'a5',name:'Bez postoju',text:'10 tys. wyngla na sekundę.',done:s=>getCps(s)>=10000},
+  {id:'a6',name:'Skarbnik przaje',text:'Kliknięty złoty wyngiel.',done:s=>s.goldenClicks>=1},
+  {id:'a7',name:'Nowa szychta',text:'Pierwszy reset prestiżowy.',done:s=>s.resets>=1},
+  {id:'a8',name:'Cołko gruba',text:'Kup pierwszy pełny zakład.',done:s=>(s.workers.gruba||0)>=1},
+  {id:'a9',name:'Stary wyga',text:'Zdobądź 25 znaków sztygara.',done:s=>s.prestige>=25}
+];
+
+const freshState=()=>({
+  coal:0,lifetime:0,allTime:0,clicks:0,workers:{},upgrades:[],tasks:[],achievements:[],
+  prestige:0,resets:0,goldenClicks:0,buyMode:'1',muted:false,last:Date.now(),
+  combo:0,lastClick:0,buffs:[],cooldowns:{dynamite:0,rush:0},activeSeconds:0
+});
+let S=freshState();
+let goldenTimer=0,goldenExpiry=0,lastFrame=performance.now(),lastRender=0;
+
+const $=q=>document.querySelector(q);
+const $$=q=>Array.from(document.querySelectorAll(q));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(a,b)=>a+Math.random()*(b-a);
+const fmt=n=>{
+  if(!Number.isFinite(n)) return '∞'; n=Math.max(0,n);
+  const units=[[1e30,'non'],[1e27,'okt'],[1e24,'sep'],[1e21,'sek'],[1e18,'try'],[1e15,'bld'],[1e12,'bln'],[1e9,'mld'],[1e6,'mln'],[1e3,'tys.']];
+  for(const [v,u] of units) if(n>=v){const x=n/v;return x.toFixed(x<10?2:x<100?1:0).replace('.',',')+' '+u;}
+  if(n<10&&n%1) return n.toFixed(1).replace('.',',');
+  return Math.floor(n).toLocaleString('pl-PL');
+};
+const formatTime=s=>{s=Math.max(0,Math.ceil(s));const m=Math.floor(s/60),r=s%60;return m?m+':'+String(r).padStart(2,'0'):r+' s';};
+
+function depthIndex(s=S){let idx=0;for(let i=0;i<DEPTHS.length;i++)if(s.lifetime>=DEPTHS[i].at)idx=i;return idx;}
+function depthMult(s=S){return DEPTHS[depthIndex(s)].mult;}
+function milestoneMult(n){let m=1;for(const t of [10,25,50,100,200])if(n>=t)m*=2;return m;}
+function nextMilestone(n){return [10,25,50,100,200].find(x=>x>n)||null;}
+function totalWorkers(s=S){return Object.values(s.workers).reduce((a,b)=>a+b,0);}
+function hasUpgrade(id,s=S){return s.upgrades.includes(id);}
+function achievementMult(s=S){return 1+s.achievements.length*.01;}
+function prestigeMult(s=S){return 1+s.prestige*.10;}
+function upgradeAllMult(s=S){let m=1;for(const u of UPGRADES)if(hasUpgrade(u.id,s)&&u.effect.all)m*=u.effect.all;return m;}
+function workerUpgradeMult(id,s=S){let m=1;for(const u of UPGRADES)if(hasUpgrade(u.id,s)&&u.effect.worker&&u.effect.worker.includes(id))m*=u.effect.mult;return m;}
+function buffMult(type,s=S){const now=Date.now();let m=1;s.buffs=s.buffs.filter(b=>b.until>now);for(const b of s.buffs)if(b.type===type)m*=b.mult;return m;}
+function rawCps(s=S){let total=0;for(const w of WORKERS){const n=s.workers[w.id]||0;total+=n*w.cps*milestoneMult(n)*workerUpgradeMult(w.id,s);}return total;}
+function getCps(s=S){return rawCps(s)*upgradeAllMult(s)*depthMult(s)*achievementMult(s)*prestigeMult(s)*buffMult('cps',s);}
+function clickBase(s=S){let v=1,share=0;for(const u of UPGRADES)if(hasUpgrade(u.id,s)){if(u.effect.click)v*=u.effect.click;if(u.effect.clickCps)share+=u.effect.clickCps;}return v+rawCps(s)*share;}
+function comboMult(s=S){return 1+Math.floor(s.combo/10)*.1;}
+function getClickPower(s=S){return clickBase(s)*upgradeAllMult(s)*depthMult(s)*achievementMult(s)*prestigeMult(s)*buffMult('click',s)*comboMult(s);}
+function workerUnitOutput(w,s=S){return w.cps*milestoneMult(s.workers[w.id]||0)*workerUpgradeMult(w.id,s)*upgradeAllMult(s)*depthMult(s)*achievementMult(s)*prestigeMult(s)*buffMult('cps',s);}
+
+function priceOne(w,owned){return Math.ceil(w.base*Math.pow(CFG.priceScale,owned));}
+function priceMany(w,n,owned=S.workers[w.id]||0){if(n<=0)return 0;return Math.ceil(w.base*Math.pow(CFG.priceScale,owned)*(Math.pow(CFG.priceScale,n)-1)/(CFG.priceScale-1));}
+function maxAffordable(w){const owned=S.workers[w.id]||0;if(S.coal<priceOne(w,owned))return 0;let lo=1,hi=1;while(priceMany(w,hi,owned)<=S.coal&&hi<1e6)hi*=2;while(lo<hi){const mid=Math.ceil((lo+hi)/2);if(priceMany(w,mid,owned)<=S.coal)lo=mid;else hi=mid-1;}return lo;}
+function selectedAmount(w){return S.buyMode==='max'?maxAffordable(w):Number(S.buyMode);}
+
+function runInvestment(s=S){
+  let total=0;
+  for(const w of WORKERS){const n=s.workers[w.id]||0;if(n>0)total+=priceMany(w,n,0);}
+  for(const u of UPGRADES)if(hasUpgrade(u.id,s))total+=u.price;
+  return total;
+}
+function completionPercent(s=S){
+  const workerDone=WORKERS.filter(w=>(s.workers[w.id]||0)>0).length;
+  const upgradeDone=UPGRADES.filter(u=>hasUpgrade(u.id,s)).length;
+  const depthDone=depthIndex(s)+1;
+  const taskDone=s.tasks.length;
+  const achievementDone=s.achievements.length;
+  const total=WORKERS.length+UPGRADES.length+DEPTHS.length+TASKS.length+ACHIEVEMENTS.length;
+  return Math.round((workerDone+upgradeDone+depthDone+taskDone+achievementDone)/total*100);
+}
+function nextUnlockData(s=S){
+  const candidates=[];
+  for(const w of WORKERS)if((s.workers[w.id]||0)===0&&s.lifetime<w.unlock)candidates.push({at:w.unlock,label:w.name,type:'brygada'});
+  for(const d of DEPTHS)if(s.lifetime<d.at)candidates.push({at:d.at,label:d.name,type:'pokład'});
+  const byLife={kilof1:40,lamp:500,kilof2:2000,wentylacja:30000,dynamit:70000,rynka:700000,zryw:10000000,kilof3:40000000,automatyka:300000000};
+  for(const u of UPGRADES)if(!hasUpgrade(u.id,s)&&byLife[u.id]&&s.lifetime<byLife[u.id])candidates.push({at:byLife[u.id],label:u.name,type:'ulepszenie'});
+  candidates.sort((a,b)=>a.at-b.at);
+  return candidates[0]||null;
+}
+function adminReport(){
+  const next=nextUnlockData();
+  return {
+    version:'2.5.1',generatedAt:new Date().toISOString(),coal:S.coal,lifetime:S.lifetime,allTime:S.allTime,
+    cps:getCps(),clickPower:getClickPower(),clicks:S.clicks,workers:totalWorkers(),workerCounts:S.workers,
+    upgrades:S.upgrades,achievements:S.achievements,tasks:S.tasks,prestige:S.prestige,resets:S.resets,
+    completion:completionPercent(),activeSeconds:S.activeSeconds||0,runInvestment:runInvestment(),nextUnlock:next
+  };
+}
+
+function addCoal(v){if(v<=0)return;S.coal+=v;S.lifetime+=v;S.allTime+=v;}
+function spend(v){if(S.coal+1e-9<v)return false;S.coal-=v;return true;}
+
+function clickRock(x,y){
+  analyticsStart('first_click');
+  const now=Date.now();S.combo=now-S.lastClick<900?Math.min(50,S.combo+1):1;S.lastClick=now;
+  const crit=Math.random()<.055;const amount=getClickPower()* (crit?5:1);addCoal(amount);S.clicks++;
+  animateRock(crit);floatingNumber(x,y,'+'+fmt(amount),crit);particles(x,y,crit?11:6);soundClick(crit);checkProgress();
+}
+
+function buyWorker(w){const amount=selectedAmount(w);if(amount<1)return;const cost=priceMany(w,amount);if(!spend(cost))return;analyticsStart('first_purchase');const before=S.workers[w.id]||0;S.workers[w.id]=before+amount;const after=S.workers[w.id];analyticsEvent('worker_bought',w.id,amount,{amount,cost,owned:after});for(const milestone of [10,25,50,100,200])if(before<milestone&&after>=milestone)analyticsEvent('worker_milestone',w.id,milestone,{milestone,owned:after});soundBuy();toast('Kupiono: '+w.name+' ×'+amount);save();checkProgress();renderShop();}
+function buyUpgrade(u){if(hasUpgrade(u.id)||!u.unlock(S)||!spend(u.price))return;analyticsStart('first_purchase');S.upgrades.push(u.id);analyticsEvent('upgrade_bought',u.id,u.price,{name:u.name,price:u.price});soundBuy();toast('Ulepszenie: '+u.name);save();renderAll(true);analyticsCheckProgress();}
+function claimTask(t){if(S.tasks.includes(t.id)||!t.done(S))return;S.tasks.push(t.id);addCoal(t.reward);analyticsEvent('task_claimed',t.id,t.reward,{name:t.name,reward:t.reward});soundBuy();toast('Nagroda za zadanie: +'+fmt(t.reward));save();renderGoals();}
+
+function useDynamite(){
+  if(!hasUpgrade('dynamit')){toast('Najpierw kup skład dynamitu.');return;}
+  const now=Date.now();if((S.cooldowns.dynamite||0)>now)return;
+  S.cooldowns.dynamite=now+CFG.dynamiteCd*1000;const gain=Math.max(getClickPower()*70,getCps()*10,500);addCoal(gain);soundBoom();toast('Dynamit! +'+fmt(gain));
+  const r=$('#coalButton').getBoundingClientRect();particles(r.left+r.width/2,r.top+r.height/2,28);checkProgress();
+}
+function useRush(){
+  if(!hasUpgrade('zryw')){toast('Najpierw kup ulepszenie Zryw brygady.');return;}
+  const now=Date.now();if((S.cooldowns.rush||0)>now)return;
+  S.cooldowns.rush=now+CFG.rushCd*1000;S.buffs.push({type:'cps',mult:3,until:now+CFG.rushDuration*1000,label:'Zryw brygady ×3'});soundBuy();toast('Brygada rusza pełną parą przez 15 sekund.');
+}
+
+function prestigeGain(){return Math.floor(Math.sqrt(S.lifetime/1000000));}
+function doPrestige(){
+  const gain=prestigeGain();if(gain<1)return;
+  if(!confirm('Rozpocząć nową szychtę za '+gain+' znaków sztygara? Zwykły postęp zostanie wyzerowany.'))return;
+  analyticsStart('prestige');analyticsEvent('prestige',String(gain),gain,{gain,lifetime:S.lifetime,prestigeBefore:S.prestige,resetsBefore:S.resets});
+  const keep={prestige:S.prestige+gain,resets:S.resets+1,achievements:[...S.achievements],goldenClicks:S.goldenClicks,allTime:S.allTime,muted:S.muted,activeSeconds:S.activeSeconds};
+  S=freshState();Object.assign(S,keep);S.last=Date.now();toast('Nowa szychta rozpoczęta. Stała premia rośnie.');save();renderAll(true);checkProgress();
+}
+
+function checkProgress(){
+  let changed=false;
+  for(const a of ACHIEVEMENTS)if(!S.achievements.includes(a.id)&&a.done(S)){S.achievements.push(a.id);analyticsEvent('achievement_unlocked',a.id,null,{name:a.name});toast('Osiągnięcie: '+a.name+' · stała premia +1%');soundAchievement();changed=true;}
+  if(changed)save();
+  analyticsCheckProgress();
+}
+
+function setTab(name){$$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tabPanel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name));if(name==='goals')renderGoals();if(name==='shift')renderShift();}
+function setBuyMode(mode){S.buyMode=mode;$$('.buyMode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));renderWorkers();save();}
+
+function renderWorkers(){
+  const root=$('#workerList');let html='';
+  for(const w of WORKERS){
+    const n=S.workers[w.id]||0,unlocked=S.lifetime>=w.unlock||n>0,amount=selectedAmount(w),cost=amount?priceMany(w,amount):priceOne(w,n),next=nextMilestone(n);
+    const can=unlocked&&amount>0&&S.coal>=cost;
+    html+=`<button class="shopItem ${can?'affordable':''} ${unlocked?'':'locked'}" data-worker="${w.id}" ${unlocked?'':'disabled'}>
+      <span class="itemIcon">${ICONS[w.icon]}</span>
+      <span class="itemMain"><span class="itemName">${w.name}<span class="itemCount">×${n}</span></span><span class="itemDesc">${w.desc}</span><span class="itemMilestone">${next?'Następny kamień milowy: '+next+' szt. · wydajność ×2':'Wszystkie kamienie milowe zdobyte'}</span></span>
+      <span class="itemRight"><span class="itemPrice">${amount?fmt(cost):'Za drogo'}</span><span class="itemOutput">${fmt(workerUnitOutput(w)*Math.max(1,amount||1))} /s</span><span class="itemOwned">${fmt(n*w.cps*milestoneMult(n))} bazowo</span></span>
+      ${unlocked?'':`<span class="lockMask">Odblokowanie po ${fmt(w.unlock)} wydobytego wyngla</span>`}
+    </button>`;
+  }
+  root.innerHTML=html;root.querySelectorAll('[data-worker]').forEach(el=>el.addEventListener('click',()=>buyWorker(WORKERS.find(w=>w.id===el.dataset.worker))));
+}
+
+function renderUpgrades(){
+  const root=$('#upgradeList');let html='';
+  for(const u of UPGRADES){
+    const bought=hasUpgrade(u.id),unlocked=u.unlock(S),can=unlocked&&!bought&&S.coal>=u.price;
+    html+=`<button class="upgradeCard ${bought?'bought':''} ${can?'affordable':''}" data-upgrade="${u.id}" ${(!unlocked||bought)?'disabled':''}>
+      <span class="itemIcon">${ICONS[u.icon]}</span><span class="itemMain"><span class="itemName">${bought?'✓ ':''}${u.name}</span><span class="itemDesc">${unlocked||bought?u.desc:'Jeszcze nieodkryte ulepszenie'}</span></span><span class="itemRight"><span class="itemPrice">${bought?'Kupione':fmt(u.price)}</span></span>
+    </button>`;
+  }
+  root.innerHTML=html;root.querySelectorAll('[data-upgrade]').forEach(el=>el.addEventListener('click',()=>buyUpgrade(UPGRADES.find(u=>u.id===el.dataset.upgrade))));
+}
+
+function renderGoals(){
+  const taskRoot=$('#taskList');taskRoot.innerHTML=TASKS.map(t=>{const claimed=S.tasks.includes(t.id),ready=t.done(S);return `<div class="task ${claimed?'done':''}"><div><div class="taskName">${claimed?'✓ ':''}${t.name}</div><div class="taskText">${t.text}</div></div>${claimed?'<div class="taskReward">Odebrane</div>':`<button class="claimBtn" data-task="${t.id}" ${ready?'':'disabled'}>${ready?'Odbierz':'+'+fmt(t.reward)}</button>`}</div>`}).join('');
+  taskRoot.querySelectorAll('[data-task]').forEach(el=>el.addEventListener('click',()=>claimTask(TASKS.find(t=>t.id===el.dataset.task))));
+  $('#achievementList').innerHTML=ACHIEVEMENTS.map(a=>{const got=S.achievements.includes(a.id);return `<div class="task ${got?'done':''}"><div><div class="taskName">${got?'✓ ':'○ '}${a.name}</div><div class="taskText">${a.text}</div></div><div class="taskReward">${got?'+1%':'Ukryte'}</div></div>`}).join('');
+}
+
+function renderAdmin(){
+  const panel=$('#adminPanel');if(!panel||panel.classList.contains('hidden'))return;
+  const progress=completionPercent(),next=nextUnlockData(),cps=getCps();
+  $('#adminCompletion').textContent=progress+'%';$('#adminProgressFill').style.width=progress+'%';
+  const metrics=[
+    ['Produkcja',fmt(cps)+' /s'],['Moc kliknięcia',fmt(getClickPower())],
+    ['Aktywny czas',formatLongTime(S.activeSeconds||0)],['Wartość kopalni',fmt(runInvestment())],
+    ['Surowe CPS',fmt(rawCps())+' /s'],['Mnożnik całości','×'+(getCps()/(rawCps()||1)).toFixed(2).replace('.',',')]
+  ];
+  $('#adminGrid').innerHTML=metrics.map(([n,v])=>`<div class="adminMetric"><small>${n}</small><b>${v}</b></div>`).join('');
+  if(next){const left=Math.max(0,next.at-S.lifetime),eta=cps>0?left/cps:null;$('#adminNext').textContent=`Następne odblokowanie: ${next.label} (${next.type}). Brakuje ${fmt(left)}${eta!==null?' · około '+formatLongTime(eta):''}.`;}
+  else $('#adminNext').textContent='Wszystkie odblokowania oparte na wydobyciu zostały osiągnięte.';
+}
+function formatLongTime(sec){sec=Math.max(0,Math.round(sec));const d=Math.floor(sec/86400);sec%=86400;const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);if(d)return d+' d '+h+' h';if(h)return h+' h '+m+' min';return m+' min';}
+
+function renderShift(){
+  const gain=prestigeGain();$('#prestigeGain').textContent=fmt(gain);$('#prestigeBtn').disabled=gain<1;
+  $('#prestigeInfo').textContent=gain?`Po restarcie otrzymasz ${gain} znaków. Łączna premia wzrośnie do +${Math.round((S.prestige+gain)*10)}%.`:`Do pierwszego znaku brakuje ${fmt(Math.max(0,1000000-S.lifetime))} wyngla.`;
+  $('#prestigeBonus').textContent='+'+Math.round((prestigeMult()-1)*100)+'%';
+  const stats=[['Wydobycie w tej kopalni',fmt(S.lifetime)],['Łącznie od początku',fmt(S.allTime)],['Kliknięcia',fmt(S.clicks)],['Brygada i maszyny',fmt(totalWorkers())],['Znaki sztygara',fmt(S.prestige)],['Nowe szychty',fmt(S.resets)]];
+  $('#statsGrid').innerHTML=stats.map(([n,v])=>`<div class="stat"><div class="statName">${n}</div><div class="statValue">${v}</div></div>`).join('');
+  renderAdmin();
+}
+
+function renderMain(){
+  $('#coalCount').textContent=fmt(S.coal);$('#rateLine').textContent=fmt(getCps())+' /s · klik +'+fmt(getClickPower());
+  $('#achievementBonus').textContent='Premia osiągnięć +'+S.achievements.length+'%';
+  const nextHud=nextUnlockData();$('#nextUnlockLine').textContent=nextHud?'Następne: '+nextHud.label+' · '+fmt(Math.max(0,nextHud.at-S.lifetime)):'Wszystkie główne progi odkryte';
+  const comboShown=S.combo>=10?(Math.round(S.combo*10)/10).toFixed(1).replace('.',','):String(Math.max(0,Math.floor(S.combo)));$('#comboText').textContent=comboShown+' · ×'+comboMult().toFixed(1).replace('.',',');$('#comboFill').style.width=(Math.max(0,Math.min(50,S.combo))/50*100)+'%';
+  const idx=depthIndex(),cur=DEPTHS[idx],next=DEPTHS[idx+1];$('#depthName').textContent=cur.name;$('#depthBonus').textContent='×'+cur.mult.toFixed(2).replace('.',',');
+  if(next){const p=clamp((S.lifetime-cur.at)/(next.at-cur.at),0,1);$('#depthFill').style.width=(p*100)+'%';$('#depthSub').textContent='Do kolejnego poziomu: '+fmt(Math.max(0,next.at-S.lifetime));}else{$('#depthFill').style.width='100%';$('#depthSub').textContent='Najgłębszy odkryty pokład';}
+  const now=Date.now();
+  renderSkill($('#dynamiteBtn'),$('#dynamiteCool'),hasUpgrade('dynamit'),S.cooldowns.dynamite||0,CFG.dynamiteCd,now);
+  renderSkill($('#rushBtn'),$('#rushCool'),hasUpgrade('zryw'),S.cooldowns.rush||0,CFG.rushCd,now);
+  const buffs=S.buffs.filter(b=>b.until>now);$('#buffBar').innerHTML=buffs.map(b=>`<span class="buff">${b.label} · ${formatTime((b.until-now)/1000)}</span>`).join('');$('#mineScene').classList.toggle('frenzy',buffs.some(b=>b.type==='cps'));
+}
+function renderSkill(btn,bar,unlocked,until,cd,now){const left=Math.max(0,(until-now)/1000);btn.disabled=!unlocked||left>0;bar.style.transform='scaleX('+(left/cd)+')';const desc=btn.querySelector('.skillDesc');if(!unlocked)desc.textContent='Wymaga ulepszenia';else if(left>0)desc.textContent='Za '+formatTime(left);else desc.textContent=btn.id==='dynamiteBtn'?'Duży urobek':'×3 / 15 s';}
+function renderShop(){renderWorkers();renderUpgrades();}
+function renderAll(force=false){renderMain();renderShop();renderGoals();renderShift();}
+
+function animateRock(crit){const b=$('#coalButton');b.classList.remove('pop','crit');void b.offsetWidth;b.classList.add(crit?'crit':'pop');setTimeout(()=>b.classList.remove('pop','crit'),240);}
+function floatingNumber(x,y,text,crit){const d=document.createElement('div');d.className='popnum'+(crit?' critical':'');d.textContent=(crit?'KRYTYK! ':'')+text;d.style.left=x+'px';d.style.top=y+'px';$('#fxLayer').appendChild(d);setTimeout(()=>d.remove(),900);}
+function particles(x,y,count){if(window.innerWidth<700)count=Math.ceil(count*.62);if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)count=Math.min(count,3);for(let i=0;i<count;i++){const d=document.createElement('i');d.className='particle'+(Math.random()<.28?' spark':'');d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--x',(Math.random()*170-85)+'px');d.style.setProperty('--y',(30+Math.random()*110)+'px');d.style.setProperty('--r',(Math.random()*420-210)+'deg');$('#fxLayer').appendChild(d);setTimeout(()=>d.remove(),700);}}
+function toast(text){const d=document.createElement('div');d.className='toast';d.textContent=text;$('#toasts').appendChild(d);setTimeout(()=>{d.style.transition='opacity .25s';d.style.opacity='0';setTimeout(()=>d.remove(),260)},3600);}
+
+let AC=null;function audio(){if(S.muted)return null;if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)try{AC=new C}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function tone(f,d=.06,type='square',gain=.035,delay=0){const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(gain,a.currentTime+delay);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+delay+d);o.connect(g);g.connect(a.destination);o.start(a.currentTime+delay);o.stop(a.currentTime+delay+d+.02);}
+function soundClick(crit){tone(crit?95:150+Math.random()*40,crit?.12:.045,'square',crit?.07:.045);}
+function soundBuy(){tone(330,.07,'triangle',.04);tone(440,.07,'triangle',.04,.07);tone(587,.09,'triangle',.04,.14);}
+function soundAchievement(){tone(523,.1,'sine',.05);tone(659,.1,'sine',.05,.1);tone(784,.14,'sine',.05,.2);}
+function soundBoom(){tone(72,.25,'sawtooth',.09);tone(45,.35,'square',.06,.06);}
+
+function scheduleGolden(){clearTimeout(goldenTimer);goldenTimer=setTimeout(showGolden,rand(CFG.goldenMin,CFG.goldenMax)*1000);}
+function showGolden(){if(document.hidden){scheduleGolden();return;}const el=$('#goldenCoal');el.style.left=rand(14,76)+'%';el.style.top=rand(18,63)+'%';el.classList.add('visible');goldenExpiry=Date.now()+CFG.goldenLife*1000;tone(620,.12,'sine',.045);tone(820,.15,'sine',.04,.12);}
+function hideGolden(){const el=$('#goldenCoal');el.classList.remove('visible');goldenExpiry=0;scheduleGolden();}
+function clickGolden(e){e.stopPropagation();S.goldenClicks++;const r=Math.random();if(r<.45){S.buffs.push({type:'cps',mult:7,until:Date.now()+30000,label:'Fedrunek ×7'});toast('Skarbnik przaje: produkcja ×7 przez 30 sekund.');}else if(r<.72){S.buffs.push({type:'click',mult:10,until:Date.now()+15000,label:'Kilof Skarbnika ×10'});toast('Kilof Skarbnika: klik ×10 przez 15 sekund.');}else{const gain=Math.max(getCps()*60,500);addCoal(gain);toast('Bogata żyła: +'+fmt(gain));}soundAchievement();hideGolden();checkProgress();save();}
+
+function save(){try{S.last=Date.now();localStorage.setItem(CFG.saveKey,JSON.stringify(S));}catch(e){}}
+function load(){
+  try{
+    const raw=localStorage.getItem(CFG.saveKey);if(raw){Object.assign(S,JSON.parse(raw));normalizeState();applyOffline();return;}
+    const old=JSON.parse(localStorage.getItem(CFG.oldSaveKey)||'null');if(old){S.coal=old.w||0;S.lifetime=old.total||0;S.allTime=old.total||0;S.clicks=old.kliki||0;S.workers=old.bud||{};S.upgrades=old.ulep||[];S.muted=!!old.muted;S.last=old.last||Date.now();normalizeState();applyOffline();toast('Wczytano postęp z poprzedniej wersji.');}
+  }catch(e){console.warn(e)}
+}
+function normalizeState(){const base=freshState();for(const k in base)if(S[k]===undefined)S[k]=base[k];S.workers=S.workers||{};S.upgrades=Array.isArray(S.upgrades)?S.upgrades:[];S.tasks=Array.isArray(S.tasks)?S.tasks:[];S.achievements=Array.isArray(S.achievements)?S.achievements:[];S.buffs=[];S.cooldowns=S.cooldowns||{dynamite:0,rush:0};}
+function applyOffline(){let sec=clamp((Date.now()-(S.last||Date.now()))/1000,0,CFG.offlineMax);if(sec>60){const gain=getCps()*sec*.85;if(gain>0){addCoal(gain);setTimeout(()=>toast('Podczas nieobecności kopalnia wyfedrowała '+fmt(gain)+' wyngla.'),500);}}S.last=Date.now();}
+function exportSave(){const data=btoa(unescape(encodeURIComponent(JSON.stringify(S))));navigator.clipboard?.writeText(data).then(()=>toast('Zapis skopiowany do schowka.')).catch(()=>prompt('Skopiuj zapis:',data));}
+function importSave(){const data=prompt('Wklej wyeksportowany zapis:');if(!data)return;try{const parsed=JSON.parse(decodeURIComponent(escape(atob(data.trim()))));S=freshState();Object.assign(S,parsed);normalizeState();save();renderAll(true);toast('Zapis zaimportowany.');}catch(e){alert('Nie udało się odczytać zapisu.');}}
+function resetGame(){if(!confirm('Na zicher? Cały postęp, także znaki sztygara, zostanie skasowany.'))return;localStorage.removeItem(CFG.saveKey);S=freshState();save();location.reload();}
+
+function loop(now){
+  const dt=Math.min(.25,(now-lastFrame)/1000);lastFrame=now;if(!document.hidden)S.activeSeconds=(S.activeSeconds||0)+dt;const production=getCps()*dt;if(production>0)addCoal(production);
+  if(Date.now()-S.lastClick>1400&&S.combo>0)S.combo=Math.max(0,S.combo-dt*10);
+  if(goldenExpiry&&Date.now()>goldenExpiry)hideGolden();
+  if(now-lastRender>100){renderMain();lastRender=now;}
+  requestAnimationFrame(loop);
+}
+
+
+/* ── ANONIMOWA ANALITYKA SUPABASE ─────────────────────────────── */
+const ANALYTICS={
+  client:null,userId:null,sessionId:null,ready:false,initializing:false,syncing:false,
+  started:false,activeStart:0,lastDepth:0,completedSent:false,eventQueue:[],flushTimer:null
+};
+function analyticsUuid(){
+  if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});
+}
+function analyticsSetBadge(mode,text){
+  const badge=$('#analyticsBadge');if(!badge)return;
+  badge.classList.remove('connecting','offline');if(mode)badge.classList.add(mode);badge.textContent=text;
+}
+function analyticsIsComplete(){return depthIndex()>=DEPTHS.length-1&&UPGRADES.every(u=>hasUpgrade(u.id));}
+function analyticsSessionSeconds(){return Math.max(0,Math.round((S.activeSeconds||0)-ANALYTICS.activeStart));}
+function analyticsSafeNumber(v){v=Number(v);return Number.isFinite(v)&&v>=0?v:0;}
+function analyticsSnapshot(){
+  const idx=depthIndex();
+  return {
+    last_seen_at:new Date().toISOString(),game_started:ANALYTICS.started,
+    active_seconds:analyticsSessionSeconds(),clicks:Math.round(analyticsSafeNumber(S.clicks)),
+    lifetime:analyticsSafeNumber(S.lifetime),all_time:analyticsSafeNumber(S.allTime),coal:analyticsSafeNumber(S.coal),
+    cps:analyticsSafeNumber(getCps()),click_power:analyticsSafeNumber(getClickPower()),depth_index:idx,
+    depth_name:DEPTHS[idx]?.name||'',prestige:Math.round(analyticsSafeNumber(S.prestige)),resets:Math.round(analyticsSafeNumber(S.resets)),
+    worker_count:totalWorkers(),upgrade_count:S.upgrades.length,achievement_count:S.achievements.length,
+    completed:ANALYTICS.completedSent||analyticsIsComplete(),version:CFG.version
+  };
+}
+async function analyticsInit(){
+  if(ANALYTICS.initializing||ANALYTICS.ready)return;ANALYTICS.initializing=true;
+  try{
+    if(!window.supabase?.createClient)throw new Error('Nie załadowano biblioteki Supabase');
+    ANALYTICS.client=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{storageKey:'fedrunek_analytics_auth_v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    let {data:{session},error}=await ANALYTICS.client.auth.getSession();if(error)throw error;
+    if(!session){const signed=await ANALYTICS.client.auth.signInAnonymously({options:{data:{app:'fedrunek',version:CFG.version}}});if(signed.error)throw signed.error;session=signed.data.session;}
+    if(!session?.user?.id)throw new Error('Brak anonimowej sesji');
+    ANALYTICS.userId=session.user.id;ANALYTICS.sessionId=analyticsUuid();ANALYTICS.activeStart=S.activeSeconds||0;ANALYTICS.lastDepth=depthIndex();
+    const insertSession=await ANALYTICS.client.from('fedrunek_sessions').insert({id:ANALYTICS.sessionId,user_id:ANALYTICS.userId,version:CFG.version,depth_index:depthIndex(),depth_name:DEPTHS[depthIndex()]?.name||''});
+    if(insertSession.error)throw insertSession.error;
+    ANALYTICS.ready=true;analyticsSetBadge('', 'STATYSTYKI ONLINE');
+    analyticsEvent('game_open',CFG.version,null,{hasSave:S.allTime>0,locale:navigator.language||null,viewport:[window.innerWidth,window.innerHeight]});
+    await analyticsSync();
+  }catch(err){console.warn('Fedrunek analytics:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE');}
+  finally{ANALYTICS.initializing=false;}
+}
+function analyticsStart(reason){
+  if(ANALYTICS.started)return;ANALYTICS.started=true;analyticsEvent('game_start',reason,null,{lifetime:S.lifetime,returning:S.allTime>0});analyticsSync();
+}
+function analyticsEvent(name,value=null,number=null,data={}){
+  const event={event_name:String(name).slice(0,60),event_value:value==null?null:String(value).slice(0,120),event_number:number==null?null:analyticsSafeNumber(number),event_data:data||{}};
+  ANALYTICS.eventQueue.push(event);if(ANALYTICS.eventQueue.length>60)ANALYTICS.eventQueue.splice(0,ANALYTICS.eventQueue.length-60);
+  clearTimeout(ANALYTICS.flushTimer);ANALYTICS.flushTimer=setTimeout(analyticsFlushEvents,1800);
+}
+async function analyticsFlushEvents(){
+  if(!ANALYTICS.ready||!ANALYTICS.eventQueue.length)return;
+  const batch=ANALYTICS.eventQueue.splice(0,20).map(e=>({...e,user_id:ANALYTICS.userId,session_id:ANALYTICS.sessionId}));
+  try{const {error}=await ANALYTICS.client.from('fedrunek_events').insert(batch);if(error)throw error;}catch(err){console.warn('Fedrunek events:',err);ANALYTICS.eventQueue.unshift(...batch.map(({user_id,session_id,...e})=>e));}
+  if(ANALYTICS.eventQueue.length){clearTimeout(ANALYTICS.flushTimer);ANALYTICS.flushTimer=setTimeout(analyticsFlushEvents,3000);}
+}
+async function analyticsSync(){
+  if(!ANALYTICS.ready||ANALYTICS.syncing)return;ANALYTICS.syncing=true;
+  try{
+    const snap=analyticsSnapshot(),completedAt=snap.completed?new Date().toISOString():null;
+    const player={user_id:ANALYTICS.userId,last_seen:new Date().toISOString(),total_active_seconds:Math.round(analyticsSafeNumber(S.activeSeconds)),max_depth:snap.depth_index,max_lifetime:analyticsSafeNumber(S.lifetime),prestige_count:snap.prestige,reset_count:snap.resets,completed_at:completedAt,version:CFG.version,locale:(navigator.language||'').slice(0,20),viewport_width:window.innerWidth,viewport_height:window.innerHeight};
+    const [p,s]=await Promise.all([
+      ANALYTICS.client.from('fedrunek_players').upsert(player,{onConflict:'user_id'}),
+      ANALYTICS.client.from('fedrunek_sessions').update(snap).eq('id',ANALYTICS.sessionId).eq('user_id',ANALYTICS.userId)
+    ]);
+    if(p.error)throw p.error;if(s.error)throw s.error;await analyticsFlushEvents();
+  }catch(err){console.warn('Fedrunek sync:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE');}
+  finally{ANALYTICS.syncing=false;}
+}
+function analyticsCheckProgress(){
+  const idx=depthIndex();
+  if(idx>ANALYTICS.lastDepth){for(let i=ANALYTICS.lastDepth+1;i<=idx;i++)analyticsEvent('depth_reached',String(i),i,{name:DEPTHS[i]?.name||'',lifetime:S.lifetime});ANALYTICS.lastDepth=idx;}
+  if(analyticsIsComplete()&&!ANALYTICS.completedSent){ANALYTICS.completedSent=true;analyticsEvent('game_completed','full_unlock',analyticsSessionSeconds(),{lifetime:S.lifetime,allTime:S.allTime,prestige:S.prestige,clicks:S.clicks});analyticsSync();}
+}
+
+$('#coalButton').addEventListener('pointerdown',e=>clickRock(e.clientX,e.clientY));
+$('#coalButton').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();const r=e.currentTarget.getBoundingClientRect();clickRock(r.left+r.width/2,r.top+r.height/2)}});
+$('#goldenCoal').addEventListener('pointerdown',clickGolden);
+$('#dynamiteBtn').addEventListener('click',useDynamite);$('#rushBtn').addEventListener('click',useRush);
+$$('.tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));$$('.buyMode').forEach(b=>b.addEventListener('click',()=>setBuyMode(b.dataset.mode)));
+$('#prestigeBtn').addEventListener('click',doPrestige);$('#exportBtn').addEventListener('click',exportSave);$('#importBtn').addEventListener('click',importSave);$('#resetBtn').addEventListener('click',resetGame);
+$('#adminToggle').addEventListener('click',()=>{const panel=$('#adminPanel'),open=panel.classList.toggle('hidden')===false;$('#adminToggle').setAttribute('aria-expanded',String(open));if(open)renderAdmin();});
+$('#adminAdd1m').addEventListener('click',()=>{addCoal(1000000);toast('Tryb admina: dodano 1 mln wyngla.');checkProgress();renderAll(true);save();});
+$('#adminAdd1b').addEventListener('click',()=>{addCoal(1000000000);toast('Tryb admina: dodano 1 mld wyngla.');checkProgress();renderAll(true);save();});
+$('#adminReportBtn').addEventListener('click',()=>{const report=JSON.stringify(adminReport(),null,2);navigator.clipboard?.writeText(report).then(()=>toast('Raport administracyjny skopiowany.')).catch(()=>prompt('Skopiuj raport:',report));});
+$('#soundBtn').addEventListener('click',()=>{S.muted=!S.muted;$('#soundBtn').textContent=S.muted?'🔇':'🔊';save();});
+$('#helpBtn').addEventListener('click',()=>toast('Klikaj bryłę po lewej. Po prawej kupuj brygadę, maszyny i ulepszenia. Kamienie milowe przy 10, 25, 50, 100 i 200 sztukach podwajają wydajność.'));
+document.addEventListener('contextmenu',e=>{if(e.target.closest('#mineScene'))e.preventDefault()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){save();analyticsSync();}else{S.last=Date.now()}});window.addEventListener('pagehide',()=>{save();analyticsSync();});
+
+document.body.classList.toggle('debugMode',new URLSearchParams(location.search).get('debug')==='1');
+load();$('#soundBtn').textContent=S.muted?'🔇':'🔊';setBuyMode(S.buyMode||'1');renderAll(true);checkProgress();scheduleGolden();setInterval(save,CFG.autosave);setTimeout(analyticsInit,150);setInterval(analyticsSync,CFG.analyticsHeartbeat*1000);setInterval(()=>{renderShop();const tab=$('.tab.active')?.dataset.tab;if(tab==='goals')renderGoals();if(tab==='shift')renderShift();},2000);requestAnimationFrame(loop);
+</script>
+</body>
+</html>
