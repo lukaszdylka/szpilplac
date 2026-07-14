@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11151d">
-<title>Fedrunek — panel administratora</title>
+<title>Fedrunek — panel administratora v2.5.2</title>
 <style>
 :root{--bg:#0e1117;--panel:#171d28;--panel2:#202838;--line:#313b50;--text:#f0ecdf;--muted:#99a5b8;--amber:#eaaa42;--amber2:#ffd37c;--green:#72d39b;--red:#ef8583;--blue:#79a9ef}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 0,rgba(234,170,66,.09),transparent 30%),linear-gradient(145deg,#0d1016,#151b26);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -65,11 +65,11 @@ async function verifyAdmin(session){
   if(error||data!==true){await db.auth.signOut();showLogin('To konto nie ma uprawnień do panelu Fedrunek.');return false}
   showDashboard(session.user.email);await loadOverview();return true;
 }
-async function loadOverview(){
-  $('#refreshBtn').disabled=true;$('#refreshBtn').textContent='Ładowanie…';
+async function loadOverview(showLoading=true){
+  if(showLoading){$('#refreshBtn').disabled=true;$('#refreshBtn').textContent='Ładowanie…';}
   const {data,error}=await db.rpc('fedrunek_admin_overview');
-  $('#refreshBtn').disabled=false;$('#refreshBtn').textContent='Odśwież';
-  if(error){alert('Nie udało się pobrać statystyk: '+error.message);return}
+  if(showLoading){$('#refreshBtn').disabled=false;$('#refreshBtn').textContent='Odśwież';}
+  if(error){if(showLoading)alert('Nie udało się pobrać statystyk: '+error.message);return}
   render(data||{});
 }
 function render(data){
@@ -86,7 +86,8 @@ function render(data){
     ['Wszystkie sesje',num(s.sessions),`${num(s.unique_started_players)} graczy rozpoczęło`]
   ];
   $('#cards').innerHTML=cards.map(c=>`<article class="card"><small>${c[0]}</small><b>${c[1]}</b><em>${c[2]}</em></article>`).join('');
-  $('#generatedAt').textContent='stan: '+date(data.generated_at);
+  const empty=!Number(s.opens)&&!Number(s.sessions)&&!Number(s.unique_players);
+  $('#generatedAt').textContent=empty?'Brak danych. W grze sprawdź: Szychta → STATYSTYKI ONLINE. Panel odświeża się co 10 s.':'stan: '+date(data.generated_at)+' · auto-odświeżanie co 10 s';
   const funnel=data.depth_funnel||[];
   $('#funnel').innerHTML=funnel.length?funnel.map(x=>`<div class="funnelRow"><span class="funnelName">${x.depth_name}</span><span class="bar"><i style="width:${Math.max(0,Math.min(100,Number(x.percent)||0))}%"></i></span><span class="funnelValue">${num(x.players)} · ${num(x.percent,1)}%</span></div>`).join(''):'<div class="empty">Brak danych.</div>';
   const upgrades=data.upgrades||[];
@@ -102,8 +103,10 @@ $('#loginForm').addEventListener('submit',async e=>{
   const {data,error}=await db.auth.signInWithPassword({email,password});btn.disabled=false;btn.textContent='Zaloguj';
   if(error){showLogin('Nieprawidłowy e-mail lub hasło.');return}await verifyAdmin(data.session);
 });
-$('#refreshBtn').addEventListener('click',loadOverview);
+$('#refreshBtn').addEventListener('click',()=>loadOverview(true));
 $('#logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#dashboard').classList.contains('hidden'))loadOverview(false)});
+setInterval(()=>{if(!document.hidden&&!$('#dashboard').classList.contains('hidden'))loadOverview(false)},10000);
 (async()=>{const {data:{session}}=await db.auth.getSession();await verifyAdmin(session)})();
 </script>
 </body>

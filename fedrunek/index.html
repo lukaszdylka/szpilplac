@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#11151d">
-<title>Fedrunek — kopalniany clicker v2.5.1</title>
+<title>Fedrunek — kopalniany clicker v2.5.3</title>
 <style>
 :root{
   --bg:#10131a;
@@ -430,7 +430,7 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 }
 
 
-/* v2.4 — dopracowany HUD i panel administracyjny */
+/* v2.5.3 — dopracowany HUD bez lokalnego panelu administracyjnego */
 .topbar{
   min-height:112px;
   border-bottom:1px solid rgba(71,83,110,.34);
@@ -491,27 +491,6 @@ button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .onlineBadge{border-color:rgba(111,207,151,.28);background:rgba(111,207,151,.08);color:#83d9a7}
 .onlineBadge.connecting{border-color:rgba(234,169,65,.28);background:rgba(234,169,65,.08);color:var(--amber2)}
 .onlineBadge.offline{border-color:rgba(239,122,121,.25);background:rgba(239,122,121,.07);color:#ef9a99}
-/* Lokalna diagnostyka jest dostępna wyłącznie z parametrem ?debug=1. */
-.adminToggle{display:none}
-body.debugMode .adminToggle{display:flex}
-.statsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.stat{position:relative;overflow:hidden;background:linear-gradient(180deg,#1b2230,#151b26)}
-.stat::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);opacity:.5}
-.statValue{font-size:15px}
-.adminToggle{width:100%;margin-top:10px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,#202837,#171d29);text-align:left}
-.adminToggle:hover{border-color:#485571;background:#252e3f}
-.adminToggle b{display:block;font-size:12px}.adminToggle small{display:block;margin-top:3px;color:var(--muted);font-size:9px}
-.adminChevron{font-size:20px;color:var(--amber2);transition:transform .18s}.adminToggle[aria-expanded="true"] .adminChevron{transform:rotate(180deg)}
-.adminPanel{margin-top:8px;padding:12px;border:1px solid #3d485f;border-radius:14px;background:linear-gradient(180deg,#1a2130,#121823)}
-.adminLead{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:900}.adminLead span:last-child{color:var(--amber2)}
-.adminProgress{height:7px;margin-top:8px;border:1px solid #313b4f;border-radius:999px;background:#0d1118;overflow:hidden}
-#adminProgressFill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--amber));transition:width .2s}
-.adminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
-.adminMetric{padding:9px;border:1px solid rgba(61,72,95,.7);border-radius:10px;background:#151b26}.adminMetric small{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.07em}.adminMetric b{display:block;margin-top:4px;font-size:12px;font-variant-numeric:tabular-nums}
-.adminNext{margin-top:8px;padding:9px 10px;border-left:3px solid var(--amber);border-radius:8px;background:#171d29;color:#aeb7c6;font-size:9px;line-height:1.45}
-.adminSectionTitle{margin-top:12px;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.12em}
-.adminActions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}.adminBtn{padding:8px 5px;border:1px solid #3a455c;border-radius:9px;background:#1d2533;color:#cbd3df;font-size:9px;font-weight:900}.adminBtn:hover{border-color:#55627e;background:#273143;color:var(--amber2)}
-.adminNote{margin-top:8px;color:#788497;font-size:8px;line-height:1.4}
 
 @media(max-width:1200px){
   .resource{min-width:230px;padding-left:18px;padding-right:18px}
@@ -535,6 +514,8 @@ body.debugMode .adminToggle{display:flex}
   .skillIcon{display:grid}
 }
 
+#analyticsBadge{cursor:pointer}
+#analyticsBadge:hover{border-color:var(--amber);color:var(--amber2)}
 </style>
 </head>
 <body>
@@ -644,20 +625,6 @@ body.debugMode .adminToggle{display:flex}
         </div>
         <div class="sectionLabel statsLabel"><span>Statystyki</span><span class="badgeGroup"><span class="localBadge">ZAPIS LOKALNY</span><span class="localBadge onlineBadge connecting" id="analyticsBadge">STATYSTYKI ŁĄCZĄ…</span></span></div>
         <div class="statsGrid" id="statsGrid"></div>
-        <button class="adminToggle" id="adminToggle" aria-expanded="false"><span><b>Panel admina</b><small>Ekonomia, postęp i narzędzia testowe</small></span><span class="adminChevron">⌄</span></button>
-        <section class="adminPanel hidden" id="adminPanel">
-          <div class="adminLead"><span>Podgląd bieżącej gry</span><span id="adminCompletion">0%</span></div>
-          <div class="adminProgress"><div id="adminProgressFill"></div></div>
-          <div class="adminGrid" id="adminGrid"></div>
-          <div class="adminNext" id="adminNext"></div>
-          <div class="adminSectionTitle">Narzędzia testowe</div>
-          <div class="adminActions">
-            <button class="adminBtn" id="adminAdd1m">+1 mln</button>
-            <button class="adminBtn" id="adminAdd1b">+1 mld</button>
-            <button class="adminBtn" id="adminReportBtn">Kopiuj raport</button>
-          </div>
-          <div class="adminNote">Narzędzia działają tylko na lokalnym zapisie tej przeglądarki.</div>
-        </section>
         <div class="smallActions"><button class="smallBtn" id="exportBtn">Eksport zapisu</button><button class="smallBtn" id="importBtn">Import zapisu</button><button class="smallBtn" id="resetBtn">Reset</button></div>
       </section>
     </div>
@@ -673,7 +640,7 @@ const CFG={
   saveKey:'fedrunek_classic_v2', oldSaveKey:'fedrunek_v1', priceScale:1.15, autosave:5000,
   offlineMax:8*3600, goldenMin:45, goldenMax:105, goldenLife:10,
   dynamiteCd:30, rushCd:45, rushDuration:15,
-  version:'2.5.1', analyticsHeartbeat:60,
+  version:'2.5.3', analyticsHeartbeat:30,
   supabaseUrl:'https://xyivrakegwybwhmmcawq.supabase.co',
   supabaseAnonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo'
 };
@@ -798,21 +765,6 @@ function priceMany(w,n,owned=S.workers[w.id]||0){if(n<=0)return 0;return Math.ce
 function maxAffordable(w){const owned=S.workers[w.id]||0;if(S.coal<priceOne(w,owned))return 0;let lo=1,hi=1;while(priceMany(w,hi,owned)<=S.coal&&hi<1e6)hi*=2;while(lo<hi){const mid=Math.ceil((lo+hi)/2);if(priceMany(w,mid,owned)<=S.coal)lo=mid;else hi=mid-1;}return lo;}
 function selectedAmount(w){return S.buyMode==='max'?maxAffordable(w):Number(S.buyMode);}
 
-function runInvestment(s=S){
-  let total=0;
-  for(const w of WORKERS){const n=s.workers[w.id]||0;if(n>0)total+=priceMany(w,n,0);}
-  for(const u of UPGRADES)if(hasUpgrade(u.id,s))total+=u.price;
-  return total;
-}
-function completionPercent(s=S){
-  const workerDone=WORKERS.filter(w=>(s.workers[w.id]||0)>0).length;
-  const upgradeDone=UPGRADES.filter(u=>hasUpgrade(u.id,s)).length;
-  const depthDone=depthIndex(s)+1;
-  const taskDone=s.tasks.length;
-  const achievementDone=s.achievements.length;
-  const total=WORKERS.length+UPGRADES.length+DEPTHS.length+TASKS.length+ACHIEVEMENTS.length;
-  return Math.round((workerDone+upgradeDone+depthDone+taskDone+achievementDone)/total*100);
-}
 function nextUnlockData(s=S){
   const candidates=[];
   for(const w of WORKERS)if((s.workers[w.id]||0)===0&&s.lifetime<w.unlock)candidates.push({at:w.unlock,label:w.name,type:'brygada'});
@@ -821,15 +773,6 @@ function nextUnlockData(s=S){
   for(const u of UPGRADES)if(!hasUpgrade(u.id,s)&&byLife[u.id]&&s.lifetime<byLife[u.id])candidates.push({at:byLife[u.id],label:u.name,type:'ulepszenie'});
   candidates.sort((a,b)=>a.at-b.at);
   return candidates[0]||null;
-}
-function adminReport(){
-  const next=nextUnlockData();
-  return {
-    version:'2.5.1',generatedAt:new Date().toISOString(),coal:S.coal,lifetime:S.lifetime,allTime:S.allTime,
-    cps:getCps(),clickPower:getClickPower(),clicks:S.clicks,workers:totalWorkers(),workerCounts:S.workers,
-    upgrades:S.upgrades,achievements:S.achievements,tasks:S.tasks,prestige:S.prestige,resets:S.resets,
-    completion:completionPercent(),activeSeconds:S.activeSeconds||0,runInvestment:runInvestment(),nextUnlock:next
-  };
 }
 
 function addCoal(v){if(v<=0)return;S.coal+=v;S.lifetime+=v;S.allTime+=v;}
@@ -909,19 +852,6 @@ function renderGoals(){
   $('#achievementList').innerHTML=ACHIEVEMENTS.map(a=>{const got=S.achievements.includes(a.id);return `<div class="task ${got?'done':''}"><div><div class="taskName">${got?'✓ ':'○ '}${a.name}</div><div class="taskText">${a.text}</div></div><div class="taskReward">${got?'+1%':'Ukryte'}</div></div>`}).join('');
 }
 
-function renderAdmin(){
-  const panel=$('#adminPanel');if(!panel||panel.classList.contains('hidden'))return;
-  const progress=completionPercent(),next=nextUnlockData(),cps=getCps();
-  $('#adminCompletion').textContent=progress+'%';$('#adminProgressFill').style.width=progress+'%';
-  const metrics=[
-    ['Produkcja',fmt(cps)+' /s'],['Moc kliknięcia',fmt(getClickPower())],
-    ['Aktywny czas',formatLongTime(S.activeSeconds||0)],['Wartość kopalni',fmt(runInvestment())],
-    ['Surowe CPS',fmt(rawCps())+' /s'],['Mnożnik całości','×'+(getCps()/(rawCps()||1)).toFixed(2).replace('.',',')]
-  ];
-  $('#adminGrid').innerHTML=metrics.map(([n,v])=>`<div class="adminMetric"><small>${n}</small><b>${v}</b></div>`).join('');
-  if(next){const left=Math.max(0,next.at-S.lifetime),eta=cps>0?left/cps:null;$('#adminNext').textContent=`Następne odblokowanie: ${next.label} (${next.type}). Brakuje ${fmt(left)}${eta!==null?' · około '+formatLongTime(eta):''}.`;}
-  else $('#adminNext').textContent='Wszystkie odblokowania oparte na wydobyciu zostały osiągnięte.';
-}
 function formatLongTime(sec){sec=Math.max(0,Math.round(sec));const d=Math.floor(sec/86400);sec%=86400;const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);if(d)return d+' d '+h+' h';if(h)return h+' h '+m+' min';return m+' min';}
 
 function renderShift(){
@@ -930,7 +860,6 @@ function renderShift(){
   $('#prestigeBonus').textContent='+'+Math.round((prestigeMult()-1)*100)+'%';
   const stats=[['Wydobycie w tej kopalni',fmt(S.lifetime)],['Łącznie od początku',fmt(S.allTime)],['Kliknięcia',fmt(S.clicks)],['Brygada i maszyny',fmt(totalWorkers())],['Znaki sztygara',fmt(S.prestige)],['Nowe szychty',fmt(S.resets)]];
   $('#statsGrid').innerHTML=stats.map(([n,v])=>`<div class="stat"><div class="statName">${n}</div><div class="statValue">${v}</div></div>`).join('');
-  renderAdmin();
 }
 
 function renderMain(){
@@ -991,15 +920,26 @@ function loop(now){
 /* ── ANONIMOWA ANALITYKA SUPABASE ─────────────────────────────── */
 const ANALYTICS={
   client:null,userId:null,sessionId:null,ready:false,initializing:false,syncing:false,
-  started:false,activeStart:0,lastDepth:0,completedSent:false,eventQueue:[],flushTimer:null
+  started:false,activeStart:0,lastDepth:0,completedSent:false,eventQueue:[],flushTimer:null,lastError:''
 };
 function analyticsUuid(){
   if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});
 }
-function analyticsSetBadge(mode,text){
+function analyticsSetBadge(mode,text,detail=''){
   const badge=$('#analyticsBadge');if(!badge)return;
   badge.classList.remove('connecting','offline');if(mode)badge.classList.add(mode);badge.textContent=text;
+  badge.title=detail||'Kliknij, aby ponowić połączenie ze statystykami';
+  ANALYTICS.lastError=detail||'';
+}
+function analyticsFriendlyError(err){
+  const raw=String(err?.message||err?.error_description||err||'Nieznany błąd');
+  const low=raw.toLowerCase();
+  if(low.includes('anonymous')&&(low.includes('disable')||low.includes('not enabled')))return 'Włącz Anonymous Sign-Ins w Supabase Authentication.';
+  if(low.includes('relation')&&low.includes('does not exist'))return 'Brakuje tabel Fedrunku. Uruchom plik SQL w Supabase.';
+  if(low.includes('row-level security')||low.includes('permission denied')||String(err?.code||'')==='42501')return 'Supabase odrzucił zapis przez RLS. Uruchom ponownie najnowszy plik SQL.';
+  if(low.includes('failed to fetch')||low.includes('network'))return 'Brak połączenia z Supabase albo blokada skryptu sieciowego.';
+  return raw.slice(0,180);
 }
 function analyticsIsComplete(){return depthIndex()>=DEPTHS.length-1&&UPGRADES.every(u=>hasUpgrade(u.id));}
 function analyticsSessionSeconds(){return Math.max(0,Math.round((S.activeSeconds||0)-ANALYTICS.activeStart));}
@@ -1022,15 +962,16 @@ async function analyticsInit(){
     if(!window.supabase?.createClient)throw new Error('Nie załadowano biblioteki Supabase');
     ANALYTICS.client=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{storageKey:'fedrunek_analytics_auth_v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
     let {data:{session},error}=await ANALYTICS.client.auth.getSession();if(error)throw error;
+    if(session&&!session.user?.is_anonymous){await ANALYTICS.client.auth.signOut({scope:'local'});session=null;}
     if(!session){const signed=await ANALYTICS.client.auth.signInAnonymously({options:{data:{app:'fedrunek',version:CFG.version}}});if(signed.error)throw signed.error;session=signed.data.session;}
     if(!session?.user?.id)throw new Error('Brak anonimowej sesji');
     ANALYTICS.userId=session.user.id;ANALYTICS.sessionId=analyticsUuid();ANALYTICS.activeStart=S.activeSeconds||0;ANALYTICS.lastDepth=depthIndex();
     const insertSession=await ANALYTICS.client.from('fedrunek_sessions').insert({id:ANALYTICS.sessionId,user_id:ANALYTICS.userId,version:CFG.version,depth_index:depthIndex(),depth_name:DEPTHS[depthIndex()]?.name||''});
     if(insertSession.error)throw insertSession.error;
-    ANALYTICS.ready=true;analyticsSetBadge('', 'STATYSTYKI ONLINE');
+    ANALYTICS.ready=true;analyticsSetBadge('', 'STATYSTYKI ONLINE','Połączenie działa. Dane są wysyłane co 30 sekund i po ważnych zdarzeniach.');
     analyticsEvent('game_open',CFG.version,null,{hasSave:S.allTime>0,locale:navigator.language||null,viewport:[window.innerWidth,window.innerHeight]});
     await analyticsSync();
-  }catch(err){console.warn('Fedrunek analytics:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE');}
+  }catch(err){const msg=analyticsFriendlyError(err);console.warn('Fedrunek analytics:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE',msg);toast('Statystyki offline: '+msg);}
   finally{ANALYTICS.initializing=false;}
 }
 function analyticsStart(reason){
@@ -1057,7 +998,7 @@ async function analyticsSync(){
       ANALYTICS.client.from('fedrunek_sessions').update(snap).eq('id',ANALYTICS.sessionId).eq('user_id',ANALYTICS.userId)
     ]);
     if(p.error)throw p.error;if(s.error)throw s.error;await analyticsFlushEvents();
-  }catch(err){console.warn('Fedrunek sync:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE');}
+  }catch(err){const msg=analyticsFriendlyError(err);console.warn('Fedrunek sync:',err);analyticsSetBadge('offline','STATYSTYKI OFFLINE',msg);}
   finally{ANALYTICS.syncing=false;}
 }
 function analyticsCheckProgress(){
@@ -1072,16 +1013,17 @@ $('#goldenCoal').addEventListener('pointerdown',clickGolden);
 $('#dynamiteBtn').addEventListener('click',useDynamite);$('#rushBtn').addEventListener('click',useRush);
 $$('.tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));$$('.buyMode').forEach(b=>b.addEventListener('click',()=>setBuyMode(b.dataset.mode)));
 $('#prestigeBtn').addEventListener('click',doPrestige);$('#exportBtn').addEventListener('click',exportSave);$('#importBtn').addEventListener('click',importSave);$('#resetBtn').addEventListener('click',resetGame);
-$('#adminToggle').addEventListener('click',()=>{const panel=$('#adminPanel'),open=panel.classList.toggle('hidden')===false;$('#adminToggle').setAttribute('aria-expanded',String(open));if(open)renderAdmin();});
-$('#adminAdd1m').addEventListener('click',()=>{addCoal(1000000);toast('Tryb admina: dodano 1 mln wyngla.');checkProgress();renderAll(true);save();});
-$('#adminAdd1b').addEventListener('click',()=>{addCoal(1000000000);toast('Tryb admina: dodano 1 mld wyngla.');checkProgress();renderAll(true);save();});
-$('#adminReportBtn').addEventListener('click',()=>{const report=JSON.stringify(adminReport(),null,2);navigator.clipboard?.writeText(report).then(()=>toast('Raport administracyjny skopiowany.')).catch(()=>prompt('Skopiuj raport:',report));});
+$('#analyticsBadge').addEventListener('click',async()=>{
+  analyticsSetBadge('connecting','STATYSTYKI ŁĄCZĄ…','Ponawianie połączenia');
+  ANALYTICS.ready=false;ANALYTICS.initializing=false;
+  await analyticsInit();
+  if(ANALYTICS.ready){await analyticsSync();toast('Połączenie ze statystykami działa.');}
+});
 $('#soundBtn').addEventListener('click',()=>{S.muted=!S.muted;$('#soundBtn').textContent=S.muted?'🔇':'🔊';save();});
 $('#helpBtn').addEventListener('click',()=>toast('Klikaj bryłę po lewej. Po prawej kupuj brygadę, maszyny i ulepszenia. Kamienie milowe przy 10, 25, 50, 100 i 200 sztukach podwajają wydajność.'));
 document.addEventListener('contextmenu',e=>{if(e.target.closest('#mineScene'))e.preventDefault()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){save();analyticsSync();}else{S.last=Date.now()}});window.addEventListener('pagehide',()=>{save();analyticsSync();});
 
-document.body.classList.toggle('debugMode',new URLSearchParams(location.search).get('debug')==='1');
 load();$('#soundBtn').textContent=S.muted?'🔇':'🔊';setBuyMode(S.buyMode||'1');renderAll(true);checkProgress();scheduleGolden();setInterval(save,CFG.autosave);setTimeout(analyticsInit,150);setInterval(analyticsSync,CFG.analyticsHeartbeat*1000);setInterval(()=>{renderShop();const tab=$('.tab.active')?.dataset.tab;if(tab==='goals')renderGoals();if(tab==='shift')renderShift();},2000);requestAnimationFrame(loop);
 </script>
 </body>
