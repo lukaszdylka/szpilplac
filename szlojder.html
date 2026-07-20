@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Szlojder — Familok</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --tlo:#161310;
+    --zielony:#4a9a6a;
+    --zloty:#c49050;
+    --krem:#ede5d0;
+    --przygaszony:#9a907a;
+    --stopka:#3d3629;
+    --czerwony:#d76a4f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:var(--tlo);color:var(--krem);
+    font-family:Inter,system-ui,-apple-system,sans-serif;
+    overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none}
+  #scena{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #wrap{position:relative}
+  canvas{display:block;background:#0f0d0b;border-radius:6px;box-shadow:0 0 0 2px var(--stopka),0 20px 60px rgba(0,0,0,.6)}
+
+  /* ---- ekrany ---- */
+  .ekran{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;text-align:center;padding:24px;border-radius:6px;
+    background:radial-gradient(120% 80% at 50% 30%,rgba(22,19,16,.86),rgba(10,9,7,.97))}
+  .ekran.schowany{display:none}
+  h1{font-family:Oswald,sans-serif;font-size:clamp(34px,9vw,52px);line-height:.95;letter-spacing:.02em;color:var(--krem)}
+  h1 em{display:block;font-style:normal;font-size:.36em;letter-spacing:.24em;color:var(--zloty);margin-top:10px}
+  h2{font-family:Oswald,sans-serif;font-size:clamp(26px,7vw,38px);color:var(--zloty)}
+  p{font-size:clamp(13px,3.6vw,15px);color:var(--przygaszony);max-width:30ch;line-height:1.55}
+  p b{color:var(--krem);font-weight:600}
+  p .zle{color:var(--czerwony);font-weight:600}
+  .klawisze{font-size:12px;color:#7a705e;line-height:1.7}
+  .klawisze b{color:var(--przygaszony);font-weight:600}
+  button.akcja{margin-top:6px;padding:14px 30px;border:0;border-radius:999px;cursor:pointer;
+    background:var(--zielony);color:#0f1a13;font-family:Oswald,sans-serif;font-size:20px;letter-spacing:.06em}
+  button.akcja:active{transform:translateY(1px)}
+  .wynik{display:flex;gap:22px;margin:4px 0 2px}
+  .wynik div{display:flex;flex-direction:column;gap:2px}
+  .wynik span{font-size:11px;letter-spacing:.14em;color:var(--przygaszony);text-transform:uppercase}
+  .wynik strong{font-family:Oswald,sans-serif;font-size:30px;color:var(--krem);font-weight:700}
+  .wynik strong.zle{color:var(--czerwony)}
+</style>
+</head>
+<body>
+<div id="scena">
+  <div id="wrap">
+    <canvas id="c"></canvas>
+
+    <div class="ekran" id="ekranStart">
+      <h1>SZLOJDER<em>GOŁYMBIE NAD FAMILOKIEM</em></h1>
+      <p>Cyluj szlojder, puść — i ogłusz gołymbia. Im wyżyj ptok, tym wiyncyj punktów.<br><span class="zle">Ino nie trefiej Zeflika!</span> Nasz gołymb je <b>jasny, beżowy</b> — reszta je szaro. Za Zeflika lecą punkty w dół.</p>
+      <button class="akcja" id="bStart">GRAMY</button>
+      <div class="klawisze"><b>Cyluj palcym</b> (abo myszką) i puść</div>
+    </div>
+
+    <div class="ekran schowany" id="ekranKoniec">
+      <h2 id="naglowekKoniec">FAJRANT</h2>
+      <div class="wynik">
+        <div><span>Punkty</span><strong id="wPunkty">0</strong></div>
+        <div><span>Gołymbie</span><strong id="wTrafienia">0</strong></div>
+        <div><span>Zeflik</span><strong id="wZeflik" class="zle">0</strong></div>
+      </div>
+      <p id="kodTxt" style="display:none;font-family:Oswald,sans-serif;font-size:30px;letter-spacing:.12em;color:var(--zloty)">KOD: 2137</p>
+      <p id="rekordTxt">Rekord: 0</p>
+      <button class="akcja" id="bZnowu">JESZCZE RAZ</button>
+    </div>
+  </div>
+</div>
+
+<script src="minigry-stats.js?v=1" data-game="szlojder"></script>
+<script>
+/* =========================================================================
+   SZLOJDER — mini-gra: strzelanie z procy do gołymbi nad familokiem.
+   Samodzielny plik: Canvas 2D + Web Audio, zero zależności.
+   Sterowanie: pointerdown gdziekolwiek → cufniyncie (drag) → puszczyni = strzał.
+   ========================================================================= */
+
+const KONFIG = {
+  // scena
+  SZER: 400,
+  WYS: 720,
+
+  // runda
+  CZAS: 60,                 // sekundy rundy
+
+  // strzał (wartości "na klatkę" przy 60 fps — skalowane delta-time)
+  GRAWITACJA: 0.30,
+  MOC_MAX: 19,              // maksymalna prędkość kamyka
+  CIAG_MAX: 130,            // ile px cufniyncia = pełna moc
+  CIAG_MIN: 12,             // poniżej tego strzał nie leci (przypadkowy tap)
+  KAMYK_R: 5,
+
+  // amunicja
+  KAMYKI_MAX: 5,
+  RELOAD_MS: 750,           // co ile wraca jeden kamyk
+
+  // gołymbie
+  SPAWN_BAZA_MS: 1250,      // odstęp między ptokami na starcie
+  SPAWN_MIN_MS: 520,        // najkrótszy odstęp (koniec rundy)
+  SZANSA_ZEFLIK: 0.18,      // szansa, że nadlatujący ptok to Zeflik
+  ZEFLIK_ZNACZNIK: false,   // true = szolka, obrys i podpis "ZEFLIK"; false = ino inny kolor
+  PTOK_R: 16,
+
+  // punkty
+  PKT_BAZA: 10,             // za trafionego gołymbia
+  PKT_ZA_WYSOKOSC: 14,      // max bonus za ptoka lecącego wysoko
+  KARA_ZEFLIK: 10,          // ile punktów w dół za Zeflika (dej 1, jak ma boleć mynij)
+  MNOZNIK_MAX: 4,           // combo: co 3 trafienia +1 do mnożnika
+
+  // kod do escape roomu
+  KOD_WLACZONY: true,       // false = kod się w ogóle nie pokazuje
+  KOD_PROG: 15,             // po ilu trafionych gołymbiach pokazać kod (Zeflik się nie liczy)
+  KOD: '2137',              // trzymać jako tekst — zachowuje zera z przodu
+
+  DZWIYNK: true,
+};
+
+// Teksty (śląskie — DO WERYFIKACJI przez Łukasza)
+const TEKSTY = {
+  combo: [
+    { min: 2, txt: 'DOBRE!' },
+    { min: 3, txt: 'GIBKO!' },
+    { min: 5, txt: 'EKSTRA!' },
+    { min: 7, txt: 'PIERONIE!' },
+    { min: 10, txt: 'MOCKA TEGO!' },
+  ],
+  zeflik: 'OJ! TO ZEFLIK!',
+  kodNapis: 'KOD',
+  pusto: 'PUSTO! CZEKEJ NA KAMYK',
+  koniec: 'FAJRANT',
+};
+
+// ---------------------------------------------------------------- canvas
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const wrap = document.getElementById('wrap');
+const W = KONFIG.SZER, H = KONFIG.WYS;
+const PROCA = { x: W / 2, y: H - 118 };   // punkt wylotu kamyka
+
+function dopasuj() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const marg = 8;
+  const skala = Math.min((window.innerWidth - marg) / W, (window.innerHeight - marg) / H);
+  const cssW = Math.floor(W * skala), cssH = Math.floor(H * skala);
+  wrap.style.width = cssW + 'px';
+  wrap.style.height = cssH + 'px';
+  c.style.width = cssW + 'px';
+  c.style.height = cssH + 'px';
+  c.width = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
+  ctx.setTransform(cssW * dpr / W, 0, 0, cssH * dpr / H, 0, 0);
+}
+window.addEventListener('resize', dopasuj);
+dopasuj();
+
+// ---------------------------------------------------------------- dźwięk
+let ac = null;
+function audio() { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); return ac; }
+function ton(f1, f2, dt, typ = 'square', gl = 0.06) {
+  if (!KONFIG.DZWIYNK) return;
+  try {
+    const a = audio(), o = a.createOscillator(), g = a.createGain();
+    o.type = typ;
+    o.frequency.setValueAtTime(f1, a.currentTime);
+    o.frequency.exponentialRampToValueAtTime(Math.max(f2, 1), a.currentTime + dt);
+    g.gain.setValueAtTime(gl, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dt);
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + dt);
+  } catch (e) {}
+}
+const dzw = {
+  napiac: () => ton(180, 260, 0.06, 'triangle', 0.03),
+  strzal: () => ton(620, 220, 0.09, 'sawtooth', 0.05),
+  trafienie: () => { ton(240, 120, 0.08, 'square', 0.06); setTimeout(() => ton(700, 380, 0.10, 'triangle', 0.04), 40); },
+  zeflik: () => { ton(400, 180, 0.22, 'sawtooth', 0.07); setTimeout(() => ton(220, 90, 0.30, 'sawtooth', 0.06), 130); },
+  pusto: () => ton(120, 90, 0.05, 'square', 0.03),
+  laduj: () => ton(520, 700, 0.05, 'triangle', 0.03),
+  combo: (n) => ton(520 + n * 70, 900 + n * 110, 0.13, 'square', 0.05),
+  kod: () => { ton(523, 784, 0.12, 'triangle', 0.06); setTimeout(() => ton(659, 988, 0.14, 'triangle', 0.06), 110); setTimeout(() => ton(784, 1175, 0.22, 'triangle', 0.07), 230); },
+  tik: () => ton(880, 880, 0.04, 'square', 0.03),
+  fajrant: () => { ton(300, 140, 0.30, 'triangle', 0.06); setTimeout(() => ton(180, 70, 0.45, 'triangle', 0.05), 150); },
+};
+
+// ---------------------------------------------------------------- stan gry
+let ptoki, kamyki, piora, toasty, celuj, punkty, trafienia, zeflikTrafiony,
+    combo, comboMax, comboTxt, comboTimer, kamykiIle, reloadAkum, spawnAkum,
+    czasDo, stan, wstrzas, blysk, ostatniTik, kodPokazany, kodAnim;
+
+let rekord = +(localStorage.getItem('familok_szlojder_rekord') || 0);
+
+function nowaGra() {
+  ptoki = []; kamyki = []; piora = []; toasty = [];
+  celuj = { aktywny: false, x0: 0, y0: 0, x: 0, y: 0 };
+  punkty = 0; trafienia = 0; zeflikTrafiony = 0;
+  combo = 0; comboMax = 0; comboTxt = null; comboTimer = 0;
+  kamykiIle = KONFIG.KAMYKI_MAX; reloadAkum = 0;
+  spawnAkum = 600;
+  czasDo = KONFIG.CZAS * 1000;
+  wstrzas = 0; blysk = 0; ostatniTik = 99;
+  kodPokazany = false; kodAnim = 0;
+  stan = 'gra';
+}
+
+function postep() {                      // 0 → 1 w trakcie rundy (trudność)
+  return 1 - Math.max(0, czasDo) / (KONFIG.CZAS * 1000);
+}
+
+// ---------------------------------------------------------------- gołymbie
+function dodejPtoka() {
+  const p = postep();
+  const zLewej = Math.random() < 0.5;
+  const jestZeflik = !ptoki.some(x => x.zeflik) && Math.random() < KONFIG.SZANSA_ZEFLIK;
+  const szybki = !jestZeflik && Math.random() < 0.18 + p * 0.22;
+  const predkosc = (1.1 + Math.random() * 1.1 + p * 1.0) * (szybki ? 1.7 : 1) * (jestZeflik ? 1.25 : 1);
+  ptoki.push({
+    x: zLewej ? -40 : W + 40,
+    y: 80 + Math.random() * 340,
+    vx: zLewej ? predkosc : -predkosc,
+    vy: 0,
+    rot: 0,
+    faza: Math.random() * 6.28,
+    amp: 6 + Math.random() * 16,
+    zeflik: jestZeflik,
+    szybki: szybki,
+    stan: 'leci',
+  });
+}
+
+function ogluszPtoka(p, kamyk) {
+  p.stan = 'ogluszony';
+  p.vx = (kamyk ? kamyk.vx * 0.22 : 0) + p.vx * 0.25;
+  p.vy = -1.6;
+  p.spin = (Math.random() < 0.5 ? -1 : 1) * (0.12 + Math.random() * 0.1);
+  for (let i = 0; i < 9; i++) dodejPioro(p.x, p.y);
+}
+
+// ---------------------------------------------------------------- efekty
+function dodejPioro(x, y) {
+  piora.push({
+    x, y,
+    vx: (Math.random() - 0.5) * 2.4,
+    vy: -0.4 - Math.random() * 1.2,
+    r: 2 + Math.random() * 2.5,
+    kat: Math.random() * 6.28,
+    zyc: 40 + Math.random() * 30,
+    max: 70,
+  });
+}
+function toast(x, y, txt, kolor) {
+  toasty.push({ x, y, txt, kolor, zyc: 45, max: 45 });
+}
+
+// ---------------------------------------------------------------- strzał
+function strzel(dx, dy) {
+  const dl = Math.hypot(dx, dy);
+  if (dl < KONFIG.CIAG_MIN) return;
+  if (kamykiIle <= 0) { dzw.pusto(); toast(PROCA.x, PROCA.y - 40, TEKSTY.pusto, '#d76a4f'); return; }
+
+  const moc = Math.min(dl, KONFIG.CIAG_MAX) / KONFIG.CIAG_MAX;
+  let ux = dx / dl, uy = dy / dl;
+  if (uy > -0.12) { uy = -0.12; const n = Math.hypot(ux, uy); ux /= n; uy /= n; }  // ino do góry
+
+  kamykiIle--;
+  kamyki.push({
+    x: PROCA.x, y: PROCA.y - 8,
+    vx: ux * KONFIG.MOC_MAX * moc,
+    vy: uy * KONFIG.MOC_MAX * moc,
+    trafil: false,
+    slad: [],
+  });
+  wstrzas = 3;
+  dzw.strzal();
+}
+
+// ---------------------------------------------------------------- input
+function pozycja(e) {
+  const r = c.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+}
+c.addEventListener('pointerdown', (e) => {
+  if (stan !== 'gra') return;
+  e.preventDefault();
+  c.setPointerCapture(e.pointerId);
+  const p = pozycja(e);
+  celuj = { aktywny: true, x0: p.x, y0: p.y, x: p.x, y: p.y };
+  dzw.napiac();
+});
+c.addEventListener('pointermove', (e) => {
+  if (!celuj.aktywny) return;
+  const p = pozycja(e);
+  celuj.x = p.x; celuj.y = p.y;
+});
+function puscic(e) {
+  if (!celuj.aktywny) return;
+  celuj.aktywny = false;
+  strzel(celuj.x0 - celuj.x, celuj.y0 - celuj.y);   // kierunek = odwrotność cufniyncia
+}
+c.addEventListener('pointerup', puscic);
+c.addEventListener('pointercancel', () => { celuj.aktywny = false; });
+
+// ---------------------------------------------------------------- update
+function update(dt, dtMs) {
+  if (stan !== 'gra') { wstrzas = Math.max(0, wstrzas - dt); return; }
+
+  // czas
+  czasDo -= dtMs;
+  const sek = Math.ceil(Math.max(0, czasDo) / 1000);
+  if (sek <= 10 && sek !== ostatniTik) { ostatniTik = sek; if (sek > 0) dzw.tik(); }
+  if (czasDo <= 0) { koniec(); return; }
+
+  // amunicja
+  if (kamykiIle < KONFIG.KAMYKI_MAX) {
+    reloadAkum += dtMs;
+    while (reloadAkum >= KONFIG.RELOAD_MS && kamykiIle < KONFIG.KAMYKI_MAX) {
+      reloadAkum -= KONFIG.RELOAD_MS;
+      kamykiIle++;
+      dzw.laduj();
+    }
+  } else reloadAkum = 0;
+
+  // spawn
+  spawnAkum -= dtMs;
+  if (spawnAkum <= 0) {
+    dodejPtoka();
+    const odstep = KONFIG.SPAWN_BAZA_MS - (KONFIG.SPAWN_BAZA_MS - KONFIG.SPAWN_MIN_MS) * postep();
+    spawnAkum = odstep * (0.75 + Math.random() * 0.5);
+  }
+
+  // ptoki
+  for (let i = ptoki.length - 1; i >= 0; i--) {
+    const p = ptoki[i];
+    if (p.stan === 'leci') {
+      p.faza += 0.045 * dt;
+      p.x += p.vx * dt;
+      p.y += Math.sin(p.faza) * p.amp * 0.03 * dt;
+      if (p.x < -60 || p.x > W + 60) ptoki.splice(i, 1);
+    } else {
+      p.vy += KONFIG.GRAWITACJA * 0.6 * dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.rot += p.spin * dt;
+      if (Math.random() < 0.12) dodejPioro(p.x, p.y);
+      if (p.y > H - 70) {
+        for (let k = 0; k < 6; k++) dodejPioro(p.x, H - 74);
+        ptoki.splice(i, 1);
+      }
+    }
+  }
+
+  // kamyki
+  for (let i = kamyki.length - 1; i >= 0; i--) {
+    const k = kamyki[i];
+    k.vy += KONFIG.GRAWITACJA * dt;
+    k.x += k.vx * dt;
+    k.y += k.vy * dt;
+    k.slad.push({ x: k.x, y: k.y });
+    if (k.slad.length > 8) k.slad.shift();
+
+    // kolizja z ptokami
+    for (const p of ptoki) {
+      if (p.stan !== 'leci') continue;
+      if (Math.hypot(p.x - k.x, p.y - k.y) < KONFIG.PTOK_R + KONFIG.KAMYK_R) {
+        trafienie(p, k);
+        k.trafil = true;
+        break;
+      }
+    }
+    if (k.trafil) { kamyki.splice(i, 1); continue; }
+
+    // pudło — kamyk poza scyną
+    if (k.y > H + 40 || k.x < -60 || k.x > W + 60 || k.y < -300) {
+      kamyki.splice(i, 1);
+      if (combo > 0) { combo = 0; comboTxt = null; }
+    }
+  }
+
+  // pióra
+  for (let i = piora.length - 1; i >= 0; i--) {
+    const f = piora[i];
+    f.vy += 0.02 * dt;
+    f.vx += Math.sin(f.zyc * 0.15) * 0.03 * dt;
+    f.x += f.vx * dt;
+    f.y += f.vy * dt;
+    f.kat += 0.05 * dt;
+    f.zyc -= dt;
+    if (f.zyc <= 0) piora.splice(i, 1);
+  }
+
+  // toasty
+  for (let i = toasty.length - 1; i >= 0; i--) {
+    const t2 = toasty[i];
+    t2.y -= 0.55 * dt;
+    t2.zyc -= dt;
+    if (t2.zyc <= 0) toasty.splice(i, 1);
+  }
+
+  if (comboTimer > 0) comboTimer -= dt;
+  if (kodPokazany) kodAnim += dt;
+  wstrzas = Math.max(0, wstrzas - dt * 0.6);
+  blysk = Math.max(0, blysk - dt * 0.04);
+}
+
+function mnoznik() {
+  return Math.min(KONFIG.MNOZNIK_MAX, 1 + Math.floor(combo / 3));
+}
+
+function trafienie(p, k) {
+  ogluszPtoka(p, k);
+
+  if (p.zeflik) {
+    zeflikTrafiony++;
+    punkty = Math.max(0, punkty - KONFIG.KARA_ZEFLIK);
+    combo = 0; comboTxt = null;
+    blysk = 1;
+    wstrzas = 7;
+    toast(p.x, p.y - 26, '-' + KONFIG.KARA_ZEFLIK, '#d76a4f');
+    toast(p.x, p.y - 48, TEKSTY.zeflik, '#d76a4f');
+    dzw.zeflik();
+    return;
+  }
+
+  trafienia++;
+  combo++;
+  comboMax = Math.max(comboMax, combo);
+
+  const wysoko = Math.max(0, Math.min(1, (440 - p.y) / 380));           // 0 nisko … 1 wysoko
+  const baza = KONFIG.PKT_BAZA + Math.round(wysoko * KONFIG.PKT_ZA_WYSOKOSC) + (p.szybki ? 8 : 0);
+  const zysk = baza * mnoznik();
+  punkty += zysk;
+
+  toast(p.x, p.y - 26, '+' + zysk, p.szybki ? '#c49050' : '#4a9a6a');
+  dzw.trafienie();
+
+  const prog = TEKSTY.combo.filter(x => combo >= x.min).pop();
+  if (prog) {
+    comboTxt = { txt: prog.txt, mn: mnoznik(), lancuch: combo };
+    comboTimer = 60;
+    dzw.combo(Math.min(6, combo));
+  }
+
+  // kod do escape roomu — pokazuje się roz i wisi do końca rundy
+  if (KONFIG.KOD_WLACZONY && !kodPokazany && trafienia >= KONFIG.KOD_PROG) {
+    kodPokazany = true;
+    kodAnim = 0;
+    dzw.kod();
+  }
+  wstrzas = 3;
+}
+
+function koniec() {
+  stan = 'koniec';
+  celuj.aktywny = false;
+  dzw.fajrant();
+
+  if (punkty > rekord) {
+    rekord = punkty;
+    try { localStorage.setItem('familok_szlojder_rekord', String(rekord)); } catch (e) {}
+  }
+
+  document.getElementById('wPunkty').textContent = punkty;
+  document.getElementById('wTrafienia').textContent = trafienia;
+  document.getElementById('wZeflik').textContent = zeflikTrafiony;
+  document.getElementById('rekordTxt').textContent =
+    (punkty >= rekord && punkty > 0 ? 'Nowy rekord: ' : 'Rekord: ') + rekord +
+    (comboMax > 1 ? ' · nojdłuższo seryjo: ' + comboMax : '');
+  const kodEl = document.getElementById('kodTxt');
+  if (kodPokazany) { kodEl.textContent = TEKSTY.kodNapis + ': ' + KONFIG.KOD; kodEl.style.display = 'block'; }
+  else kodEl.style.display = 'none';
+  document.getElementById('ekranKoniec').classList.remove('schowany');
+
+  // statystyki gierek (hub + runner)
+  const dane = { score: punkty, meta: { trafienia: trafienia, zeflik: zeflikTrafiony, combo: comboMax } };
+  if (window.SZPILPLAC_MINIGRA_STATS) window.SZPILPLAC_MINIGRA_STATS.finish(dane);
+  else if (window.SZPILPLAC_MINIGRA) window.SZPILPLAC_MINIGRA.finish(dane);
+}
+
+// ---------------------------------------------------------------- rysowanie
+function tlo(t) {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#1b1712');
+  g.addColorStop(0.55, '#2a2118');
+  g.addColorStop(1, '#3a2c1d');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // ksiynżyc
+  ctx.fillStyle = 'rgba(237,229,208,.16)';
+  ctx.beginPath(); ctx.arc(W - 70, 84, 30, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = 'rgba(237,229,208,.30)';
+  ctx.beginPath(); ctx.arc(W - 70, 84, 22, 0, 6.2832); ctx.fill();
+
+  // dym z kominów
+  ctx.fillStyle = 'rgba(237,229,208,.05)';
+  for (let i = 0; i < 3; i++) {
+    const bx = 40 + i * 140;
+    for (let j = 0; j < 4; j++) {
+      const s = 8 + j * 5;
+      ctx.beginPath();
+      ctx.arc(bx + Math.sin(t / 900 + j + i) * 10, H - 300 - j * 34, s, 0, 6.2832);
+      ctx.fill();
+    }
+  }
+
+  // familoki w tle
+  ctx.fillStyle = '#221c15';
+  for (let i = 0; i < 5; i++) {
+    const bw = 76 + (i % 2) * 22;
+    const bx = i * 84 - 10;
+    const bh = 150 + (i % 3) * 46;
+    ctx.fillRect(bx, H - 130 - bh, bw, bh);
+    ctx.fillStyle = '#2c241b';
+    ctx.fillRect(bx + bw * 0.22, H - 130 - bh - 26, 14, 26);   // komin
+    ctx.fillStyle = '#221c15';
+  }
+
+  // okna
+  for (let i = 0; i < 5; i++) {
+    const bx = i * 84 - 10;
+    const bh = 150 + (i % 3) * 46;
+    for (let r = 0; r < Math.floor(bh / 46); r++) {
+      for (let k = 0; k < 3; k++) {
+        const sw = ((i * 7 + r * 3 + k) % 5) === 0;
+        ctx.fillStyle = sw ? 'rgba(196,144,80,.55)' : 'rgba(237,229,208,.06)';
+        ctx.fillRect(bx + 12 + k * 22, H - 118 - bh + r * 46 + 12, 11, 15);
+      }
+    }
+  }
+
+  // dach na piyrszym planie
+  ctx.fillStyle = '#171410';
+  ctx.fillRect(0, H - 70, W, 70);
+  ctx.fillStyle = '#241d16';
+  for (let x = 0; x < W; x += 26) {
+    ctx.beginPath();
+    ctx.moveTo(x, H - 70);
+    ctx.lineTo(x + 13, H - 78);
+    ctx.lineTo(x + 26, H - 70);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function rysPtok(p, t) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  if (p.stan === 'ogluszony') ctx.rotate(p.rot);
+  else if (p.vx > 0) ctx.scale(-1, 1);
+
+  // Zeflik = ciepły, jasny beż; reszta gołymbi = zimna szaroniebiesko
+  const kolorCialo = p.zeflik ? '#d3bd93' : (p.szybki ? '#8e8fa3' : '#6f7488');
+  const kolorSkrz = p.zeflik ? '#b39f78' : (p.szybki ? '#767a92' : '#585d70');
+
+  // ogon
+  ctx.fillStyle = kolorSkrz;
+  ctx.beginPath();
+  ctx.moveTo(9, -1); ctx.lineTo(21, -7); ctx.lineTo(21, 5); ctx.closePath();
+  ctx.fill();
+
+  // cioło
+  ctx.fillStyle = kolorCialo;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 14, 9, 0, 0, 6.2832);
+  ctx.fill();
+
+  // skrzidło (klapanie)
+  const klap = p.stan === 'leci' ? Math.sin(t / 70 + p.faza * 3) : Math.sin(t / 40);
+  ctx.fillStyle = kolorSkrz;
+  ctx.save();
+  ctx.translate(1, -3);
+  ctx.rotate(klap * 0.6 - 0.2);
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(16, -4); ctx.lineTo(9, 8); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // gowa
+  ctx.fillStyle = kolorCialo;
+  ctx.beginPath();
+  ctx.arc(-12, -7, 6.5, 0, 6.2832);
+  ctx.fill();
+
+  // dziub
+  ctx.fillStyle = '#c49050';
+  ctx.beginPath();
+  ctx.moveTo(-18, -7); ctx.lineTo(-24, -5); ctx.lineTo(-18, -3.5); ctx.closePath();
+  ctx.fill();
+
+  // ôko / gwiozdki jak ogłuszony
+  if (p.stan === 'ogluszony') {
+    ctx.strokeStyle = '#c49050';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(-15, -9); ctx.lineTo(-11, -5); ctx.moveTo(-11, -9); ctx.lineTo(-15, -5); ctx.stroke();
+  } else {
+    ctx.fillStyle = '#161310';
+    ctx.beginPath(); ctx.arc(-14, -8, 1.6, 0, 6.2832); ctx.fill();
+  }
+
+  // Zeflik — dodatkowe oznaczynie (domyślnie wyłączone: poznasz go po kolorze)
+  if (p.zeflik && KONFIG.ZEFLIK_ZNACZNIK) {
+    ctx.fillStyle = '#d76a4f';
+    ctx.beginPath();
+    ctx.ellipse(-7, -2, 4.5, 3.2, -0.3, 0, 6.2832);
+    ctx.fill();
+    ctx.strokeStyle = '#4a9a6a';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.ellipse(0, 0, 20, 15, 0, 0, 6.2832); ctx.stroke();
+  }
+  ctx.restore();
+
+  if (p.zeflik && p.stan === 'leci' && KONFIG.ZEFLIK_ZNACZNIK) {
+    ctx.fillStyle = '#4a9a6a';
+    ctx.font = '800 10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ZEFLIK', p.x, p.y - 24);
+    ctx.textAlign = 'left';
+  }
+}
+
+function rysProca(t) {
+  const bx = PROCA.x, by = PROCA.y;
+
+  // chopiec
+  ctx.fillStyle = '#3d3629';
+  ctx.fillRect(bx - 9, by + 26, 7, 30);            // noga
+  ctx.fillRect(bx + 2, by + 26, 7, 30);
+  ctx.fillStyle = '#4a9a6a';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(bx - 12, by + 2, 24, 28, 5) : ctx.rect(bx - 12, by + 2, 24, 28);
+  ctx.fill();
+  ctx.fillStyle = '#ede5d0';
+  ctx.beginPath(); ctx.arc(bx, by - 8, 9, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = '#c49050';                        // czopka
+  ctx.beginPath();
+  ctx.arc(bx, by - 10, 9, Math.PI, 6.2832);
+  ctx.fill();
+  ctx.fillRect(bx - 12, by - 11, 12, 3);
+
+  // widełki procy
+  ctx.strokeStyle = '#7a5a33';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(bx, by + 14);
+  ctx.lineTo(bx, by - 2);
+  ctx.moveTo(bx, by - 2);
+  ctx.lineTo(bx - 13, by - 20);
+  ctx.moveTo(bx, by - 2);
+  ctx.lineTo(bx + 13, by - 20);
+  ctx.stroke();
+
+  // gumy + kapsel
+  let px = bx, py = by - 14;
+  if (celuj.aktywny) {
+    let dx = celuj.x - celuj.x0, dy = celuj.y - celuj.y0;
+    const dl = Math.hypot(dx, dy);
+    const ogr = Math.min(dl, KONFIG.CIAG_MAX) * 0.22;
+    if (dl > 0.5) { px = bx + dx / dl * ogr; py = by - 14 + dy / dl * ogr; }
+  }
+  ctx.strokeStyle = '#c49050';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(bx - 13, by - 20); ctx.lineTo(px, py);
+  ctx.moveTo(bx + 13, by - 20); ctx.lineTo(px, py);
+  ctx.stroke();
+  if (kamykiIle > 0) {
+    ctx.fillStyle = '#9a907a';
+    ctx.beginPath(); ctx.arc(px, py, KONFIG.KAMYK_R, 0, 6.2832); ctx.fill();
+  }
+}
+
+function rysCelownik() {
+  if (!celuj.aktywny || kamykiIle <= 0) return;
+  const dx = celuj.x0 - celuj.x, dy = celuj.y0 - celuj.y;
+  const dl = Math.hypot(dx, dy);
+  if (dl < KONFIG.CIAG_MIN) return;
+
+  const moc = Math.min(dl, KONFIG.CIAG_MAX) / KONFIG.CIAG_MAX;
+  let ux = dx / dl, uy = dy / dl;
+  if (uy > -0.12) { uy = -0.12; const n = Math.hypot(ux, uy); ux /= n; uy /= n; }
+
+  let x = PROCA.x, y = PROCA.y - 8;
+  let vx = ux * KONFIG.MOC_MAX * moc, vy = uy * KONFIG.MOC_MAX * moc;
+  ctx.fillStyle = 'rgba(237,229,208,.55)';
+  for (let i = 0; i < 60; i++) {
+    vy += KONFIG.GRAWITACJA;
+    x += vx; y += vy;
+    if (y > H || x < 0 || x > W) break;
+    if (i % 4 === 0) {
+      ctx.globalAlpha = 0.55 * (1 - i / 60);
+      ctx.beginPath(); ctx.arc(x, y, 2.4, 0, 6.2832); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // pasek mocy
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
+  ctx.fillRect(PROCA.x - 40, H - 40, 80, 7);
+  ctx.fillStyle = moc > 0.85 ? '#d76a4f' : '#4a9a6a';
+  ctx.fillRect(PROCA.x - 40, H - 40, 80 * moc, 7);
+}
+
+function hud(t) {
+  // punkty
+  ctx.fillStyle = '#ede5d0';
+  ctx.font = '700 30px Oswald, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(String(punkty), 16, 76);
+  ctx.fillStyle = '#9a907a';
+  ctx.font = '800 10px Inter, sans-serif';
+  ctx.fillText('PUNKTY', 16, 90);
+
+  const mn = mnoznik();
+  if (mn > 1 && stan === 'gra') {
+    ctx.fillStyle = '#c49050';
+    ctx.font = '700 18px Oswald, sans-serif';
+    ctx.fillText('×' + mn, 16 + ctx.measureText(String(punkty)).width + 44, 74);
+  }
+
+  // czas
+  const sek = Math.ceil(Math.max(0, czasDo) / 1000);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = sek <= 10 ? '#d76a4f' : '#ede5d0';
+  ctx.font = '700 30px Oswald, sans-serif';
+  ctx.fillText(String(sek), W / 2, 76);
+  ctx.fillStyle = '#9a907a';
+  ctx.font = '800 10px Inter, sans-serif';
+  ctx.fillText('SEKUNDY', W / 2, 90);
+
+  // amunicja
+  for (let i = 0; i < KONFIG.KAMYKI_MAX; i++) {
+    const x = W - 20 - i * 16, y = 66;
+    if (i < kamykiIle) {
+      ctx.fillStyle = '#9a907a';
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.2832); ctx.fill();
+    } else {
+      ctx.strokeStyle = 'rgba(154,144,122,.35)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.2832); ctx.stroke();
+    }
+  }
+  if (kamykiIle < KONFIG.KAMYKI_MAX) {
+    const f = reloadAkum / KONFIG.RELOAD_MS;
+    ctx.fillStyle = 'rgba(74,154,106,.7)';
+    ctx.fillRect(W - 90, 78, 78 * f, 3);
+  }
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#9a907a';
+  ctx.font = '800 10px Inter, sans-serif';
+  ctx.fillText('KAMYKI', W - 15, 92);
+  ctx.textAlign = 'left';
+
+  // combo
+  if (comboTimer > 0 && comboTxt) {
+    const a = Math.min(1, comboTimer / 25);
+    ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#c49050';
+    ctx.font = '700 28px Oswald, sans-serif';
+    ctx.fillText(comboTxt.txt, W / 2, 150 - (60 - comboTimer) * 0.4);
+    ctx.fillStyle = '#4a9a6a';
+    ctx.font = '800 13px Inter, sans-serif';
+    ctx.fillText('×' + comboTxt.mn + ' · seryjo ' + comboTxt.lancuch, W / 2, 172 - (60 - comboTimer) * 0.4);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+  }
+
+  // blysk po Zefliku
+  if (blysk > 0) {
+    ctx.fillStyle = 'rgba(215,106,79,' + (blysk * 0.28) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+function rysKod() {
+  if (!kodPokazany) return;
+  const wej = Math.min(1, kodAnim / 20);                                 // wjazd ~1/3 s
+  const s = (0.6 + 0.4 * wej) * (1 + Math.sin(kodAnim * 0.07) * 0.015);  // lekki puls
+  ctx.save();
+  ctx.globalAlpha = wej;
+  ctx.translate(W / 2, H / 2);
+  ctx.scale(s, s);
+  ctx.fillStyle = 'rgba(15,13,11,.88)';
+  ctx.strokeStyle = '#c49050';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(-105, -52, 210, 104, 14); else ctx.rect(-105, -52, 210, 104);
+  ctx.fill();
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#9a907a';
+  ctx.font = '800 11px Inter, sans-serif';
+  ctx.fillText(TEKSTY.kodNapis, 0, -26);
+  ctx.fillStyle = '#c49050';
+  ctx.font = '700 54px Oswald, sans-serif';
+  ctx.fillText(String(KONFIG.KOD), 0, 30);
+  ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- pętla
+let ostatni = performance.now();
+function klatka(t) {
+  const dtMs = Math.min(50, t - ostatni);
+  ostatni = t;
+  const dt = (dtMs / 1000) * 60;   // dtScale — 1.0 przy 60 fps
+
+  update(dt, dtMs);
+
+  ctx.save();
+  if (wstrzas > 0) ctx.translate((Math.random() - 0.5) * wstrzas, (Math.random() - 0.5) * wstrzas);
+  tlo(t);
+
+  for (const p of ptoki) rysPtok(p, t);
+
+  // pióra
+  for (const f of piora) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, f.zyc / f.max);
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.kat);
+    ctx.fillStyle = '#ede5d0';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, f.r * 1.8, f.r * 0.6, 0, 0, 6.2832);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+
+  // kamyki + ślad
+  for (const k of kamyki) {
+    for (let i = 0; i < k.slad.length; i++) {
+      ctx.globalAlpha = (i / k.slad.length) * 0.35;
+      ctx.fillStyle = '#ede5d0';
+      ctx.beginPath(); ctx.arc(k.slad[i].x, k.slad[i].y, KONFIG.KAMYK_R * 0.7, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#c9bfa6';
+    ctx.beginPath(); ctx.arc(k.x, k.y, KONFIG.KAMYK_R, 0, 6.2832); ctx.fill();
+  }
+
+  if (stan === 'gra') { rysCelownik(); rysProca(t); }
+  else rysProca(t);
+
+  // toasty
+  for (const t2 of toasty) {
+    ctx.globalAlpha = Math.max(0, t2.zyc / t2.max);
+    ctx.fillStyle = t2.kolor;
+    ctx.font = '800 15px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(t2.txt, t2.x, t2.y);
+    ctx.textAlign = 'left';
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+  hud(t);
+  rysKod();
+
+  requestAnimationFrame(klatka);
+}
+requestAnimationFrame(klatka);
+
+// ---------------------------------------------------------------- ekrany
+function restart() {
+  document.getElementById('ekranStart').classList.add('schowany');
+  document.getElementById('ekranKoniec').classList.add('schowany');
+  try { audio().resume(); } catch (e) {}
+  if (window.SZPILPLAC_MINIGRA_STATS) window.SZPILPLAC_MINIGRA_STATS.reset();
+  else if (window.SZPILPLAC_MINIGRA) window.SZPILPLAC_MINIGRA.start();
+  nowaGra();
+}
+document.getElementById('bStart').addEventListener('click', restart);
+document.getElementById('bZnowu').addEventListener('click', restart);
+
+nowaGra();
+stan = 'menu';
+czasDo = KONFIG.CZAS * 1000;
+</script>
+
+<!-- ── pasek Gierek (powrót + pełny ekran) ── -->
+<style>
+#gp-bar{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;z-index:2147483000;
+  display:flex;gap:6px;font-family:system-ui,-apple-system,sans-serif;opacity:.55;transition:opacity .2s}
+#gp-bar:hover,#gp-bar:active{opacity:1}
+#gp-bar a,#gp-bar button{display:flex;align-items:center;justify-content:center;height:32px;min-width:32px;
+  padding:0 9px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(20,18,14,.72);
+  color:#ede5d0;font-size:14px;font-weight:700;line-height:1;text-decoration:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+</style>
+<div id="gp-bar">
+  <a href="gierki.html" title="Wróć do gierek">&#8592;</a>
+  <button id="gp-fs" type="button" title="Pełny ekran">&#9974;</button>
+</div>
+<script>
+(function(){
+  var el=document.documentElement;
+  function pelny(){
+    var f=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+    } else if(f){ try{ f.call(el,{navigationUI:"hide"}); }catch(e){ try{ f.call(el); }catch(e2){} } }
+  }
+  document.getElementById("gp-fs").addEventListener("click",function(e){ e.stopPropagation(); pelny(); });
+  if(/[?&]fs=1/.test(location.search)){
+    var raz=function(){ document.removeEventListener("pointerdown",raz,true); if(!document.fullscreenElement) pelny(); };
+    document.addEventListener("pointerdown",raz,true);
+  }
+})();
+</script>
+
+</body>
+</html>
