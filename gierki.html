@@ -52,6 +52,10 @@ function card(game){
 }
 function render(games){document.getElementById("siatka").innerHTML=games.length?games.map(card).join(""):'<div class="empty">Brak opublikowanych gierek.</div>';}
 async function boot(){
+  var fallbackDescriptions={
+    "skok-do-nieba":"Skacz po dachach familoka, zbieraj wyngiel i uważaj na ptoki. Steruj dotykiem albo przechyłem i pnij się jak najwyżej.",
+    "zeflik":"Machaj skrzydłami Zeflika, przelatuj między familokami i zbieraj kołocz. Każdy minięty familok daje punkt, a kołocz dorzuca bonus."
+  };
   var games=window.SZP_GAMES?window.SZP_GAMES.minigames():[];
   render(games);
   var cfg=window.SZPILPLAC_CONFIG||{};
@@ -64,7 +68,7 @@ async function boot(){
     rows.forEach(function(row){
       var href=row.typ==="link"&&row.url?row.url:"minigra.html?g="+encodeURIComponent(row.slug);
       if(known[row.slug]||known[href])return;
-      games.push({id:row.slug,title:row.tytul,description:row.opis||"",icon:row.ikona,href:href,fullscreen:!!row.pelny});
+      games.push({id:row.slug,title:row.tytul,description:row.opis||fallbackDescriptions[row.slug]||"",icon:row.ikona,href:href,fullscreen:!!row.pelny});
     });
     render(games);
   }catch(e){}
