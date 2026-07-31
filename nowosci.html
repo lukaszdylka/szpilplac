@@ -52,152 +52,28 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 :focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
 header,main,footer{width:100%;max-width:860px}
 header{padding-top:18px}
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:18px;
-}
-.back{
-  min-height:36px;
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:8px 12px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:var(--surface2);
-  color:var(--green);
-  font-size:12px;
-  font-weight:900;
-}
-.icon-btn{
-  width:36px;
-  height:36px;
-  display:grid;
-  place-items:center;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:var(--surface2);
-  color:var(--ink2);
-}
-.hero{
-  padding:22px;
-  border:1px solid var(--line);
-  border-radius:22px;
-  background:linear-gradient(180deg,rgba(191,138,58,.14),rgba(191,138,58,.04)),var(--surface);
-  box-shadow:var(--shadow);
-}
-.kicker{
-  color:var(--gold);
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.09em;
-  text-transform:uppercase;
-}
-h1{
-  margin:6px 0 8px;
-  font-family:Oswald,system-ui,sans-serif;
-  font-size:clamp(34px,6vw,52px);
-  line-height:1;
-  text-transform:uppercase;
-  letter-spacing:.01em;
-}
-.lead{
-  max-width:640px;
-  margin:0;
-  color:var(--ink2);
-  font-size:14px;
-  line-height:1.55;
-}
-.news-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:16px;
-}
-.card{
-  padding:16px;
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:var(--surface);
-  box-shadow:var(--shadow);
-}
-.card h2{
-  margin:0 0 8px;
-  font-family:Oswald,system-ui,sans-serif;
-  font-size:22px;
-  line-height:1.05;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
-.card p{
-  margin:0;
-  color:var(--ink2);
-  font-size:13px;
-  line-height:1.5;
-}
-.list{
-  display:grid;
-  gap:8px;
-  margin:10px 0 0;
-  padding:0;
-  list-style:none;
-}
-.list li{
-  padding:9px 10px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--surface2);
-  color:var(--ink2);
-  font-size:12.5px;
-  line-height:1.4;
-}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.back{min-height:36px;display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);color:var(--green);font-size:12px;font-weight:900}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);color:var(--ink2)}
+.hero{padding:22px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,rgba(191,138,58,.14),rgba(191,138,58,.04)),var(--surface);box-shadow:var(--shadow)}
+.kicker{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+h1{margin:6px 0 8px;font-family:Oswald,system-ui,sans-serif;font-size:clamp(34px,6vw,52px);line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.lead{max-width:680px;margin:0;color:var(--ink2);font-size:14px;line-height:1.55}
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.card.featured{grid-column:1/-1;background:linear-gradient(135deg,rgba(47,74,57,.13),rgba(191,138,58,.10)),var(--surface);border-color:var(--gold)}
+.card h2{margin:0 0 8px;font-family:Oswald,system-ui,sans-serif;font-size:22px;line-height:1.05;text-transform:uppercase;letter-spacing:.03em}
+.card p{margin:0;color:var(--ink2);font-size:13px;line-height:1.5}
+.list{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.list li{padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--ink2);font-size:12.5px;line-height:1.4}
 .list b{color:var(--ink)}
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:9px;
-  margin-top:16px;
-}
-.btn{
-  min-height:40px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 14px;
-  border-radius:999px;
-  background:var(--green);
-  color:#fff;
-  font-size:12px;
-  font-weight:900;
-}
-.btn.secondary{
-  border:1px solid var(--line);
-  background:var(--surface2);
-  color:var(--ink);
-}
-.btn.gold{
-  background:var(--gold);
-  color:#20170d;
-}
-footer{
-  margin-top:20px;
-  color:var(--ink2);
-  font-size:11.5px;
-  text-align:center;
-  line-height:1.5;
-}
-@media(max-width:740px){
-  header,main,footer{max-width:560px}
-  .news-grid{grid-template-columns:1fr}
-  .topbar{align-items:flex-start}
-}
-@media(max-width:420px){
-  body{padding-left:12px;padding-right:12px}
-  .hero{padding:18px;border-radius:18px}
-}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;background:var(--green);color:#fff;font-size:12px;font-weight:900}
+.btn.secondary{border:1px solid var(--line);background:var(--surface2);color:var(--ink)}
+.btn.gold{background:var(--gold);color:#20170d}
+footer{margin-top:20px;color:var(--ink2);font-size:11.5px;text-align:center;line-height:1.5}
+@media(max-width:740px){header,main,footer{max-width:560px}.news-grid{grid-template-columns:1fr}.card.featured{grid-column:auto}.topbar{align-items:flex-start}}
+@media(max-width:420px){body{padding-left:12px;padding-right:12px}.hero{padding:18px;border-radius:18px}}
 </style>
 <meta name="theme-color" content="#2f4a39">
 </head>
@@ -213,29 +89,40 @@ footer{
   <section class="hero">
     <div class="kicker">Nowości</div>
     <h1>Co nowego na Szpilplacu?</h1>
-    <p class="lead">Najkrócej: grasz codziennie, zbierasz punkty, odznaki i rangi, a teraz możesz też dodać innych graczy do Kamratów z placu.</p>
+    <p class="lead">Raja została przebudowana jako cotygodniowa śląska zagadka. Czeka w niej 52 ręcznie przygotowanych zestawów, a nowy pojawia się w każdy poniedziałek.</p>
     <div class="actions">
-      <a class="btn" href="index.html">Przejdź do gier</a>
-      <a class="btn secondary" href="ranking.html">Ranking</a>
+      <a class="btn" href="raja/">Zagraj w Raję</a>
+      <a class="btn secondary" href="index.html">Wszystkie gry</a>
       <a class="btn gold" href="konto.html">Moje konto</a>
     </div>
   </section>
 
   <section class="news-grid" aria-label="Najważniejsze informacje">
+    <article class="card featured">
+      <h2>Nowa Raja</h2>
+      <p>Raja nie jest już codziennym zbiorem przypadkowych tematów. To jedna porządna śląska zagadka na cały tydzień.</p>
+      <ul class="list">
+        <li><b>52 śląskie zestawy</b> związane z godką, historią, przemysłem, geografią, koleją, kulturą i sportem.</li>
+        <li><b>Nowa zagadka w poniedziałek</b> według czasu Europe/Warsaw.</li>
+        <li><b>Dokładne polecenia</b>, na przykład od najstarszego do najnowszego, od zachodu na wschód albo od najniższego do najwyższego.</li>
+        <li><b>Stabilne sprawdzanie</b>, blokowanie poprawnych pozycji, 4 próby i podpowiedź po dwóch nieudanych podejściach.</li>
+      </ul>
+    </article>
+
     <article class="card">
       <h2>Gry</h2>
       <p>Na Szpilplacu są krótkie gry logiczne i słowne w klimacie Familocka.</p>
       <ul class="list">
-        <li><b>Słōwko</b> — zgadnij śląskie słowo dnia.</li>
-        <li><b>Kłōdka</b> — rozszyfruj codzienny 4-cyfrowy kod.</li>
-        <li><b>Raja</b> — ułóż pięć śląskich rzeczy w kolejności.</li>
-        <li><b>Cuzamen</b> — kolejna gra, przygotowywana jako grupowanie słów.</li>
+        <li><b>Słōwko</b> · zgadnij śląskie słowo dnia.</li>
+        <li><b>Kłōdka</b> · rozszyfruj tygodniowy 4-cyfrowy kod.</li>
+        <li><b>Raja</b> · ułóż pięć śląskich elementów zgodnie z podanym kryterium.</li>
+        <li><b>Cuzamen</b> · szukaj ukrytych grup i połączeń między słowami.</li>
       </ul>
     </article>
 
     <article class="card">
       <h2>Konto gracza</h2>
-      <p>Konto nie jest wymagane do grania, ale daje więcej sensu codziennym powrotom.</p>
+      <p>Konto nie jest wymagane do grania, ale daje więcej sensu regularnym powrotom.</p>
       <ul class="list">
         <li>zapis punktów i rozegranych gier,</li>
         <li>ranking i rangi gracza,</li>
@@ -246,7 +133,7 @@ footer{
 
     <article class="card">
       <h2>Kamraty z placu</h2>
-      <p>To lekka społecznościowa warstwa Szpilplaca — bez czatu, bez komentarzy i bez spiny.</p>
+      <p>To lekka społecznościowa warstwa Szpilplaca, bez czatu, komentarzy i spiny.</p>
       <ul class="list">
         <li>włączasz profil publiczny,</li>
         <li>dodajesz graczy z rankingu do kamratów,</li>
@@ -268,12 +155,12 @@ footer{
 
     <article class="card">
       <h2>Odznaki</h2>
-      <p>Odznaki są za granie, serie, wyniki i teraz także za Kamratów.</p>
+      <p>Odznaki są za granie, serie, wyniki i aktywność z Kamratami.</p>
       <ul class="list">
         <li>za pierwszego kamrata,</li>
         <li>za profil publiczny,</li>
         <li>za reakcje,</li>
-        <li>za bycie rozpoznawalnym graczem na placu.</li>
+        <li>za regularne granie na placu.</li>
       </ul>
     </article>
 
@@ -281,17 +168,17 @@ footer{
       <h2>Co zrobić teraz?</h2>
       <p>Najprostsza ścieżka dla gracza.</p>
       <ul class="list">
-        <li>zagraj w dzisiejsze gry,</li>
+        <li>zagraj w aktualne gry,</li>
+        <li>sprawdź nową tygodniową Raję,</li>
         <li>załóż konto albo zaloguj się,</li>
-        <li>sprawdź ranking,</li>
-        <li>włącz profil publiczny i dodaj kamrata.</li>
+        <li>zajrzyj do rankingu i Kamratów.</li>
       </ul>
     </article>
   </section>
 </main>
 
 <footer>
-  Szpilplac · Familock — krótkie gry, punkty, rangi i familockowy klimat.
+  Szpilplac · Familock · krótkie gry, punkty, rangi i familockowy klimat.
 </footer>
 
 <script>
