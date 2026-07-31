@@ -6,7 +6,7 @@
 <title>Nowości · Szpilplac · Familock</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="description" content="Zobacz, co nowego czeka na graczy Szpilplaca: nowe gry, wyzwania, ranking, rangi i Kamraty z placu.">
+<meta name="description" content="Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, Kamraty, odznaki i kolejne zmiany projektu.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,9 +20,7 @@
   --ink2:#6a6150;
   --line:#c9bfa6;
   --green:#2f4a39;
-  --green2:#3f6a4d;
   --gold:#bf8a3a;
-  --correct:#3f8a5a;
   --shadow:0 12px 34px -22px rgba(35,32,26,.65);
 }
 [data-theme=dark]{
@@ -33,9 +31,7 @@
   --ink2:#aaa18d;
   --line:#3d3629;
   --green:#4a7a56;
-  --green2:#5c9169;
   --gold:#d4a04a;
-  --correct:#4a9a6a;
   --shadow:0 14px 38px -24px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
@@ -57,114 +53,65 @@ body{
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 :focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:10px}
-header,main,footer{width:100%;max-width:940px}
+header,main,footer{width:100%;max-width:900px}
 header{padding-top:18px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.back,.icon-btn{
-  border:1px solid var(--line);
-  background:var(--surface2);
-  color:var(--ink2);
-  box-shadow:var(--shadow);
-}
+.back,.icon-btn{border:1px solid var(--line);background:var(--surface2);color:var(--ink2);box-shadow:var(--shadow)}
 .back{min-height:38px;display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:900}
 .back:hover{color:var(--green)}
 .icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:999px}
 .hero{
-  position:relative;
-  overflow:hidden;
-  padding:28px;
+  padding:26px;
   border:1px solid var(--line);
-  border-radius:26px;
-  background:linear-gradient(135deg,rgba(191,138,58,.16),rgba(47,74,57,.10)),var(--surface);
+  border-radius:24px;
+  background:linear-gradient(135deg,rgba(191,138,58,.15),rgba(47,74,57,.09)),var(--surface);
   box-shadow:var(--shadow);
 }
-.hero::after{
-  content:"";
-  position:absolute;
-  right:-72px;
-  top:-88px;
-  width:230px;
-  height:230px;
-  border-radius:999px;
-  border:34px solid rgba(191,138,58,.10);
-}
-.kicker{position:relative;z-index:1;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-h1{position:relative;z-index:1;max-width:720px;margin:7px 0 10px;font-family:Oswald,system-ui,sans-serif;font-size:clamp(38px,7vw,62px);line-height:.98;text-transform:uppercase;letter-spacing:.01em}
-.lead{position:relative;z-index:1;max-width:660px;margin:0;color:var(--ink2);font-size:15px;line-height:1.58}
-.actions{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
-.btn{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 15px;border-radius:999px;background:var(--green);color:#fff;font-size:12px;font-weight:900;transition:transform .12s ease,filter .12s ease}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.kicker{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+h1{margin:7px 0 10px;font-family:Oswald,system-ui,sans-serif;font-size:clamp(38px,7vw,60px);line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.lead{max-width:720px;margin:0;color:var(--ink2);font-size:14.5px;line-height:1.58}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.btn{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;border-radius:999px;background:var(--green);color:#fff;font-size:12px;font-weight:900}
 .btn.secondary{border:1px solid var(--line);background:var(--surface2);color:var(--ink)}
-.btn.gold{background:var(--gold);color:#20170d}
-.section{margin-top:18px}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 2px 10px}
-.section-kicker{color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
-.section-title{margin:3px 0 0;font-family:Oswald,system-ui,sans-serif;font-size:27px;line-height:1;text-transform:uppercase}
-.section-note{max-width:380px;color:var(--ink2);font-size:12px;line-height:1.45;text-align:right}
-.feature{
+.summary{
   display:grid;
-  grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);
-  gap:14px;
-  padding:20px;
-  border:1px solid var(--gold);
-  border-radius:22px;
-  background:linear-gradient(135deg,rgba(47,74,57,.14),rgba(191,138,58,.11)),var(--surface);
-  box-shadow:var(--shadow);
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:14px;
 }
-.feature-main{min-width:0}
-.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:var(--green);color:#fff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.feature h2{margin:12px 0 8px;font-family:Oswald,system-ui,sans-serif;font-size:clamp(30px,5vw,42px);line-height:1;text-transform:uppercase}
-.feature p{max-width:600px;margin:0;color:var(--ink2);font-size:13.5px;line-height:1.55}
-.feature-points{display:grid;gap:8px;margin:15px 0 0;padding:0;list-style:none}
-.feature-points li{display:flex;align-items:flex-start;gap:9px;color:var(--ink);font-size:12.5px;font-weight:700;line-height:1.42}
-.feature-points li::before{content:"✓";flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:999px;background:rgba(63,138,90,.16);color:var(--correct);font-size:12px;font-weight:900}
-.feature-side{display:flex;flex-direction:column;justify-content:space-between;gap:16px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
-.feature-side strong{display:block;font-family:Oswald,system-ui,sans-serif;font-size:46px;line-height:.9;color:var(--gold)}
-.feature-side span{display:block;margin-top:7px;color:var(--ink2);font-size:12px;line-height:1.4}
-.game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.game-card{
-  position:relative;
-  min-height:150px;
-  overflow:hidden;
-  display:flex;
-  gap:14px;
-  padding:17px;
-  border:1px solid var(--line);
-  border-radius:20px;
-  background:var(--surface);
-  box-shadow:var(--shadow);
-  transition:transform .12s ease,border-color .12s ease;
-}
-.game-card:hover{transform:translateY(-2px);border-color:var(--gold)}
-.game-icon{flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--line);border-radius:15px;background:var(--surface2);color:var(--green)}
-.game-copy{min-width:0;padding-right:42px}
-.game-name{font-family:Oswald,system-ui,sans-serif;font-size:25px;line-height:1;text-transform:uppercase}
-.game-desc{margin-top:7px;color:var(--ink2);font-size:12.5px;line-height:1.45}
-.game-when{margin-top:11px;color:var(--green);font-size:11px;font-weight:900}
-.arrow{position:absolute;right:15px;bottom:14px;color:var(--ink2);font-size:19px}
-.account-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.benefit{padding:17px;border:1px solid var(--line);border-radius:19px;background:var(--surface);box-shadow:var(--shadow)}
-.benefit-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:var(--surface2);color:var(--gold)}
-.benefit h3{margin:12px 0 6px;font-family:Oswald,system-ui,sans-serif;font-size:20px;line-height:1;text-transform:uppercase}
-.benefit p{margin:0;color:var(--ink2);font-size:12.5px;line-height:1.5}
-.closing{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:22px;background:var(--surface2)}
-.closing h2{margin:0;font-family:Oswald,system-ui,sans-serif;font-size:28px;line-height:1;text-transform:uppercase}
-.closing p{margin:7px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.45}
+.summary-item{padding:13px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.summary-item span{display:block;color:var(--gold);font-family:Oswald,system-ui,sans-serif;font-size:22px;line-height:1;text-transform:uppercase}
+.summary-item small{display:block;margin-top:5px;color:var(--ink2);font-size:11.5px;line-height:1.4}
+.section{margin-top:22px}
+.section-title{margin:0 0 12px;font-family:Oswald,system-ui,sans-serif;font-size:28px;line-height:1;text-transform:uppercase}
+.timeline{position:relative;display:grid;gap:12px}
+.timeline::before{content:"";position:absolute;left:18px;top:22px;bottom:22px;width:2px;background:var(--line)}
+.entry{position:relative;display:grid;grid-template-columns:38px minmax(0,1fr);gap:12px}
+.dot{position:relative;z-index:1;width:38px;height:38px;display:grid;place-items:center;border:2px solid var(--gold);border-radius:999px;background:var(--surface);color:var(--gold);font-family:Oswald,system-ui,sans-serif;font-size:12px;box-shadow:var(--shadow)}
+.entry-card{padding:17px;border:1px solid var(--line);border-radius:19px;background:var(--surface);box-shadow:var(--shadow)}
+.entry-card.latest{border-color:var(--gold);background:linear-gradient(135deg,rgba(191,138,58,.12),rgba(47,74,57,.08)),var(--surface)}
+.entry-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.entry-date{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.tag{padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);color:var(--ink2);font-size:10px;font-weight:900;text-transform:uppercase}
+.entry-card h2{margin:0;font-family:Oswald,system-ui,sans-serif;font-size:25px;line-height:1.05;text-transform:uppercase}
+.entry-card p{margin:8px 0 0;color:var(--ink2);font-size:13px;line-height:1.55}
+.changes{display:grid;gap:6px;margin:11px 0 0;padding:0;list-style:none}
+.changes li{position:relative;padding-left:16px;color:var(--ink);font-size:12.5px;line-height:1.45}
+.changes li::before{content:"";position:absolute;left:1px;top:.62em;width:6px;height:6px;border-radius:999px;background:var(--green)}
+.entry-link{display:inline-flex;margin-top:12px;color:var(--green);font-size:11.5px;font-weight:900}
+.note{margin-top:18px;padding:16px 17px;border:1px solid var(--line);border-radius:18px;background:var(--surface2);color:var(--ink2);font-size:12.5px;line-height:1.55}
 footer{margin-top:22px;color:var(--ink2);font-size:11.5px;text-align:center;line-height:1.5}
-@media(max-width:760px){
-  header,main,footer{max-width:580px}
-  .feature{grid-template-columns:1fr}
-  .game-grid{grid-template-columns:1fr}
-  .account-grid{grid-template-columns:1fr}
-  .section-head{align-items:flex-start;flex-direction:column;gap:5px}
-  .section-note{text-align:left}
-  .closing{align-items:flex-start;flex-direction:column}
+@media(max-width:660px){
+  header,main,footer{max-width:560px}
+  .summary{grid-template-columns:1fr}
+  .hero{padding:21px}
 }
-@media(max-width:440px){
+@media(max-width:420px){
   body{padding-left:12px;padding-right:12px}
-  .hero{padding:21px;border-radius:21px}
-  .feature{padding:16px}
-  .game-card{padding:15px}
+  .timeline::before{left:15px}
+  .entry{grid-template-columns:32px minmax(0,1fr);gap:10px}
+  .dot{width:32px;height:32px;font-size:10px}
+  .entry-card{padding:15px}
 }
 </style>
 <meta name="theme-color" content="#2f4a39">
@@ -179,160 +126,168 @@ footer{margin-top:22px;color:var(--ink2);font-size:11.5px;text-align:center;line
 
 <main>
   <section class="hero">
-    <div class="kicker">Co nowego?</div>
-    <h1>Na placu dzieje się fest</h1>
-    <p class="lead">Tutaj znajdziesz tylko to, co naprawdę ma znaczenie dla gracza: nowe zagadki, świeże wyzwania i miejsca, do których warto zajrzeć.</p>
+    <div class="kicker">Historia projektu</div>
+    <h1>Jak zmieniał się Szpilplac</h1>
+    <p class="lead">W tym miejscu zapisujemy większe zmiany w grach i całym Szpilplacu. Najnowsze wpisy są na górze, a niżej można zobaczyć, jak projekt rozwijał się od pierwszych wersji.</p>
     <div class="actions">
-      <a class="btn" href="index.html">Zagraj teraz</a>
-      <a class="btn secondary" href="ranking.html">Zobacz ranking</a>
-      <a class="btn gold" href="konto.html">Moje konto</a>
+      <a class="btn" href="index.html">Przejdź do gier</a>
+      <a class="btn secondary" href="ranking.html">Ranking</a>
+      <a class="btn secondary" href="konto.html">Konto gracza</a>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="latest-title">
-    <div class="section-head">
-      <div>
-        <div class="section-kicker">Najnowsza zmiana</div>
-        <h2 class="section-title" id="latest-title">Raja po naszymu</h2>
-      </div>
-      <div class="section-note">Jedna zagadka na cały tydzień. Nowy zestaw pojawia się w każdy poniedziałek.</div>
-    </div>
+  <div class="summary" aria-label="Podsumowanie rozwoju">
+    <div class="summary-item"><span>czerwiec 2026</span><small>Pierwsze wersje Szpilplacu pojawiły się w internecie.</small></div>
+    <div class="summary-item"><span>gry i konto</span><small>Projekt urósł z kilku zagadek do placu z profilem, wynikami i rankingiem.</small></div>
+    <div class="summary-item"><span>ciągły rozwój</span><small>Ta lista będzie uzupełniana przy kolejnych większych zmianach.</small></div>
+  </div>
 
-    <article class="feature">
-      <div class="feature-main">
-        <div class="pill">Nowe wyzwanie tygodnia</div>
-        <h2>Ułóż Śląsk we właściwej kolejności</h2>
-        <p>W Rai dostajesz pięć elementów i jedno konkretne zadanie. Czasem układasz wydarzenia od najstarszego, innym razem miasta z zachodu na wschód, kluby według daty powstania albo szczyty od najniższego.</p>
-        <ul class="feature-points">
-          <li>Tematy z godki, historii, kopalń, kolei, miast, muzyki i sportu.</li>
-          <li>Cztery próby, a poprawne miejsca zostają już na swoim placu.</li>
-          <li>Po dwóch próbach możesz skorzystać z jednej podpowiedzi.</li>
-          <li>Po grze zobaczysz prawidłową kolejność i krótkie objaśnienia.</li>
-        </ul>
-        <div class="actions">
-          <a class="btn" href="raja/">Zagraj w Raję</a>
-        </div>
-      </div>
-      <div class="feature-side">
-        <div>
-          <strong>52</strong>
-          <span>śląskie zestawy, czyli cały rok nowych tygodniowych zagadek.</span>
-        </div>
-        <a class="btn gold" href="raja/">Sprawdź tę tygodniową</a>
-      </div>
-    </article>
-  </section>
+  <section class="section" aria-labelledby="timeline-title">
+    <h2 class="section-title" id="timeline-title">Oś zmian</h2>
 
-  <section class="section" aria-labelledby="games-title">
-    <div class="section-head">
-      <div>
-        <div class="section-kicker">W co zagrać?</div>
-        <h2 class="section-title" id="games-title">Gry na placu</h2>
-      </div>
-      <div class="section-note">Każda gra jest krótka. Możesz wpaść na chwilę albo wracać regularnie po kolejne wyniki.</div>
-    </div>
-
-    <div class="game-grid">
-      <a class="game-card" href="slowko.html">
-        <div class="game-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <div class="timeline">
+      <article class="entry">
+        <div class="dot">31 VII</div>
+        <div class="entry-card latest">
+          <div class="entry-meta"><span class="entry-date">31 lipca 2026</span><span class="tag">Raja</span></div>
+          <h2>Raja stała się grą tygodniową</h2>
+          <p>Raja została przebudowana od podstaw. Zamiast codziennych, przypadkowych zestawów pojawia się jedna większa zagadka na cały tydzień.</p>
+          <ul class="changes">
+            <li>52 zestawy związane ze Śląskiem</li>
+            <li>nowa Raja w każdy poniedziałek</li>
+            <li>tematy z godki, historii, przemysłu, geografii, kolei, kultury i sportu</li>
+            <li>jednoznaczne polecenia i objaśnienie poprawnej kolejności po grze</li>
+          </ul>
+          <a class="entry-link" href="raja/">Zagraj w Raję →</a>
         </div>
-        <div class="game-copy">
-          <div class="game-name">Słōwko</div>
-          <div class="game-desc">Odgadnij śląskie słowo, korzystając z podpowiedzi po każdej próbie.</div>
-          <div class="game-when">Nowe słowo codziennie</div>
-        </div>
-        <div class="arrow">→</div>
-      </a>
-
-      <a class="game-card" href="klodka.html">
-        <div class="game-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/><circle cx="12" cy="15" r="1"/><path d="M12 16v2"/></svg>
-        </div>
-        <div class="game-copy">
-          <div class="game-name">Kłōdka</div>
-          <div class="game-desc">Połącz tropy i znajdź czterocyfrowy kod, zanim skończą się próby.</div>
-          <div class="game-when">Nowa kłódka co tydzień</div>
-        </div>
-        <div class="arrow">→</div>
-      </a>
-
-      <a class="game-card" href="raja/">
-        <div class="game-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5h13M8 12h13M8 19h13"/><circle cx="4" cy="5" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="4" cy="19" r="1.5"/></svg>
-        </div>
-        <div class="game-copy">
-          <div class="game-name">Raja</div>
-          <div class="game-desc">Ustaw pięć śląskich elementów według wskazanej kolejności.</div>
-          <div class="game-when">Nowa Raja w poniedziałek</div>
-        </div>
-        <div class="arrow">→</div>
-      </a>
-
-      <a class="game-card" href="cuzamen.html">
-        <div class="game-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
-        </div>
-        <div class="game-copy">
-          <div class="game-name">Cuzamen</div>
-          <div class="game-desc">Znajdź cztery ukryte grupy i odkryj, co łączy należące do nich słowa.</div>
-          <div class="game-when">Dla fanów skojarzeń</div>
-        </div>
-        <div class="arrow">→</div>
-      </a>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="account-title">
-    <div class="section-head">
-      <div>
-        <div class="section-kicker">Grasz po swojemu</div>
-        <h2 class="section-title" id="account-title">Bez konta też zagrasz</h2>
-      </div>
-      <div class="section-note">Konto jest dodatkiem dla tych, którzy chcą zbierać wyniki i zostać na placu dłużej.</div>
-    </div>
-
-    <div class="account-grid">
-      <article class="benefit">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
-        </div>
-        <h3>Twój postęp</h3>
-        <p>Zapisuj rozegrane gry, punkty, zwycięstwa i swoje najlepsze serie.</p>
       </article>
 
-      <article class="benefit">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 6H4v2a4 4 0 004 4M17 6h3v2a4 4 0 01-4 4"/></svg>
+      <article class="entry">
+        <div class="dot">13 VII</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">13 lipca 2026</span><span class="tag">Nowe gry</span></div>
+          <h2>Szpilplac zaczął wychodzić poza cztery główne zagadki</h2>
+          <p>Do projektu trafiła pierwsza wersja Szychty, a osobna część z dodatkowymi grami zaczęła się rozrastać.</p>
+          <ul class="changes">
+            <li>pierwsza grywalna wersja Szychty</li>
+            <li>rozwój działu z dodatkowymi grami</li>
+            <li>porządkowanie przejść między grami i głównym placem</li>
+          </ul>
         </div>
-        <h3>Ranking i rangi</h3>
-        <p>Porównuj wyniki, zdobywaj kolejne rangi i sprawdzaj, kto dzisiaj najlepiej szpiloł.</p>
       </article>
 
-      <article class="benefit">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <article class="entry">
+        <div class="dot">12 VII</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">12 lipca 2026</span><span class="tag">Kłōdka</span></div>
+          <h2>Kłōdka dostała stały rytm tygodniowy</h2>
+          <p>Tygodnie w Kłōdce zostały uporządkowane tak, żeby nowa zagadka rozpoczynała się w poniedziałek.</p>
+          <ul class="changes">
+            <li>nowy tydzień od poniedziałku</li>
+            <li>poprawione przechodzenie między tygodniami</li>
+            <li>stabilniejsze zapisywanie rozegranej zagadki</li>
+          </ul>
+          <a class="entry-link" href="klodka.html">Zagraj w Kłōdkę →</a>
         </div>
-        <h3>Kamraty z placu</h3>
-        <p>Dodawaj znajomych z rankingu, porównuj postępy i wysyłaj krótkie reakcje.</p>
+      </article>
+
+      <article class="entry">
+        <div class="dot">10 VII</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">10 lipca 2026</span><span class="tag">Aplikacja</span></div>
+          <h2>Szpilplac można było dodać do telefonu</h2>
+          <p>Projekt otrzymał obsługę instalacji jako aplikacja internetowa oraz ustawienia powiadomień.</p>
+          <ul class="changes">
+            <li>instalacja Szpilplacu na ekranie telefonu</li>
+            <li>ustawienia powiadomień w koncie</li>
+            <li>dalsze porządkowanie profilu gracza</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">8&9</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">8 i 9 lipca 2026</span><span class="tag">Społeczność</span></div>
+          <h2>Doszli Kamraty, odznaki i strona nowości</h2>
+          <p>Szpilplac przestał być wyłącznie zbiorem pojedynczych gier. Pojawiły się elementy wspólnej zabawy i miejsce opisujące rozwój projektu.</p>
+          <ul class="changes">
+            <li>publiczne profile graczy i Kamraty z placu</li>
+            <li>reakcje między graczami</li>
+            <li>odznaki związane z graniem i aktywnością</li>
+            <li>uporządkowany ranking oraz pierwsza wersja tej strony</li>
+          </ul>
+          <a class="entry-link" href="ranking.html">Zobacz ranking →</a>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">7 VII</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">7 lipca 2026</span><span class="tag">Wyniki</span></div>
+          <h2>Serie, osiągnięcia i czytelniejsze zakończenia gier</h2>
+          <p>Rozbudowano zapisywanie regularnej gry i uporządkowano ekrany pokazywane po zakończeniu zagadki.</p>
+          <ul class="changes">
+            <li>liczenie codziennych i tygodniowych serii</li>
+            <li>osiągnięcia za regularne granie</li>
+            <li>czytelniejsze podsumowania wyników</li>
+            <li>poprawki wyglądu na telefonach</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">30 VI</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">30 czerwca 2026</span><span class="tag">Konto</span></div>
+          <h2>Pojawiło się konto gracza</h2>
+          <p>Gracze mogli zacząć logować się do Szpilplacu i zachowywać swoje wyniki pomiędzy kolejnymi wizytami.</p>
+          <ul class="changes">
+            <li>rejestracja i logowanie</li>
+            <li>ustawienia konta</li>
+            <li>zapisywanie wyników i historii gier</li>
+            <li>podstawa pod późniejsze punkty, rangi i ranking</li>
+          </ul>
+          <a class="entry-link" href="konto.html">Przejdź do konta →</a>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">27 VI</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">27 czerwca 2026</span><span class="tag">Kłōdka</span></div>
+          <h2>Kłōdka otrzymała tygodniowe zagadki i podpowiedzi</h2>
+          <p>Rozwijana gra z czterocyfrowym kodem dostała przygotowane zestawy tygodniowe oraz system wskazówek.</p>
+          <ul class="changes">
+            <li>kolejne kody tygodnia</li>
+            <li>podpowiedzi prowadzące do rozwiązania</li>
+            <li>przygotowanie gry do regularnych powrotów</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">24 VI</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">od 24 do 29 czerwca 2026</span><span class="tag">Początek</span></div>
+          <h2>Powstały pierwsze wersje Szpilplacu</h2>
+          <p>W internecie pojawił się plac z pierwszymi grami i śląskim klimatem. W kolejnych dniach doszły podstawowe elementy strony oraz połączenia z Familockiem.</p>
+          <ul class="changes">
+            <li>pierwsze gry słowne i logiczne</li>
+            <li>główna strona prowadząca do zagadek</li>
+            <li>motyw jasny i ciemny</li>
+            <li>odnośniki do Familocka i jego mediów społecznościowych</li>
+          </ul>
+        </div>
       </article>
     </div>
   </section>
 
-  <section class="closing">
-    <div>
-      <h2>To co, szpilomy?</h2>
-      <p>Wybierz grę, zrób wynik i wróć po kolejną zagadkę.</p>
-    </div>
-    <div class="actions">
-      <a class="btn" href="index.html">Wybierz grę</a>
-      <a class="btn secondary" href="konto.html">Zaloguj się</a>
-    </div>
-  </section>
+  <div class="note"></div>
 </main>
 
 <footer>
-  Szpilplac · Familock · śląskie gry słowne i logiczne.
+  Szpilplac · Familock · historia rozwoju projektu
 </footer>
 
 <script>
