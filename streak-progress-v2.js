@@ -73,8 +73,9 @@
       var when=warsawKey(new Date(row.finished_at));
       var game=normGame(row.game);
       playedDays[when]=true;
-      if(when===today)dailyDone[game]=true;
-      if(when>=weekStart)weeklyDone[game]=true;
+      var mode=String(row.mode||"").toLowerCase();
+      if(when===today && !(game==="klodka"&&mode==="weekly"))dailyDone[game]=true;
+      if(when>=weekStart && (game!=="klodka"||mode==="weekly"))weeklyDone[game]=true;
     });
 
     dailyGames.forEach(function(game){
@@ -104,6 +105,9 @@
       return gameChip(game,!!weeklyDone[game.id],"w tym tygodniu");
     }).join("");
 
+    var sub=document.querySelector(".profile-progress .progress-sub");
+    if(sub)sub.textContent="Seria kolejnych dni oraz gry codzienne i tygodniowe.";
+
     box.innerHTML=
       '<div class="progress-card wide szp-streak-main">'+
         '<div class="progress-kicker">Seria aktywności</div>'+
@@ -114,11 +118,6 @@
         '<div class="progress-kicker">Dzisiaj</div>'+
         '<div class="progress-main">'+(todayPlayed?'Zagrano':'Do zagrania')+'</div>'+
         '<div class="progress-note">Nie trzeba robić całego kompletu. Wystarczy jedna ukończona gra.</div>'+
-      '</div>'+
-      '<div class="progress-card">'+
-        '<div class="progress-kicker">Najbliższy krok</div>'+
-        '<div class="progress-main">'+(todayPlayed?'Jutro':'Dzisiaj')+'</div>'+
-        '<div class="progress-note">Seria nie zatrzymuje się po 7 ani 30 dniach.</div>'+
       '</div>'+
       '<div class="progress-card wide">'+
         '<div class="progress-kicker">Gry codzienne</div>'+
