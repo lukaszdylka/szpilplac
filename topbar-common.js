@@ -1,14 +1,23 @@
-/* Szpilplac topbar-common.js v132 */
+/* Szpilplac topbar-common.js */
 (function(){
   "use strict";
-  var VERSION="v132";
+  var FALLBACK_BUILD="2026.08.01.2";
+  var updateRequested=false;
+
+  function buildId(){
+    return window.SZP_BUILD_ID||FALLBACK_BUILD;
+  }
+
+  function asset(path){
+    return path+(path.indexOf("?")===-1?"?":"&")+"v="+encodeURIComponent(buildId());
+  }
 
   function loadCss(){
     if(document.getElementById("szp-common-css"))return;
     var link=document.createElement("link");
     link.id="szp-common-css";
     link.rel="stylesheet";
-    link.href="/szpilplac-common.css?v=130";
+    link.href=asset("/szpilplac-common.css");
     document.head.appendChild(link);
   }
 
@@ -37,13 +46,13 @@
   }
 
   function loadEnhancements(){
-    loadScript("szp-games-registry","/games-registry.js?v=130",function(){
+    loadScript("szp-games-registry",asset("/games-registry.js"),function(){
       if(isHomePage()){
-        loadScript("szp-weekly-status","/weekly-status.js?v=131");
-        loadScript("szp-support-coffee","/support-coffee.js?v=132");
+        loadScript("szp-weekly-status",asset("/weekly-status.js"));
+        loadScript("szp-support-coffee",asset("/support-coffee.js"));
       }
       if(location.pathname.indexOf("konto")!==-1){
-        loadScript("szp-streak-progress","/streak-progress-v2.js?v=131");
+        loadScript("szp-streak-progress",asset("/streak-progress-v2.js"));
       }
     });
   }
@@ -55,6 +64,8 @@
     toast.className="szp-update-toast";
     toast.innerHTML='<span>Dostępna jest nowa wersja Szpilplacu.</span><button type="button">Odśwież</button>';
     toast.querySelector("button").addEventListener("click",function(){
+      if(!registration.waiting)return;
+      updateRequested=true;
       registration.waiting.postMessage({type:"SKIP_WAITING"});
     });
     document.body.appendChild(toast);
@@ -62,12 +73,13 @@
 
   function watchServiceWorker(){
     if(!("serviceWorker" in navigator))return;
-    var reloading=false;
+
     navigator.serviceWorker.addEventListener("controllerchange",function(){
-      if(reloading)return;
-      reloading=true;
+      if(!updateRequested)return;
+      updateRequested=false;
       location.reload();
     });
+
     navigator.serviceWorker.getRegistration().then(function(registration){
       if(!registration)return;
       showUpdate(registration);
@@ -75,7 +87,9 @@
         var worker=registration.installing;
         if(!worker)return;
         worker.addEventListener("statechange",function(){
-          if(worker.state==="installed"&&navigator.serviceWorker.controller)showUpdate(registration);
+          if(worker.state==="installed"&&navigator.serviceWorker.controller){
+            showUpdate(registration);
+          }
         });
       });
       registration.update().catch(function(){});
@@ -87,17 +101,21 @@
     addStyle();
     var menuButton=document.getElementById("playerMenuBtn");
     document.documentElement.classList.toggle("szp-compact-topbar",!!menuButton);
-    document.querySelectorAll(".topbar .controls a.icon-btn").forEach(function(a){a.setAttribute("role","button");});
+    document.querySelectorAll(".topbar .controls a.icon-btn").forEach(function(a){
+      a.setAttribute("role","button");
+    });
   }
 
-  function boot(){
-    normalize();
-    loadEnhancements();
-    watchServiceWorker();
+  function start(){
+    loadScript("szp-build-version","/build-version.js?v="+encodeURIComponent(FALLBACK_BUILD),function(){
+      normalize();
+      loadEnhancements();
+      watchServiceWorker();
+    });
   }
 
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot); else boot();
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start); else start();
   setTimeout(normalize,250);
-  window.SZP_TOPBAR={version:VERSION,normalize:normalize};
-  console.info("Szpilplac topbar-common.js "+VERSION);
+  window.SZP_TOPBAR={version:FALLBACK_BUILD,normalize:normalize};
+  console.info("Szpilplac topbar-common.js "+FALLBACK_BUILD);
 })();

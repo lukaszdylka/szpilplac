@@ -1,8 +1,8 @@
-/* Szpilplac games registry v130 */
+/* Szpilplac games registry */
 (function(){
   "use strict";
 
-  var VERSION="v130";
+  var VERSION=window.SZP_BUILD_ID||"2026.08.01.2";
   var games=[
     {
       id:"slowko", aliases:["slowko"], title:"Słōwko", href:"slowko.html",
@@ -62,7 +62,9 @@
     var n=norm(id);
     for(var i=0;i<games.length;i++){
       var g=games[i];
-      if(norm(g.id)===n || norm(g.href)===n || (g.aliases||[]).some(function(a){return norm(a)===n;}))return clone(g);
+      if(norm(g.id)===n||norm(g.href)===n||(g.aliases||[]).some(function(a){return norm(a)===n;})){
+        return clone(g);
+      }
     }
     return null;
   }
@@ -70,9 +72,9 @@
   function list(filter){
     return games.filter(function(g){
       if(!filter)return true;
-      if(filter.kind && g.kind!==filter.kind)return false;
-      if(filter.active!=null && g.active!==filter.active)return false;
-      if(filter.cadence && g.cadence.indexOf(filter.cadence)===-1)return false;
+      if(filter.kind&&g.kind!==filter.kind)return false;
+      if(filter.active!=null&&g.active!==filter.active)return false;
+      if(filter.cadence&&g.cadence.indexOf(filter.cadence)===-1)return false;
       return true;
     }).map(clone);
   }
@@ -94,9 +96,8 @@
 
   function boot(){
     syncIndex();
-    try{
-      new MutationObserver(function(){syncIndex();}).observe(document.documentElement,{childList:true,subtree:true});
-    }catch(e){}
+    requestAnimationFrame(function(){requestAnimationFrame(syncIndex);});
+    document.addEventListener("szp:games-rendered",syncIndex);
   }
 
   window.SZP_GAMES={

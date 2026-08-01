@@ -1,0 +1,23 @@
+name: Walidacja Szpilplacu
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pobierz repozytorium
+        uses: actions/checkout@v4
+      - name: Ustaw Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Sprawdź pliki
+        run: node scripts/validate.mjs
