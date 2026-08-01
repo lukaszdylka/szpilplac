@@ -1,14 +1,17 @@
 /*
-  Szpilplac footer-normalizer.js v102
+  Szpilplac footer-normalizer.js v131
   Jedno źródło prawdy dla stopki:
   - usuwa stare footer-nav i zdublowane footer-legal
   - zawsze buduje jedną linię: Regulamin · Prywatność · Cookies · Mailing
   - poprawia relatywne linki na podstronach, np. raja/
+  - pilnuje, żeby link Cookies nie został wyczyszczony przez późniejszy skrypt
 */
 (function(){
   "use strict";
 
-  var VERSION = "v102";
+  var VERSION = "v131";
+  var repairing = false;
+  var observer = null;
 
   function isNested(){
     return /\/raja\/[^\/]*$/.test(location.pathname);
@@ -44,12 +47,27 @@
       ".site-footer .footer-icons a{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line,#3d3629);border-radius:999px;background:var(--surface2,#2e2820);color:var(--green,#4a7a56);text-decoration:none}",
       ".site-footer .footer-icons a:hover{background:var(--surface,#262018);color:var(--gold,#d4a04a);transform:translateY(-1px)}",
       ".site-footer .footer-legal{display:flex!important;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:12px;color:var(--ink2,#9a907a);font-size:11px;line-height:1.6;opacity:.95}",
-      ".site-footer .footer-legal a{color:var(--green,#4a7a56)!important;font-weight:900!important;text-decoration:none!important}",
+      ".site-footer .footer-legal a{display:inline!important;visibility:visible!important;opacity:1!important;color:var(--green,#4a7a56)!important;font-size:inherit!important;font-weight:900!important;text-decoration:none!important}",
       ".site-footer .footer-legal a:hover{color:var(--gold,#d4a04a)!important;text-decoration:underline!important}",
+      ".site-footer .footer-legal #footerCookies,.site-footer .footer-legal a[href$='cookies.html']{display:inline!important;visibility:visible!important;opacity:1!important;color:var(--green,#4a7a56)!important;font-size:inherit!important}",
+      ".site-footer .footer-legal #footerCookies:empty::before,.site-footer .footer-legal a[href$='cookies.html']:empty::before{content:'Cookies'}",
       ".site-footer .footer-nav{display:none!important}",
       ".site-footer .footer-legal + .footer-legal{display:none!important}"
     ].join("\n");
     document.head.appendChild(st);
+  }
+  function buildLegal(){
+    var p = prefix();
+    return ''+
+      '<div class="footer-legal" data-footer-legal="v131">'+
+        '<a href="'+p+'regulamin.html" id="footerTerms">Regulamin</a>'+
+        '<span aria-hidden="true">·</span>'+
+        '<a href="'+p+'polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>'+
+        '<span aria-hidden="true">·</span>'+
+        '<a href="'+p+'cookies.html" id="footerCookies">Cookies</a>'+
+        '<span aria-hidden="true">·</span>'+
+        '<a href="'+p+'mailing.html" id="footerMailing">Mailing</a>'+
+      '</div>';
   }
   function buildFooter(){
     var p = prefix();
@@ -73,15 +91,42 @@
         '<a href="https://www.instagram.com/familock.escaperoom/" target="_blank" rel="noopener" aria-label="Instagram">'+iconSvg("instagram")+'</a>'+
         '<a href="https://www.facebook.com/groups/mieszkancy.familoka" target="_blank" rel="noopener" aria-label="Wspólnota Familoka">'+iconSvg("group")+'</a>'+
       '</div>'+
-      '<div class="footer-legal" data-footer-legal="v102">'+
-        '<a href="'+p+'regulamin.html" id="footerTerms">Regulamin</a>'+
-        '<span>·</span>'+
-        '<a href="'+p+'polityka-prywatnosci.html" id="footerPrivacy">Prywatność</a>'+
-        '<span>·</span>'+
-        '<a href="'+p+'cookies.html" id="footerCookies">Cookies</a>'+
-        '<span>·</span>'+
-        '<a href="'+p+'mailing.html" id="footerMailing">Mailing</a>'+
-      '</div>';
+      buildLegal();
+  }
+  function repairLegal(){
+    if(repairing)return;
+    var footer = document.querySelector(".site-footer");
+    if(!footer)return;
+    repairing = true;
+    try{
+      var legal = footer.querySelector(".footer-legal");
+      var cookies = legal && (legal.querySelector("#footerCookies") || legal.querySelector('a[href$="cookies.html"]'));
+      var correctCount = legal ? legal.querySelectorAll("a").length === 4 : false;
+      if(!legal || !cookies || !correctCount){
+        if(legal)legal.outerHTML = buildLegal();
+        else footer.insertAdjacentHTML("beforeend",buildLegal());
+        cookies = footer.querySelector("#footerCookies");
+      }
+      if(cookies){
+        if(String(cookies.textContent || "").trim() !== "Cookies")cookies.textContent = "Cookies";
+        cookies.style.removeProperty("display");
+        cookies.style.removeProperty("visibility");
+        cookies.style.removeProperty("opacity");
+        cookies.removeAttribute("hidden");
+        cookies.setAttribute("aria-label","Cookies i localStorage");
+      }
+    }finally{
+      repairing = false;
+    }
+  }
+  function installObserver(footer){
+    if(observer || !footer)return;
+    try{
+      observer = new MutationObserver(function(){
+        setTimeout(repairLegal,0);
+      });
+      observer.observe(footer,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["style","class","hidden"]});
+    }catch(e){}
   }
   function normalizeFooter(){
     addStyle();
@@ -94,7 +139,9 @@
     if(!footer)return;
 
     footer.innerHTML = buildFooter();
-    footer.setAttribute("data-footer-normalized","v102");
+    footer.setAttribute("data-footer-normalized","v131");
+    repairLegal();
+    installObserver(footer);
   }
 
   if(document.readyState === "loading"){
@@ -102,8 +149,10 @@
   }else{
     normalizeFooter();
   }
-  setTimeout(normalizeFooter, 250);
-  setTimeout(normalizeFooter, 1000);
+  setTimeout(normalizeFooter,250);
+  setTimeout(repairLegal,750);
+  setTimeout(repairLegal,1500);
   window.SZP_NORMALIZE_FOOTER = normalizeFooter;
+  window.SZP_REPAIR_FOOTER_LEGAL = repairLegal;
   console.info("Szpilplac footer-normalizer.js " + VERSION);
 })();
