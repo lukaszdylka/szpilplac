@@ -3,7 +3,7 @@
 
 importScripts("/build-version.js");
 
-const BUILD_ID=self.SZP_BUILD_ID||"2026.08.01.4";
+const BUILD_ID=self.SZP_BUILD_ID||"2026.08.01.5";
 const CACHE_NAME="szpilplac-pwa-"+BUILD_ID;
 const CORE_ASSETS=[
   "/",
