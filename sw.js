@@ -1,7 +1,10 @@
-/* Szpilplac PWA Service Worker v14 */
+/* Szpilplac PWA Service Worker */
 "use strict";
 
-const CACHE_NAME="szpilplac-pwa-v14";
+importScripts("/build-version.js");
+
+const BUILD_ID=self.SZP_BUILD_ID||"2026.08.01.2";
+const CACHE_NAME="szpilplac-pwa-"+BUILD_ID;
 const CORE_ASSETS=[
   "/",
   "/index.html",
@@ -18,51 +21,56 @@ const CORE_ASSETS=[
   "/favicon.svg",
   "/pwa-icon.svg",
   "/pwa-maskable.svg",
+  "/build-version.js",
   "/szpilplac-common.css",
   "/games-registry.js",
   "/daily-status.js",
   "/game-played.js",
   "/weekly-status.js",
-  "/support-coffee.js",
   "/topbar-common.js",
   "/player-menu-common.js",
   "/footer-normalizer.js",
-  "/streak-progress-v2.js"
+  "/streak-progress-v2.js",
+  "/support-coffee.js"
 ];
 
 self.addEventListener("install",function(event){
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache){
-        return Promise.all(CORE_ASSETS.map(function(url){
-          return cache.add(url).catch(function(){return null;});
-        }));
-      })
-      .then(function(){return self.skipWaiting();})
+    caches.open(CACHE_NAME).then(function(cache){
+      return Promise.all(CORE_ASSETS.map(function(url){
+        return cache.add(url).catch(function(){return null;});
+      }));
+    })
   );
 });
 
 self.addEventListener("activate",function(event){
   event.waitUntil(
-    caches.keys()
-      .then(function(keys){
-        return Promise.all(keys.filter(function(key){return key!==CACHE_NAME;}).map(function(key){return caches.delete(key);}));
-      })
-      .then(function(){return self.clients.claim();})
+    caches.keys().then(function(keys){
+      return Promise.all(keys.filter(function(key){
+        return key.indexOf("szpilplac-pwa-")===0&&key!==CACHE_NAME;
+      }).map(function(key){return caches.delete(key);}));
+    }).then(function(){return self.clients.claim();})
   );
 });
 
 function shouldCache(request,url,response){
   if(!response||!response.ok||url.origin!==self.location.origin)return false;
   if(url.pathname.indexOf("/rest/v1/")!==-1||url.pathname.indexOf("/auth/v1/")!==-1)return false;
-  return request.destination==="document"||request.destination==="script"||request.destination==="style"||request.destination==="image"||url.pathname.endsWith(".webmanifest");
+  return request.destination==="document"||
+    request.destination==="script"||
+    request.destination==="style"||
+    request.destination==="image"||
+    url.pathname.endsWith(".webmanifest");
 }
 
 function networkFirst(request){
   return fetch(request).then(function(response){
     var url=new URL(request.url);
     if(shouldCache(request,url,response)){
-      caches.open(CACHE_NAME).then(function(cache){cache.put(request,response.clone()).catch(function(){});});
+      caches.open(CACHE_NAME).then(function(cache){
+        cache.put(request,response.clone()).catch(function(){});
+      });
     }
     return response;
   }).catch(function(){
@@ -79,7 +87,9 @@ function staleWhileRevalidate(request){
     var update=fetch(request).then(function(response){
       var url=new URL(request.url);
       if(shouldCache(request,url,response)){
-        caches.open(CACHE_NAME).then(function(cache){cache.put(request,response.clone()).catch(function(){});});
+        caches.open(CACHE_NAME).then(function(cache){
+          cache.put(request,response.clone()).catch(function(){});
+        });
       }
       return response;
     }).catch(function(){return null;});
