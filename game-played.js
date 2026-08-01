@@ -1,7 +1,7 @@
-/* Szpilplac game-played.js v131 */
+/* Szpilplac game-played.js */
 (function(){
   "use strict";
-  var VERSION="v131";
+  var VERSION=window.SZP_BUILD_ID||"2026.08.01.2";
   var accountPlayed={};
 
   function norm(game){
@@ -26,11 +26,20 @@
     return !!(obj&&obj.results&&obj.results[String(key)]);
   }
 
+  function emit(game,mode,puzzleNo,source){
+    try{
+      document.dispatchEvent(new CustomEvent("szp:game-played",{
+        detail:{game:norm(game),mode:String(mode||"any").toLowerCase(),puzzle_no:puzzleNo,source:source||"account"}
+      }));
+    }catch(e){}
+  }
+
   function markAccountPlayed(game,mode,puzzleNo){
     if(!game||puzzleNo==null)return;
     var g=norm(game),m=mode==null?"any":String(mode).toLowerCase(),n=String(puzzleNo);
     accountPlayed[g+":"+m+":"+n]=true;
     accountPlayed[g+":any:"+n]=true;
+    emit(g,m,puzzleNo,"account");
   }
 
   function accountHasPlayed(game,puzzleNo,mode){
