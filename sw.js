@@ -1,7 +1,7 @@
-/* Szpilplac PWA Service Worker v13 */
+/* Szpilplac PWA Service Worker v14 */
 "use strict";
 
-const CACHE_NAME="szpilplac-pwa-v13";
+const CACHE_NAME="szpilplac-pwa-v14";
 const CORE_ASSETS=[
   "/",
   "/index.html",
@@ -23,6 +23,7 @@ const CORE_ASSETS=[
   "/daily-status.js",
   "/game-played.js",
   "/weekly-status.js",
+  "/support-coffee.js",
   "/topbar-common.js",
   "/player-menu-common.js",
   "/footer-normalizer.js",
