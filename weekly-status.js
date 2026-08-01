@@ -1,11 +1,9 @@
-/* Szpilplac weekly-status.js v131 */
+/* Szpilplac weekly-status.js */
 (function(){
   "use strict";
-  var VERSION="v131";
+  var VERSION=window.SZP_BUILD_ID||"2026.08.01.2";
   var accountPlayed=false;
-  var queryRunning=false;
   var accountChecked=false;
-  var observer=null;
 
   function isRaja(id){
     var g=String(id||"").toLowerCase();
@@ -25,47 +23,15 @@
     if(window.SZP_DAILY&&typeof window.SZP_DAILY.gameInfo==="function"){
       return window.SZP_DAILY.gameInfo("raja");
     }
-    var today=new Date();
-    var p;
-    try{
-      var parts=new Intl.DateTimeFormat("en-CA",{
-        timeZone:"Europe/Warsaw",
-        year:"numeric",
-        month:"2-digit",
-        day:"2-digit"
-      }).formatToParts(today);
-      p={};
-      parts.forEach(function(x){if(x.type!=="literal")p[x.type]=Number(x.value);});
-    }catch(e){
-      p={year:today.getFullYear(),month:today.getMonth()+1,day:today.getDate()};
-    }
-    var days=Math.floor((Date.UTC(p.year,p.month-1,p.day)-Date.UTC(2026,6,27))/86400000);
-    var rawWeek=Math.floor(days/7);
-    return {
-      started:days>=0,
-      mode:"weekly",
-      week_index:Math.max(0,rawWeek),
-      puzzle_no:Math.max(0,rawWeek)+1
-    };
+    return {started:true,mode:"weekly",week_index:0,puzzle_no:1};
   }
 
   function localPlayed(){
     var current=info();
     if(!current.started)return false;
     try{
-      if(window.SZP_GAME_PLAYED&&typeof window.SZP_GAME_PLAYED.isPlayed==="function"){
-        return !!window.SZP_GAME_PLAYED.isPlayed("raja","weekly");
-      }
-    }catch(e){}
-    try{
-      var state=JSON.parse(localStorage.getItem("raja_weekly_v2_w"+current.week_index)||"null");
-      if(state&&(state.status==="won"||state.status==="lost"||state.status==="finished"))return true;
-      var stats=JSON.parse(localStorage.getItem("raja_weekly_stats_v2")||"null");
-      var result=stats&&stats.weeks&&stats.weeks[String(current.week_index)];
-      return !!(result&&(result.won===true||result.won===false));
-    }catch(e){
-      return false;
-    }
+      return !!(window.SZP_GAME_PLAYED&&window.SZP_GAME_PLAYED.isPlayed&&window.SZP_GAME_PLAYED.isPlayed("raja","weekly"));
+    }catch(e){return false;}
   }
 
   function played(){
@@ -73,7 +39,7 @@
   }
 
   function patchGlobals(){
-    if(typeof window.statusLabelForGame==="function"&&!window.statusLabelForGame.__szpWeekly131){
+    if(typeof window.statusLabelForGame==="function"&&!window.statusLabelForGame.__szpWeekly){
       var originalLabel=window.statusLabelForGame;
       var replacement=function(id,isPlayed){
         if(isRaja(id)){
@@ -82,41 +48,28 @@
         }
         return originalLabel.apply(this,arguments);
       };
-      replacement.__szpWeekly131=true;
+      replacement.__szpWeekly=true;
       window.statusLabelForGame=replacement;
     }
 
-    if(typeof window.playedRaja==="function"&&!window.playedRaja.__szpWeekly131){
+    if(typeof window.playedRaja==="function"&&!window.playedRaja.__szpWeekly){
       var replacementPlayed=function(){return played();};
-      replacementPlayed.__szpWeekly131=true;
+      replacementPlayed.__szpWeekly=true;
       window.playedRaja=replacementPlayed;
     }
   }
 
-  function findCard(){
-    var root=document.getElementById("games");
-    if(!root)return null;
-    return root.querySelector(
-      '[data-game-id="raja"],'+
-      '[data-game-id="zorta"],'+
-      'a[href="raja/"],'+
-      'a[href="/raja/"],'+
-      'a[href$="/raja/"]'
-    );
-  }
-
   function applyBadge(){
-    patchGlobals();
-    var card=findCard();
+    var root=document.getElementById("games");
+    if(!root)return;
+    var card=root.querySelector('[data-game-id="raja"],[data-game-id="zorta"],a[href="raja/"],a[href="/raja/"],a[href$="/raja/"]');
     if(!card)return;
     var badge=card.querySelector(".badge");
     if(!badge)return;
     var done=played();
     var text=labels();
-    var expected=done?text.done:text.play;
-    var cls="badge "+(done?"done":"live");
-    if(badge.textContent!==expected)badge.textContent=expected;
-    if(badge.className!==cls)badge.className=cls;
+    badge.textContent=done?text.done:text.play;
+    badge.className="badge "+(done?"done":"live");
   }
 
   function rerender(){
@@ -124,42 +77,33 @@
     if(typeof window.renderGames==="function"){
       try{window.renderGames();}catch(e){}
     }
+    if(window.SZP_GAMES&&typeof window.SZP_GAMES.syncIndex==="function"){
+      window.SZP_GAMES.syncIndex();
+    }
     applyBadge();
+    try{document.dispatchEvent(new CustomEvent("szp:games-rendered"));}catch(e){}
   }
 
-  function wait(ms){
-    return new Promise(function(resolve){setTimeout(resolve,ms);});
+  async function getClient(){
+    if(window.__SZPILPLAC_SUPABASE_CLIENT)return window.__SZPILPLAC_SUPABASE_CLIENT;
+    if(typeof window.client==="function"){
+      try{return await window.client();}catch(e){return null;}
+    }
+    return null;
   }
 
   async function queryAccount(){
-    if(queryRunning||accountChecked)return;
-    queryRunning=true;
-    var client=null;
-
-    for(var i=0;i<24;i++){
-      client=window.__SZPILPLAC_SUPABASE_CLIENT||null;
-      if(client)break;
-      await wait(250);
-    }
-
-    if(!client){
-      queryRunning=false;
-      return;
-    }
+    if(accountChecked)return;
+    accountChecked=true;
+    var client=await getClient();
+    if(!client)return;
 
     try{
       var sr=await client.auth.getSession();
       var session=sr&&sr.data&&sr.data.session;
-      if(!session||!session.user){
-        accountChecked=true;
-        return;
-      }
-
+      if(!session||!session.user)return;
       var current=info();
-      if(!current.started){
-        accountChecked=true;
-        return;
-      }
+      if(!current.started)return;
 
       var result=await client.from("user_game_results")
         .select("game,mode,puzzle_no")
@@ -169,7 +113,6 @@
         .eq("puzzle_no",current.puzzle_no)
         .limit(1);
 
-      accountChecked=true;
       if(!result.error&&Array.isArray(result.data)&&result.data.length){
         accountPlayed=true;
         if(window.SZP_GAME_PLAYED&&typeof window.SZP_GAME_PLAYED.markAccountPlayed==="function"){
@@ -179,31 +122,19 @@
       }
     }catch(e){
       console.warn("Raja weekly status",e);
-    }finally{
-      queryRunning=false;
     }
-  }
-
-  function watch(){
-    var root=document.getElementById("games");
-    if(root&&!observer){
-      observer=new MutationObserver(function(){setTimeout(applyBadge,0);});
-      observer.observe(root,{childList:true,subtree:true});
-    }
-    window.addEventListener("storage",function(e){
-      if(!e||String(e.key||"").indexOf("raja_weekly")===0)rerender();
-    });
   }
 
   function boot(){
     patchGlobals();
-    watch();
     rerender();
     queryAccount();
-    setTimeout(rerender,250);
-    setTimeout(rerender,1000);
-    setTimeout(queryAccount,2000);
-    setTimeout(queryAccount,5000);
+    document.addEventListener("szp:game-played",function(e){
+      if(!e||!e.detail||isRaja(e.detail.game))rerender();
+    });
+    window.addEventListener("storage",function(e){
+      if(!e||String(e.key||"").indexOf("raja_weekly")===0)rerender();
+    });
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
