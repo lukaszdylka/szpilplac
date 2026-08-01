@@ -1,9 +1,10 @@
-/* Szpilplac support-coffee.js v132 */
+/* Szpilplac support-coffee.js */
 (function(){
   "use strict";
 
-  var VERSION="v132";
-  var URL="https://buycoffee.to/wspolnotafamilocka";
+  var VERSION=window.SZP_BUILD_ID||"2026.08.01.2";
+  var BASE_URL="https://buycoffee.to/wspolnotafamilocka";
+  var URL=BASE_URL+"?utm_source=szpilplac&utm_medium=website&utm_campaign=wsparcie";
 
   function isHomePage(){
     var path=location.pathname||"/";
@@ -36,7 +37,17 @@
     document.head.appendChild(style);
   }
 
+  function normalizeLinks(){
+    document.querySelectorAll('a[href^="'+BASE_URL+'"]')
+      .forEach(function(link){
+        link.href=URL;
+        link.rel="noopener noreferrer";
+        link.setAttribute("data-support-source","szpilplac");
+      });
+  }
+
   function render(){
+    normalizeLinks();
     if(!isHomePage()||document.getElementById("szpSupportCoffee"))return;
     var side=document.querySelector(".side");
     if(!side)return;
@@ -48,7 +59,8 @@
     card.className="szp-support-card";
     card.href=URL;
     card.target="_blank";
-    card.rel="noopener";
+    card.rel="noopener noreferrer";
+    card.setAttribute("data-support-source","szpilplac-card");
     card.setAttribute("aria-label",text.button+" — otwiera buycoffee.to w nowej karcie");
     card.innerHTML=
       '<span class="szp-support-icon" aria-hidden="true">'+
@@ -68,10 +80,10 @@
 
     var mini=document.getElementById("miniCard");
     side.insertBefore(card,mini||null);
+    normalizeLinks();
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render);else render();
-  setTimeout(render,300);
   window.SZP_SUPPORT_COFFEE={version:VERSION,render:render};
   console.info("Szpilplac support-coffee.js "+VERSION);
 })();
