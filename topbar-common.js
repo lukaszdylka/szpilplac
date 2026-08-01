@@ -1,7 +1,7 @@
 /* Szpilplac topbar-common.js */
 (function(){
   "use strict";
-  var FALLBACK_BUILD="2026.08.01.3";
+  var FALLBACK_BUILD="2026.08.01.4";
   var updateRequested=false;
   function buildId(){return window.SZP_BUILD_ID||FALLBACK_BUILD}
   function asset(path){return path+(path.indexOf("?")===-1?"?":"&")+"v="+encodeURIComponent(buildId())}
