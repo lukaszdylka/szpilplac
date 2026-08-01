@@ -21,6 +21,23 @@ for(const file of files.filter((f)=>f.endsWith(".js"))){
   catch(error){fail(`Błąd składni JS: ${path.relative(root,file)}\n${error.stderr?.toString()||error.message}`);}
 }
 
+for(const relative of ["gierki.html","minigra.html"]){
+  try{
+    const html=fs.readFileSync(path.join(root,relative),"utf8");
+    const pattern=/<script(?![^>]*\bsrc\s*=)([^>]*)>([\s\S]*?)<\/script>/gi;
+    let match,index=0;
+    while((match=pattern.exec(html))){
+      const attrs=match[1]||"";
+      if(/\btype\s*=\s*["'](?!text\/javascript|application\/javascript|module)[^"']+["']/i.test(attrs))continue;
+      const code=match[2].trim();
+      if(!code)continue;
+      index+=1;
+      try{new vm.Script(code,{filename:`${relative}#inline-${index}`});}
+      catch(error){fail(`Błąd składni skryptu osadzonego: ${relative} (#${index})\n${error.message}`);}
+    }
+  }catch(error){fail(`Nie udało się sprawdzić skryptów w ${relative}: ${error.message}`);}
+}
+
 try{JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));}
 catch(error){fail(`Niepoprawny manifest.webmanifest: ${error.message}`);}
 

@@ -3,7 +3,7 @@
 
 importScripts("/build-version.js");
 
-const BUILD_ID=self.SZP_BUILD_ID||"2026.08.01.3";
+const BUILD_ID=self.SZP_BUILD_ID||"2026.08.01.4";
 const CACHE_NAME="szpilplac-pwa-"+BUILD_ID;
 const CORE_ASSETS=[
   "/",
@@ -13,6 +13,12 @@ const CORE_ASSETS=[
   "/klodka.html",
   "/raja/",
   "/gierki.html",
+  "/minigra.html",
+  "/kopalnia.html",
+  "/na-wiyrch.html",
+  "/bandyta.html",
+  "/pong.html",
+  "/minigry-stats.js",
   "/konto.html",
   "/ranking.html",
   "/nowosci.html",

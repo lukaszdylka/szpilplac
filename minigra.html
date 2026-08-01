@@ -6,58 +6,70 @@
 <title>Gierka · Szpilplac</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<script src="config.js?v=13"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="/build-version.js"></script>
+<script src="/config.js?v=13"></script>
+<script src="/games-registry.js"></script>
+<script src="/analytics.js" defer></script>
 <style>
-:root{--bg:#12100d;--surface:#1e1a15;--ink:#ede5d0;--muted:#a79d88;--line:#3d3629;--green:#4a9a6a;--red:#d76a4f}
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--muted:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--danger:#b5482f}
+[data-theme=dark]{--bg:#12100d;--surface:#1e1a15;--surface2:#272118;--ink:#ede5d0;--muted:#a79d88;--line:#3d3629;--green:#4a9a6a;--gold:#d4a04a;--danger:#d76a4f}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
-body{display:grid;grid-template-rows:auto 1fr}
-.bar{min-height:48px;display:flex;align-items:center;gap:10px;padding:7px max(10px,env(safe-area-inset-right)) 7px max(10px,env(safe-area-inset-left));background:rgba(18,16,13,.96);border-bottom:1px solid var(--line);z-index:3}
-.back,.btn{min-height:34px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:var(--surface);color:var(--ink);text-decoration:none;font:800 12px/1 Inter,system-ui,sans-serif;cursor:pointer}
+body{display:grid;grid-template-rows:auto minmax(0,1fr)}
+.bar{min-height:52px;display:flex;align-items:center;gap:10px;padding:8px max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left));background:color-mix(in srgb,var(--surface) 96%,transparent);border-bottom:1px solid var(--line);z-index:4}
+.back,.btn{min-height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:var(--surface2);color:var(--ink);text-decoration:none;font:900 12px/1 Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 .back{color:var(--green)}
-.title{min-width:0;flex:1;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stage{position:relative;min-height:0}
+.back:hover,.btn:hover{background:var(--surface);border-color:var(--gold)}
+.title{min-width:0;flex:1;font-family:Oswald,Inter,sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage{position:relative;min-height:0;background:#0d0b09}
 iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
-.state{position:absolute;inset:0;z-index:2;display:grid;place-items:center;padding:24px;text-align:center;background:radial-gradient(circle at 50% 25%,#272118,var(--bg) 68%)}
+.state{position:absolute;inset:0;z-index:3;display:grid;place-items:center;padding:24px;text-align:center;background:radial-gradient(circle at 50% 25%,var(--surface2),var(--bg) 68%)}
 .state.hidden{display:none}
-.box{max-width:520px;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:22px;box-shadow:0 22px 60px -36px #000}
+.box{width:min(520px,100%);border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:24px;box-shadow:0 24px 70px -40px #000}
 .box h1{margin:0 0 8px;font:700 28px/1 Oswald,Inter,sans-serif;text-transform:uppercase}
 .box p{margin:0;color:var(--muted);font-size:13px;line-height:1.55;white-space:pre-line}
-.box .back{margin-top:15px}
-@media(max-width:560px){.bar{min-height:46px}.btn{width:38px;padding:0}.btn span{display:none}}
+.box .back{margin-top:16px}
+@media(max-width:560px){.bar{min-height:48px}.btn{width:38px;padding:0}.btn span{display:none}.title{font-size:14px}.back{padding:8px 10px}}
 </style>
 </head>
 <body>
 <nav class="bar" aria-label="Nawigacja gierki">
-  <a class="back" href="gierki.html" id="backToGames">← Gierki</a>
-  <div class="title" id="gameTitle">Ładowanie gierki...</div>
-  <button class="btn" id="fullscreenBtn" type="button" title="Pełny ekran">⛶ <span>Pełny ekran</span></button>
+  <a class="back" href="/gierki" id="backToGames">← Gierki</a>
+  <div class="title" id="gameTitle">Ładowanie gierki…</div>
+  <button class="btn" id="fullscreenBtn" type="button" title="Pełny ekran" aria-label="Włącz pełny ekran">⛶ <span>Pełny ekran</span></button>
 </nav>
-<main class="stage">
-  <div class="state" id="state"><div class="box"><h1>Momencik</h1><p id="stateText">Pobieram kod gierki.</p></div></div>
-  <iframe id="gameFrame" title="Gierka" sandbox="allow-scripts allow-forms allow-modals allow-pointer-lock" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
+<main class="stage" id="stage">
+  <div class="state" id="state"><div class="box"><h1>Momencik</h1><p id="stateText">Pobieram gierkę.</p></div></div>
+  <iframe id="gameFrame" title="Gierka" allow="fullscreen; autoplay; accelerometer; gyroscope" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 </main>
-
 <script>
 (function(){
   "use strict";
+
   var cfg=window.SZPILPLAC_CONFIG||{};
   var frame=document.getElementById("gameFrame");
   var state=document.getElementById("state");
   var stateText=document.getElementById("stateText");
   var title=document.getElementById("gameTitle");
+  var fullscreenBtn=document.getElementById("fullscreenBtn");
   var slug=String(new URLSearchParams(location.search).get("g")||"").toLowerCase().trim();
   var startedAt=Date.now();
   var startSent=false;
   var lastFinish=0;
+  var trackingInline=false;
   var VISITOR_KEY="szpilplac_minigry_visitor_v1";
   var GAME_STORE_KEY="szpilplac_minigra_store_v1:"+slug;
+
+  try{document.documentElement.setAttribute("data-theme",localStorage.getItem("szpilplac_theme")||"light");}catch(e){}
 
   function visitorId(){
     try{
       var id=localStorage.getItem(VISITOR_KEY);
       if(id)return id;
-      id=(crypto&&crypto.randomUUID)?crypto.randomUUID():("v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+      id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():("v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
       localStorage.setItem(VISITOR_KEY,id);
       return id;
     }catch(e){return "v-"+Math.random().toString(36).slice(2);}
@@ -67,20 +79,24 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
     state.classList.remove("hidden");
     state.querySelector("h1").textContent="Nie udało się otworzyć";
     stateText.textContent=text;
-    if(!state.querySelector("a"))state.querySelector(".box").insertAdjacentHTML("beforeend",'<a class="back" href="gierki.html">Wróć do gierek</a>');
+    if(!state.querySelector("a"))state.querySelector(".box").insertAdjacentHTML("beforeend",'<a class="back" href="/gierki">Wróć do gierek</a>');
+  }
+
+  function setTitle(text){
+    text=String(text||"Gierka");
+    document.title=text+" · Szpilplac";
+    title.textContent=text;
+    frame.title=text;
   }
 
   function track(type,data){
     data=data||{};
-    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return Promise.resolve();
+    if(!trackingInline||!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return Promise.resolve();
     return fetch(cfg.SUPABASE_URL+"/rest/v1/rpc/szpilplac_minigry_track",{
-      method:"POST",
-      keepalive:true,
+      method:"POST",keepalive:true,
       headers:{"Content-Type":"application/json",apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY},
       body:JSON.stringify({
-        p_slug:slug,
-        p_event_type:type,
-        p_visitor_id:visitorId(),
+        p_slug:slug,p_event_type:type,p_visitor_id:visitorId(),
         p_won:data.won===true?true:(data.won===false?false:null),
         p_score:Number.isFinite(Number(data.score))?Number(data.score):null,
         p_duration_ms:Number.isFinite(Number(data.duration_ms))?Math.max(0,Math.round(Number(data.duration_ms))):null,
@@ -90,23 +106,16 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
   }
 
   function readGameStorage(){
-    var data={};
     try{
-      data=JSON.parse(localStorage.getItem(GAME_STORE_KEY)||"{}")||{};
+      var data=JSON.parse(localStorage.getItem(GAME_STORE_KEY)||"{}")||{};
       if(typeof data!=="object"||Array.isArray(data))data={};
-      if(data.szpilplac_theme==null){
-        var theme=localStorage.getItem("szpilplac_theme");
-        if(theme)data.szpilplac_theme=theme;
-      }
-    }catch(e){data={};}
-    return data;
+      if(data.szpilplac_theme==null){var theme=localStorage.getItem("szpilplac_theme");if(theme)data.szpilplac_theme=theme;}
+      return data;
+    }catch(e){return {};}
   }
 
   function saveGameStorage(data){
-    try{
-      var raw=JSON.stringify(data||{});
-      if(raw.length<=200000)localStorage.setItem(GAME_STORE_KEY,raw);
-    }catch(e){}
+    try{var raw=JSON.stringify(data||{});if(raw.length<=200000)localStorage.setItem(GAME_STORE_KEY,raw);}catch(e){}
   }
 
   function bridgeHtml(html){
@@ -114,76 +123,125 @@ iframe{display:block;width:100%;height:100%;border:0;background:#0d0b09}
     var initial=JSON.stringify(readGameStorage()).replace(/</g,"\\u003c");
     var bridge='<script>(function(){"use strict";var begun=Date.now(),sent=false,memory='+initial+';function post(type,data){parent.postMessage({source:"szpilplac-minigra",type:type,data:data||{}},"*");}var storage={get length(){return Object.keys(memory).length;},key:function(i){var keys=Object.keys(memory);return keys[i]==null?null:keys[i];},getItem:function(k){k=String(k);return Object.prototype.hasOwnProperty.call(memory,k)?memory[k]:null;},setItem:function(k,v){k=String(k);v=String(v);memory[k]=v;post("storage",{action:"set",key:k,value:v});},removeItem:function(k){k=String(k);delete memory[k];post("storage",{action:"remove",key:k});},clear:function(){memory={};post("storage",{action:"clear"});}};try{Object.defineProperty(window,"localStorage",{value:storage,configurable:true});}catch(e){}function start(){if(sent)return;sent=true;begun=Date.now();post("start");}window.SZPILPLAC_MINIGRA={start:start,storage:storage,finish:function(data){data=data||{};if(data.duration_ms==null)data.duration_ms=Date.now()-begun;post("finish",data);}};addEventListener("pointerdown",start,{once:true,capture:true});addEventListener("keydown",start,{once:true,capture:true});post("ready");})();<\/script>';
     html=String(html||"");
-    if(/<head[^>]*>/i.test(html))html=html.replace(/<head([^>]*)>/i,"<head$1>"+base+bridge);
-    else html=base+bridge+html;
-    return html;
+    if(/<head[^>]*>/i.test(html))return html.replace(/<head([^>]*)>/i,"<head$1>"+base+bridge);
+    return base+bridge+html;
   }
 
-  function load(){
-    if(!/^[a-z0-9][a-z0-9-]{1,59}$/.test(slug)){showError("Link do gierki jest nieprawidłowy.");return;}
-    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){showError("Brakuje konfiguracji Supabase w pliku config.js.");return;}
-    var select="slug,tytul,opis,html,pelny,typ,url";
+  function frameReady(){state.classList.add("hidden");}
+
+  function trustedFrame(url,gameTitle){
+    trackingInline=false;
+    setTitle(gameTitle);
+    frame.setAttribute("sandbox","allow-scripts allow-forms allow-modals allow-pointer-lock allow-same-origin allow-popups");
+    frame.addEventListener("load",function(){
+      frameReady();
+      try{
+        var child=frame.contentWindow;
+        if(!child.SZPILPLAC_MINIGRA_STATS){
+          trackingInline=true;
+          track("open");
+          function start(){if(startSent)return;startSent=true;startedAt=Date.now();track("start");}
+          child.addEventListener("pointerdown",start,{once:true,capture:true});
+          child.addEventListener("keydown",start,{once:true,capture:true});
+        }
+      }catch(e){}
+    },{once:true});
+    frame.src=url;
+  }
+
+  function inlineFrame(game){
+    if(!game.html)throw new Error("Gierka nie ma zapisanego kodu HTML.");
+    trackingInline=true;
+    setTitle(game.tytul||game.title||slug);
+    frame.setAttribute("sandbox","allow-scripts allow-forms allow-modals allow-pointer-lock");
+    frame.addEventListener("load",frameReady,{once:true});
+    startedAt=Date.now();
+    frame.srcdoc=bridgeHtml(game.html);
+    track("open");
+  }
+
+  function registryGame(){
+    if(!window.SZP_GAMES)return null;
+    var game=window.SZP_GAMES.get(slug);
+    return game&&game.kind==="minigame"?game:null;
+  }
+
+  async function databaseGame(){
+    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw new Error("Brakuje konfiguracji Supabase.");
+    var select="slug,tytul,opis,html,pelny,typ,url,ikona";
     var url=cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select="+select+"&slug=eq."+encodeURIComponent(slug)+"&opublikowana=eq.true&limit=1";
-    fetch(url,{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}})
-      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
-      .then(function(rows){
-        var game=rows&&rows[0];
-        if(!game)throw new Error("Ta gierka nie istnieje albo jest jeszcze ukryta.");
-        if(game.typ==="link"&&game.url){location.replace(game.url);return;}
-        if(!game.html)throw new Error("Gierka nie ma zapisanego kodu HTML.");
-        document.title=game.tytul+" · Szpilplac";
-        title.textContent=game.tytul;
-        startedAt=Date.now();
-        frame.srcdoc=bridgeHtml(game.html);
-        frame.addEventListener("load",function(){state.classList.add("hidden");},{once:true});
-        track("open");
-      })
-      .catch(function(e){showError(e&&e.message||"Nieznany błąd.");});
+    var response=await fetch(url,{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}});
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    var rows=await response.json();
+    if(!rows||!rows[0])throw new Error("Ta gierka nie istnieje albo jest jeszcze ukryta.");
+    return rows[0];
+  }
+
+  async function load(){
+    if(!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)){showError("Link do gierki jest nieprawidłowy.");return;}
+    try{
+      var local=registryGame();
+      if(local&&local.file){
+        var separator=local.file.indexOf("?")===-1?"?":"&";
+        trustedFrame("/"+local.file.replace(/^\//,"")+separator+"embed=1",local.title);
+        return;
+      }
+
+      var game=await databaseGame();
+      if(game.typ==="link"&&game.url){
+        var target=new URL(game.url,location.origin);
+        trustedFrame(target.href,game.tytul||slug);
+        return;
+      }
+      inlineFrame(game);
+    }catch(e){showError(e&&e.message||"Nieznany błąd.");}
   }
 
   window.addEventListener("message",function(e){
     if(e.source!==frame.contentWindow)return;
-    var m=e.data||{};
-    if(m.source!=="szpilplac-minigra")return;
-    if(m.type==="storage"){
-      var action=m.data&&m.data.action;
+    var message=e.data||{};
+    if(message.source!=="szpilplac-minigra")return;
+    if(message.type==="storage"){
+      var action=message.data&&message.data.action;
       var memory=readGameStorage();
       if(action==="clear")memory={};
-      if(action==="remove"&&m.data.key!=null)delete memory[String(m.data.key)];
-      if(action==="set"&&m.data.key!=null&&String(m.data.key).length<=200){
-        memory[String(m.data.key)]=String(m.data.value==null?"":m.data.value);
-      }
+      if(action==="remove"&&message.data.key!=null)delete memory[String(message.data.key)];
+      if(action==="set"&&message.data.key!=null&&String(message.data.key).length<=200)memory[String(message.data.key)]=String(message.data.value==null?"":message.data.value);
       saveGameStorage(memory);
       return;
     }
-    if(m.type==="start"&&!startSent){startSent=true;startedAt=Date.now();track("start");}
-    if(m.type==="finish"){
+    if(message.type==="start"&&!startSent){startSent=true;startedAt=Date.now();track("start");}
+    if(message.type==="finish"){
       if(!startSent)return;
-      var now=Date.now();
-      if(now-lastFinish<800)return;
-      lastFinish=now;
-      var d=m.data&&typeof m.data==="object"?m.data:{};
-      if(d.duration_ms==null)d.duration_ms=now-startedAt;
-      track("finish",d);
+      var now=Date.now();if(now-lastFinish<800)return;lastFinish=now;
+      var data=message.data&&typeof message.data==="object"?message.data:{};
+      if(data.duration_ms==null)data.duration_ms=now-startedAt;
+      track("finish",data);
     }
   });
 
-  document.getElementById("fullscreenBtn").addEventListener("click",function(){
-    var el=document.documentElement;
-    if(document.fullscreenElement)document.exitFullscreen&&document.exitFullscreen();
-    else el.requestFullscreen&&el.requestFullscreen();
+  function updateFullscreenButton(){
+    var active=!!document.fullscreenElement;
+    fullscreenBtn.title=active?"Wyłącz pełny ekran":"Pełny ekran";
+    fullscreenBtn.setAttribute("aria-label",fullscreenBtn.title);
+    var label=fullscreenBtn.querySelector("span");if(label)label.textContent=active?"Wyjdź":"Pełny ekran";
+  }
+
+  fullscreenBtn.addEventListener("click",function(){
+    if(document.fullscreenElement){if(document.exitFullscreen)document.exitFullscreen();return;}
+    var el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();
   });
+  document.addEventListener("fullscreenchange",updateFullscreenButton);
 
   document.addEventListener("click",function(e){
-    var link=e.target.closest&&e.target.closest('a.back[href="gierki.html"]');
+    var link=e.target.closest&&e.target.closest('a.back[href="/gierki"]');
     if(!link)return;
     e.preventDefault();
-    function back(){location.href=link.href;}
-    if(document.fullscreenElement&&document.exitFullscreen){
-      Promise.resolve(document.exitFullscreen()).then(back,back);
-    }else back();
+    function go(){location.assign("/gierki");}
+    if(document.fullscreenElement&&document.exitFullscreen)Promise.resolve(document.exitFullscreen()).then(go,go);else go();
   });
 
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
   load();
 })();
 </script>

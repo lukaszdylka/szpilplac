@@ -11,69 +11,168 @@
 <meta property="og:title" content="Gierki · Szpilplac">
 <meta property="og:description" content="Dodatkowe familockowe gierki — klikasz i grasz.">
 <meta property="og:image" content="https://szpilplac.familock.pl/og-image.svg">
-<script src="config.js?v=13"></script>
-<script src="games-registry.js?v=130"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script src="/build-version.js"></script>
+<script src="/config.js?v=13"></script>
+<script src="/games-registry.js"></script>
+<script src="/analytics.js" defer></script>
 <style>
-:root{--tlo:#12100d;--karta:#1e1a15;--karta2:#272118;--ink:#ede5d0;--ink2:#9a907a;--linia:#3d3629;--zielony:#4a9a6a;--zloty:#d4a04a;--czerwony:#d76a4f}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{min-height:100dvh;background:radial-gradient(1100px 500px at 50% -10%,#221d16 0%,transparent 60%),var(--tlo);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:0 16px 44px;display:flex;flex-direction:column;align-items:center}a{color:inherit;text-decoration:none}header,main,footer{width:100%;max-width:860px}header{padding:20px 0 6px}.back{font-size:12px;font-weight:700;color:var(--zielony)}h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;line-height:1}.sub{color:var(--ink2);font-size:13px;margin-bottom:18px}.siatka{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:640px){.siatka{grid-template-columns:1fr 1fr}}.karta{position:relative;display:flex;gap:14px;align-items:center;padding:16px;background:linear-gradient(160deg,var(--karta2),var(--karta));border:1px solid var(--linia);border-radius:16px;overflow:hidden;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}.karta:hover{transform:translateY(-2px);border-color:var(--zloty);box-shadow:0 18px 36px -22px rgba(0,0,0,.9)}.karta:active{transform:translateY(0)}.karta::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 70%,rgba(212,160,74,.05))}.ico{flex:none;width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--zloty);background:#0f0d0a;border:1px solid var(--linia)}.ico svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.txt{flex:1;min-width:0}.txt h2{font-family:Oswald;font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 3px;line-height:1.1}.txt p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.4}.meta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}.pill{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--linia);color:var(--ink2)}.pill.gra{color:var(--zielony);border-color:var(--zielony)}.graj{flex:none;align-self:center;font-family:Oswald;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:8px 14px;border-radius:999px;background:var(--zielony);color:#fff}.empty{padding:18px;border:1px dashed var(--linia);border-radius:16px;color:var(--ink2)}footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.9}footer a{color:var(--zielony);font-weight:700}.made{opacity:.6}@media(max-width:480px){body{padding-left:12px;padding-right:12px}.karta{align-items:flex-start}.graj{display:none}.ico{width:50px;height:50px}.txt h2{font-size:19px}}
+:root{
+  --bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;
+  --line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--shadow:0 15px 38px -28px rgba(35,32,26,.7)
+}
+[data-theme=dark]{
+  --bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#aaa18d;
+  --line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--shadow:0 20px 48px -30px rgba(0,0,0,.9)
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100dvh;padding:0 16px 44px;background:radial-gradient(circle at top left,rgba(191,138,58,.14),transparent 32%),var(--bg);
+  color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+header,main,footer{width:100%;max-width:980px}
+header{padding:20px 0 12px}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.back{display:inline-flex;align-items:center;min-height:36px;color:var(--green);font-size:12px;font-weight:900}
+.controls{display:flex;gap:8px}
+.icon-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);display:grid;place-items:center;cursor:pointer}
+.icon-btn:hover{background:var(--surface);color:var(--green)}
+h1{font-family:Oswald,system-ui,sans-serif;font-size:clamp(34px,8vw,52px);text-transform:uppercase;letter-spacing:.035em;margin:12px 0 4px;line-height:.96}
+.sub{max-width:620px;color:var(--ink2);font-size:13px;line-height:1.5}
+.summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 14px;color:var(--ink2);font-size:11.5px}
+.summary b{color:var(--ink)}
+.siatka{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.karta{
+  position:relative;display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:14px;align-items:center;min-height:126px;padding:17px;
+  background:linear-gradient(145deg,var(--surface),var(--surface2));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+  overflow:hidden;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease
+}
+.karta:after{content:"";position:absolute;right:-42px;bottom:-58px;width:120px;height:120px;border:20px solid rgba(191,138,58,.08);border-radius:999px;pointer-events:none}
+.karta:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:0 20px 48px -30px rgba(0,0,0,.8)}
+.karta:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ico{position:relative;z-index:1;width:62px;height:62px;border-radius:17px;display:grid;place-items:center;color:var(--gold);background:rgba(191,138,58,.1);border:1px solid rgba(191,138,58,.34)}
+.ico svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.txt{position:relative;z-index:1;min-width:0}
+.txt h2{font-family:Oswald,system-ui,sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.025em;margin:0 0 4px;line-height:1.08}
+.txt p{margin:0;color:var(--ink2);font-size:12.5px;line-height:1.45}
+.meta{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.pill{font-size:9.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)}
+.pill.score{color:var(--green);border-color:rgba(74,122,86,.6)}
+.graj{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:9px 14px;border-radius:999px;background:var(--green);color:#fff;font-family:Oswald,system-ui,sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+.empty{grid-column:1/-1;padding:18px;border:1px dashed var(--line);border-radius:18px;background:var(--surface);color:var(--ink2);font-size:13px;line-height:1.5}
+footer{margin-top:26px;text-align:center;color:var(--ink2);font-size:11.5px;line-height:1.8}
+footer a{color:var(--green);font-weight:900}
+@media(max-width:760px){.siatka{grid-template-columns:1fr}.karta{min-height:118px}}
+@media(max-width:480px){body{padding-left:12px;padding-right:12px}.karta{grid-template-columns:54px minmax(0,1fr);gap:12px;padding:14px}.ico{width:54px;height:54px}.graj{display:none}.txt h2{font-size:20px}.summary{align-items:flex-start;flex-direction:column;gap:4px}}
 </style>
 </head>
 <body>
 <header>
-  <a class="back" href="index.html">← Szpilplac</a>
+  <div class="topbar">
+    <a class="back" href="/">← Szpilplac</a>
+    <div class="controls"><button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw">◐</button></div>
+  </div>
   <h1>Gierki</h1>
-  <div class="sub">Dodatkowe familockowe szpile — klikasz i grasz.</div>
+  <div class="sub">Dodatkowe familockowe gry na szybko. Każda otwiera się w tym samym widoku, z jednym powrotem i pełnym ekranem.</div>
 </header>
-<main><div class="siatka" id="siatka"><div class="empty">Ładuję gierki...</div></div></main>
-<footer><a href="index.html">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br><span class="made">Made in Świyntochłowice</span></footer>
+<main>
+  <div class="summary"><span id="gameCount">Ładuję katalog…</span><span>Wyniki i rekordy zostają na urządzeniu.</span></div>
+  <div class="siatka" id="siatka"><div class="empty">Ładuję gierki…</div></div>
+</main>
+<footer><a href="/">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br>Made in Świyntochłowice</footer>
 <script>
-"use strict";
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
-function iconSvg(icon,id){
-  var key=(String(icon||"")+" "+String(id||"")).toLowerCase(),body;
-  if(key.indexOf("zeflik")>=0||key.indexOf("ptak")>=0){body='<path d="M4 14c4-1 6-4 7-8 2 3 4 5 8 6-2 5-6 8-11 7"/><path d="M11 12c-3 0-5 1-7 3"/><path d="M17 12l3-1-2 3"/>';}
-  else if(key.indexOf("kopal")>=0||key.indexOf("kilof")>=0){body='<path d="M5 5c5-3 11-2 15 2"/><path d="M12 5l-2 4"/><path d="M11 8l8 12"/><path d="M6 20L17 9"/>';}
-  else if(key.indexOf("wiyrch")>=0||key.indexOf("familok")>=0){body='<path d="M4 21V7h16v14"/><path d="M3 7h18"/><path d="M8 11h3v3H8zM14 11h3v3h-3zM9 21v-4h6v4"/>';}
-  else if(key.indexOf("bandyt")>=0||key.indexOf("automat")>=0){body='<rect x="4" y="4" width="14" height="17" rx="2"/><path d="M7 8h8v6H7z"/><circle cx="9" cy="11" r=".7"/><circle cx="13" cy="11" r=".7"/><path d="M18 8h2v6h-2M20 8V6"/><path d="M8 18h6"/>';}
-  else if(key.indexOf("pong")>=0){body='<path d="M5 6v12M19 6v12"/><circle cx="12" cy="12" r="2"/><path d="M9 9l6 6"/>';}
-  else{body='<path d="M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4Z"/><path d="M7 13h4M9 11v4"/><circle cx="16" cy="12" r=".7"/><circle cx="18" cy="14" r=".7"/>';}
-  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+body+'</svg>';
-}
-function card(game){
-  return '<a class="karta" href="'+esc(game.href)+'">'+
-    '<div class="ico">'+iconSvg(game.icon,game.id)+'</div>'+
-    '<div class="txt"><h2>'+esc(game.title)+'</h2><p>'+esc(game.description||"")+'</p><div class="meta">'+
-      (game.scoreLabel?'<span class="pill gra">'+esc(game.scoreLabel)+'</span>':'')+
-      (game.fullscreen?'<span class="pill">Pełny ekran</span>':'')+
-    '</div></div><div class="graj">Graj</div></a>';
-}
-function render(games){document.getElementById("siatka").innerHTML=games.length?games.map(card).join(""):'<div class="empty">Brak opublikowanych gierek.</div>';}
-async function boot(){
-  var fallbackDescriptions={
-    "skok-do-nieba":"Skacz po dachach familoka, zbieraj wyngiel i uważaj na ptoki. Steruj dotykiem albo przechyłem i pnij się jak najwyżej.",
-    "zeflik":"Machaj skrzydłami Zeflika, przelatuj między familokami i zbieraj kołocz. Każdy minięty familok daje punkt, a kołocz dorzuca bonus."
-  };
-  var games=window.SZP_GAMES?window.SZP_GAMES.minigames():[];
-  render(games);
-  var cfg=window.SZPILPLAC_CONFIG||{};
-  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return;
-  try{
-    var response=await fetch(cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny&opublikowana=eq.true&order=kolejnosc.asc",{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}});
-    if(!response.ok)return;
-    var rows=await response.json();
-    var known={};games.forEach(function(g){known[g.id]=true;known[g.href]=true;});
+(function(){
+  "use strict";
+
+  var grid=document.getElementById("siatka");
+  var count=document.getElementById("gameCount");
+  var themeBtn=document.getElementById("themeBtn");
+  var theme="light";
+
+  try{theme=localStorage.getItem("szpilplac_theme")||"light";}catch(e){}
+  function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
+  themeBtn.addEventListener("click",function(){theme=theme==="dark"?"light":"dark";try{localStorage.setItem("szpilplac_theme",theme);}catch(e){}applyTheme();});
+  applyTheme();
+
+  function esc(value){return String(value==null?"":value).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+
+  function iconSvg(name){
+    var icons={
+      mine:'<path d="M4 8c4-4 12-4 16 0"/><path d="M12 6 9 11"/><path d="m10 10 8 10"/><path d="m6 20 11-11"/>',
+      climb:'<path d="M5 21V6h14v15"/><path d="M4 6h16"/><path d="M8 10h3v3H8zM14 10h3v3h-3z"/><path d="M10 21v-4h4v4"/><path d="m19 4 2-2m0 0v4m0-4h-4"/>',
+      slot:'<rect x="4" y="3" width="14" height="18" rx="2"/><path d="M7 7h8v7H7z"/><circle cx="9" cy="10.5" r=".8"/><circle cx="13" cy="10.5" r=".8"/><path d="M18 8h2v6h-2M20 8V6M8 18h6"/>',
+      pong:'<path d="M5 6v12M19 6v12"/><circle cx="12" cy="12" r="2"/><path d="m9 9 6 6"/>',
+      bird:'<path d="M4 15c4-1 6-4 7-9 2 4 5 6 9 6-2 5-6 8-11 7"/><path d="M11 13c-3 0-5 1-7 3"/><path d="m17 12 3-1-2 3"/>',
+      jump:'<path d="M5 18h14"/><path d="M7 14h4M13 10h4M7 6h4"/><path d="m16 18 3-4 3 4"/><path d="M19 14v7"/>',
+      gamepad:'<path d="M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4Z"/><path d="M7 13h4M9 11v4"/><circle cx="16" cy="12" r=".7"/><circle cx="18" cy="14" r=".7"/>'
+    };
+    return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(icons[name]||icons.gamepad)+'</svg>';
+  }
+
+  function card(game){
+    var meta=[];
+    if(game.category)meta.push('<span class="pill">'+esc(game.category)+'</span>');
+    if(game.scoreLabel)meta.push('<span class="pill score">'+esc(game.scoreLabel)+'</span>');
+    return '<a class="karta" href="'+esc(game.href)+'" data-game-id="'+esc(game.id)+'">'+
+      '<div class="ico">'+iconSvg(game.icon)+'</div>'+
+      '<div class="txt"><h2>'+esc(game.title)+'</h2><p>'+esc(game.description)+'</p><div class="meta">'+meta.join("")+'</div></div>'+
+      '<span class="graj">Graj</span></a>';
+  }
+
+  function render(games){
+    games.sort(function(a,b){return Number(a.order||999)-Number(b.order||999)||String(a.title).localeCompare(String(b.title),"pl");});
+    grid.innerHTML=games.length?games.map(card).join(""):'<div class="empty">Brak opublikowanych gierek.</div>';
+    count.innerHTML='<b>'+games.length+'</b> '+(games.length===1?'gierka':(games.length<5?'gierki':'gierek'));
+  }
+
+  function registryGames(){return window.SZP_GAMES?window.SZP_GAMES.minigames():[];}
+
+  function fromRow(row){
+    var source={
+      id:row.slug,title:row.tytul,description:row.opis,icon:row.ikona,category:row.kategoria,
+      source:"database",dbType:row.typ,externalUrl:row.url||"",fullscreen:!!row.pelny,order:Number(row.kolejnosc||500)
+    };
+    return window.SZP_GAMES?window.SZP_GAMES.decorateMinigame(source):source;
+  }
+
+  function mergeGames(base,rows){
+    var byId={};
+    base.forEach(function(game){byId[game.id]=game;});
     rows.forEach(function(row){
-      var href=row.typ==="link"&&row.url?row.url:"minigra.html?g="+encodeURIComponent(row.slug);
-      if(known[row.slug]||known[href])return;
-      games.push({id:row.slug,title:row.tytul,description:row.opis||fallbackDescriptions[row.slug]||"",icon:row.ikona,href:href,fullscreen:!!row.pelny});
+      var dbGame=fromRow(row);
+      var current=byId[dbGame.id];
+      if(!current){byId[dbGame.id]=dbGame;return;}
+      var file=current.file;
+      Object.keys(dbGame).forEach(function(key){if(dbGame[key]!==""&&dbGame[key]!=null)current[key]=dbGame[key];});
+      if(file){current.file=file;current.source="file";current.externalUrl="";}
+      current.href="minigra.html?g="+encodeURIComponent(current.id);
     });
+    return Object.keys(byId).map(function(key){return byId[key];});
+  }
+
+  async function boot(){
+    var games=registryGames();
     render(games);
-  }catch(e){}
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+    var cfg=window.SZPILPLAC_CONFIG||{};
+    if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return;
+    try{
+      var url=cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny,kolejnosc&opublikowana=eq.true&order=kolejnosc.asc";
+      var response=await fetch(url,{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}});
+      if(!response.ok)throw new Error("HTTP "+response.status);
+      render(mergeGames(games,await response.json()));
+    }catch(e){
+      console.warn("Katalog gierek: używam danych lokalnych",e&&e.message||e);
+    }
+  }
+
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
 </script>
 </body>
 </html>
