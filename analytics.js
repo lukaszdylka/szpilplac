@@ -1,11 +1,13 @@
 /* Szpilplac first-party analytics */
 (function(){
   "use strict";
-  var VERSION=window.SZP_BUILD_ID||"2026.08.01.5";
+  var VERSION=window.SZP_BUILD_ID||"2026.08.01.6";
   var VISITOR_KEY="szpilplac_visitor_id_v1";
   var PAGE_PREFIX="szpilplac_page_view_v1:";
+  var QUEUE_KEY="szpilplac_analytics_queue_v1";
   var configPromise=null;
   var nativeFetch=window.fetch.bind(window);
+  var flushing=false;
 
   function isAdminPath(){
     return /(?:^|\/)(?:admin|stats|podpowiedzi|game-results-admin|mailing-admin|avatar-admin|odznaki-admin|auth-diagnostyka)(?:[_./-]|$)/i.test(location.pathname||"");
@@ -31,6 +33,10 @@
     catch(e){return "pl";}
   }
 
+  function clean(value,max){
+    return String(value||"").replace(/[\u0000-\u001f]/g,"").slice(0,max||180);
+  }
+
   function loadConfig(){
     if(window.SZPILPLAC_CONFIG)return Promise.resolve(window.SZPILPLAC_CONFIG);
     if(configPromise)return configPromise;
@@ -51,17 +57,43 @@
     return configPromise;
   }
 
-  function clean(value,max){
-    return String(value||"").replace(/[\u0000-\u001f]/g,"").slice(0,max||180);
+  function readQueue(){
+    try{
+      var rows=JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]");
+      return Array.isArray(rows)?rows:[];
+    }catch(e){return [];}
   }
 
-  function send(eventType,value){
-    if(isAdminPath())return Promise.resolve(false);
+  function writeQueue(rows){
+    try{
+      localStorage.setItem(QUEUE_KEY,JSON.stringify((rows||[]).slice(-40)));
+    }catch(e){}
+  }
+
+  function queueEvent(eventType,value){
+    var rows=readQueue();
+    var event={
+      type:clean(eventType,40),
+      value:clean(value,240),
+      lang:lang(),
+      visitor:visitorId(),
+      created:Date.now()
+    };
+    var duplicate=rows.some(function(row){
+      return row.type===event.type&&row.value===event.value&&event.created-Number(row.created||0)<10000;
+    });
+    if(!duplicate){rows.push(event);writeQueue(rows);}
+  }
+
+  function postEvent(eventType,value,eventLang,eventVisitor){
     return loadConfig().then(function(cfg){
-      if(!cfg||!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return false;
+      if(!cfg||!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
+        throw new Error("Brak konfiguracji Supabase");
+      }
       return nativeFetch(cfg.SUPABASE_URL+"/rest/v1/rpc/szpilplac_analytics_track",{
         method:"POST",
         keepalive:true,
+        cache:"no-store",
         headers:{
           apikey:cfg.SUPABASE_ANON_KEY,
           Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY,
@@ -69,14 +101,51 @@
         },
         body:JSON.stringify({
           p_event_type:clean(eventType,40),
-          p_visitor_id:visitorId(),
+          p_visitor_id:eventVisitor||visitorId(),
           p_value:clean(value,240),
-          p_lang:lang()
+          p_lang:eventLang||lang()
         })
-      }).then(function(r){
-        if(!r.ok)console.warn("Analityka Szpilplacu: HTTP "+r.status);
-        return r.ok;
-      }).catch(function(){return false;});
+      }).then(function(response){
+        if(!response.ok){
+          return response.text().then(function(text){
+            throw new Error("RPC "+response.status+(text?": "+text.slice(0,180):""));
+          });
+        }
+        try{document.dispatchEvent(new CustomEvent("szp:analytics-ok",{detail:{type:eventType,value:value}}));}catch(e){}
+        return true;
+      });
+    });
+  }
+
+  function send(eventType,value){
+    if(isAdminPath())return Promise.resolve(false);
+    return postEvent(eventType,value).catch(function(error){
+      console.warn("Analityka Szpilplacu",error&&error.message?error.message:error);
+      queueEvent(eventType,value);
+      try{document.dispatchEvent(new CustomEvent("szp:analytics-error",{detail:{message:String(error&&error.message||error)}}));}catch(e){}
+      return false;
+    });
+  }
+
+  function flushQueue(){
+    if(flushing||!navigator.onLine)return Promise.resolve(false);
+    var rows=readQueue();
+    if(!rows.length)return Promise.resolve(true);
+    flushing=true;
+    var remaining=[];
+    var chain=Promise.resolve();
+    rows.forEach(function(row){
+      chain=chain.then(function(){
+        return postEvent(row.type,row.value,row.lang,row.visitor).catch(function(){remaining.push(row);});
+      });
+    });
+    return chain.then(function(){
+      writeQueue(remaining);
+      flushing=false;
+      return remaining.length===0;
+    }).catch(function(){
+      flushing=false;
+      return false;
     });
   }
 
@@ -111,7 +180,9 @@
 
   function trackPage(){
     if(isAdminPath())return;
-    var key=PAGE_PREFIX+pageKey(),now=Date.now(),last=0;
+    var key=PAGE_PREFIX+pageKey();
+    var now=Date.now();
+    var last=0;
     try{last=Number(sessionStorage.getItem(key)||0);}catch(e){}
     if(now-last<10000)return;
     try{sessionStorage.setItem(key,String(now));}catch(e){}
@@ -138,13 +209,16 @@
   function boot(){
     installGameEventBridge();
     document.addEventListener("click",handleClick,true);
-    trackPage();
+    window.addEventListener("online",flushQueue);
+    flushQueue().then(trackPage);
   }
 
   window.SZP_ANALYTICS={
     version:VERSION,
     track:function(type,value){return send(type,value);},
-    visitorId:visitorId
+    flush:flushQueue,
+    visitorId:visitorId,
+    queued:function(){return readQueue().length;}
   };
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
