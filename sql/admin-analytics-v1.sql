@@ -50,7 +50,7 @@ events as (
     nullif(e.puzzle_word,'') as detail
   from public.szpilplac_events e
 ),
-returning as (
+returning_stats as (
   select count(*)::integer as returning_visitors_7d
   from (
     select visitor_id
@@ -85,7 +85,7 @@ select
   count(*) filter (where event_type = 'support_click' and local_day = calendar.today)::integer as support_clicks_today,
   count(*) filter (where event_type = 'support_click' and local_day between calendar.today - 6 and calendar.today)::integer as support_clicks_7d,
   count(*) filter (where event_type = 'support_click' and local_day between calendar.today - 29 and calendar.today)::integer as support_clicks_30d,
-  (select returning_visitors_7d from returning) as returning_visitors_7d,
+  (select returning_visitors_7d from returning_stats) as returning_visitors_7d,
   max(created_at) filter (where event_type = 'page_view') as last_page_view
 from events
 cross join calendar
