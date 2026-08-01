@@ -83,15 +83,12 @@ grant execute on function public.szpilplac_analytics_track(text,text,text,text) 
 
 commit;
 
--- Test techniczny. Po wykonaniu powinien zwrócić true.
-select public.szpilplac_analytics_track(
-  'page_view',
-  'sql-test-visitor-0001',
-  '/test-analityki',
-  'pl'
-) as zapisano;
+-- Kontrola instalacji funkcji. Powinna zwrócić jej nazwę i sygnaturę.
+select to_regprocedure(
+  'public.szpilplac_analytics_track(text,text,text,text)'
+) as analytics_rpc;
 
--- Kontrola ostatnich zdarzeń analitycznych.
+-- Kontrola ostatnich prawdziwych zdarzeń analitycznych.
 select
   created_at,
   event_type,
