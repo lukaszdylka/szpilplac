@@ -1,7 +1,7 @@
-/* Szpilplac topbar-common.js v130 */
+/* Szpilplac topbar-common.js v131 */
 (function(){
   "use strict";
-  var VERSION="v130";
+  var VERSION="v131";
 
   function loadCss(){
     if(document.getElementById("szp-common-css"))return;
@@ -31,10 +31,18 @@
     document.head.appendChild(st);
   }
 
+  function isHomePage(){
+    var path=location.pathname||"/";
+    return path==="/"||/(^|\/)index\.html$/.test(path);
+  }
+
   function loadEnhancements(){
     loadScript("szp-games-registry","/games-registry.js?v=130",function(){
+      if(isHomePage()){
+        loadScript("szp-weekly-status","/weekly-status.js?v=131");
+      }
       if(location.pathname.indexOf("konto")!==-1){
-        loadScript("szp-streak-progress","/streak-progress-v2.js?v=130");
+        loadScript("szp-streak-progress","/streak-progress-v2.js?v=131");
       }
     });
   }
