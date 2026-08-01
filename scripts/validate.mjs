@@ -21,7 +21,7 @@ for(const file of files.filter((f)=>f.endsWith(".js"))){
   catch(error){fail(`Błąd składni JS: ${path.relative(root,file)}\n${error.stderr?.toString()||error.message}`);}
 }
 
-for(const relative of ["gierki.html","minigra.html"]){
+for(const relative of ["gierki.html","minigra.html","stats.html"]){
   try{
     const html=fs.readFileSync(path.join(root,relative),"utf8");
     const pattern=/<script(?![^>]*\bsrc\s*=)([^>]*)>([\s\S]*?)<\/script>/gi;
