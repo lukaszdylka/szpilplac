@@ -3,8 +3,8 @@
   "use strict";
   var VERSION="v131";
   var accountPlayed=false;
-  var patched=false;
-  var queryStarted=false;
+  var queryRunning=false;
+  var accountChecked=false;
   var observer=null;
 
   function isRaja(id){
@@ -28,7 +28,12 @@
     var today=new Date();
     var p;
     try{
-      var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(today);
+      var parts=new Intl.DateTimeFormat("en-CA",{
+        timeZone:"Europe/Warsaw",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit"
+      }).formatToParts(today);
       p={};
       parts.forEach(function(x){if(x.type!=="literal")p[x.type]=Number(x.value);});
     }catch(e){
@@ -36,7 +41,12 @@
     }
     var days=Math.floor((Date.UTC(p.year,p.month-1,p.day)-Date.UTC(2026,6,27))/86400000);
     var rawWeek=Math.floor(days/7);
-    return {started:days>=0,mode:"weekly",week_index:Math.max(0,rawWeek),puzzle_no:Math.max(0,rawWeek)+1};
+    return {
+      started:days>=0,
+      mode:"weekly",
+      week_index:Math.max(0,rawWeek),
+      puzzle_no:Math.max(0,rawWeek)+1
+    };
   }
 
   function localPlayed(){
@@ -53,7 +63,9 @@
       var stats=JSON.parse(localStorage.getItem("raja_weekly_stats_v2")||"null");
       var result=stats&&stats.weeks&&stats.weeks[String(current.week_index)];
       return !!(result&&(result.won===true||result.won===false));
-    }catch(e){return false;}
+    }catch(e){
+      return false;
+    }
   }
 
   function played(){
@@ -61,9 +73,6 @@
   }
 
   function patchGlobals(){
-    if(patched)return;
-    var changed=false;
-
     if(typeof window.statusLabelForGame==="function"&&!window.statusLabelForGame.__szpWeekly131){
       var originalLabel=window.statusLabelForGame;
       var replacement=function(id,isPlayed){
@@ -75,23 +84,25 @@
       };
       replacement.__szpWeekly131=true;
       window.statusLabelForGame=replacement;
-      changed=true;
     }
 
     if(typeof window.playedRaja==="function"&&!window.playedRaja.__szpWeekly131){
       var replacementPlayed=function(){return played();};
       replacementPlayed.__szpWeekly131=true;
       window.playedRaja=replacementPlayed;
-      changed=true;
     }
-
-    patched=changed||patched;
   }
 
   function findCard(){
     var root=document.getElementById("games");
     if(!root)return null;
-    return root.querySelector('[data-game-id="raja"],[data-game-id="zorta"],a[href="raja/"],a[href="/raja/"],a[href$="/raja/"]');
+    return root.querySelector(
+      '[data-game-id="raja"],'+
+      '[data-game-id="zorta"],'+
+      'a[href="raja/"],'+
+      'a[href="/raja/"],'+
+      'a[href$="/raja/"]'
+    );
   }
 
   function applyBadge(){
@@ -116,11 +127,13 @@
     applyBadge();
   }
 
-  function wait(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+  function wait(ms){
+    return new Promise(function(resolve){setTimeout(resolve,ms);});
+  }
 
   async function queryAccount(){
-    if(queryStarted)return;
-    queryStarted=true;
+    if(queryRunning||accountChecked)return;
+    queryRunning=true;
     var client=null;
 
     for(var i=0;i<24;i++){
@@ -128,14 +141,25 @@
       if(client)break;
       await wait(250);
     }
-    if(!client)return;
+
+    if(!client){
+      queryRunning=false;
+      return;
+    }
 
     try{
       var sr=await client.auth.getSession();
       var session=sr&&sr.data&&sr.data.session;
-      if(!session||!session.user)return;
+      if(!session||!session.user){
+        accountChecked=true;
+        return;
+      }
+
       var current=info();
-      if(!current.started)return;
+      if(!current.started){
+        accountChecked=true;
+        return;
+      }
 
       var result=await client.from("user_game_results")
         .select("game,mode,puzzle_no")
@@ -145,6 +169,7 @@
         .eq("puzzle_no",current.puzzle_no)
         .limit(1);
 
+      accountChecked=true;
       if(!result.error&&Array.isArray(result.data)&&result.data.length){
         accountPlayed=true;
         if(window.SZP_GAME_PLAYED&&typeof window.SZP_GAME_PLAYED.markAccountPlayed==="function"){
@@ -154,6 +179,8 @@
       }
     }catch(e){
       console.warn("Raja weekly status",e);
+    }finally{
+      queryRunning=false;
     }
   }
 
@@ -175,7 +202,8 @@
     queryAccount();
     setTimeout(rerender,250);
     setTimeout(rerender,1000);
-    setTimeout(queryAccount,1500);
+    setTimeout(queryAccount,2000);
+    setTimeout(queryAccount,5000);
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
