@@ -2,177 +2,78 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Gierki · Szpilplac</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Familockowe gierki: kopalnia, Na Wiyrch, jednoręki bandyta, pong. Zagraj od ręki w przeglądarce.">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="description" content="Dodatkowe familockowe gierki dostępne od ręki w przeglądarce.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Gierki · Szpilplac">
-<meta property="og:description" content="Familockowe gierki — zagraj od ręki.">
+<meta property="og:description" content="Dodatkowe familockowe gierki — klikasz i grasz.">
 <meta property="og:image" content="https://szpilplac.familock.pl/og-image.svg">
 <script src="config.js?v=13"></script>
+<script src="games-registry.js?v=130"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
 <style>
-:root{
-  --tlo:#12100d; --karta:#1e1a15; --karta2:#272118;
-  --ink:#ede5d0; --ink2:#9a907a; --linia:#3d3629;
-  --zielony:#4a9a6a; --zloty:#d4a04a; --czerwony:#d76a4f;
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{min-height:100dvh;background:
-   radial-gradient(1100px 500px at 50% -10%, #221d16 0%, transparent 60%), var(--tlo);
-  color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
-  padding:0 16px 44px;display:flex;flex-direction:column;align-items:center}
-a{color:inherit;text-decoration:none}
-header,main,footer{width:100%;max-width:860px}
-header{padding:20px 0 6px}
-.back{font-size:12px;font-weight:700;color:var(--zielony)}
-h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;letter-spacing:.05em;
-  margin:6px 0 4px;line-height:1}
-.sub{color:var(--ink2);font-size:13px;margin-bottom:18px}
-
-.siatka{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:640px){.siatka{grid-template-columns:1fr 1fr}}
-
-.karta{position:relative;display:flex;gap:14px;align-items:center;padding:16px;
-  background:linear-gradient(160deg,var(--karta2),var(--karta));
-  border:1px solid var(--linia);border-radius:16px;overflow:hidden;
-  transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
-.karta:hover{transform:translateY(-2px);border-color:var(--zloty);
-  box-shadow:0 18px 36px -22px rgba(0,0,0,.9)}
-.karta:active{transform:translateY(0)}
-.karta::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(90deg,transparent 70%,rgba(212,160,74,.05))}
-.ico{flex:none;width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  color:var(--zloty);background:#0f0d0a;border:1px solid var(--linia)}
-.ico svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.7;
-  stroke-linecap:round;stroke-linejoin:round}
-.txt{flex:1;min-width:0}
-.txt h2{font-family:Oswald;font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 3px;line-height:1.1}
-.txt p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.4}
-.meta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
-.pill{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 8px;border-radius:999px;border:1px solid var(--linia);color:var(--ink2)}
-.pill.gra{color:var(--zielony);border-color:var(--zielony)}
-.pill.prop{color:var(--zloty);border-color:var(--zloty)}
-.graj{flex:none;align-self:center;font-family:Oswald;font-size:13px;text-transform:uppercase;letter-spacing:.06em;
-  padding:8px 14px;border-radius:999px;background:var(--zielony);color:#fff}
-
-footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.9}
-footer a{color:var(--zielony);font-weight:700}
-.made{opacity:.6}
+:root{--tlo:#12100d;--karta:#1e1a15;--karta2:#272118;--ink:#ede5d0;--ink2:#9a907a;--linia:#3d3629;--zielony:#4a9a6a;--zloty:#d4a04a;--czerwony:#d76a4f}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{min-height:100dvh;background:radial-gradient(1100px 500px at 50% -10%,#221d16 0%,transparent 60%),var(--tlo);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:0 16px 44px;display:flex;flex-direction:column;align-items:center}a{color:inherit;text-decoration:none}header,main,footer{width:100%;max-width:860px}header{padding:20px 0 6px}.back{font-size:12px;font-weight:700;color:var(--zielony)}h1{font-family:Oswald;font-size:clamp(30px,9vw,44px);text-transform:uppercase;letter-spacing:.05em;margin:6px 0 4px;line-height:1}.sub{color:var(--ink2);font-size:13px;margin-bottom:18px}.siatka{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:640px){.siatka{grid-template-columns:1fr 1fr}}.karta{position:relative;display:flex;gap:14px;align-items:center;padding:16px;background:linear-gradient(160deg,var(--karta2),var(--karta));border:1px solid var(--linia);border-radius:16px;overflow:hidden;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}.karta:hover{transform:translateY(-2px);border-color:var(--zloty);box-shadow:0 18px 36px -22px rgba(0,0,0,.9)}.karta:active{transform:translateY(0)}.karta::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 70%,rgba(212,160,74,.05))}.ico{flex:none;width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--zloty);background:#0f0d0a;border:1px solid var(--linia)}.ico svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.txt{flex:1;min-width:0}.txt h2{font-family:Oswald;font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 3px;line-height:1.1}.txt p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.4}.meta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}.pill{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--linia);color:var(--ink2)}.pill.gra{color:var(--zielony);border-color:var(--zielony)}.graj{flex:none;align-self:center;font-family:Oswald;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:8px 14px;border-radius:999px;background:var(--zielony);color:#fff}.empty{padding:18px;border:1px dashed var(--linia);border-radius:16px;color:var(--ink2)}footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.9}footer a{color:var(--zielony);font-weight:700}.made{opacity:.6}@media(max-width:480px){body{padding-left:12px;padding-right:12px}.karta{align-items:flex-start}.graj{display:none}.ico{width:50px;height:50px}.txt h2{font-size:19px}}
 </style>
 </head>
 <body>
-
 <header>
   <a class="back" href="index.html">← Szpilplac</a>
   <h1>Gierki</h1>
-  <div class="sub">Familockowe szpile na jeden raz — klikasz i grasz.</div>
+  <div class="sub">Dodatkowe familockowe szpile — klikasz i grasz.</div>
 </header>
-
-<main>
-  <div class="siatka" id="siatka"></div>
-</main>
-
-<footer>
-  <a href="index.html">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br>
-  <span class="made">Made in Świyntochłowice</span>
-</footer>
-
+<main><div class="siatka" id="siatka"><div class="empty">Ładuję gierki...</div></div></main>
+<footer><a href="index.html">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br><span class="made">Made in Świyntochłowice</span></footer>
 <script>
 "use strict";
-
-/* ══ LISTA GIEREK — dopisujesz tu nową i tyle ══════════════════════════
-   plik      — nazwa pliku w repo
-   pelny     — true: pokazuje plakietkę informującą o trybie pełnoekranowym
-   wynik     — co pokazuje plakietka (rekord trzymany w localStorage danej gry)
-   ukryta    — true: nie pokazuje się na liście, ale link działa (tablet w roomie)
-*/
-var GRY = [
-  { plik:"kopalnia.html",  ikona:"kopalnia", tytul:"Starzik w kopalni",
-    opis:"Zbierz cały wyngiel, wal kilofem we fledermausy, pilnuj metanu i wjedź szolą na wiyrch. Liczy się czas szychty.",
-    wynik:"Rekord czasu", pelny:true },
-
-  { plik:"na-wiyrch.html", ikona:"familok", tytul:"Na Wiyrch",
-    opis:"Skacz po balkonach familoka coraz wyżej. Combo, przyspieszenie, jeden fałszywy krok i lecisz w dół.",
-    wynik:"Rekord punktów", pelny:true },
-
-  { plik:"bandyta.html",   ikona:"automat", tytul:"Jednoręki bandyta",
-    opis:"Pięć rund po trzy kręcenia. Trzymaj powtórki i składaj układy — sztyry take same to setka.",
-    wynik:"Rekord punktów", pelny:true },
-
-  { plik:"pong.html",      ikona:"pong", tytul:"Pong",
-    opis:"Klasyk do trzech punktów. Wygrywaj pod rząd i bij rekord serii.",
-    wynik:"Rekord serii", pelny:true }
-];
-
-/* ══ opcjonalnie: dociąga też gierki wrzucone przez panel admina ══ */
-var Z_BAZY = true;
-
-/* Opisy awaryjne dla gier, które mają jeszcze puste pole opisu w bazie. */
-var OPISY_BAZOWE = {
-  "skok-do-nieba":"Skacz po dachach familoka, zbieraj wyngiel i uważaj na ptoki. Steruj dotykiem albo przechyłem i pnij się jak najwyżej.",
-  "zeflik":"Machaj skrzydłami Zeflika, przelatuj między familokami i zbieraj kołocz. Każdy minięty familok daje punkt, a kołocz dorzuca bonus."
-};
-
-/* ───────────────────────────────────────────────────────────────── */
-function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){
-  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
-
-function ikonaSvg(ikona,slug){
-  var id=(String(slug||"")+" "+String(ikona||"")).toLowerCase();
-  var body;
-  if(id.indexOf("zeflik")>=0 || id.indexOf("ptak")>=0 || id.indexOf("bird")>=0){
-    body='<path d="M4 14c4-1 6-4 7-8 2 3 4 5 8 6-2 5-6 8-11 7"/><path d="M11 12c-3 0-5 1-7 3"/><path d="M17 12l3-1-2 3"/>';
-  }else if(id.indexOf("kopal")>=0 || id.indexOf("kilof")>=0 || id.indexOf("mine")>=0){
-    body='<path d="M5 5c5-3 11-2 15 2"/><path d="M12 5l-2 4"/><path d="M11 8l8 12"/><path d="M6 20L17 9"/>';
-  }else if(id.indexOf("wiyrch")>=0 || id.indexOf("familok")>=0 || id.indexOf("dom")>=0){
-    body='<path d="M4 21V7h16v14"/><path d="M3 7h18"/><path d="M8 11h3v3H8zM14 11h3v3h-3zM9 21v-4h6v4"/>';
-  }else if(id.indexOf("bandyt")>=0 || id.indexOf("automat")>=0 || id.indexOf("slot")>=0){
-    body='<rect x="4" y="4" width="14" height="17" rx="2"/><path d="M7 8h8v6H7z"/><circle cx="9" cy="11" r=".7"/><circle cx="13" cy="11" r=".7"/><path d="M18 8h2v6h-2M20 8V6"/><path d="M8 18h6"/>';
-  }else if(id.indexOf("pong")>=0 || id.indexOf("palet")>=0){
-    body='<path d="M5 6v12M19 6v12"/><circle cx="12" cy="12" r="2"/><path d="M9 9l6 6"/>';
-  }else{
-    body='<path d="M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4Z"/><path d="M7 13h4M9 11v4"/><circle cx="16" cy="12" r=".7"/><circle cx="18" cy="14" r=".7"/>';
-  }
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function iconSvg(icon,id){
+  var key=(String(icon||"")+" "+String(id||"")).toLowerCase(),body;
+  if(key.indexOf("zeflik")>=0||key.indexOf("ptak")>=0){body='<path d="M4 14c4-1 6-4 7-8 2 3 4 5 8 6-2 5-6 8-11 7"/><path d="M11 12c-3 0-5 1-7 3"/><path d="M17 12l3-1-2 3"/>';}
+  else if(key.indexOf("kopal")>=0||key.indexOf("kilof")>=0){body='<path d="M5 5c5-3 11-2 15 2"/><path d="M12 5l-2 4"/><path d="M11 8l8 12"/><path d="M6 20L17 9"/>';}
+  else if(key.indexOf("wiyrch")>=0||key.indexOf("familok")>=0){body='<path d="M4 21V7h16v14"/><path d="M3 7h18"/><path d="M8 11h3v3H8zM14 11h3v3h-3zM9 21v-4h6v4"/>';}
+  else if(key.indexOf("bandyt")>=0||key.indexOf("automat")>=0){body='<rect x="4" y="4" width="14" height="17" rx="2"/><path d="M7 8h8v6H7z"/><circle cx="9" cy="11" r=".7"/><circle cx="13" cy="11" r=".7"/><path d="M18 8h2v6h-2M20 8V6"/><path d="M8 18h6"/>';}
+  else if(key.indexOf("pong")>=0){body='<path d="M5 6v12M19 6v12"/><circle cx="12" cy="12" r="2"/><path d="M9 9l6 6"/>';}
+  else{body='<path d="M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4Z"/><path d="M7 13h4M9 11v4"/><circle cx="16" cy="12" r=".7"/><circle cx="18" cy="14" r=".7"/>';}
   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+body+'</svg>';
 }
-
-function kafelek(g){
-  var href = g.plik;
-  return '<a class="karta" href="'+esc(href)+'">'+
-    '<div class="ico">'+ikonaSvg(g.ikona,g.slug)+'</div>'+
-    '<div class="txt"><h2>'+esc(g.tytul)+'</h2><p>'+esc(g.opis||"")+'</p>'+
-      '<div class="meta">'+(g.wynik?'<span class="pill gra">'+esc(g.wynik)+'</span>':'')+
-      (g.pelny?'<span class="pill">Pełny ekran</span>':'')+'</div></div>'+
-    '<div class="graj">Graj</div></a>';
+function card(game){
+  return '<a class="karta" href="'+esc(game.href)+'">'+
+    '<div class="ico">'+iconSvg(game.icon,game.id)+'</div>'+
+    '<div class="txt"><h2>'+esc(game.title)+'</h2><p>'+esc(game.description||"")+'</p><div class="meta">'+
+      (game.scoreLabel?'<span class="pill gra">'+esc(game.scoreLabel)+'</span>':'')+
+      (game.fullscreen?'<span class="pill">Pełny ekran</span>':'')+
+    '</div></div><div class="graj">Graj</div></a>';
 }
-
-document.getElementById("siatka").innerHTML =
-  GRY.filter(function(g){ return !g.ukryta; }).map(kafelek).join("");
-
-/* ── gierki z Supabase (panel admina) ── */
-if(Z_BAZY){
-  var URL_  = (window.SZPILPLAC_CONFIG && window.SZPILPLAC_CONFIG.SUPABASE_URL) || "";
-  var ANON_ = (window.SZPILPLAC_CONFIG && window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY) || "";
-  if(URL_ && ANON_){
-    fetch(URL_+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny&opublikowana=eq.true&order=kolejnosc.asc",
-      { headers:{ apikey:ANON_, Authorization:"Bearer "+ANON_ } })
-      .then(function(r){ return r.ok ? r.json() : []; })
-      .then(function(rows){
-        if(!rows || !rows.length) return;
-        document.getElementById("siatka").insertAdjacentHTML("beforeend",
-          rows.map(function(r){
-            return kafelek({ slug:r.slug, plik:(r.typ==="link"&&r.url)?r.url:("minigra.html?g="+encodeURIComponent(r.slug)),
-                             ikona:r.ikona, tytul:r.tytul, opis:r.opis||OPISY_BAZOWE[r.slug]||"", pelny:!!r.pelny });
-          }).join(""));
-      }).catch(function(){});
-  }
+function render(games){document.getElementById("siatka").innerHTML=games.length?games.map(card).join(""):'<div class="empty">Brak opublikowanych gierek.</div>';}
+async function boot(){
+  var fallbackDescriptions={
+    "skok-do-nieba":"Skacz po dachach familoka, zbieraj wyngiel i uważaj na ptoki. Steruj dotykiem albo przechyłem i pnij się jak najwyżej.",
+    "zeflik":"Machaj skrzydłami Zeflika, przelatuj między familokami i zbieraj kołocz. Każdy minięty familok daje punkt, a kołocz dorzuca bonus."
+  };
+  var games=window.SZP_GAMES?window.SZP_GAMES.minigames():[];
+  render(games);
+  var cfg=window.SZPILPLAC_CONFIG||{};
+  if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return;
+  try{
+    var response=await fetch(cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny&opublikowana=eq.true&order=kolejnosc.asc",{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}});
+    if(!response.ok)return;
+    var rows=await response.json();
+    var known={};games.forEach(function(g){known[g.id]=true;known[g.href]=true;});
+    rows.forEach(function(row){
+      var href=row.typ==="link"&&row.url?row.url:"minigra.html?g="+encodeURIComponent(row.slug);
+      if(known[row.slug]||known[href])return;
+      games.push({id:row.slug,title:row.tytul,description:row.opis||fallbackDescriptions[row.slug]||"",icon:row.ikona,href:href,fullscreen:!!row.pelny});
+    });
+    render(games);
+  }catch(e){}
 }
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 </script>
 </body>
 </html>
