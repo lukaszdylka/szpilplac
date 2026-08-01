@@ -1,8 +1,8 @@
-/* Szpilplac account streak and cadence view v130 */
+/* Szpilplac account streak and cadence view v131 */
 (function(){
   "use strict";
 
-  var VERSION="v130";
+  var VERSION="v131";
   var originalLoadResults=typeof window.loadResults==="function" ? window.loadResults : null;
 
   function esc(value){
@@ -39,9 +39,9 @@
     return g==="zorta"?"raja":g;
   }
 
-  function localPlayed(game){
+  function localPlayed(game,mode){
     try{
-      return !!(window.SZP_GAME_PLAYED&&window.SZP_GAME_PLAYED.isPlayed&&window.SZP_GAME_PLAYED.isPlayed(game));
+      return !!(window.SZP_GAME_PLAYED&&window.SZP_GAME_PLAYED.isPlayed&&window.SZP_GAME_PLAYED.isPlayed(game,mode));
     }catch(e){return false;}
   }
 
@@ -79,7 +79,11 @@
     });
 
     dailyGames.forEach(function(game){
-      if(localPlayed(game.id))dailyDone[game.id]=true;
+      if(localPlayed(game.id,"daily"))dailyDone[game.id]=true;
+    });
+
+    weeklyGames.forEach(function(game){
+      if(localPlayed(game.id,"weekly"))weeklyDone[game.id]=true;
     });
 
     if(Object.keys(dailyDone).some(function(k){return dailyDone[k];}))playedDays[today]=true;
