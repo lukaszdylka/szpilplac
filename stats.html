@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
-<link rel="stylesheet" href="/admin-common.css?v=2026.08.01.5">
-<script src="config.js?v=2026.08.01.5"></script>
+<link rel="stylesheet" href="/admin-common.css?v=2026.08.02.1">
+<script src="/build-version.js?v=2026.08.02.1"></script>
+<script src="/config.js?v=2026.08.02.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="admin-page">
@@ -26,7 +27,10 @@
 <main class="admin-main admin-wrap">
   <div class="admin-msg" id="msg">Ładuję statystyki…</div>
   <section class="admin-card hidden" id="guestCard"><h2>Dostęp administratora</h2><p class="admin-muted">Zaloguj się na konto administratora Szpilplacu.</p><a class="admin-action" href="konto.html">Przejdź do logowania</a></section>
-  <section class="admin-card hidden" id="setupCard"><h2>Włącz analitykę</h2><p class="admin-muted">W Supabase SQL Editor uruchom kolejno <b>sql/admin-analytics-v1.sql</b>, poprawkę dat kont v2 oraz <b>sql/admin-analytics-v3-track-events.sql</b>. Wyniki gier pozostają bez zmian.</p></section>
+  <section class="admin-card hidden" id="setupCard"><h2>Włącz analitykę</h2><p class="admin-muted">W Supabase SQL Editor uruchom <b>sql/admin-analytics-v5-separate-events-table.sql</b>. Skrypt tworzy osobną tabelę ruchu i nie zmienia wyników gier.</p></section>
+  <section class="admin-card hidden" id="healthCard">
+    <div class="admin-section-head"><div><h2>Stan analityki</h2><div class="admin-muted" id="healthText">Sprawdzam zapis odsłon…</div></div><div class="admin-section-note" id="healthBadge">—</div></div>
+  </section>
   <section class="admin-card hidden" id="overviewCard">
     <div class="admin-section-head"><div><h2>Najważniejsze teraz</h2><div class="admin-muted">Liczby potrzebne do oceny ruchu i zaangażowania.</div></div><div class="admin-section-note" id="updatedAt">—</div></div>
     <div class="admin-kpis" id="kpis"></div>
@@ -65,19 +69,42 @@ function gameName(v){return ({slowko:"Słōwko",klodka:"Kłōdka",zorta:"Raja",r
 function sourceName(v){return ({card:"Karta na stronie",header:"Ikona w nagłówku",menu:"Menu gracza",link:"Inny link"}[v]||v||"Inny link")}
 function playerValue(v,row){return n(row&&row.game_finishes)>0&&n(v)===0?"—":integer(v)}
 function playerHint(finishes,players){return n(finishes)>0&&n(players)===0?"brak danych w starych wpisach":integer(players)+" graczy"}
+function renderHealth(health){
+  show("healthCard");
+  if(!health.ok){
+    el("healthBadge").textContent="Błąd";
+    el("healthText").textContent="Nie udało się odczytać diagnostyki v5. Sprawdź widok stats_admin_analytics_health.";
+    return;
+  }
+  var h=health.data&&health.data[0];
+  if(!h){
+    el("healthBadge").textContent="Brak widoku";
+    el("healthText").textContent="Uruchom SQL v5, aby włączyć niezależną diagnostykę analityki.";
+    return;
+  }
+  if(n(h.page_views_total)>0){
+    el("healthBadge").textContent="Działa";
+    el("healthText").textContent="Zapisano "+integer(h.page_views_total)+" odsłon. Ostatnia: "+dateTime(h.last_page_view)+".";
+  }else{
+    el("healthBadge").textContent="Czeka na ruch";
+    el("healthText").textContent="Tabela i widok działają, ale nie zapisano jeszcze prawdziwej odsłony z publicznej strony.";
+  }
+}
 async function load(){
   el("refreshBtn").disabled=true;setMsg("Ładuję statystyki…");
   try{
     var s=await session();if(!s||!s.user){show("guestCard");setMsg("Nie jesteś zalogowany.","err");return}
     var access=await view("stats_admin_overview",1);if(!access.ok||!access.data.length){show("guestCard");setMsg("To konto nie ma dostępu administratora.","err");return}
     var base=access.data[0];
-    var results=await Promise.all([view("stats_admin_analytics_overview",1),view("stats_admin_analytics_daily",14),view("stats_admin_all_plays_by_game",20),view("stats_admin_new_accounts",15),view("stats_admin_support_sources",20),view("stats_admin_top_pages",12)]);
-    var analytics=results[0],daily=results[1],games=results[2],accounts=results[3],support=results[4],pages=results[5];
+    var results=await Promise.all([view("stats_admin_analytics_overview",1),view("stats_admin_analytics_daily",14),view("stats_admin_all_plays_by_game",20),view("stats_admin_new_accounts",15),view("stats_admin_support_sources",20),view("stats_admin_top_pages",12),view("stats_admin_analytics_health",1)]);
+    var analytics=results[0],daily=results[1],games=results[2],accounts=results[3],support=results[4],pages=results[5],health=results[6];
+    renderHealth(health);
     var o=analytics.ok&&analytics.data.length?analytics.data[0]:null;
     if(!o){
       show("setupCard");
       el("kpis").innerHTML=[kpi("Konta",integer(base.registered_players),"wszystkie"),kpi("Aktywni dziś",integer(base.active_today),"zalogowani gracze"),kpi("Wyniki",integer(base.total_results),"zapisane na kontach"),kpi("Aktywni 7 dni",integer(base.active_7d),"zalogowani gracze")].join("")
     }else{
+      hide("setupCard");
       el("kpis").innerHTML=[
         kpi("Odsłony dziś",integer(o.page_views_today),"wszystkie strony","good"),
         kpi("Osoby dziś",integer(o.visitors_today),"unikalne przeglądarki","good"),
@@ -88,12 +115,12 @@ async function load(){
       ].join("")
     }
     show("overviewCard");el("updatedAt").textContent="Odświeżono: "+new Date().toLocaleString("pl-PL");
-    if(daily.ok){el("dailyTable").innerHTML=table(daily.data,[{key:"day",label:"Dzień",format:day},{key:"page_views",label:"Odsłony",num:true,format:integer},{key:"visitors",label:"Osoby",num:true,format:integer},{key:"game_finishes",label:"Gry",num:true,format:integer},{key:"game_players",label:"Gracze",num:true,format:playerValue},{key:"new_accounts",label:"Nowe konta",num:true,format:integer},{key:"support_clicks",label:"Kawa",num:true,format:integer}],"Dane ruchu zaczną pojawiać się po uruchomieniu RPC analityki.");show("dailyCard")}
-    el("gamesTable").innerHTML=games.ok?table(games.data,[{key:"game",label:"Gra",format:gameName},{key:"plays_30d",label:"Gry 30 dni",num:true,format:integer},{key:"players_30d",label:"Gracze",num:true,format:integer},{key:"win_pct",label:"Wygrane",num:true,format:pct}],"Brak ukończonych gier."):"<div class=\"admin-empty\">Brak widoku gier.</div>";
-    el("accountsTable").innerHTML=accounts.ok?table(accounts.data,[{key:"login",label:"Login"},{key:"created_at",label:"Rejestracja",format:dateTime},{key:"games_played",label:"Gry",num:true,format:integer},{label:"Miejsce",value:function(r){return [r.city,r.voivodeship].filter(Boolean).join(", ")||"—"}}],"Brak kont."):"<div class=\"admin-empty\">Uruchom SQL v2, aby zobaczyć rzeczywiste daty rejestracji.</div>";
+    if(daily.ok){el("dailyTable").innerHTML=table(daily.data,[{key:"day",label:"Dzień",format:day},{key:"page_views",label:"Odsłony",num:true,format:integer},{key:"visitors",label:"Osoby",num:true,format:integer},{key:"game_finishes",label:"Gry",num:true,format:integer},{key:"game_players",label:"Gracze",num:true,format:playerValue},{key:"new_accounts",label:"Nowe konta",num:true,format:integer},{key:"support_clicks",label:"Kawa",num:true,format:integer}],"Brak zapisanych zdarzeń w wybranym okresie.");show("dailyCard")}
+    el("gamesTable").innerHTML=games.ok?table(games.data,[{key:"game",label:"Gra",format:gameName},{key:"plays_30d",label:"Gry 30 dni",num:true,format:integer},{key:"players_30d",label:"Gracze",num:true,format:integer},{key:"win_pct",label:"Wygrane",num:true,format:pct}],"Brak ukończonych gier."):"<div class=\"admin-empty\">Nie udało się odczytać widoku gier.</div>";
+    el("accountsTable").innerHTML=accounts.ok?table(accounts.data,[{key:"login",label:"Login"},{key:"created_at",label:"Rejestracja",format:dateTime},{key:"games_played",label:"Gry",num:true,format:integer},{label:"Miejsce",value:function(r){return [r.city,r.voivodeship].filter(Boolean).join(", ")||"—"}}],"Brak kont."):"<div class=\"admin-empty\">Nie udało się odczytać nowych kont.</div>";
     show("mainGrid");
-    el("supportTable").innerHTML=support.ok?table(support.data,[{key:"source",label:"Miejsce",format:sourceName},{key:"clicks_today",label:"Dziś",num:true,format:integer},{key:"clicks_7d",label:"7 dni",num:true,format:integer},{key:"clicks_30d",label:"30 dni",num:true,format:integer}],"Jeszcze nie odnotowano kliknięć."):"<div class=\"admin-empty\">Uruchom SQL v3, aby analizować kliknięcia.</div>";
-    el("pagesTable").innerHTML=pages.ok?table(pages.data,[{key:"path",label:"Strona"},{key:"views_7d",label:"7 dni",num:true,format:integer},{key:"views_30d",label:"30 dni",num:true,format:integer},{key:"visitors_30d",label:"Osoby",num:true,format:integer}],"Odsłony zaczną pojawiać się po uruchomieniu SQL v3."):"<div class=\"admin-empty\">Uruchom SQL v3, aby analizować ruch.</div>";
+    el("supportTable").innerHTML=support.ok?table(support.data,[{key:"source",label:"Miejsce",format:sourceName},{key:"clicks_today",label:"Dziś",num:true,format:integer},{key:"clicks_7d",label:"7 dni",num:true,format:integer},{key:"clicks_30d",label:"30 dni",num:true,format:integer}],"Jeszcze nie odnotowano kliknięć."):"<div class=\"admin-empty\">Nie udało się odczytać kliknięć wsparcia.</div>";
+    el("pagesTable").innerHTML=pages.ok?table(pages.data,[{key:"path",label:"Strona"},{key:"views_7d",label:"7 dni",num:true,format:integer},{key:"views_30d",label:"30 dni",num:true,format:integer},{key:"visitors_30d",label:"Osoby",num:true,format:integer}],"Brak zapisanych odsłon od uruchomienia nowej analityki."):"<div class=\"admin-empty\">Nie udało się odczytać ruchu.</div>";
     show("trafficGrid");hide("msg")
   }catch(e){setMsg("Nie udało się pobrać statystyk: "+(e.message||e),"err")}finally{el("refreshBtn").disabled=false}
 }
