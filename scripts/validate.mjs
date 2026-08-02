@@ -16,14 +16,17 @@ function walk(dir){
 }
 
 const files=walk(root);
-for(const file of files.filter((f)=>f.endsWith(".js"))){
+const htmlFiles=files.filter((file)=>file.endsWith(".html"));
+
+for(const file of files.filter((file)=>file.endsWith(".js"))){
   try{execFileSync(process.execPath,["--check",file],{stdio:"pipe"});}
   catch(error){fail(`Błąd składni JS: ${path.relative(root,file)}\n${error.stderr?.toString()||error.message}`);}
 }
 
-for(const relative of ["gierki.html","minigra.html","stats.html"]){
+for(const file of htmlFiles){
+  const relative=path.relative(root,file).replaceAll("\\","/");
   try{
-    const html=fs.readFileSync(path.join(root,relative),"utf8");
+    const html=fs.readFileSync(file,"utf8");
     const pattern=/<script(?![^>]*\bsrc\s*=)([^>]*)>([\s\S]*?)<\/script>/gi;
     let match,index=0;
     while((match=pattern.exec(html))){
@@ -61,9 +64,49 @@ const buildMatch=buildText.match(/SZP_BUILD_ID="([^"]+)"/);
 if(!buildMatch)fail("Brak SZP_BUILD_ID w build-version.js.");
 else{
   const expected=buildMatch[1];
-  for(const file of ["topbar-common.js","sw.js"]){
+  for(const file of ["topbar-common.js","sw.js","site-events.js","analytics.js"]){
     const text=fs.readFileSync(path.join(root,file),"utf8");
     if(!text.includes(expected))fail(`${file} nie zawiera aktualnej wersji ${expected}.`);
+  }
+}
+
+const topbar=fs.readFileSync(path.join(root,"topbar-common.js"),"utf8");
+const legacyTracker=fs.readFileSync(path.join(root,"analytics.js"),"utf8");
+const serviceWorker=fs.readFileSync(path.join(root,"sw.js"),"utf8");
+const stats=fs.readFileSync(path.join(root,"stats.html"),"utf8");
+const analyticsSql=fs.readFileSync(path.join(root,"sql/admin-analytics-v5-separate-events-table.sql"),"utf8");
+
+if(!topbar.includes('/site-events.js'))fail("topbar-common.js nie ładuje site-events.js.");
+if(!legacyTracker.includes('/site-events.js'))fail("analytics.js nie przekierowuje starych wersji do site-events.js.");
+if(!serviceWorker.includes('"/site-events.js"'))fail("sw.js nie przechowuje site-events.js w cache PWA.");
+if(!stats.includes("stats_admin_analytics_health"))fail("stats.html nie odczytuje diagnostyki analityki v5.");
+if(!stats.includes("admin-analytics-v5-separate-events-table.sql"))fail("stats.html nie wskazuje aktualnego SQL v5.");
+if(!analyticsSql.includes("create table if not exists public.szpilplac_analytics_events"))fail("SQL v5 nie tworzy osobnej tabeli analityki.");
+if(!analyticsSql.includes("stats_admin_analytics_health"))fail("SQL v5 nie tworzy widoku diagnostycznego.");
+
+const publicPages=[
+  "index.html",
+  "slowko.html",
+  "cuzamen.html",
+  "klodka.html",
+  "gierki.html",
+  "minigra.html",
+  "kopalnia.html",
+  "na-wiyrch.html",
+  "bandyta.html",
+  "pong.html",
+  "konto.html",
+  "ranking.html",
+  "nowosci.html",
+  "raja/index.html"
+];
+
+for(const relative of publicPages){
+  const file=path.join(root,relative);
+  if(!fs.existsSync(file)){fail(`Brak publicznej strony ${relative}.`);continue;}
+  const html=fs.readFileSync(file,"utf8");
+  if(!/(?:topbar-common|site-events|analytics)\.js/i.test(html)){
+    fail(`${relative} nie uruchamia wspólnego modułu zdarzeń.`);
   }
 }
 
