@@ -1,4 +1,4 @@
-/* Szpilplac minigry-stats.js v1
+/* Szpilplac minigry-stats.js v2
    Lekki tracker dla gier zapisanych jako osobne pliki HTML.
    Użycie: <script src="minigry-stats.js" data-game="pong"></script>
 */
@@ -9,16 +9,19 @@
   var slug=String(script&&script.dataset&&script.dataset.game||"").toLowerCase();
   var startedAt=Date.now();
   var startSent=false;
-  var lastFinishAt=0;
+  var finishSent=false;
   var readyPromise=null;
-  var VISITOR_KEY="szpilplac_minigry_visitor_v1";
+  var VISITOR_KEY="szpilplac_visitor_id_v1";
+  var LEGACY_VISITOR_KEY="szpilplac_minigry_visitor_v1";
 
   function visitorId(){
     try{
-      var id=localStorage.getItem(VISITOR_KEY);
-      if(id)return id;
-      id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():("v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+      var id=localStorage.getItem(VISITOR_KEY)||localStorage.getItem(LEGACY_VISITOR_KEY);
+      if(!id){
+        id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():("v-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+      }
       localStorage.setItem(VISITOR_KEY,id);
+      localStorage.setItem(LEGACY_VISITOR_KEY,id);
       return id;
     }catch(e){
       return "v-"+Math.random().toString(36).slice(2);
@@ -30,7 +33,7 @@
     if(readyPromise)return readyPromise;
     readyPromise=new Promise(function(resolve,reject){
       var s=document.createElement("script");
-      s.src="config.js?v=13";
+      s.src="/config.js?v=13";
       s.onload=function(){window.SZPILPLAC_CONFIG?resolve(window.SZPILPLAC_CONFIG):reject(new Error("Brak konfiguracji"));};
       s.onerror=function(){reject(new Error("Nie udało się załadować config.js"));};
       document.head.appendChild(s);
@@ -64,6 +67,10 @@
   }
 
   function start(){
+    if(finishSent){
+      finishSent=false;
+      startSent=false;
+    }
     if(startSent)return;
     startSent=true;
     startedAt=Date.now();
@@ -71,24 +78,34 @@
   }
 
   function finish(data){
+    if(finishSent)return;
+    if(!startSent){
+      startSent=true;
+      startedAt=Date.now();
+      track("start");
+    }
+    finishSent=true;
     var now=Date.now();
-    if(now-lastFinishAt<800)return;
-    lastFinishAt=now;
     data=data||{};
     if(data.duration_ms==null)data.duration_ms=Math.max(0,now-startedAt);
     track("finish",data);
   }
 
   function reset(){
+    finishSent=false;
     startSent=false;
     startedAt=Date.now();
     start();
   }
 
-  window.SZPILPLAC_MINIGRA_STATS={track:track,start:start,finish:finish,reset:reset,slug:slug};
+  function status(){
+    return {slug:slug,started:startSent,finished:finishSent,startedAt:startedAt};
+  }
+
+  window.SZPILPLAC_MINIGRA_STATS={track:track,start:start,finish:finish,reset:reset,status:status,slug:slug};
 
   if(!slug)return;
   track("open");
-  document.addEventListener("pointerdown",start,{once:true,capture:true});
-  document.addEventListener("keydown",start,{once:true,capture:true});
+  document.addEventListener("pointerdown",start,{capture:true});
+  document.addEventListener("keydown",start,{capture:true});
 })();
