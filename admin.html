@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;600;800;900&display=swap&subset=latin,latin-ext" rel="stylesheet">
-<link rel="stylesheet" href="/admin-common.css?v=2026.08.01.3">
-<script src="config.js?v=2026.08.01.3"></script>
+<link rel="stylesheet" href="/admin-common.css?v=2026.08.02.1">
+<script src="/build-version.js?v=2026.08.02.1"></script>
+<script src="/config.js?v=2026.08.02.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="admin-page">
@@ -28,7 +29,7 @@
   <section class="admin-card hidden" id="guestCard"><h2>Dostęp administratora</h2><p class="admin-muted">Zaloguj się na konto administratora Szpilplacu.</p><a class="admin-action" href="konto.html">Przejdź do logowania</a></section>
   <section class="admin-card hidden" id="overviewCard"><div class="admin-section-head"><div><h2>Przegląd</h2><div class="admin-muted">Szybki obraz tego, co dzieje się na Szpilplacu.</div></div><div class="admin-section-note" id="updatedAt">—</div></div><div class="admin-kpis" id="kpis"></div></section>
   <section class="admin-card hidden" id="menuCard"><div class="admin-section-head"><div><h2>Narzędzia</h2><div class="admin-muted">Najczęściej używane panele w jednym miejscu.</div></div></div><div class="admin-menu-grid" id="menuGrid"></div></section>
-  <section class="admin-card hidden" id="setupCard"><h2>Analityka ruchu</h2><p class="admin-muted">Po scaleniu uruchom w Supabase plik <b>sql/admin-analytics-v1.sql</b>. Do tego czasu panel pokaże dotychczasowe statystyki kont.</p></section>
+  <section class="admin-card hidden" id="setupCard"><h2>Dokończ konfigurację statystyk</h2><p class="admin-muted">W Supabase SQL Editor uruchom <b>sql/admin-analytics-v5-separate-events-table.sql</b>, a następnie <b>sql/admin-analytics-v6-filter-fedrunek-accounts.sql</b>. Gdy v5 jest już uruchomiony, wystarczy wykonać v6.</p></section>
 </main>
 <footer class="admin-footer admin-wrap"><a href="index.html">Szpilplac</a> · <a href="ranking.html">Ranking</a> · <a href="konto.html">Konto</a></footer>
 <script>
@@ -54,7 +55,7 @@ async function load(){
     var s=await session();if(!s||!s.user){show("guestCard");setMsg("Nie jesteś zalogowany.","err");return}
     var access=await view("stats_admin_overview",1);if(!access.ok||!access.data.length){show("guestCard");setMsg("To konto nie ma dostępu administratora.","err");return}
     var base=access.data[0],analytics=await view("stats_admin_analytics_overview",1),mailing=await mailingCount(),o=analytics.ok&&analytics.data.length?analytics.data[0]:null;
-    if(o){el("kpis").innerHTML=[kpi("Osoby dziś",integer(o.visitors_today),integer(o.page_views_today)+" odsłon","good"),kpi("Nowe konta 7 dni",integer(o.new_accounts_7d),integer(o.new_accounts_today)+" dzisiaj"),kpi("Gry dziś",integer(o.game_finishes_today),integer(o.game_players_today)+" graczy"),kpi("Kawa 7 dni",integer(o.support_clicks_7d),integer(o.support_clicks_today)+" dzisiaj","gold")].join("")}else{show("setupCard");el("kpis").innerHTML=[kpi("Konta",integer(base.registered_players),"wszystkie"),kpi("Aktywni dziś",integer(base.active_today),"zalogowani"),kpi("Wyniki",integer(base.total_results),"zapisane"),kpi("Aktywni 7 dni",integer(base.active_7d),"zalogowani")].join("")}
+    if(o){hide("setupCard");el("kpis").innerHTML=[kpi("Osoby dziś",integer(o.visitors_today),integer(o.page_views_today)+" odsłon","good"),kpi("Nowe konta 7 dni",integer(o.new_accounts_7d),integer(o.new_accounts_today)+" dzisiaj"),kpi("Gry dziś",integer(o.game_finishes_today),integer(o.game_players_today)+" graczy"),kpi("Kawa 7 dni",integer(o.support_clicks_7d),integer(o.support_clicks_today)+" dzisiaj","gold")].join("")}else{show("setupCard");el("kpis").innerHTML=[kpi("Konta",integer(base.registered_players),"wszystkie"),kpi("Aktywni dziś",integer(base.active_today),"zalogowani"),kpi("Wyniki",integer(base.total_results),"zapisane"),kpi("Aktywni 7 dni",integer(base.active_7d),"zalogowani")].join("")}
     el("menuGrid").innerHTML=[
       tile("Statystyki","Ruch, nowe konta, gry i kliknięcia Postaw kawę.","stats.html","Analizuj"),
       tile("Wyniki gier","Rozwiązania i wyniki Słōwka, Kłōdki oraz Rai.","game-results-admin.html","Sprawdź wyniki"),
