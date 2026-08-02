@@ -1,7 +1,7 @@
 /* Szpilplac topbar-common.js */
 (function(){
   "use strict";
-  var FALLBACK_BUILD="2026.08.01.6";
+  var FALLBACK_BUILD="2026.08.02.1";
   var updateRequested=false;
 
   function buildId(){return window.SZP_BUILD_ID||FALLBACK_BUILD;}
@@ -16,15 +16,54 @@
     document.head.appendChild(link);
   }
 
-  function loadScript(id,src,done){
+  function loadScript(id,src,done,fail){
     var old=document.getElementById(id);
-    if(old){if(done)done();return;}
+    if(old){
+      if(done){
+        if(old.dataset&&old.dataset.loaded==="1")done();
+        else old.addEventListener("load",done,{once:true});
+      }
+      if(fail)old.addEventListener("error",fail,{once:true});
+      return old;
+    }
+
     var script=document.createElement("script");
     script.id=id;
     script.src=src;
     script.async=false;
-    if(done)script.onload=done;
+    script.onload=function(){
+      if(script.dataset)script.dataset.loaded="1";
+      if(done)done();
+    };
+    script.onerror=function(){if(fail)fail();};
     document.head.appendChild(script);
+    return script;
+  }
+
+  function loadSiteEvents(){
+    if(window.SZP_SITE_EVENTS)return;
+
+    function failed(){
+      var old=document.getElementById("szp-site-events");
+      if(old)old.remove();
+      loadScript(
+        "szp-site-events",
+        asset("/site-events.js")+"&retry="+Date.now(),
+        null,
+        function(){
+          console.error("Nie udało się załadować modułu zdarzeń Szpilplacu.");
+          try{document.dispatchEvent(new CustomEvent("szp:site-events-load-error"));}catch(error){}
+        }
+      );
+    }
+
+    loadScript("szp-site-events",asset("/site-events.js"),null,failed);
+    setTimeout(function(){
+      if(!window.SZP_SITE_EVENTS){
+        console.error("Moduł zdarzeń Szpilplacu nie uruchomił się w wymaganym czasie.");
+        try{document.dispatchEvent(new CustomEvent("szp:site-events-timeout"));}catch(error){}
+      }
+    },4000);
   }
 
   function addStyle(){
@@ -41,7 +80,7 @@
   }
 
   function loadEnhancements(){
-    loadScript("szp-analytics",asset("/analytics.js"));
+    loadSiteEvents();
     loadScript("szp-games-registry",asset("/games-registry.js"),function(){
       if(isHomePage()){
         loadScript("szp-weekly-status",asset("/weekly-status.js"));
@@ -108,6 +147,6 @@
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
   setTimeout(normalize,250);
-  window.SZP_TOPBAR={version:FALLBACK_BUILD,normalize:normalize};
+  window.SZP_TOPBAR={version:FALLBACK_BUILD,normalize:normalize,loadSiteEvents:loadSiteEvents};
   console.info("Szpilplac topbar-common.js "+FALLBACK_BUILD);
 })();
