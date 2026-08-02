@@ -27,7 +27,7 @@
 <main class="admin-main admin-wrap">
   <div class="admin-msg" id="msg">Ładuję statystyki…</div>
   <section class="admin-card hidden" id="guestCard"><h2>Dostęp administratora</h2><p class="admin-muted">Zaloguj się na konto administratora Szpilplacu.</p><a class="admin-action" href="konto.html">Przejdź do logowania</a></section>
-  <section class="admin-card hidden" id="setupCard"><h2>Włącz analitykę</h2><p class="admin-muted">W Supabase SQL Editor uruchom <b>sql/admin-analytics-v5-separate-events-table.sql</b>. Skrypt tworzy osobną tabelę ruchu i nie zmienia wyników gier.</p></section>
+  <section class="admin-card hidden" id="setupCard"><h2>Włącz analitykę</h2><p class="admin-muted">W Supabase SQL Editor uruchom kolejno <b>sql/admin-analytics-v5-separate-events-table.sql</b> oraz <b>sql/admin-analytics-v6-filter-fedrunek-accounts.sql</b>. Skrypty nie zmieniają wyników gier ani danych Fedrunku.</p></section>
   <section class="admin-card hidden" id="healthCard">
     <div class="admin-section-head"><div><h2>Stan analityki</h2><div class="admin-muted" id="healthText">Sprawdzam zapis odsłon…</div></div><div class="admin-section-note" id="healthBadge">—</div></div>
   </section>
@@ -38,7 +38,7 @@
   <section class="admin-card hidden" id="dailyCard"><div class="admin-section-head"><div><h2>Ostatnie 14 dni</h2><div class="admin-muted">Dzienny ruch, ukończone gry, rozpoznani gracze, rejestracje i kliknięcia wsparcia.</div></div><div class="admin-section-note">„—” oznacza stare wpisy bez identyfikatora gracza.</div></div><div id="dailyTable"></div></section>
   <section class="admin-grid-2 hidden" id="mainGrid">
     <section class="admin-card"><div class="admin-section-head"><div><h2>Gry</h2><div class="admin-muted">Ostatnie 30 dni, także gracze bez konta.</div></div><a class="admin-action" href="game-results-admin.html">Szczegółowe wyniki</a></div><div id="gamesTable"></div></section>
-    <section class="admin-card"><div class="admin-section-head"><div><h2>Nowe konta</h2><div class="admin-muted">Najnowsze rejestracje i pierwsza aktywność.</div></div></div><div id="accountsTable"></div></section>
+    <section class="admin-card"><div class="admin-section-head"><div><h2>Nowe konta</h2><div class="admin-muted">Tylko konta Szpilplacu; anonimowe sesje Fedrunku są pomijane.</div></div></div><div id="accountsTable"></div></section>
   </section>
   <section class="admin-grid-2 hidden" id="trafficGrid">
     <section class="admin-card"><div class="admin-section-head"><div><h2>Postaw kawę</h2><div class="admin-muted">Kliknięcia według miejsca linku.</div></div></div><div id="supportTable"></div></section>
