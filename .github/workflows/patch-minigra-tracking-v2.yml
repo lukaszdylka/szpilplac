@@ -1,0 +1,36 @@
+name: Jednorazowa poprawka trackera minigier
+
+on:
+  push:
+    branches: [agent/stabilny-zapis-minigierek]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pobierz gałąź
+        uses: actions/checkout@v4
+        with:
+          ref: agent/stabilny-zapis-minigierek
+      - name: Ustaw Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Popraw tracker osadzonych minigier
+        run: node scripts/patch-minigra-tracking-v2.mjs
+      - name: Zapisz zmianę
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add minigra.html
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zapisania."
+          else
+            git commit -m "Uodpornij tracker osadzonych minigier"
+            git push
+          fi
