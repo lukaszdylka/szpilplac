@@ -1,17 +1,25 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v131
+  Szpilplac Kłōdka Auth Bridge v132
   Konto, wynik i blokada powtórki dla codziennej Kłōdki.
   Warstwa zgodności usuwa z interfejsu dawną tygodniówkę.
 */
 (function(){
 "use strict";
 
-var VERSION="v131";
+var VERSION="v132";
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
+var PUBLIC_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
 var sb=null;
 var patched=false;
 var hydratedKey=null;
 var attempts={};
+
+function repairPublicAnonKey(){
+  try{
+    window.SUPABASE_ANON_KEY=PUBLIC_ANON_KEY;
+    if(window.SZPILPLAC_CONFIG)window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY=PUBLIC_ANON_KEY;
+  }catch(e){}
+}
 
 function retireWeeklyUi(){
   try{
@@ -48,6 +56,7 @@ function loadScript(src,test){
 }
 
 async function client(){
+  repairPublicAnonKey();
   await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",function(){return !!window.supabase;});
   var url=window.SUPABASE_URL||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL);
   var key=window.SUPABASE_ANON_KEY||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY);
@@ -300,8 +309,23 @@ function hookFinish(){
   return true;
 }
 
+function repairMetaAfterBadKey(){
+  setTimeout(function(){
+    try{
+      repairPublicAnonKey();
+      if(window.repeatMode==="on"&&typeof window.loadCodeMeta==="function"){
+        window.codeMetaCache={};
+        window.loadCodeMeta();
+      }
+      if(window.game&&(window.game.status==="won"||window.game.status==="lost")&&!window.game.reveal&&typeof window.openFinishedModal==="function")window.openFinishedModal(0);
+    }catch(e){}
+  },300);
+}
+
 function boot(){
   console.info("Szpilplac klodka-auth-bridge.js "+VERSION);
+  repairPublicAnonKey();
+  repairMetaAfterBadKey();
   retireWeeklyUi();
   window.SZP_KLODKA_ACCOUNT={version:VERSION,hydrate:hydrate,saveResult:saveResult,retireWeeklyUi:retireWeeklyUi};
   loadScript("archive-achievement-common.js?v=125",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;});
@@ -318,5 +342,6 @@ function boot(){
   },100);
 }
 
+repairPublicAnonKey();
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
