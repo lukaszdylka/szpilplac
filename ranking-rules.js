@@ -1,13 +1,12 @@
 /*
-  Szpilplac Ranking Rules v41
-  ---------------------------
+  Szpilplac Ranking Rules v42
   Rozbudowuje sekcję „Jak liczymy?” w ranking.html.
 */
 
 (function(){
   "use strict";
 
-  var VERSION = "v41";
+  var VERSION = "v42";
 
   function esc(v){
     return String(v == null ? "" : v).replace(/[&<>"']/g, function(ch){
@@ -211,14 +210,14 @@
       slowkoTitle:"Słōwko",
       slowkoText:"Codzienne hasło. Najwięcej punktów dostaje się za szybkie odgadnięcie.",
       klodkaTitle:"Kłōdka",
-      klodkaText:"Kod dnia i tygodniówka. Mniej prób oznacza więcej punktów.",
+      klodkaText:"Codzienny kod. Mniej prób oznacza więcej punktów.",
       rajaTitle:"Raja",
       rajaText:"Tygodniowa układanka. Podpowiedź pomaga, ale obniża wynik.",
       ranksTitle:"Rangi",
       ranksText:"Rangi pokazują łączny postęp gracza. Pierwszy awans jest szybki, kolejne wymagają coraz więcej regularnej gry.",
       note:"Punktacja może być jeszcze delikatnie dostrajana, ale zasada zostaje taka sama: lepszy wynik, mniej prób i regularna gra dają wyższą pozycję.",
       account:"Wyniki zapisują się tylko na koncie gracza.",
-      archive:"Archiwalne gry służą do zabawy i ćwiczenia — ranking opiera się na aktualnych grach.",
+      archive:"Archiwalne gry służą do zabawy i ćwiczenia. Ranking opiera się na aktualnych grach.",
       hidden:"Gracz może ukryć się z publicznego rankingu w profilu.",
       hint:"Podpowiedzi obniżają wynik, ale nie psują zabawy.",
       slowkoRows:[
@@ -232,9 +231,12 @@
         ["Podpowiedź","-15 pkt"]
       ],
       klodkaRows:[
-        ["Kłōdka dzienna","do 120 pkt"],
-        ["Kłōdka tygodniowa","do 150 pkt"],
-        ["Kolejne próby","mniej punktów"],
+        ["1. próba","120 pkt"],
+        ["2. próba","100 pkt"],
+        ["3. próba","80 pkt"],
+        ["4. próba","60 pkt"],
+        ["5. próba","40 pkt"],
+        ["6. próba","25 pkt"],
         ["Nieudane podejście","5 pkt"]
       ],
       rajaRows:[
@@ -264,14 +266,14 @@
       slowkoTitle:"Słōwko",
       slowkoText:"Codziynne hasło. Nojwiyncyj punktōw je za gibkie ôdgadniyńcie.",
       klodkaTitle:"Kłōdka",
-      klodkaText:"Kod dnia i tydniōwka. Mynij prōb znaczy wiyncyj punktōw.",
+      klodkaText:"Codziynny kod. Mynij prōb znaczy wiyncyj punktōw.",
       rajaTitle:"Raja",
       rajaText:"Tydniowo ukłŏdanka. Podpowiydź pōmoże, ale ôbnizŏ wynik.",
       ranksTitle:"Rangi",
       ranksText:"Rangi pokŏzujōm postymp gracza. Piyrszy awans je gibki, dalsze trza już wyszpilać regularnie.",
       note:"Punktacyjo może być jeszcze lekko rychtowano, ale zasada zostaje tako sama: lepszy wynik, mynij prōb i regularno gra dajōm wyższe miejsce.",
       account:"Wyniki spamiyntujōm sie ino na kōncie gracza.",
-      archive:"Archiwalne szpile sōm do zabawy i ćwiczynio — ranking opiyrŏ sie na aktualnych szpilach.",
+      archive:"Archiwalne szpile sōm do zabawy i ćwiczynio. Ranking opiyrŏ sie na aktualnych szpilach.",
       hidden:"Gracz może sie skryć z publicznego rankingu w profilu.",
       hint:"Podpowiydzi ôbnizajōm wynik, ale niy psujōm zabawy.",
       slowkoRows:[
@@ -285,9 +287,12 @@
         ["Podpowiydź","-15 pkt"]
       ],
       klodkaRows:[
-        ["Kłōdka dziynno","do 120 pkt"],
-        ["Kłōdka tydniowo","do 150 pkt"],
-        ["Dalsze prōby","mynij punktōw"],
+        ["1. prōba","120 pkt"],
+        ["2. prōba","100 pkt"],
+        ["3. prōba","80 pkt"],
+        ["4. prōba","60 pkt"],
+        ["5. prōba","40 pkt"],
+        ["6. prōba","25 pkt"],
         ["Niyudany szpil","5 pkt"]
       ],
       rajaRows:[
@@ -406,8 +411,8 @@
 
     ["lPl","lSzl"].forEach(function(id){
       var btn = document.getElementById(id);
-      if(btn && !btn.dataset.rulesV41){
-        btn.dataset.rulesV41 = "1";
+      if(btn && !btn.dataset.rulesV42){
+        btn.dataset.rulesV42 = "1";
         btn.addEventListener("click", function(){
           setTimeout(render, 80);
           setTimeout(render, 300);
