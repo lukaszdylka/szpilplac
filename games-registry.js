@@ -16,7 +16,7 @@
     },
     {
       id:"klodka",aliases:["klodka"],title:"Kłōdka",href:"klodka.html",
-      cadence:["daily","weekly"],kind:"main",active:true,
+      cadence:["daily"],kind:"main",active:true,
       description:"Odgadnij czterocyfrowy kod, korzystając z informacji po każdej próbie."
     },
     {
