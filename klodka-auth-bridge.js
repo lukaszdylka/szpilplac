@@ -1,16 +1,30 @@
 /*
-  Szpilplac Kłōdka Auth Bridge v130
+  Szpilplac Kłōdka Auth Bridge v131
   Konto, wynik i blokada powtórki dla codziennej Kłōdki.
+  Warstwa zgodności usuwa z interfejsu dawną tygodniówkę.
 */
 (function(){
 "use strict";
 
-var VERSION="v130";
+var VERSION="v131";
 var AUTH_STORAGE_KEY="szpilplac-auth-v05";
 var sb=null;
 var patched=false;
 var hydratedKey=null;
 var attempts={};
+
+function retireWeeklyUi(){
+  try{
+    window.view="daily";
+    ["weektile","weeklyHint","weeklyHintGame","subback"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&el.parentNode)el.parentNode.removeChild(el);
+    });
+    if(typeof window.fetchWeeklyHint==="function")window.fetchWeeklyHint=function(){return Promise.resolve();};
+    if(typeof window.refreshWeektile==="function")window.refreshWeektile=function(){};
+    if(typeof window.switchView==="function")window.switchView=function(){return false;};
+  }catch(e){}
+}
 
 function esc(x){
   return String(x==null?"":x).replace(/[&<>"']/g,function(ch){
@@ -239,6 +253,7 @@ function showDone(row,i){
 
 async function hydrate(){
   try{
+    retireWeeklyUi();
     var i=idx();
     var key="daily:"+String(i);
     if(!isCurrent(i))return;
@@ -265,6 +280,7 @@ function hookFinish(){
   if(patched||typeof window.finish!=="function")return !!patched;
   var old=window.finish;
   window.finish=function(won){
+    retireWeeklyUi();
     var d=snap(!!won);
     var ret=old.apply(this,arguments);
     var key=d.game+":"+d.mode+":"+d.puzzleNo;
@@ -286,14 +302,17 @@ function hookFinish(){
 
 function boot(){
   console.info("Szpilplac klodka-auth-bridge.js "+VERSION);
-  window.SZP_KLODKA_ACCOUNT={version:VERSION,hydrate:hydrate,saveResult:saveResult};
+  retireWeeklyUi();
+  window.SZP_KLODKA_ACCOUNT={version:VERSION,hydrate:hydrate,saveResult:saveResult,retireWeeklyUi:retireWeeklyUi};
   loadScript("archive-achievement-common.js?v=125",function(){return !!window.SZP_ARCHIVE_ACHIEVEMENT;});
   loadScript("game-stats-common.js?v=125",function(){return !!window.SZP_GAME_STATS;});
+  setTimeout(retireWeeklyUi,40);
   setTimeout(hydrate,500);
   setTimeout(hydrate,1400);
   var n=0;
   var timer=setInterval(function(){
     n++;
+    retireWeeklyUi();
     if(hookFinish()||n>80)clearInterval(timer);
     if(n===10||n===30)hydrate();
   },100);
