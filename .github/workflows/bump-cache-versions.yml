@@ -24,65 +24,11 @@ jobs:
 
           replacements = {
               'konto.html': {
-                  'achievement-toast.js?v=124': 'achievement-toast.js?v=125',
-                  'achievements-panel.js?v=124': 'achievements-panel.js?v=125',
-                  'google-auth-bridge.js?v=124': 'google-auth-bridge.js?v=125',
-                  'game-display-names.js?v=124': 'game-display-names.js?v=125',
-                  'avatar-select.js?v=124': 'avatar-select.js?v=125',
-                  'konto-dashboard.js?v=124': 'konto-dashboard.js?v=039',
-                  'konto-delete-bridge.js?v=124': 'konto-delete-bridge.js?v=038',
-                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
-                  '<script src="kamraty-achievements-bridge.js?v=2"></script>': '<script src="retired-achievements.js?v=1"></script>',
-                  '<script src="kamraty-reaction-summary.js?v=6"></script>': '<script src="account-notifications-compat.js?v=1"></script>',
                   '<script src="retired-achievements.js?v=1"></script>': '',
-              },
-              'ranking.html': {
-                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
-                  '<script src="kamraty-achievements-bridge.js?v=2"></script>': '',
-              },
-              'gracz.html': {
-                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
               },
               'nowosci.html': {
                   'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, Kamraty, odznaki i kolejne zmiany projektu.': 'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, odznaki, profile i kolejne zmiany projektu.',
-                  '''    <div class="timeline">
-      <article class="entry">
-        <div class="dot">8 IX</div>
-        <div class="entry-card latest">''': '''    <div class="timeline">
-      <article class="entry">
-        <div class="dot">10 IX</div>
-        <div class="entry-card latest">
-          <div class="entry-meta"><span class="entry-date">10 września 2026</span><span class="tag">Konto</span></div>
-          <h2>Szpilplac uprościł część społecznościową</h2>
-          <p>Kamraty z placu zostały wycofane. Zostają konto, ranking, odznaki i prosty profil publiczny gracza, bez obserwowania, reakcji i porównań.</p>
-          <ul class="changes">
-            <li>usunięte Kamraty, reakcje i porównywanie graczy</li>
-            <li>zachowany prosty profil publiczny i link z rankingu</li>
-            <li>zachowane odznaki niezwiązane z Kamratami</li>
-            <li>usunięte stare skrypty i pozostałości po dawnych poprawkach</li>
-          </ul>
-          <a class="entry-link" href="konto.html">Przejdź do konta →</a>
-        </div>
-      </article>
-
-      <article class="entry">
-        <div class="dot">8 IX</div>
-        <div class="entry-card">''',
-              },
-              'klodka.html': {
-                  'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
-                  'game-result-actions.js?v=80': 'game-result-actions.js?v=126',
-              },
-              'slowko.html': {
-                  'game-result-actions.js?v=79': 'game-result-actions.js?v=126',
-              },
-              'raja/index.html': {
-                  'raja-auth-bridge.js?v=124': 'raja-auth-bridge.js?v=125',
-                  '../achievement-toast.js?v=124': '../achievement-toast.js?v=125',
-                  '../game-result-actions.js?v=124': '../game-result-actions.js?v=126',
-                  '../game-played.js?v=124': '../game-played.js?v=125',
-                  '../game-save.js?v=124': '../game-save.js?v=125',
-                  '../archive-achievement-common.js?v=124': '../archive-achievement-common.js?v=125',
+                  '    <div class="timeline">\n      <article class="entry">\n        <div class="dot">8 IX</div>\n        <div class="entry-card latest">': '    <div class="timeline">\n      <article class="entry">\n        <div class="dot">10 IX</div>\n        <div class="entry-card latest">\n          <div class="entry-meta"><span class="entry-date">10 września 2026</span><span class="tag">Konto</span></div>\n          <h2>Szpilplac uprościł część społecznościową</h2>\n          <p>Kamraty z placu zostały wycofane. Zostają konto, ranking, odznaki i prosty profil publiczny gracza, bez obserwowania, reakcji i porównań.</p>\n          <ul class="changes">\n            <li>usunięte Kamraty, reakcje i porównywanie graczy</li>\n            <li>zachowany prosty profil publiczny i link z rankingu</li>\n            <li>zachowane odznaki niezwiązane z Kamratami</li>\n            <li>usunięte stare skrypty i pozostałości po dawnych poprawkach</li>\n          </ul>\n          <a class="entry-link" href="konto.html">Przejdź do konta →</a>\n        </div>\n      </article>\n\n      <article class="entry">\n        <div class="dot">8 IX</div>\n        <div class="entry-card">',
               },
           }
 
@@ -106,12 +52,12 @@ jobs:
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- konto.html ranking.html gracz.html nowosci.html klodka.html slowko.html raja/index.html; then
+          if git diff --quiet -- konto.html nowosci.html; then
             echo "No HTML cache-version changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add konto.html ranking.html gracz.html nowosci.html klodka.html slowko.html raja/index.html
+          git add konto.html nowosci.html
           git commit -m "Bump HTML cache versions"
           git push
