@@ -10,17 +10,41 @@ permissions:
 
 jobs:
   bump:
-    if: ${{ !contains(github.event.head_commit.message, 'Bump HTML cache versions') }}
+    if: ${{ !contains(github.event.head_commit.message, 'Bump HTML cache versions') && !contains(github.event.head_commit.message, 'Sync shared build versions') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Bump script query versions
+      - name: Sync shared build and script query versions
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
+
+          build_text = Path('build-version.js').read_text(encoding='utf-8')
+          match = re.search(r'SZP_BUILD_ID="([^"]+)"', build_text)
+          if not match:
+              raise SystemExit('Brak SZP_BUILD_ID w build-version.js')
+          build = match.group(1)
+
+          shared_patterns = {
+              'topbar-common.js': (r'FALLBACK_BUILD="[^"]+"', f'FALLBACK_BUILD="{build}"'),
+              'site-events.js': (r'var VERSION=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var VERSION=window.SZP_BUILD_ID||"{build}";'),
+              'analytics.js': (r'var version=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var version=window.SZP_BUILD_ID||"{build}";'),
+              'sw.js': (r'const BUILD_ID=self\.SZP_BUILD_ID\|\|"[^"]+";', f'const BUILD_ID=self.SZP_BUILD_ID||"{build}";'),
+          }
+
+          changed = []
+          for file, (pattern, replacement) in shared_patterns.items():
+              p = Path(file)
+              text = p.read_text(encoding='utf-8')
+              new_text = re.sub(pattern, replacement, text, count=1)
+              if new_text != text:
+                  p.write_text(new_text, encoding='utf-8', newline='')
+                  changed.append(file)
+                  print('synced build', file, build)
 
           replacements = {
               'konto.html': {
@@ -49,7 +73,6 @@ jobs:
               },
           }
 
-          changed = []
           for file, reps in replacements.items():
               p = Path(file)
               text = p.read_text(encoding='utf-8')
@@ -59,9 +82,7 @@ jobs:
               if text != old_text:
                   p.write_text(text, encoding='utf-8', newline='')
                   changed.append(file)
-                  print('changed', file)
-              else:
-                  print('no changes', file)
+                  print('changed cache ref', file)
 
           if not changed:
               print('nothing to commit')
@@ -69,12 +90,12 @@ jobs:
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- konto.html klodka.html slowko.html raja/index.html; then
-            echo "No HTML cache-version changes."
+          if git diff --quiet; then
+            echo "No build/cache-version changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add konto.html klodka.html slowko.html raja/index.html
-          git commit -m "Bump HTML cache versions"
+          git add topbar-common.js site-events.js analytics.js sw.js konto.html klodka.html slowko.html raja/index.html
+          git commit -m "Sync shared build versions"
           git push
