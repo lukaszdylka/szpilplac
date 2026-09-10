@@ -45,4 +45,20 @@ begin
 end;
 $$;
 
+-- Stare endpointy społecznościowe zostają w schemacie jako historia,
+-- ale nie są już dostępne dla klienta publicznego ani zalogowanych graczy.
+revoke execute on function public.szp_check_kamrat_achievements(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_check_my_kamrat_achievements() from public, anon, authenticated;
+revoke execute on function public.szp_compare_with_player(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_follow_player(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_my_kamraty() from public, anon, authenticated;
+revoke execute on function public.szp_my_reaction_summary() from public, anon, authenticated;
+revoke execute on function public.szp_public_player_reactions(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_public_reaction_summary(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_send_reaction(uuid, text) from public, anon, authenticated;
+revoke execute on function public.szp_unfollow_player(uuid) from public, anon, authenticated;
+revoke execute on function public.szp_kamraty_achievements_follow_trg() from public, anon, authenticated;
+revoke execute on function public.szp_kamraty_achievements_profile_trg() from public, anon, authenticated;
+revoke execute on function public.szp_kamraty_achievements_reaction_trg() from public, anon, authenticated;
+
 commit;
