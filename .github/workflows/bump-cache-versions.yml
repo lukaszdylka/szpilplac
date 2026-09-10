@@ -31,6 +31,7 @@ jobs:
                   'avatar-select.js?v=124': 'avatar-select.js?v=125',
                   'konto-dashboard.js?v=124': 'konto-dashboard.js?v=039',
                   'konto-delete-bridge.js?v=124': 'konto-delete-bridge.js?v=038',
+                  'account-notifications-compat.js?v=1': 'account-notifications-compat.js?v=2',
               },
               'klodka.html': {
                   'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
