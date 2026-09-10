@@ -1,5 +1,6 @@
 name: Bump cache versions
 
+# Utrzymuje wspólny numer buildu w skryptach i aktualizuje znane odwołania cache.
 on:
   push:
     branches: [main]
