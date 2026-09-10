@@ -31,13 +31,16 @@ jobs:
                   'avatar-select.js?v=124': 'avatar-select.js?v=125',
                   'konto-dashboard.js?v=124': 'konto-dashboard.js?v=039',
                   'konto-delete-bridge.js?v=124': 'konto-delete-bridge.js?v=038',
-                  'kamraty.js?v=6': 'kamraty.js?v=7',
-                  'kamraty-achievements-bridge.js?v=1': 'kamraty-achievements-bridge.js?v=2',
-                  'kamraty-reaction-summary.js?v=1': 'kamraty-reaction-summary.js?v=6',
+                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
+                  '<script src="kamraty-achievements-bridge.js?v=2"></script>': '<script src="retired-achievements.js?v=1"></script>',
+                  '<script src="kamraty-reaction-summary.js?v=6"></script>': '<script src="account-notifications-compat.js?v=1"></script>',
               },
               'ranking.html': {
-                  'kamraty.js?v=5': 'kamraty.js?v=7',
-                  'kamraty-achievements-bridge.js?v=1': 'kamraty-achievements-bridge.js?v=2',
+                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
+                  '<script src="kamraty-achievements-bridge.js?v=2"></script>': '',
+              },
+              'gracz.html': {
+                  '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
               },
               'klodka.html': {
                   'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
@@ -76,12 +79,12 @@ jobs:
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- konto.html ranking.html klodka.html slowko.html raja/index.html; then
+          if git diff --quiet -- konto.html ranking.html gracz.html klodka.html slowko.html raja/index.html; then
             echo "No HTML cache-version changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add konto.html ranking.html klodka.html slowko.html raja/index.html
+          git add konto.html ranking.html gracz.html klodka.html slowko.html raja/index.html
           git commit -m "Bump HTML cache versions"
           git push
