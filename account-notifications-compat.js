@@ -1,28 +1,48 @@
-/* Szpilplac account-notifications compatibility v1
-   Zachowuje dotychczasowe ukrycie nieużywanego panelu powiadomień konta.
+/* Szpilplac account-notifications compatibility v2
+   Kamraty zostały wycofane, więc ukrywamy tylko ich stare opcje powiadomień.
+   Właściwy panel PWA i pozostałe ustawienia powiadomień pozostają widoczne.
 */
 (function(){
   "use strict";
-  var VERSION="v1";
+  var VERSION="v2";
+  var RETIRED=["kamrat_reactions","kamrat_added"];
 
   function injectStyle(){
-    if(document.getElementById("accountNotificationsHideStyle"))return;
+    if(document.getElementById("accountNotificationsCompatStyle"))return;
     var st=document.createElement("style");
-    st.id="accountNotificationsHideStyle";
+    st.id="accountNotificationsCompatStyle";
     st.textContent=[
       "#kontoNotificationsFoldout{display:none!important}",
-      "details#kontoNotificationsFoldout{display:none!important}",
       "#kontoNotificationsSlot{display:none!important}",
-      "#szpNotifyCard{display:none!important}",
-      ".szp-notify-card{display:none!important}",
-      "[data-szp-notify-type='kamrat_reactions']{display:none!important}"
+      "[data-szp-notify-type='kamrat_reactions']{display:none!important}",
+      "[data-szp-notify-type='kamrat_added']{display:none!important}"
     ].join("\n");
     document.head.appendChild(st);
   }
 
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",injectStyle);
-  else injectStyle();
+  function retireSocialPreferences(){
+    RETIRED.forEach(function(type){
+      var input=document.querySelector('[data-szp-notify-type="'+type+'"]');
+      if(!input)return;
+      input.checked=false;
+      var row=input.closest&&input.closest(".szp-notify-row");
+      if(row)row.style.display="none";
+    });
+  }
 
-  window.SZP_ACCOUNT_NOTIFICATIONS_COMPAT={version:VERSION,notificationsHidden:true};
+  function boot(){
+    injectStyle();
+    retireSocialPreferences();
+    if(window.MutationObserver){
+      new MutationObserver(retireSocialPreferences).observe(document.documentElement,{childList:true,subtree:true});
+    }
+    setTimeout(retireSocialPreferences,500);
+    setTimeout(retireSocialPreferences,1500);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);
+  else boot();
+
+  window.SZP_ACCOUNT_NOTIFICATIONS_COMPAT={version:VERSION,retiredTypes:RETIRED.slice()};
   console.info("Szpilplac account-notifications compatibility "+VERSION);
 })();
