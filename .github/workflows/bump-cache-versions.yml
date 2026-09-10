@@ -34,6 +34,7 @@ jobs:
                   '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
                   '<script src="kamraty-achievements-bridge.js?v=2"></script>': '<script src="retired-achievements.js?v=1"></script>',
                   '<script src="kamraty-reaction-summary.js?v=6"></script>': '<script src="account-notifications-compat.js?v=1"></script>',
+                  '<script src="retired-achievements.js?v=1"></script>': '',
               },
               'ranking.html': {
                   '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
@@ -41,6 +42,32 @@ jobs:
               },
               'gracz.html': {
                   '<script src="kamraty.js?v=7"></script>': '<script src="public-profile.js?v=1"></script>',
+              },
+              'nowosci.html': {
+                  'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, Kamraty, odznaki i kolejne zmiany projektu.': 'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, odznaki, profile i kolejne zmiany projektu.',
+                  '''    <div class="timeline">
+      <article class="entry">
+        <div class="dot">8 IX</div>
+        <div class="entry-card latest">''': '''    <div class="timeline">
+      <article class="entry">
+        <div class="dot">10 IX</div>
+        <div class="entry-card latest">
+          <div class="entry-meta"><span class="entry-date">10 września 2026</span><span class="tag">Konto</span></div>
+          <h2>Szpilplac uprościł część społecznościową</h2>
+          <p>Kamraty z placu zostały wycofane. Zostają konto, ranking, odznaki i prosty profil publiczny gracza, bez obserwowania, reakcji i porównań.</p>
+          <ul class="changes">
+            <li>usunięte Kamraty, reakcje i porównywanie graczy</li>
+            <li>zachowany prosty profil publiczny i link z rankingu</li>
+            <li>zachowane odznaki niezwiązane z Kamratami</li>
+            <li>usunięte stare skrypty i pozostałości po dawnych poprawkach</li>
+          </ul>
+          <a class="entry-link" href="konto.html">Przejdź do konta →</a>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">8 IX</div>
+        <div class="entry-card">''',
               },
               'klodka.html': {
                   'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
@@ -79,12 +106,12 @@ jobs:
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- konto.html ranking.html gracz.html klodka.html slowko.html raja/index.html; then
+          if git diff --quiet -- konto.html ranking.html gracz.html nowosci.html klodka.html slowko.html raja/index.html; then
             echo "No HTML cache-version changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add konto.html ranking.html gracz.html klodka.html slowko.html raja/index.html
+          git add konto.html ranking.html gracz.html nowosci.html klodka.html slowko.html raja/index.html
           git commit -m "Bump HTML cache versions"
           git push
