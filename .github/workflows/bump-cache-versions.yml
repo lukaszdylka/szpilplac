@@ -17,39 +17,69 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Bump script query versions
+      - name: Apply current frontend cleanup
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           replacements = {
               'index.html': {
-                  'szpilplac-welcome.js?v=1': 'szpilplac-welcome.js?v=2',
+                  'szpilplac-welcome.js?v=2': 'szpilplac-welcome.js?v=3',
+                  'profileLabel:"Twój profil"': 'profileLabel:"Twoje konto"',
+                  'profileLabel:"Twōj profil"': 'profileLabel:"Twoje konto"',
+                  'myProfile:"Mój profil"': 'myProfile:"Konto"',
+                  'myProfile:"Mōj profil"': 'myProfile:"Konto"',
+                  'p.profileLabel || "Twój profil"': 'p.profileLabel || "Twoje konto"',
               },
               'konto.html': {
-                  'achievement-toast.js?v=124': 'achievement-toast.js?v=125',
-                  'achievements-panel.js?v=124': 'achievements-panel.js?v=125',
-                  'google-auth-bridge.js?v=124': 'google-auth-bridge.js?v=125',
-                  'game-display-names.js?v=124': 'game-display-names.js?v=125',
-                  'avatar-select.js?v=124': 'avatar-select.js?v=125',
-                  'konto-dashboard.js?v=124': 'konto-dashboard.js?v=039',
-                  'konto-delete-bridge.js?v=124': 'konto-delete-bridge.js?v=038',
-                  'account-notifications-compat.js?v=1': 'account-notifications-compat.js?v=2',
+                  '<span>Profil i zgody<small>Dane konta, miejscowość, mailing i widoczność w rankingu.</small></span>': '<span>Konto i zgody<small>Dane konta, miejscowość, mailing i widoczność w rankingu.</small></span>',
+                  '<script src="public-profile.js?v=1"></script>\n': '',
+                  '<script src="account-notifications-compat.js?v=2"></script>\n': '',
+                  'setMsg(currentProfile.show_in_ranking ? "Profil będzie widoczny w rankingu." : "Profil został ukryty z rankingu.","ok");': 'setMsg(currentProfile.show_in_ranking ? "Będziesz widoczny w rankingu." : "Zostałeś ukryty z rankingu.","ok");',
               },
-              'klodka.html': {
-                  'klodka-auth-bridge.js?v=80': 'klodka-auth-bridge.js?v=126',
-                  'game-result-actions.js?v=80': 'game-result-actions.js?v=126',
+              'ranking.html': {
+                  '<script src="public-profile.js?v=1"></script>\n': '',
               },
-              'slowko.html': {
-                  'game-result-actions.js?v=79': 'game-result-actions.js?v=126',
+              'szpilplac-welcome.js': {
+                  '/* Szpilplac welcome modal v2': '/* Szpilplac welcome modal v3',
+                  'var VERSION = "v2";': 'var VERSION = "v3";',
+                  'var STORAGE_KEY = "szp_welcome_seen_20260910_v2";': 'var STORAGE_KEY = "szp_welcome_seen_20260910_v3";',
+                  '<li><span class="szp-welcome-mark">3</span><div><b>Profil publiczny</b><span>Możesz włączyć prosty profil publiczny, żeby pokazywać avatar, rangę i wybrane statystyki w rankingu.</span></div></li>': '<li><span class="szp-welcome-mark">3</span><div><b>Ranking</b><span>Ranking pokazuje punkty, rangę i podstawowe statystyki graczy. Konto możesz w każdej chwili ukryć z rankingu.</span></div></li>',
+                  '<li><span class="szp-welcome-mark">4</span><div><b>Prywatność</b><span>Publiczny profil nie pokazuje maila, prywatnych danych ani rozwiązań zagadek.</span></div></li>': '<li><span class="szp-welcome-mark">4</span><div><b>Prywatność</b><span>Ranking nie pokazuje adresu e-mail, prywatnych danych ani rozwiązań zagadek.</span></div></li>',
               },
-              'raja/index.html': {
-                  'raja-auth-bridge.js?v=124': 'raja-auth-bridge.js?v=125',
-                  '../achievement-toast.js?v=124': '../achievement-toast.js?v=125',
-                  '../game-result-actions.js?v=124': '../game-result-actions.js?v=126',
-                  '../game-played.js?v=124': '../game-played.js?v=125',
-                  '../game-save.js?v=124': '../game-save.js?v=125',
-                  '../archive-achievement-common.js?v=124': '../archive-achievement-common.js?v=125',
+              'nowosci.html': {
+                  'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, odznaki, profile i kolejne zmiany projektu.': 'Historia rozwoju Szpilplacu. Zobacz, kiedy pojawiały się gry, konto gracza, ranking, odznaki i kolejne zmiany projektu.',
+                  'Projekt urósł z kilku zagadek do placu z profilem, wynikami i rankingiem.': 'Projekt urósł z kilku zagadek do placu z wynikami, kontem i rankingiem.',
+                  '<h2>Szpilplac uprościł część społecznościową</h2>': '<h2>Szpilplac wraca do prostszej formy</h2>',
+                  '<p>Kamraty z placu zostały wycofane. Zostają konto, ranking, odznaki i prosty profil publiczny gracza, bez obserwowania, reakcji i porównań.</p>': '<p>Kamraty i publiczne profile graczy zostały wycofane. Zostają gry, konto do zapisywania wyników, ranking, rangi i odznaki — bez warstwy społecznościowej.</p>',
+                  '<li>zachowany prosty profil publiczny i link z rankingu</li>': '<li>usunięte publiczne profile graczy i linki do nich z rankingu</li>',
+              },
+              'regulamin.html': {
+                  '<a class="back" href="konto.html">Mój profil</a>': '<a class="back" href="konto.html">Konto</a>',
+                  'funkcji związanych z profilem użytkownika': 'funkcji związanych z kontem użytkownika',
+                  'Użytkownik może ukryć swój profil z rankingu, jeżeli taka opcja jest dostępna w profilu albo po kontakcie z administratorem.': 'Użytkownik może ukryć się z rankingu w ustawieniach konta albo po kontakcie z administratorem.',
+                  'Administrator może zmienić, ukryć, zablokować lub usunąć profil, login, wynik albo konto, jeżeli narusza regulamin, bezpieczeństwo serwisu lub prawa innych osób.': 'Administrator może zmienić lub zablokować login, wynik albo konto, jeżeli narusza regulamin, bezpieczeństwo serwisu lub prawa innych osób.',
+                  'Usunięcie konta może skutkować usunięciem albo anonimizacją profilu, zgód i zapisanych wyników.': 'Usunięcie konta może skutkować usunięciem albo anonimizacją danych konta, zgód i zapisanych wyników.',
+              },
+              'polityka-prywatnosci.html': {
+                  '<a class="back" href="konto.html">Mój profil</a>': '<a class="back" href="konto.html">Konto</a>',
+                  '<tr><td>Dane profilu</td><td>ranga, widoczność w rankingu, opcjonalnie województwo i miejscowość</td></tr>': '<tr><td>Dane rankingu</td><td>ranga, widoczność w rankingu, opcjonalnie województwo i miejscowość</td></tr>',
+                  'założenie konta, logowanie, utrzymanie profilu i obsługa użytkownika': 'założenie konta, logowanie, utrzymanie konta i obsługa użytkownika',
+                  'publicznie mogą być widoczne dane związane z profilem gracza:': 'publicznie mogą być widoczne dane związane z rankingiem gracza:',
+              },
+              'cookies.html': {
+                  '<a class="back" href="konto.html">Mój profil</a>': '<a class="back" href="konto.html">Konto</a>',
+              },
+              'mailing.html': {
+                  '<a class="back" href="konto.html">Mój profil</a>': '<a class="back" href="konto.html">Konto</a>',
+                  'w dowolnym momencie w profilu użytkownika, jeżeli taka funkcja jest dostępna, albo przez kontakt e-mail': 'w dowolnym momencie w ustawieniach konta, jeżeli taka funkcja jest dostępna, albo przez kontakt e-mail',
+              },
+              'build-version.js': {
+                  'root.SZP_BUILD_ID="2026.08.02.1";': 'root.SZP_BUILD_ID="2026.09.10.1";',
+              },
+              'sw.js': {
+                  'const BUILD_ID=self.SZP_BUILD_ID||"2026.08.02.1";': 'const BUILD_ID=self.SZP_BUILD_ID||"2026.09.10.1";',
               },
           }
 
@@ -60,6 +90,17 @@ jobs:
               old_text = text
               for old, new in reps.items():
                   text = text.replace(old, new)
+
+              if file == 'konto.html':
+                  text = re.sub(
+                      r'\n\n/\* v112 konto: dolne natywne schowki dla Kamratów i Powiadomień \*/.*?(?=\n</style>)',
+                      '', text, flags=re.S
+                  )
+                  text = re.sub(
+                      r'\n\s*<section class="konto-bottom-foldouts" id="kontoBottomFoldouts" aria-label="Kamraty i powiadomienia">.*?</section>',
+                      '', text, flags=re.S
+                  )
+
               if text != old_text:
                   p.write_text(text, encoding='utf-8', newline='')
                   changed.append(file)
@@ -67,18 +108,25 @@ jobs:
               else:
                   print('no changes', file)
 
+          for file in ['public-profile.js', 'gracz.html', 'account-notifications-compat.js']:
+              p = Path(file)
+              if p.exists():
+                  p.unlink()
+                  changed.append(file)
+                  print('deleted', file)
+
           if not changed:
               print('nothing to commit')
           PY
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- index.html konto.html klodka.html slowko.html raja/index.html; then
-            echo "No HTML cache-version changes."
+          if git diff --quiet; then
+            echo "No frontend cleanup changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html konto.html klodka.html slowko.html raja/index.html
-          git commit -m "Bump HTML cache versions"
+          git add -A
+          git commit -m "Usuń publiczne profile graczy"
           git push
