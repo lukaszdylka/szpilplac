@@ -1,12 +1,12 @@
-/* Szpilplac welcome modal v2
+/* Szpilplac welcome modal v3
    Jednorazowe okienko startowe po wejściu na index.html.
    Pokazuje się raz od tej wersji, po kliknięciu "Przeczytałem".
 */
 (function(){
   "use strict";
 
-  var VERSION = "v2";
-  var STORAGE_KEY = "szp_welcome_seen_20260910_v2";
+  var VERSION = "v3";
+  var STORAGE_KEY = "szp_welcome_seen_20260910_v3";
 
   function isHome(){
     var p = (location.pathname || "").toLowerCase();
@@ -76,8 +76,8 @@
           '<ul class="szp-welcome-list">'+
             '<li><span class="szp-welcome-mark">1</span><div><b>Gry</b><span>Słōwko, Cuzamen Szpil i Kłōdka mają nową zagadkę codziennie. Raja zmienia się raz w tygodniu.</span></div></li>'+
             '<li><span class="szp-welcome-mark">2</span><div><b>Konto</b><span>Konto zapisuje wyniki, punkty, rangi, odznaki i statystyki po grze.</span></div></li>'+
-            '<li><span class="szp-welcome-mark">3</span><div><b>Profil publiczny</b><span>Możesz włączyć prosty profil publiczny, żeby pokazywać avatar, rangę i wybrane statystyki w rankingu.</span></div></li>'+
-            '<li><span class="szp-welcome-mark">4</span><div><b>Prywatność</b><span>Publiczny profil nie pokazuje maila, prywatnych danych ani rozwiązań zagadek.</span></div></li>'+
+            '<li><span class="szp-welcome-mark">3</span><div><b>Ranking</b><span>Ranking pokazuje punkty, rangę i podstawowe statystyki graczy. Konto możesz w każdej chwili ukryć z rankingu.</span></div></li>'+
+            '<li><span class="szp-welcome-mark">4</span><div><b>Prywatność</b><span>Ranking nie pokazuje adresu e-mail, prywatnych danych ani rozwiązań zagadek.</span></div></li>'+
           '</ul>'+
           '<div class="szp-welcome-actions">'+
             '<a class="szp-welcome-more" href="nowosci.html" id="szpWelcomeMore">Zobacz nowości</a>'+

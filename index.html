@@ -1832,14 +1832,14 @@ var COPY = {
     erDesc:"Świętochłowice — zarezerwuj pokój",
     starzikName:"Starzik: TheSzpil",
     starzikDesc:"Gra point&click online — za darmo",
-    profileLabel:"Twój profil",
+    profileLabel:"Twoje konto",
     guestLabel:"Grasz bez konta",
     guest:"Gość",
     guestText:"Gry działają normalnie. Konto zapisze punkty, ranking i historię.",
     create:"Załóż konto",
     login:"Zaloguj",
     loginTitle:"Zaloguj się",
-    myProfile:"Mój profil",
+    myProfile:"Konto",
     points:"Punkty",
     gamesNo:"Gry",
     wins:"Wygrane",
@@ -1928,14 +1928,14 @@ var COPY = {
     erDesc:"Świyntochłowice — rezerwacyjo",
     starzikName:"Starzik: TheSzpil",
     starzikDesc:"Szpil point&click w internecie",
-    profileLabel:"Twōj profil",
+    profileLabel:"Twoje konto",
     guestLabel:"Szpilosz bez kōnta",
     guest:"Gość",
     guestText:"Szpile fungujōm normalnie. Kōnto spamiyntuje punkty, ranking i historyjo.",
     create:"Załōż kōnto",
     login:"Zaloguj",
     loginTitle:"Zaloguj sie",
-    myProfile:"Mōj profil",
+    myProfile:"Konto",
     points:"Punkty",
     gamesNo:"Szpile",
     wins:"Wygrane",
@@ -2391,7 +2391,7 @@ function renderTopPlayerMenu(){
 
     menu.innerHTML =
       '<div class="player-menu-head">'+
-        '<div class="player-menu-kicker">'+esc(p.profileLabel || "Twój profil")+'</div>'+
+        '<div class="player-menu-kicker">'+esc(p.profileLabel || "Twoje konto")+'</div>'+
         '<div class="player-menu-name">'+esc(login)+'</div>'+
         '<div class="player-menu-meta">'+rankIconHtml(rank)+'<span>'+esc(p.rank || "Ranga")+': '+esc(rank)+' · '+esc(p.points || "Punkty")+': '+esc(points)+'</span></div>'+
       '</div>'+
@@ -2908,7 +2908,7 @@ console.info("Szpilplac index.html v124 google login linking");
   setTimeout(forceFooterLabels, 1000);
 })();
 </script>
-<script src="szpilplac-welcome.js?v=2"></script>
+<script src="szpilplac-welcome.js?v=3"></script>
 <script src="pwa-push.js?v=1"></script>
 </body>
 </html>
