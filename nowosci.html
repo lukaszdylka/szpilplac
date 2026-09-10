@@ -154,12 +154,27 @@ footer{margin-top:22px;color:var(--ink2);font-size:11.5px;text-align:center;line
           <h2>Szpilplac uprościł część społecznościową</h2>
           <p>Kamraty z placu zostały wycofane. Zostają konto, ranking, odznaki i prosty profil publiczny gracza, bez obserwowania, reakcji i porównań.</p>
           <ul class="changes">
-            <li>usunięte Kamraty, reakcje i porównywanie graczy</li>
+            <li>usunięte Kamraty, reakcje, obserwowanie i porównywanie graczy</li>
             <li>zachowany prosty profil publiczny i link z rankingu</li>
-            <li>zachowane odznaki niezwiązane z Kamratami</li>
-            <li>usunięte stare skrypty i pozostałości po dawnych poprawkach</li>
+            <li>wyłączone odznaki związane wyłącznie z Kamratami, bez kasowania historycznych danych</li>
+            <li>zamknięte stare mechanizmy Kamratów w tle, żeby wycofana funkcja nie działała bokiem</li>
           </ul>
           <a class="entry-link" href="konto.html">Przejdź do konta →</a>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="dot">10 IX</div>
+        <div class="entry-card">
+          <div class="entry-meta"><span class="entry-date">10 września 2026</span><span class="tag">Porządki</span><span class="tag">PWA</span></div>
+          <h2>Mniej martwego kodu i prostsze powiadomienia</h2>
+          <p>Po wycofaniu Kamratów posprzątane zostały również techniczne pozostałości tej funkcji i starszych etapów rozwoju. Uproszczone zostały ustawienia powiadomień oraz kod odpowiedzialny za PWA.</p>
+          <ul class="changes">
+            <li>usunięte powiadomienia o reakcjach i nowych Kamratach</li>
+            <li>zostają powiadomienia o grach dnia, nowościach, odznakach i podsumowaniu tygodnia</li>
+            <li>usunięte stare jednorazowe skrypty poprawek, nieużywany manifest i cache Pythona</li>
+            <li>uproszczony kod PWA i zabezpieczone repo przed ponownym dodawaniem plików cache</li>
+          </ul>
         </div>
       </article>
 
