@@ -270,7 +270,19 @@
     if(target)send("support_click",sourceFor(target));
   }
 
+  function loadResultCycle(){
+    var path=String(location.pathname||"").toLowerCase();
+    var isGame=path.endsWith("/slowko.html")||path.endsWith("/klodka.html")||path==="/raja/"||path.endsWith("/raja/index.html");
+    if(!isGame||document.getElementById("szp-result-cycle"))return;
+    var script=document.createElement("script");
+    script.id="szp-result-cycle";
+    script.src="/result-cycle.js?v="+encodeURIComponent(VERSION);
+    script.async=false;
+    document.head.appendChild(script);
+  }
+
   function boot(){
+    loadResultCycle();
     installGameEventBridge();
     document.addEventListener("click",handleClick,true);
     window.addEventListener("online",flushQueue);

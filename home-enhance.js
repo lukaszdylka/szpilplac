@@ -244,6 +244,11 @@
     else if(!storedSession())renderGuest();
   }
 
+  document.addEventListener("click",function(e){
+    var t=e&&e.target;
+    if(t&&(t.id==="langPl"||t.id==="langSzl"))setTimeout(refresh,30);
+  },true);
+
   document.addEventListener("szp:game-played",function(){setTimeout(renderPlayed,0);});
   window.addEventListener("pageshow",refresh);
   window.addEventListener("focus",refresh);
