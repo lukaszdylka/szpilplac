@@ -56,8 +56,6 @@ jobs:
               ],
               'nowosci.html': [
                   (r'/site-events\.js\?v=[^"\']+', f'/site-events.js?v={build}'),
-                  (r'<p>Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach\. Na głównej zostają teraz Słōwko, Kłōdka i Raja\.</p>', '<p>Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, ale wróciły też przydatne skróty w lżejszej formie.</p>'),
-                  (r'<li>Cuzamen został zdjęty ze strony głównej i oznaczony jako nieaktywny</li>\s*<li>strona główna została przebudowana w prostszy układ mobile-first</li>\s*<li>usunięte zostały ciężkie elementy panelowe, dodatkowe boksy i nakładające się poprawki mobilne</li>\s*<li>ranking, konto i nowości zostały sprowadzone do prostych skrótów, a Familock do jednego lekkiego bloku</li>', '<li>Cuzamen został zdjęty ze strony głównej i oznaczony jako nieaktywny</li>\n            <li>strona główna została przebudowana w prostszy układ mobile-first</li>\n            <li>zostały lekkie skróty do rankingu, konta lub logowania, nowości i wsparcia projektu</li>\n            <li>blok Familocka prowadzi teraz zarówno do familock.pl, jak i do gra.familock.pl</li>'),
               ],
           }
 
