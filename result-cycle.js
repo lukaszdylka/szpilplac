@@ -68,6 +68,8 @@
     var a=old.querySelector("a");
     a.href=n.href;
     a.textContent=n.label;
+    a.setAttribute("aria-label",n.label);
+    a.setAttribute("title",n.label);
   }
 
   function boot(){
