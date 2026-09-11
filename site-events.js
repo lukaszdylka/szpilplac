@@ -5,7 +5,7 @@
   if(window.__SZP_SITE_EVENTS_ACTIVE)return;
   window.__SZP_SITE_EVENTS_ACTIVE=true;
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.10.1";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.11.1";
   var VISITOR_KEY="szpilplac_visitor_id_v1";
   var PAGE_PREFIX="szpilplac_page_view_v1:";
   var QUEUE_KEY="szpilplac_site_events_queue_v1";
