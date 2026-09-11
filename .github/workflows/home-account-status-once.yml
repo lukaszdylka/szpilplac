@@ -72,16 +72,6 @@ jobs:
           text=p.read_text(encoding='utf-8').replace('2026.09.11.1','2026.09.11.2',1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          p=Path('.github/workflows/bump-cache-versions.yml')
-          text=p.read_text(encoding='utf-8')
-          needle="              'games-registry.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
-          add1="              'home-enhance.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
-          add2="              'result-cycle.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
-          if needle in text and "'home-enhance.js':" not in text:
-              text=text.replace(needle,needle+add1+add2,1)
-          text=text.replace('git add topbar-common.js site-events.js analytics.js sw.js games-registry.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html','git add topbar-common.js site-events.js analytics.js sw.js games-registry.js home-enhance.js result-cycle.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html',1)
-          p.write_text(text,encoding='utf-8',newline='')
-
           p=Path('nowosci.html')
           text=p.read_text(encoding='utf-8')
           text=text.replace('Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, ale wróciły też przydatne skróty w lżejszej formie.','Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, a przydatne informacje o koncie i rozegranych grach wróciły w lekkiej formie.',1)
@@ -94,6 +84,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html home-enhance.js site-events.js sw.js build-version.js nowosci.html .github/workflows/bump-cache-versions.yml
+          git add index.html home-enhance.js site-events.js sw.js build-version.js nowosci.html
           git commit -m "Napraw konto, status gier i przejścia po wyniku"
           git push
