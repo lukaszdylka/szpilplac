@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.08.01.4";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.10.1";
   var games=[
     {
       id:"slowko",aliases:["slowko"],title:"Słōwko",href:"slowko.html",
@@ -11,7 +11,7 @@
     },
     {
       id:"cuzamen",aliases:["cuzamen"],title:"Cuzamen Szpil",href:"cuzamen.html",
-      cadence:["daily"],kind:"main",active:true,
+      cadence:["daily"],kind:"main",active:false,
       description:"Znajdź cztery ukryte grupy śląskich słów i skojarzeń."
     },
     {
