@@ -9,7 +9,6 @@ const CORE_ASSETS=[
   "/",
   "/index.html",
   "/slowko.html",
-  "/cuzamen.html",
   "/klodka.html",
   "/raja/",
   "/gierki.html",
