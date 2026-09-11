@@ -36,6 +36,8 @@ jobs:
               'analytics.js': (r'var version=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var version=window.SZP_BUILD_ID||"{build}";'),
               'sw.js': (r'const BUILD_ID=self\.SZP_BUILD_ID\|\|"[^"]+";', f'const BUILD_ID=self.SZP_BUILD_ID||"{build}";'),
               'games-registry.js': (r'var VERSION=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var VERSION=window.SZP_BUILD_ID||"{build}";'),
+              'home-enhance.js': (r'var VERSION=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var VERSION=window.SZP_BUILD_ID||"{build}";'),
+              'result-cycle.js': (r'var VERSION=window\.SZP_BUILD_ID\|\|"[^"]+";', f'var VERSION=window.SZP_BUILD_ID||"{build}";'),
           }
 
           changed = []
@@ -120,6 +122,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add topbar-common.js site-events.js analytics.js sw.js games-registry.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html
+          git add topbar-common.js site-events.js analytics.js sw.js games-registry.js home-enhance.js result-cycle.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html
           git commit -m "Sync shared build versions"
           git push
