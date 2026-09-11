@@ -22,45 +22,44 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          # index.html: właściwy klucz sesji + czytelny osobny przycisk point & click
           p=Path('index.html')
           text=p.read_text(encoding='utf-8')
           text=text.replace('var AUTH_KEY="sb-xyivrakegwybwhmmcawq-auth-token";','var AUTH_KEY="szpilplac-auth-v05";',1)
           text=text.replace('>gra.familock.pl ↗</a>','>Gra point & click ↗</a>',1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # home-enhance.js: po zmianie języka odtwórz zalogowany kafelek konta
           p=Path('home-enhance.js')
           text=p.read_text(encoding='utf-8')
           marker='  document.addEventListener("szp:game-played",function(){setTimeout(renderPlayed,0);});\n'
-          insert='  document.addEventListener("click",function(e){\n    var t=e&&e.target;\n    if(t&&(t.id==="langPl"||t.id==="langSzl"))setTimeout(refresh,30);\n  },true);\n\n'+marker
+          click='  document.addEventListener("click",function(e){\n    var t=e&&e.target;\n    if(t&&(t.id==="langPl"||t.id==="langSzl"))setTimeout(refresh,30);\n  },true);\n\n'
           if marker in text and 't.id==="langPl"||t.id==="langSzl"' not in text:
-              text=text.replace(marker,insert,1)
+              text=text.replace(marker,click+marker,1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # site-events.js jest już na wszystkich trzech grach: doładuj wspólny cykl następnej gry
           p=Path('site-events.js')
           text=p.read_text(encoding='utf-8')
           marker='  function boot(){\n    installGameEventBridge();'
-          replacement='''  function loadResultCycle(){
-    var path=String(location.pathname||"").toLowerCase();
-    var isGame=path.endsWith("/slowko.html")||path.endsWith("/klodka.html")||path==="/raja/"||path.endsWith("/raja/index.html");
-    if(!isGame||document.getElementById("szp-result-cycle"))return;
-    var script=document.createElement("script");
-    script.id="szp-result-cycle";
-    script.src="/result-cycle.js?v="+encodeURIComponent(VERSION);
-    script.async=false;
-    document.head.appendChild(script);
-  }
-
-  function boot(){
-    loadResultCycle();
-    installGameEventBridge();'''
+          lines=[
+              '  function loadResultCycle(){',
+              '    var path=String(location.pathname||"").toLowerCase();',
+              '    var isGame=path.endsWith("/slowko.html")||path.endsWith("/klodka.html")||path==="/raja/"||path.endsWith("/raja/index.html");',
+              '    if(!isGame||document.getElementById("szp-result-cycle"))return;',
+              '    var script=document.createElement("script");',
+              '    script.id="szp-result-cycle";',
+              '    script.src="/result-cycle.js?v="+encodeURIComponent(VERSION);',
+              '    script.async=false;',
+              '    document.head.appendChild(script);',
+              '  }',
+              '',
+              '  function boot(){',
+              '    loadResultCycle();',
+              '    installGameEventBridge();'
+          ]
+          replacement='\n'.join(lines)
           if marker in text and 'function loadResultCycle()' not in text:
               text=text.replace(marker,replacement,1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # PWA: nowe wspólne skrypty dostępne również z cache
           p=Path('sw.js')
           text=p.read_text(encoding='utf-8')
           if '"/home-enhance.js"' not in text:
@@ -69,35 +68,25 @@ jobs:
               text=text.replace('  "/weekly-status.js",\n','  "/weekly-status.js",\n  "/result-cycle.js",\n',1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # build po zmianie zachowania strony i gier
           p=Path('build-version.js')
           text=p.read_text(encoding='utf-8').replace('2026.09.11.1','2026.09.11.2',1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # stała synchronizacja fallbacków nowych modułów przy następnych buildach
           p=Path('.github/workflows/bump-cache-versions.yml')
           text=p.read_text(encoding='utf-8')
           needle="              'games-registry.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
-          extra=needle+"              'home-enhance.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n              'result-cycle.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
+          add1="              'home-enhance.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
+          add2="              'result-cycle.js': (r'var VERSION=window\\.SZP_BUILD_ID\\|\\|\"[^\"]+\";', f'var VERSION=window.SZP_BUILD_ID||\"{build}\";'),\n"
           if needle in text and "'home-enhance.js':" not in text:
-              text=text.replace(needle,extra,1)
+              text=text.replace(needle,needle+add1+add2,1)
           text=text.replace('git add topbar-common.js site-events.js analytics.js sw.js games-registry.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html','git add topbar-common.js site-events.js analytics.js sw.js games-registry.js home-enhance.js result-cycle.js index.html nowosci.html konto.html klodka.html slowko.html raja/index.html',1)
           p.write_text(text,encoding='utf-8',newline='')
 
-          # Nowości: dopisz finalny zakres zmian strony głównej i nawigacji po grach
           p=Path('nowosci.html')
           text=p.read_text(encoding='utf-8')
-          text=text.replace(
-            'Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, ale wróciły też przydatne skróty w lżejszej formie.',
-            'Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, a przydatne informacje o koncie i rozegranych grach wróciły w lekkiej formie.',1)
-          old='''            <li>zostały lekkie skróty do rankingu, konta lub logowania, nowości i wsparcia projektu</li>
-            <li>blok Familocka prowadzi teraz zarówno do familock.pl, jak i do gra.familock.pl</li>'''
-          new='''            <li>dla zalogowanego gracza wrócił mały kafelek konta; gość widzi skrót do logowania i rejestracji</li>
-            <li>status rozegrania Słōwka, Kłōdki i tygodniowej Rai jest ponownie synchronizowany z urządzeniem i kontem</li>
-            <li>po zakończeniu gry następny krok jest stały: Słōwko → Kłōdka → Raja → Słōwko</li>
-            <li>Familock i gra point & click mają osobne przyciski</li>'''
-          if old in text:
-              text=text.replace(old,new,1)
+          text=text.replace('Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, ale wróciły też przydatne skróty w lżejszej formie.','Szpilplac został uproszczony tak, żeby szybciej prowadził do gry i lepiej działał na telefonach. Na głównej zostają Słōwko, Kłōdka i Raja, a przydatne informacje o koncie i rozegranych grach wróciły w lekkiej formie.',1)
+          text=text.replace('            <li>zostały lekkie skróty do rankingu, konta lub logowania, nowości i wsparcia projektu</li>','            <li>dla zalogowanego gracza wrócił mały kafelek konta; gość widzi skrót do logowania i rejestracji</li>\n            <li>status rozegrania Słōwka, Kłōdki i tygodniowej Rai jest ponownie synchronizowany z urządzeniem i kontem</li>\n            <li>po zakończeniu gry następny krok jest stały: Słōwko → Kłōdka → Raja → Słōwko</li>',1)
+          text=text.replace('            <li>blok Familocka prowadzi teraz zarówno do familock.pl, jak i do gra.familock.pl</li>','            <li>Familock i gra point & click mają osobne przyciski</li>',1)
           p.write_text(text,encoding='utf-8',newline='')
           PY
 
