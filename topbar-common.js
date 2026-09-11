@@ -84,7 +84,6 @@
     loadScript("szp-games-registry",asset("/games-registry.js"),function(){
       if(isHomePage()){
         loadScript("szp-weekly-status",asset("/weekly-status.js"));
-        loadScript("szp-support-coffee",asset("/support-coffee.js"));
       }
       if(location.pathname.indexOf("konto")!==-1){
         loadScript("szp-streak-progress",asset("/streak-progress-v2.js"));
