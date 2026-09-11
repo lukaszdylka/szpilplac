@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.10.1";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.11.1";
   var games=[
     {
       id:"slowko",aliases:["slowko"],title:"Słōwko",href:"slowko.html",
@@ -144,7 +144,7 @@
       var name=card.querySelector(".game-name");
       var desc=card.querySelector(".game-desc");
       if(name&&name.textContent!==game.title)name.textContent=game.title;
-      if(desc&&desc.textContent!==game.description)desc.textContent=game.description;
+      if(name&&desc&&desc.textContent!==game.description)desc.textContent=game.description;
       card.setAttribute("data-game-id",game.id);
     });
   }
