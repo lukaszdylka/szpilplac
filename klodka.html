@@ -41,18 +41,12 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .tagline{font-size:12.5px;color:var(--ink2);margin:2px 2px 0}
 .toast{min-height:22px;font-weight:700;font-size:13.5px;color:var(--green);text-align:center;margin:10px 0 2px;transition:opacity .2s}
 .board{display:flex;flex-direction:column;gap:8px;align-items:center;margin:8px 0 4px}
-.repeat-info{min-height:22px;text-align:center;font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 4px;letter-spacing:.02em}
-.repeat-info b{color:var(--green)}
 .row{display:flex;gap:8px}
 .tile{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Oswald";font-size:30px;color:var(--ink);background:var(--surface2);border:2px solid var(--line);transition:transform .08s}
 .tile.filled{border-color:var(--ink2);animation:pop .1s}
 .tile.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .tile.present{background:var(--present);border-color:var(--present);color:#fff}
 .tile.absent{background:var(--absent);border-color:var(--absent);color:#fff}
-.tile.dir-higher,.tile.dir-lower{position:relative;overflow:hidden}
-.tile.dir-higher::after,.tile.dir-lower::after{position:absolute;right:5px;bottom:3px;font-family:"Inter",system-ui,sans-serif;font-size:16px;font-weight:900;line-height:1;color:#fff;opacity:.98;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.tile.dir-higher::after{content:"↑"}
-.tile.dir-lower::after{content:"↓"}
 .tile.reveal{animation:flip .4s ease forwards}
 .row.shake{animation:shake .35s}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
@@ -61,6 +55,7 @@ main{width:100%;max-width:480px;padding:6px 18px 28px;flex:1;display:flex;flex-d
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:300px;margin:14px auto 0;width:100%}
 .key{height:54px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);font-family:"Oswald";font-size:24px;color:var(--ink);display:flex;align-items:center;justify-content:center;transition:transform .06s,background .1s}
 .key:active{transform:scale(.94)}
+.key:disabled{opacity:.42;cursor:default;transform:none}
 .key.wide{font-family:"Inter";font-size:14px;font-weight:800;letter-spacing:.02em}
 .key.enter{background:var(--green);color:#fff;border-color:var(--green)}
 .key.del{color:var(--ink2)}
@@ -170,7 +165,6 @@ footer a{color:var(--green);font-weight:600}
   <div class="tagline" id="tagline"></div>
   <div class="toast" id="toast"></div>
   <div class="board" id="board"></div>
-  <div class="repeat-info" id="repeatInfo"></div>
   <div class="pad" id="pad"></div>
 </main>
 <footer><div id="footLine"></div><div><a href="https://www.familock.pl" target="_blank" rel="noopener">familock.pl</a></div></footer>
@@ -184,13 +178,14 @@ footer a{color:var(--green);font-weight:600}
 </div>
 <script>
 "use strict";
-window.KLODKA_VERSION="daily-clean-2026-09-08";
+window.KLODKA_VERSION="unique-digits-2026-09-22";
 
 var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
 var SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
 var EPOCH=new Date(2026,5,23);
 var MAX_TRIES=6;
 var LEN=4;
+var UNIQUE_DIGITS_FROM=93;
 
 var LANG_KEY="familock_lang";
 var THEME_KEY="szpilplac_theme";
@@ -198,9 +193,7 @@ var DAILY_KEY="klodka_daily_v1";
 var SOUND_KEY="klodka_sound";
 var CB_KEY="klodka_cb";
 var ANIM_KEY="klodka_anim";
-var REPEAT_KEY="klodka_repeat_info";
-var DIR_KEY="klodka_dir_hints";
-var HELP_KEY="klodka_help_seen_v2";
+var HELP_KEY="klodka_help_seen_v3";
 
 function warsawDateParts(d){
   var parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Warsaw",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d||new Date());
@@ -223,30 +216,24 @@ function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}
 
 var S={
   pl:{
-    title:"Kłōdka",tag:"Zgadnij 4-cyfrowy kod. Masz 6 prób.",pno:"Kod nr ",enter:"OK",short:"Wpisz 4 cyfry.",none:"Brak kodu na dziś.",
+    title:"Kłōdka",tag:"Zgadnij 4-cyfrowy kod. Masz 6 prób.",tagUnique:"Zgadnij 4-cyfrowy kod z czterech różnych cyfr. Masz 6 prób.",pno:"Kod nr ",enter:"OK",short:"Wpisz 4 cyfry.",unique:"Każda cyfra może wystąpić tylko raz.",none:"Brak kodu na dziś.",
     win:["Otwarte!","Brawo!","Świetnie!","Udało się!","Klik!"],lose:"Nie tym razem.",endW:"Otwarte!",endL:"Nie udało się",revealLbl:"Kod był:",
     played:"Rozegrane",wpct:"% otwartych",streak:"Seria",best:"Rekord",next:"Nowy kod za",again:"Zamknij",share:"Udostępnij wynik",copied:"Skopiowano do schowka",copyFail:"Nie udało się skopiować.",
-    howH:"Jak grać",how:"Każdego dnia pojawia się jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokazują, jak blisko jesteś:",
-    lgC:"cyfra na właściwym miejscu",lgP:"cyfra jest w kodzie, ale gdzie indziej",lgA:"cyfra nie pasuje do tej próby",
+    howH:"Jak grać",how:"Każdego dnia pojawia się jeden ukryty 4-cyfrowy kod. Masz 6 prób. Po każdej próbie kafelki pokazują, jak blisko jesteś:",uniqueInfo:"Od Kłōdki #93 kod składa się z czterech różnych cyfr — żadna cyfra się nie powtarza.",
+    lgC:"cyfra na właściwym miejscu",lgP:"cyfra jest w kodzie, ale gdzie indziej",lgA:"cyfra nie występuje w kodzie",
     foot:"Codzienna śląska kłódka · Familock Starzik.",settH:"Ustawienia",settOn:"Wł.",settOff:"Wył.",
     settSoundL:"Dźwięki",settSoundS:"Kliknięcia, błędy i otwarcie kłódki",settCbL:"Tryb dla daltonistów",settCbS:"Inne kolory podpowiedzi",settAnimL:"Animacje",settAnimS:"Obrót kafelków i efekty",
-    settRepeatL:"Informacja o powtórkach",settRepeatS:"Pod planszą pokaże, czy cyfry się powtarzają",settDirL:"Podpowiedzi góra/dół",settDirS:"Przy szarym kafelku pokaże kierunek dla tej pozycji",
-    dirLegend:"Przy szarym kafelku: <b>↑</b> w tej pozycji szukaj wyższej cyfry, <b>↓</b> szukaj niższej. Strzałka dotyczy konkretnej kolumny.",
-    repeatYes:"W tym kodzie <b>cyfra się powtarza</b>.",repeatNo:"W tym kodzie <b>cyfry się nie powtarzają</b>.",repeatMaybe:"Nie udało się sprawdzić powtórek cyfr.",
-    statsH:"Statystyki",dist:"Rozkład prób",archive:"Archiwum",today:"Dzisiaj",optionsInfo:"Dodatkowe ułatwienia można włączać osobno w ustawieniach.",archiveDone:"Archiwalna kłódka zakończona."
+    statsH:"Statystyki",dist:"Rozkład prób",archive:"Archiwum",today:"Dzisiaj",archiveDone:"Archiwalna kłódka zakończona."
   },
   szl:{
-    title:"Kłōdka",tag:"Zgodnij 4-cyfrowy kod. Mosz 6 prób.",pno:"Kod nr ",enter:"OK",short:"Wkludź 4 cyfry.",none:"Ni ma kodu na dzisiej.",
+    title:"Kłōdka",tag:"Zgodnij 4-cyfrowy kod. Mosz 6 prób.",tagUnique:"Zgodnij 4-cyfrowy kod ze sztyrech rożnych cyfr. Mosz 6 prób.",pno:"Kod nr ",enter:"OK",short:"Wkludź 4 cyfry.",unique:"Kożdo cyfra może być ino roz.",none:"Ni ma kodu na dzisiej.",
     win:["Otwarte!","Brawo!","Udało sie!","Klik!"],lose:"Niy tym razym.",endW:"Otwarte!",endL:"Niy podarziło sie",revealLbl:"Kod był:",
     played:"Rozegrane",wpct:"% otwartych",streak:"Seryjo",best:"Rekord",next:"Nowy kod za",again:"Zawrzij",share:"Udostympnij wynik",copied:"Skopiowano do schowka",copyFail:"Niy szło skopiować.",
-    howH:"Jak grać",how:"Kożdy dziyń je jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożom, jak blisko jeżeś:",
-    lgC:"cyfra na dobrym placu",lgP:"cyfra je w kodzie, ale kaj indziej",lgA:"cyfra niy pasuje do tyj próby",
+    howH:"Jak grać",how:"Kożdy dziyń je jedyn skryty 4-cyfrowy kod. Mosz 6 prób. Po kożdyj próbie kachle pokożom, jak blisko jeżeś:",uniqueInfo:"Od Kłōdki #93 kod mo sztyry rożne cyfry — żodno sie niy powtarzo.",
+    lgC:"cyfra na dobrym placu",lgP:"cyfra je w kodzie, ale kaj indziej",lgA:"cyfry niy ma w kodzie",
     foot:"Codziynno ślonsko kłódka · Familock Starzik.",settH:"Ustawiynia",settOn:"Wł.",settOff:"Wył.",
     settSoundL:"Dźwiyki",settSoundS:"Klikniyncia, błyndy i otwarcie kłódki",settCbL:"Tryb dlo daltonistów",settCbS:"Inksze farby podpowiydzi",settAnimL:"Animacyje",settAnimS:"Obrót kafli i efekty",
-    settRepeatL:"Info o powtórkach",settRepeatS:"Pod planszom pokoże, eli cyfry sie powtarzajom",settDirL:"Podpowiydzi góra/dół",settDirS:"Przi siwym kafelku pokoże kierunek dlo tego placu",
-    dirLegend:"Przi siwym kafelku: <b>↑</b> szukej wyższyj cyfry, <b>↓</b> szukej niższyj. Strzałka tyczy sie konkretnego placu.",
-    repeatYes:"W tym kodzie <b>cyfra sie powtarzo</b>.",repeatNo:"W tym kodzie <b>cyfry sie niy powtarzajom</b>.",repeatMaybe:"Niy szło sprawdzić powtórek cyfr.",
-    statsH:"Statystyki",dist:"Rozkłod prób",archive:"Archiwum",today:"Dzisiej",optionsInfo:"Ekstra ułatwiynia idzie włonczyć osobno w ustawiyniach.",archiveDone:"Archiwalno kłódka je skończono."
+    statsH:"Statystyki",dist:"Rozkłod prób",archive:"Archiwum",today:"Dzisiej",archiveDone:"Archiwalno kłódka je skończono."
   }
 };
 var lang=(localStorage.getItem(LANG_KEY)==="ŚL"||localStorage.getItem(LANG_KEY)==="szl")?"szl":"pl";
@@ -254,8 +241,9 @@ function t(){return S[lang];}
 var soundMode=localStorage.getItem(SOUND_KEY)||"off";
 var cbMode=localStorage.getItem(CB_KEY)||"off";
 var animMode=localStorage.getItem(ANIM_KEY)||"on";
-var repeatMode=localStorage.getItem(REPEAT_KEY)||"off";
-var dirMode=localStorage.getItem(DIR_KEY)||"off";
+
+function usesUniqueDigits(){return DAY_NO>=UNIQUE_DIGITS_FROM;}
+function hasRepeatedDigit(code){return new Set(String(code||"").split("")).size<String(code||"").length;}
 
 var theme=localStorage.getItem(THEME_KEY)==="dark"?"dark":"light";
 function applyTheme(){document.documentElement.setAttribute("data-theme",theme);}
@@ -307,7 +295,6 @@ function saveGameFor(mode,idx,g){
 function loadGame(){
   game=loadSavedGame("daily",DAY_NO)||freshGame("daily",DAY_NO);
   if(game.status==="won"||game.status==="lost")recordHistoryFor("daily",DAY_NO,game.status==="won",(game.guesses||[]).length||MAX_TRIES);
-  loadCodeMeta();
 }
 function persist(){
   saveGameFor("daily",DAY_NO,game);
@@ -315,38 +302,16 @@ function persist(){
 }
 function updateRevealInModal(code){var el=document.getElementById("revealCode");if(el)el.textContent=code||"····";}
 
-var codeMetaCache={};
-function metaKey(idx){return "daily:"+idx;}
-function loadCodeMeta(){
-  var key=metaKey(DAY_NO);
-  if(repeatMode!=="on"||codeMetaCache[key]){updateRepeatInfo();return;}
-  rpc("klodka_meta",{p_mode:"daily",p_idx:DAY_NO}).then(function(meta){codeMetaCache[key]=meta||{};updateRepeatInfo();}).catch(function(){codeMetaCache[key]={has_repeat:null};updateRepeatInfo();});
-}
-function updateRepeatInfo(){
-  var el=document.getElementById("repeatInfo");if(!el)return;
-  if(repeatMode!=="on"){el.textContent="";el.style.display="none";return;}
-  el.style.display="block";
-  var meta=codeMetaCache[metaKey(DAY_NO)]||{};
-  if(meta.has_repeat===true)el.innerHTML=t().repeatYes;
-  else if(meta.has_repeat===false)el.innerHTML=t().repeatNo;
-  else el.innerHTML=t().repeatMaybe;
-}
-function applyDirectionHint(tile,g,c){
-  if(dirMode!=="on"||!g||!g.states||g.states[c]!=="absent"||!g.directions)return;
-  if(g.directions[c]==="higher")tile.classList.add("dir-higher");
-  else if(g.directions[c]==="lower")tile.classList.add("dir-lower");
-}
-
 var boardEl=document.getElementById("board");
 var padEl=document.getElementById("pad");
 var toastEl=document.getElementById("toast");
 function renderStatic(){
   var T=t();
   document.getElementById("title").textContent=T.title;
-  document.getElementById("tagline").textContent=T.tag;
+  document.getElementById("tagline").textContent=usesUniqueDigits()?T.tagUnique:T.tag;
   document.getElementById("pno").textContent=T.pno+DAY_NO;
   document.getElementById("footLine").textContent=T.foot;
-  buildBoard();buildPad();paintFromGame();updateNavBar();updateRepeatInfo();
+  buildBoard();buildPad();paintFromGame();updateNavBar();
 }
 function buildBoard(){
   boardEl.innerHTML="";
@@ -374,11 +339,11 @@ function paintFromGame(){
     var tiles=rows[r].querySelectorAll(".tile");var g=game.guesses[r];
     for(var c=0;c<LEN;c++){
       var tile=tiles[c];tile.className="tile";tile.textContent="";
-      if(g){tile.textContent=g.code[c];if(g.states){tile.classList.add(g.states[c]);applyDirectionHint(tile,g,c);}}
+      if(g){tile.textContent=g.code[c];if(g.states)tile.classList.add(g.states[c]);}
       else if(r===game.guesses.length&&current[c]!==undefined){tile.textContent=current[c];tile.classList.add("filled");}
     }
   }
-  paintPad();updateRepeatInfo();
+  paintPad();
 }
 function paintPad(){
   var best={},rank={absent:0,present:1,correct:2};
@@ -386,7 +351,14 @@ function paintPad(){
     if(!g.states)return;
     for(var c=0;c<LEN;c++){var d=g.code[c],st=g.states[c];if(best[d]===undefined||rank[st]>rank[best[d]])best[d]=st;}
   });
-  padEl.querySelectorAll(".key").forEach(function(b){var k=b.dataset.key;b.classList.remove("correct","present","absent");if(/^[0-9]$/.test(k)&&best[k])b.classList.add(best[k]);});
+  padEl.querySelectorAll(".key").forEach(function(b){
+    var k=b.dataset.key;
+    b.classList.remove("correct","present","absent");
+    if(/^[0-9]$/.test(k)){
+      if(best[k])b.classList.add(best[k]);
+      b.disabled=usesUniqueDigits()&&current.indexOf(k)!==-1;
+    }else b.disabled=false;
+  });
 }
 
 var _ctx=null;
@@ -407,11 +379,15 @@ function onKey(k){
   if(!game||game.status!=="playing")return;
   if(k==="enter"){submit();return;}
   if(k==="del"){current=current.slice(0,-1);paintCurrentRow();playSound("key");return;}
-  if(/^[0-9]$/.test(k)&&current.length<LEN){current+=k;paintCurrentRow();playSound("key");}
+  if(/^[0-9]$/.test(k)&&current.length<LEN){
+    if(usesUniqueDigits()&&current.indexOf(k)!==-1){toast(t().unique);playSound("bad");return;}
+    current+=k;paintCurrentRow();playSound("key");
+  }
 }
 function paintCurrentRow(){
   var row=boardEl.querySelectorAll(".row")[(game.guesses||[]).length];if(!row)return;
   var tiles=row.querySelectorAll(".tile");for(var c=0;c<LEN;c++){tiles[c].className="tile";tiles[c].textContent="";if(current[c]!==undefined){tiles[c].textContent=current[c];tiles[c].classList.add("filled");}}
+  paintPad();
 }
 document.addEventListener("keydown",function(e){
   if(document.getElementById("scrim").classList.contains("open")||document.getElementById("calScrim").classList.contains("open"))return;
@@ -424,23 +400,21 @@ function computeDailyStates(guess,answer){
   for(var gi=0;gi<LEN;gi++){if(usedG[gi])continue;for(var a=0;a<LEN;a++){if(!usedA[a]&&guess[gi]===answer[a]){states[gi]="present";usedA[a]=true;usedG[gi]=true;break;}}}
   return states;
 }
-function computeDirections(guess,answer,states){
-  var dirs=[];for(var i=0;i<LEN;i++){dirs[i]=null;if(states&&states[i]==="absent"&&answer.indexOf(guess[i])===-1){var gv=parseInt(guess[i],10),av=parseInt(answer[i],10);if(!isNaN(gv)&&!isNaN(av))dirs[i]=gv<av?"higher":(gv>av?"lower":null);}}return dirs;
-}
 function guessArchiveFromReveal(args){
-  return rpc("klodka_reveal",{p_mode:"daily",p_idx:args.p_idx}).then(function(answer){answer=String(answer||"");if(answer.length!==LEN)throw new Error("archive reveal empty");var states=computeDailyStates(String(args.p_guess||""),answer);return {correct:String(args.p_guess)===answer,states:states,directions:computeDirections(String(args.p_guess||""),answer,states)};});
+  return rpc("klodka_reveal",{p_mode:"daily",p_idx:args.p_idx}).then(function(answer){answer=String(answer||"");if(answer.length!==LEN)throw new Error("archive reveal empty");var states=computeDailyStates(String(args.p_guess||""),answer);return {correct:String(args.p_guess)===answer,states:states};});
 }
 function guessCode(args){
-  return rpc("klodka_guess_hints",args).catch(function(){return rpc("klodka_guess",args).catch(function(err){if(args.p_idx<TODAY_NO)return guessArchiveFromReveal(args);throw err;});});
+  return rpc("klodka_guess",args).catch(function(err){if(args.p_idx<TODAY_NO)return guessArchiveFromReveal(args);throw err;});
 }
 var busy=false;
 function submit(){
   if(busy)return;
   if(current.length<LEN){shakeRow();toast(t().short);playSound("bad");return;}
+  if(usesUniqueDigits()&&hasRepeatedDigit(current)){shakeRow();toast(t().unique);playSound("bad");return;}
   var guess=current;busy=true;
   guessCode({p_mode:"daily",p_idx:DAY_NO,p_guess:guess}).then(function(res){
-    if(res&&res.error){busy=false;toast(res.error==="no code"?t().none:t().short);return;}
-    var entry={code:guess,states:res.states,correct:!!res.correct};if(res.directions)entry.directions=res.directions;
+    if(res&&res.error){busy=false;toast(res.error==="no code"?t().none:(res.error==="digits must be unique"?t().unique:t().short));return;}
+    var entry={code:guess,states:res.states,correct:!!res.correct};
     game.guesses.push(entry);current="";persist();revealRow(game.guesses.length-1);
     if(res.correct){playSound("win");finish(true);}else if(game.guesses.length>=MAX_TRIES){playSound("bad");finish(false);}else{playSound(res.states&&res.states.some(function(x){return x==="correct"||x==="present";})?"ok":"bad");}
     busy=false;
@@ -448,7 +422,7 @@ function submit(){
 }
 function revealRow(r){
   var row=boardEl.querySelectorAll(".row")[r],tiles=row.querySelectorAll(".tile"),g=game.guesses[r];
-  for(var c=0;c<LEN;c++)(function(tile,col){var apply=function(){tile.classList.add("reveal");tile.textContent=g.code[col];if(g.states){tile.classList.add(g.states[col]);applyDirectionHint(tile,g,col);}if(col===LEN-1)paintPad();};if(animMode==="off")apply();else setTimeout(apply,col*90);})(tiles[c],c);
+  for(var c=0;c<LEN;c++)(function(tile,col){var apply=function(){tile.classList.add("reveal");tile.textContent=g.code[col];if(g.states)tile.classList.add(g.states[col]);if(col===LEN-1)paintPad();};if(animMode==="off")apply();else setTimeout(apply,col*90);})(tiles[c],c);
 }
 function shakeRow(){var row=boardEl.querySelectorAll(".row")[(game.guesses||[]).length];if(!row)return;row.classList.add("shake");setTimeout(function(){row.classList.remove("shake");},360);}
 
@@ -511,12 +485,12 @@ function openSimpleModal(html){modal.innerHTML='<button class="modal-close" aria
 function showStats(){var T=t(),hist=hydrateHistory("daily");openSimpleModal('<h2>'+T.statsH+'</h2>'+statsSummaryHtml(hist)+distHtml(hist)+'<button class="btn" id="closeBtn">OK</button>');modal.querySelector("#closeBtn").addEventListener("click",closeModal);}
 function showSettings(){
   var T=t();function tog(cur,key){return '<div class="seg"><button data-k="'+key+'" data-v="on" class="seg-opt'+(cur==="on"?' on':'')+'">'+T.settOn+'</button><button data-k="'+key+'" data-v="off" class="seg-opt'+(cur==="off"?' on':'')+'">'+T.settOff+'</button></div>';}
-  openSimpleModal('<h2>'+T.settH+'</h2><div class="sett-row"><div><div class="sett-label">'+T.settSoundL+'</div><div class="sett-sub">'+T.settSoundS+'</div></div>'+tog(soundMode,SOUND_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settAnimL+'</div><div class="sett-sub">'+T.settAnimS+'</div></div>'+tog(animMode,ANIM_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settCbL+'</div><div class="sett-sub">'+T.settCbS+'</div></div>'+tog(cbMode,CB_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settDirL+'</div><div class="sett-sub">'+T.settDirS+'</div></div>'+tog(dirMode,DIR_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settRepeatL+'</div><div class="sett-sub">'+T.settRepeatS+'</div></div>'+tog(repeatMode,REPEAT_KEY)+'</div>');
-  modal.querySelectorAll(".seg-opt").forEach(function(btn){btn.addEventListener("click",function(){var k=btn.dataset.k,v=btn.dataset.v;modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){b.classList.toggle("on",b.dataset.v===v);});localStorage.setItem(k,v);if(k===SOUND_KEY)soundMode=v;if(k===ANIM_KEY){animMode=v;applyAnimMode();}if(k===CB_KEY){cbMode=v;applyCbMode();}if(k===DIR_KEY){dirMode=v;paintFromGame();}if(k===REPEAT_KEY){repeatMode=v;loadCodeMeta();updateRepeatInfo();}});});
+  openSimpleModal('<h2>'+T.settH+'</h2><div class="sett-row"><div><div class="sett-label">'+T.settSoundL+'</div><div class="sett-sub">'+T.settSoundS+'</div></div>'+tog(soundMode,SOUND_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settAnimL+'</div><div class="sett-sub">'+T.settAnimS+'</div></div>'+tog(animMode,ANIM_KEY)+'</div><div class="sett-row"><div><div class="sett-label">'+T.settCbL+'</div><div class="sett-sub">'+T.settCbS+'</div></div>'+tog(cbMode,CB_KEY)+'</div>');
+  modal.querySelectorAll(".seg-opt").forEach(function(btn){btn.addEventListener("click",function(){var k=btn.dataset.k,v=btn.dataset.v;modal.querySelectorAll('.seg-opt[data-k="'+k+'"]').forEach(function(b){b.classList.toggle("on",b.dataset.v===v);});localStorage.setItem(k,v);if(k===SOUND_KEY)soundMode=v;if(k===ANIM_KEY){animMode=v;applyAnimMode();}if(k===CB_KEY){cbMode=v;applyCbMode();}});});
 }
 function showHelp(){
   try{localStorage.setItem(HELP_KEY,"seen");}catch(e){}
-  var T=t();var html='<p>'+T.how+'</p><p style="margin-top:8px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p><p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p><p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p><p style="margin-top:8px">'+T.dirLegend+'</p><p style="margin-top:12px">'+T.optionsInfo+'</p>';
+  var T=t();var html='<p>'+T.how+'</p>'+(usesUniqueDigits()?'<p style="margin-top:8px"><b>'+T.uniqueInfo+'</b></p>':'')+'<p style="margin-top:10px"><span class="swatch" style="background:var(--correct)"></span>'+T.lgC+'</p><p><span class="swatch" style="background:var(--present)"></span>'+T.lgP+'</p><p><span class="swatch" style="background:var(--absent)"></span>'+T.lgA+'</p>';
   modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button><h2>'+T.howH+'</h2><div class="howlist">'+html+'</div><button class="btn" id="closeBtn" style="margin-top:16px">OK</button>';scrim.classList.add("open");modal.querySelector(".modal-close").addEventListener("click",closeModal);modal.querySelector("#closeBtn").addEventListener("click",closeModal);
 }
 document.getElementById("statBtn").addEventListener("click",showStats);
