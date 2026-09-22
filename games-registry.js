@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.11.2";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.22.1";
   var games=[
     {
       id:"slowko",aliases:["slowko"],title:"Słōwko",href:"slowko.html",
