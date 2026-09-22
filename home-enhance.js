@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.22.2";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.22.3";
   var AUTH_KEY="szpilplac-auth-v05";
   var sb=null;
   var refreshBusy=false;

@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.22.2";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.22.3";
 
   function currentGame(){
     var p=String(location.pathname||"").toLowerCase();
