@@ -2,7 +2,7 @@
 (function(){
   "use strict";
 
-  var VERSION=window.SZP_BUILD_ID||"2026.09.11.2";
+  var VERSION=window.SZP_BUILD_ID||"2026.09.22.1";
 
   function currentGame(){
     var p=String(location.pathname||"").toLowerCase();
@@ -66,10 +66,19 @@
       host.appendChild(old);
     }
     var a=old.querySelector("a");
-    a.href=n.href;
-    a.textContent=n.label;
-    a.setAttribute("aria-label",n.label);
-    a.setAttribute("title",n.label);
+    if(a.getAttribute("href")!==n.href)a.setAttribute("href",n.href);
+    if(a.textContent!==n.label)a.textContent=n.label;
+    if(a.getAttribute("aria-label")!==n.label)a.setAttribute("aria-label",n.label);
+    if(a.getAttribute("title")!==n.label)a.setAttribute("title",n.label);
+  }
+
+  var renderQueued=false;
+  function queueRender(){
+    if(renderQueued)return;
+    renderQueued=true;
+    var run=function(){renderQueued=false;render();};
+    if(typeof window.requestAnimationFrame==="function")window.requestAnimationFrame(run);
+    else setTimeout(run,0);
   }
 
   function boot(){
@@ -77,11 +86,11 @@
     addStyle();
     render();
     try{
-      var obs=new MutationObserver(function(){render();});
+      var obs=new MutationObserver(queueRender);
       obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
     }catch(e){}
-    document.addEventListener("click",function(){setTimeout(render,40);},true);
-    window.addEventListener("storage",function(e){if(e&&e.key==="familock_lang")setTimeout(render,0);});
+    document.addEventListener("click",function(){setTimeout(queueRender,40);},true);
+    window.addEventListener("storage",function(e){if(e&&e.key==="familock_lang")queueRender();});
     console.info("Szpilplac result-cycle.js "+VERSION);
   }
 
