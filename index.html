@@ -212,12 +212,54 @@ h1{
 .badge.live{border-color:transparent;background:var(--ok);color:#fff}
 .badge.done{border-color:var(--ok);color:var(--ok);background:var(--surface)}
 .arrow{color:var(--ink2);font-size:20px;line-height:1}
+.account-card{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:stretch;
+  gap:10px;
+  padding:11px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--green) 10%,var(--surface)),var(--surface));
+  box-shadow:var(--shadow);
+}
+.account-main{
+  min-width:0;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  padding:2px 4px 2px 2px;
+}
+.account-avatar{
+  width:44px;height:44px;display:grid;place-items:center;flex:none;
+  border-radius:13px;background:var(--green);color:#fff;
+  font-family:Oswald,system-ui,sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;
+}
+.account-copy{min-width:0}
+.account-eyebrow{display:block;color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.account-name{display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:Oswald,system-ui,sans-serif;font-size:20px;line-height:1.05;text-transform:uppercase}
+.account-sub{display:block;margin-top:4px;color:var(--ink2);font-size:10.5px;line-height:1.3}
+.account-arrow{color:var(--ink2);font-size:20px}
+.account-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(64px,1fr));
+  align-items:stretch;
+  gap:6px;
+}
+.account-stat{
+  min-width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:7px 9px;border:1px solid var(--line);border-radius:11px;background:var(--surface2);text-align:center;
+}
+.account-stat b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:Oswald,system-ui,sans-serif;font-size:16px;line-height:1;color:var(--ink)}
+.account-stat small{margin-top:4px;color:var(--ink2);font-size:8.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
 .quick{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
-  max-width:680px;
-  margin-top:14px;
+  max-width:560px;
+  margin-top:8px;
 }
 .quick a{
   min-height:44px;
@@ -321,7 +363,10 @@ h1{
   .cookie-actions button{padding:8px 13px}
 }
 @media(max-width:600px){
+  .account-card{grid-template-columns:1fr}
+  .account-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
   .quick{grid-template-columns:1fr 1fr}
+  .quick .support{grid-column:1/-1}
   .familock-strip{align-items:flex-start;flex-direction:column}
   .familock-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
   .familock-link{width:100%}
@@ -339,6 +384,11 @@ h1{
   .game-card{grid-template-columns:44px minmax(0,1fr) auto;gap:10px;padding:12px}
   .game-icon{width:44px;height:44px;border-radius:12px}
   .game-title{font-size:21px}
+  .account-card{padding:10px}
+  .account-main{grid-template-columns:40px minmax(0,1fr) auto;gap:9px}
+  .account-avatar{width:40px;height:40px;border-radius:12px;font-size:18px}
+  .account-name{font-size:18px}
+  .account-stat{min-width:0;padding:7px 4px}
   .familock-actions{grid-template-columns:1fr}
   .cookie-actions{grid-template-columns:1fr}
 }
@@ -358,12 +408,6 @@ h1{
         <button id="langPl" type="button">PL</button>
         <button id="langSzl" type="button">ŚL</button>
       </div>
-      <a class="icon-btn" href="ranking.html" aria-label="Ranking" title="Ranking">
-        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8v2.2a4 4 0 0 1-8 0V4z"/><path d="M6 6H3.8A1.8 1.8 0 0 0 5.6 9H6M14 6h2.2A1.8 1.8 0 0 1 14.4 9H14"/><path d="M10 10.2V14M7 17h6M8 14h4v3H8z"/></svg>
-      </a>
-      <a class="icon-btn" href="konto.html" id="accountTopLink" aria-label="Konto" title="Konto">
-        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="6.5" r="3.2"/><path d="M4 18c.9-4.1 3-6.2 6-6.2s5.1 2.1 6 6.2"/></svg>
-      </a>
       <button class="icon-btn" id="themeBtn" type="button" aria-label="Zmień motyw" title="Zmień motyw"></button>
     </div>
   </header>
@@ -414,9 +458,25 @@ h1{
       </a>
     </section>
 
+    <section class="account-card" id="accountCard" aria-label="Konto gracza">
+      <a class="account-main" href="konto.html" id="accountMain">
+        <span class="account-avatar" id="accountAvatar" aria-hidden="true">?</span>
+        <span class="account-copy">
+          <span class="account-eyebrow" id="accountEyebrow">Konto gracza</span>
+          <span class="account-name" id="accountName">Zaloguj / zarejestruj</span>
+          <span class="account-sub" id="accountSub">Zapisuj wyniki i punkty na swoim koncie.</span>
+        </span>
+        <span class="account-arrow" aria-hidden="true">›</span>
+      </a>
+      <div class="account-stats" id="accountStats" hidden>
+        <span class="account-stat"><b id="accountRank">—</b><small id="accountRankLabel">Ranga</small></span>
+        <span class="account-stat"><b id="accountPoints">0</b><small id="accountPointsLabel">Punkty</small></span>
+        <span class="account-stat"><b id="accountGames">0</b><small id="accountGamesLabel">Gry</small></span>
+      </div>
+    </section>
+
     <nav class="quick" aria-label="Skróty">
       <a href="ranking.html" id="quickRanking">Ranking</a>
-      <a href="konto.html" id="quickAccount">Konto</a>
       <a href="nowosci.html" id="quickNews">Nowości</a>
       <a class="support" href="https://buycoffee.to/wspolnotafamilocka" target="_blank" rel="noopener" id="quickCoffee" data-support-source="home-shortcut">Postaw kawę ↗</a>
     </nav>
@@ -477,6 +537,10 @@ h1{
       ranking:"Ranking",
       account:"Konto",
       loginRegister:"Zaloguj / zarejestruj",
+      accountEyebrow:"Konto gracza",
+      accountLoggedOut:"Zapisuj wyniki, punkty i historię gier na swoim koncie.",
+      accountLoggedIn:"Twoje wyniki w jednym miejscu.",
+      rankLabel:"Ranga",pointsLabel:"Punkty",gamesLabel:"Gry",
       news:"Nowości",
       coffee:"Postaw kawę ↗",
       familockTitle:"Familock Escape Room",
@@ -496,6 +560,10 @@ h1{
       ranking:"Ranking",
       account:"Konto",
       loginRegister:"Zaloguj / zaregistruj",
+      accountEyebrow:"Konto gracza",
+      accountLoggedOut:"Zapisuj wyniki, punkty i historyjo szpili na swoim koncie.",
+      accountLoggedIn:"Twoje wyniki na jednym placu.",
+      rankLabel:"Ranga",pointsLabel:"Punkty",gamesLabel:"Szpile",
       news:"Nowości",
       coffee:"Postow kawa ↗",
       familockTitle:"Familock Escape Room",
@@ -508,22 +576,77 @@ h1{
     catch(e){return "pl";}
   }
   function setText(id,value){var el=document.getElementById(id);if(el)el.textContent=value;}
-  function hasActiveSession(){
+  var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
+  var SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
+  var accountSummary=null,accountLoadPromise=null;
+  function getStoredSession(){
     try{
       var raw=localStorage.getItem(AUTH_KEY);
-      if(!raw)return false;
+      if(!raw)return null;
       var stored=JSON.parse(raw);
       var session=stored&&((stored.currentSession)||(stored.session)||stored);
-      if(!session||!session.access_token||!session.user)return false;
+      if(!session||!session.access_token||!session.user)return null;
       var expires=Number(session.expires_at||0);
-      return !expires||(expires*1000>Date.now());
-    }catch(e){return false;}
+      if(expires&&expires*1000<=Date.now())return null;
+      return session;
+    }catch(e){return null;}
   }
-  function updateAccountShortcut(p){
-    var label=hasActiveSession()?p.account:p.loginRegister;
-    setText("quickAccount",label);
-    var top=document.getElementById("accountTopLink");
-    if(top){top.setAttribute("aria-label",label);top.setAttribute("title",label);}
+  function accountInitial(name){
+    var s=String(name||"?").trim();
+    return s?s.charAt(0).toUpperCase():"?";
+  }
+  function renderAccountCard(p){
+    var session=getStoredSession(),stats=document.getElementById("accountStats");
+    setText("accountEyebrow",p.accountEyebrow);
+    setText("accountRankLabel",p.rankLabel);
+    setText("accountPointsLabel",p.pointsLabel);
+    setText("accountGamesLabel",p.gamesLabel);
+    if(!session){
+      if(stats)stats.hidden=true;
+      setText("accountAvatar","?");
+      setText("accountName",p.loginRegister);
+      setText("accountSub",p.accountLoggedOut);
+      return;
+    }
+    var fallback=(session.user&&session.user.email?String(session.user.email).split("@")[0]:"gracz");
+    var s=accountSummary||{};
+    var name=s.login||s.display_name||fallback;
+    setText("accountAvatar",accountInitial(name));
+    setText("accountName",name);
+    setText("accountSub",p.accountLoggedIn);
+    setText("accountRank",s.rank_name||"—");
+    setText("accountPoints",Number(s.points||0).toLocaleString("pl-PL"));
+    setText("accountGames",Number(s.games_played||0).toLocaleString("pl-PL"));
+    if(stats)stats.hidden=false;
+  }
+  function fetchAccountJson(path,token){
+    return fetch(SUPABASE_URL+"/rest/v1/"+path,{
+      headers:{"Accept":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+token}
+    }).then(function(r){if(!r.ok)throw new Error("account "+r.status);return r.json();});
+  }
+  function loadAccountSummary(){
+    var session=getStoredSession();
+    if(!session){accountSummary=null;accountLoadPromise=null;renderAccountCard(copy[getLang()]);return Promise.resolve();}
+    if(accountLoadPromise)return accountLoadPromise;
+    var id=encodeURIComponent(session.user.id),token=session.access_token;
+    accountLoadPromise=Promise.all([
+      fetchAccountJson("profiles?select=login,display_name,rank_name&id=eq."+id+"&limit=1",token),
+      fetchAccountJson("user_game_results?select=score&user_id=eq."+id+"&limit=1000",token)
+    ]).then(function(res){
+      var profile=res[0]&&res[0][0]?res[0][0]:{};
+      var results=Array.isArray(res[1])?res[1]:[];
+      accountSummary={
+        login:profile.login||null,
+        display_name:profile.display_name||null,
+        rank_name:profile.rank_name||null,
+        points:results.reduce(function(sum,row){return sum+(Number(row&&row.score)||0);},0),
+        games_played:results.length
+      };
+    }).catch(function(){accountSummary=null;}).then(function(){
+      accountLoadPromise=null;
+      renderAccountCard(copy[getLang()]);
+    });
+    return accountLoadPromise;
   }
   function applyLang(){
     var lang=getLang(),p=copy[lang];
@@ -540,7 +663,7 @@ h1{
     setText("klodkaBadge",p.daily);
     setText("rajaBadge",p.weekly);
     setText("quickRanking",p.ranking);
-    updateAccountShortcut(p);
+    renderAccountCard(p);
     setText("quickNews",p.news);
     setText("quickCoffee",p.coffee);
     setText("familockTitle",p.familockTitle);
@@ -583,8 +706,12 @@ h1{
   window.addEventListener("focus",function(){updateAccountShortcut(copy[getLang()]);});
   window.addEventListener("storage",function(e){if(e.key===AUTH_KEY)updateAccountShortcut(copy[getLang()]);});
   applyLang();
+  loadAccountSummary();
   themeIcon();
   bootCookies();
+  window.addEventListener("pageshow",function(){accountSummary=null;applyLang();loadAccountSummary();});
+  window.addEventListener("focus",function(){accountSummary=null;applyLang();loadAccountSummary();});
+  window.addEventListener("storage",function(e){if(e&&e.key===AUTH_KEY){accountSummary=null;applyLang();loadAccountSummary();}});
 })();
 </script>
 <script src="build-version.js?v=2026.09.22.2"></script>
