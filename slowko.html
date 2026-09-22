@@ -93,6 +93,7 @@ main{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:c
 .key.correct{background:var(--correct);border-color:var(--correct);color:#fff}
 .key.present{background:var(--present);border-color:var(--present);color:#fff}
 .key.absent{background:var(--absent);border-color:var(--absent);color:#ccc}
+.orth-note{max-width:500px;margin:7px auto 0;text-align:center;font-size:11px;line-height:1.35;color:var(--ink2);opacity:.9}
 
 footer{width:100%;max-width:500px;text-align:center;color:var(--ink2);font-size:11.5px;margin-top:8px}
 footer a{color:var(--green);font-weight:600}
@@ -352,6 +353,7 @@ footer a{color:var(--green);font-weight:600}
   <div class="archive-msg" id="archiveMsg" style="display:none"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="kbd" id="kbd"></div>
+  <div class="orth-note" id="orthNote"></div>
 </main>
 
 <footer>
@@ -507,7 +509,8 @@ var S={
     contactBug:"Zgłoś błąd / propozycję",
     contactMe:"Kontakt z autorem",
     spH:"Jak wpisywać?",
-    spB:"Słowa są takie jak w słowniku śląskim — wpisujemy je dokładnie tak jak brzmią po śląsku.<br><br>Kilka przykładów:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>",
+    spB:"Używamy uproszczonej pisowni. W odpowiedziach nie stosujemy dodatkowych śląskich liter <b>ō, ô, ŏ</b> — korzystamy ze standardowych liter polskich.<br><br>Przykłady:<br>• śląskie <b>łokno</b> → ŁOKNO<br>• śląskie <b>rechtor</b> → RECHTOR<br>",
+    orth:"Pisownia uproszczona: bez liter ō, ô i ŏ.",
     settH:"Ustawienia",
     settCatL:"Kategoria słowa",settCatS:"Temat/kategoria jako podpowiedź",
     settHintL:"Tłumaczenie",
@@ -544,7 +547,8 @@ var S={
     contactBug:"Zgłoś błąd / propozycja",
     contactMe:"Kontakt z autorim",
     spH:"Jak wpisywać?",
-    spB:"Słowa som takie jak w słowniku ślonskim — wpisujymy je tak jak brzmom po ślonsku.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>",
+    spB:"Używomy uproszczonyj pisowni. We odpowiedziach niy używomy dodatkowych ślonskich liter <b>ō, ô, ŏ</b> — korzystomy ze standardowych liter polskich.<br><br>Paro przikładow:<br>• ślonske <b>łokno</b> → ŁOKNO<br>",
+    orth:"Uproszczono pisownia: bez liter ō, ô i ŏ.",
     settH:"Ustawiynia",
     settCatL:"Kategoryjo słowa",settCatS:"Tymat jako podpowiydź",
     settHintL:"Tłumaczynie",
@@ -552,7 +556,7 @@ var S={
     settOff:"Wył.",settManual:"Na żodanie",sett3:"Po 3",sett4:"Po 4",sett5:"Po 5",
     settAnimL:"Animacyje",settAnimS:"Łobrót kafli i efekty",
     settSoundL:"Dźwiyki",settSoundS:"Klik przi wpisowaniu, dźwiyk trafiynia",
-    settCbL:"Tryb dlŏ daltonistów",settCbS:"Wzory zamiast yno kolorów",
+    settCbL:"Tryb dlo daltonistów",settCbS:"Wzory zamiast yno kolorów",
     settSwapL:"Zamiana Enter / ⌫",settSwapS:"Enter po prawej, ⌫ po lewej",
     settOn:"Wł.",
     hintBtn:"Pokoz podpowiydź",
@@ -642,7 +646,7 @@ function hydrateStatsFromDayGames(){
 
 /* ── KLAWIATURA ─────────────────────────────────────────────────────── */
 var KEY_ROWS=[
-  ["Ą","Ć","Ę","Ł","Ń","Ó","Ś","Ź","Ż","Ō","Ô","Ŏ"],
+  ["Ą","Ć","Ę","Ł","Ń","Ó","Ś","Ź","Ż"],
   ["Q","W","E","R","T","Y","U","I","O","P"],
   ["A","S","D","F","G","H","J","K","L"],
   ["ENTER","Z","X","C","V","B","N","M","⌫"]
@@ -1266,6 +1270,7 @@ function applyLang(){
   document.documentElement.lang=lang==="szl"?"szl":"pl";
   document.getElementById("lPl").className=lang==="pl"?"on":"";
   document.getElementById("lSzl").className=lang==="szl"?"on":"";
+  var orth=document.getElementById("orthNote");if(orth)orth.textContent=T().orth;
   relabelKbd();updateNavBar();
   if(scrim.classList.contains("open"))closeModal();}
 function setLang(l){lang=l;store.set(LANG_KEY,l);applyLang();}
