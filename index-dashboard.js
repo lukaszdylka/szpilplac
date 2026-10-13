@@ -620,7 +620,16 @@
     }
   }
 
+  var lastProfileRefresh = 0;
+  var profileRefreshPromise = null;
   async function loadProfile(){
+    if(profileRefreshPromise)return profileRefreshPromise;
+    if(Date.now()-lastProfileRefresh < 60000)return;
+    profileRefreshPromise = loadProfileNow();
+    try{await profileRefreshPromise; lastProfileRefresh = Date.now();}
+    finally{profileRefreshPromise = null;}
+  }
+  async function loadProfileNow(){
     profile = null;
     rankStats = null;
 
