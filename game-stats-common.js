@@ -313,10 +313,14 @@
     modal.show();
   }
 
+  var accountStatsCache = new Map();
   async function fetchAccountRows(key){
     var c = await getClient();
     var s = await getSession();
     if(!c || !s || !s.user)return null;
+    var cacheKey = s.user.id + ':' + key;
+    var cached = accountStatsCache.get(cacheKey);
+    if(cached && Date.now()-cached.at < 30000)return cached.rows;
 
     async function query(withFinished){
       var sel = withFinished
@@ -335,7 +339,9 @@
       return res && Array.isArray(res.data) ? res.data : [];
     }
 
-    return query(true);
+    var rows = await query(true);
+    if(rows && rows.length)accountStatsCache.set(cacheKey,{at:Date.now(),rows:rows});
+    return rows;
   }
 
   async function showStats(){
