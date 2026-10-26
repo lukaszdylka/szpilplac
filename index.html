@@ -121,6 +121,33 @@ button,a{-webkit-tap-highlight-color:transparent}
 }
 .icon-btn:hover{color:var(--ink);background:var(--surface)}
 main{padding:8px 0 0}
+.hero{position:relative;overflow:hidden;border-radius:20px}
+.hero::before{content:"";position:absolute;right:-54px;top:-52px;width:225px;height:225px;border:1px solid color-mix(in srgb,var(--gold) 25%,transparent);border-radius:50%;pointer-events:none}
+.hero::after{content:"";position:absolute;right:-6px;top:-8px;width:126px;height:126px;border:1px solid color-mix(in srgb,var(--gold) 22%,transparent);border-radius:50%;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.game-card:focus-visible,.arcade-card:focus-visible{outline-offset:4px}
+.arcade-card{
+  position:relative;display:grid;grid-template-columns:58px minmax(0,1fr) auto;
+  align-items:center;gap:17px;overflow:hidden;margin:17px 0 19px;padding:19px;
+  border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line));border-radius:20px;
+  color:#f6ecd2;background:linear-gradient(120deg,#203d31 0%,#2b493b 63%,#4d5235 100%);
+  box-shadow:0 16px 32px -24px rgba(0,0,0,.7);transition:transform .16s ease,box-shadow .16s ease
+}
+.arcade-card:hover{transform:translateY(-2px);box-shadow:0 19px 36px -22px rgba(0,0,0,.58)}
+.arcade-card::after{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(245,215,147,.12);border-radius:50%;right:-65px;top:-100px;pointer-events:none}
+.arcade-icon{width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(240,215,165,.28);border-radius:16px;background:rgba(255,255,255,.09);color:#edc878}
+.arcade-copy{min-width:0;position:relative;z-index:1}
+.arcade-eyebrow{display:block;color:#e7c586;font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.arcade-title{display:block;margin-top:3px;font-family:Oswald,system-ui,sans-serif;font-size:27px;line-height:1.1;text-transform:uppercase}
+.arcade-desc{display:block;max-width:540px;margin-top:5px;color:#e0e5d8;font-size:12px;line-height:1.45}
+.arcade-action{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:9px 15px;border-radius:999px;background:#e6bc70;color:#26352a;font-size:11px;font-weight:900;white-space:nowrap}
+@media(max-width:600px){
+  .arcade-card{grid-template-columns:46px minmax(0,1fr);gap:11px;padding:15px}
+  .arcade-icon{width:46px;height:46px;border-radius:13px}
+  .arcade-title{font-size:23px}
+  .arcade-action{grid-column:1/-1;width:100%}
+}
+
 .hero{padding:18px 2px 17px}
 .kicker{
   margin:0 0 7px;
@@ -458,6 +485,18 @@ h1{
       </a>
     </section>
 
+    <a class="arcade-card" href="/gierki" id="arcadeLink" aria-label="Otwórz strefę gierek">
+      <span class="arcade-icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="5"/><path d="M8 11v5M5.5 13.5h5M15.5 12h.01M18 14h.01"/><path d="M8 7 9 4h6l1 3"/></svg>
+      </span>
+      <span class="arcade-copy">
+        <span class="arcade-eyebrow" id="arcadeEyebrow">Masz ochotę na coś jeszcze?</span>
+        <span class="arcade-title" id="arcadeTitle">Strefa gierek</span>
+        <span class="arcade-desc" id="arcadeDesc">Krótkie gry zręcznościowe i śląskie minigry. Wskakuj, graj i bij rekordy, kiedy chcesz.</span>
+      </span>
+      <span class="arcade-action" id="arcadeAction">Odkryj gierki <span aria-hidden="true">↗</span></span>
+    </a>
+
     <section class="account-card" id="accountCard" aria-label="Konto gracza">
       <a class="account-main" href="konto.html" id="accountMain">
         <span class="account-avatar" id="accountAvatar" aria-hidden="true">?</span>
@@ -534,6 +573,11 @@ h1{
       raja:"Ułóż pięć śląskich elementów we właściwej kolejności.",
       daily:"Codziennie",
       weekly:"Zagraj w tym tygodniu",
+      arcadeEyebrow:"Masz ochotę na coś jeszcze?",
+      arcadeTitle:"Strefa gierek",
+      arcadeDesc:"Krótkie gry zręcznościowe i śląskie minigry. Wskakuj, graj i bij rekordy, kiedy chcesz.",
+      arcadeAction:"Odkryj gierki",
+      arcadeAria:"Otwórz strefę gierek",
       ranking:"Ranking",
       account:"Konto",
       loginRegister:"Zaloguj / zarejestruj",
@@ -557,6 +601,11 @@ h1{
       raja:"Poukładej piyńć slonskich rzeczy we dobrym porzondku.",
       daily:"Kożdy dziyń",
       weekly:"Szpilej w tym tydniu",
+      arcadeEyebrow:"Chcesz jeszcze trocha poszpilać?",
+      arcadeTitle:"Plac gierek",
+      arcadeDesc:"Krotkie szpile na refleks i slonskie minigry. Wskakuj, szpilej i bij rekordy, kej chcesz.",
+      arcadeAction:"Idź do gierek",
+      arcadeAria:"Ôtwōrz plac gierek",
       ranking:"Ranking",
       account:"Konto",
       loginRegister:"Zaloguj / zaregistruj",
@@ -571,9 +620,18 @@ h1{
     }
   };
 
+  var activeLang="pl";
   function getLang(){
-    try{return localStorage.getItem(LANG_KEY)==="szl"?"szl":"pl";}
-    catch(e){return "pl";}
+    try{var stored=localStorage.getItem(LANG_KEY);if(stored==="szl"||stored==="pl")activeLang=stored;}
+    catch(e){}
+    return activeLang;
+  }
+  function chooseLang(lang){
+    activeLang=lang==="szl"?"szl":"pl";
+    try{localStorage.setItem(LANG_KEY,activeLang);}catch(e){}
+    applyLang();
+    try{document.dispatchEvent(new CustomEvent("szp:language-changed",{detail:{lang:activeLang}}));}catch(e){}
+    if(window.SZP_HOME_ENHANCE&&window.SZP_HOME_ENHANCE.renderPlayed)window.SZP_HOME_ENHANCE.renderPlayed();
   }
   function setText(id,value){var el=document.getElementById(id);if(el)el.textContent=value;}
   var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
@@ -662,6 +720,12 @@ h1{
     setText("slowkoBadge",p.daily);
     setText("klodkaBadge",p.daily);
     setText("rajaBadge",p.weekly);
+    setText("arcadeEyebrow",p.arcadeEyebrow);
+    setText("arcadeTitle",p.arcadeTitle);
+    setText("arcadeDesc",p.arcadeDesc);
+    var arcadeAction=document.getElementById("arcadeAction");
+    if(arcadeAction)arcadeAction.textContent=p.arcadeAction+" ↗";
+    document.getElementById("arcadeLink").setAttribute("aria-label",p.arcadeAria);
     setText("quickRanking",p.ranking);
     renderAccountCard(p);
     setText("quickNews",p.news);
@@ -670,6 +734,8 @@ h1{
     setText("familockText",p.familockText);
     document.getElementById("langPl").classList.toggle("on",lang==="pl");
     document.getElementById("langSzl").classList.toggle("on",lang==="szl");
+    document.getElementById("langPl").setAttribute("aria-pressed",String(lang==="pl"));
+    document.getElementById("langSzl").setAttribute("aria-pressed",String(lang==="szl"));
     setTimeout(function(){if(window.SZP_WEEKLY_STATUS&&window.SZP_WEEKLY_STATUS.refresh)window.SZP_WEEKLY_STATUS.refresh();},0);
   }
 
@@ -699,19 +765,20 @@ h1{
     document.getElementById("cookieAllBtn").addEventListener("click",function(){saveConsent(true);banner.hidden=true;});
   }
 
-  document.getElementById("langPl").addEventListener("click",function(){try{localStorage.setItem(LANG_KEY,"pl");}catch(e){}applyLang();});
-  document.getElementById("langSzl").addEventListener("click",function(){try{localStorage.setItem(LANG_KEY,"szl");}catch(e){}applyLang();});
+  document.getElementById("langPl").addEventListener("click",function(){chooseLang("pl");});
+  document.getElementById("langSzl").addEventListener("click",function(){chooseLang("szl");});
   document.getElementById("themeBtn").addEventListener("click",toggleTheme);
-  window.addEventListener("pageshow",function(){updateAccountShortcut(copy[getLang()]);});
-  window.addEventListener("focus",function(){updateAccountShortcut(copy[getLang()]);});
-  window.addEventListener("storage",function(e){if(e.key===AUTH_KEY)updateAccountShortcut(copy[getLang()]);});
   applyLang();
   loadAccountSummary();
   themeIcon();
   bootCookies();
   window.addEventListener("pageshow",function(){accountSummary=null;applyLang();loadAccountSummary();});
   window.addEventListener("focus",function(){accountSummary=null;applyLang();loadAccountSummary();});
-  window.addEventListener("storage",function(e){if(e&&e.key===AUTH_KEY){accountSummary=null;applyLang();loadAccountSummary();}});
+  window.addEventListener("storage",function(e){
+    if(!e)return;
+    if(e.key===LANG_KEY)applyLang();
+    if(e.key===AUTH_KEY){accountSummary=null;applyLang();loadAccountSummary();}
+  });
 })();
 </script>
 <script src="build-version.js?v=2026.09.22.3"></script>
