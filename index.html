@@ -420,6 +420,66 @@ h1{
   .cookie-actions{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Odświeżony panel gracza i Familocka */
+.account-card{
+  position:relative;overflow:hidden;margin-top:18px;padding:15px 16px;gap:18px;
+  grid-template-columns:minmax(0,1fr) minmax(260px,auto);
+  border-radius:20px;
+  background:linear-gradient(115deg,color-mix(in srgb,var(--green) 13%,var(--surface)),var(--surface) 72%);
+}
+.account-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--green)}
+.account-main{grid-template-columns:48px minmax(0,1fr) 18px;gap:13px;padding:4px 0 4px 3px}
+.account-avatar{width:48px;height:48px;border-radius:15px;font-size:22px}
+.account-name{font-size:23px;line-height:1.12}
+.account-sub{margin-top:5px;font-size:11px}
+.account-eyebrow{letter-spacing:.13em}
+.account-arrow{font-size:24px;transition:transform .16s}
+.account-main:hover .account-arrow{transform:translateX(3px)}
+.account-stats{grid-template-columns:repeat(3,minmax(78px,1fr));gap:8px}
+.account-stats[hidden]{display:none}
+.account-stat{min-width:0;min-height:64px;padding:10px 9px;border-radius:13px}
+.account-stat b{font-size:clamp(14px,1.65vw,21px);overflow:visible;text-overflow:clip}
+.account-stat small{font-size:9px;margin-top:6px;letter-spacing:.07em}
+.quick{max-width:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.quick a{position:relative;min-height:55px;border-radius:14px;background:var(--surface);color:var(--ink);font-size:12px;transition:transform .15s,border-color .15s,background .15s}
+.quick a::before{content:"";width:17px;height:17px;flex:none;background:currentColor;opacity:.75;mask-size:contain;mask-position:center;mask-repeat:no-repeat}
+.quick a:hover{transform:translateY(-2px);background:var(--surface2);border-color:var(--gold)}
+.quick #quickRanking::before{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 20h16M6 17V9h4v8m0-11h4v11m0-6h4v6M10 3l2-2 2 2' stroke='black' stroke-width='2' fill='none'/%3E%3C/svg%3E")}
+.quick #quickNews::before{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 3h14v18H5zM8 8h8M8 12h8M8 16h5' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E")}
+.quick #quickCoffee::before{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 7h13v7a6 6 0 0 1-12 0V7Zm13 1h2a3 3 0 0 1 0 6h-2M3 21h16' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E")}
+.familock-strip{
+  position:relative;overflow:hidden;margin-top:19px;min-height:99px;padding:19px 20px;
+  border-radius:19px;gap:20px;
+  background:linear-gradient(110deg,color-mix(in srgb,var(--green) 14%,var(--surface2)),var(--surface2));
+}
+.familock-strip::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+.familock-title{font-family:Oswald,system-ui,sans-serif;font-size:20px;letter-spacing:.02em;text-transform:uppercase}
+.familock-text{font-size:11.5px;line-height:1.5;margin-top:6px}
+.familock-actions{gap:9px}
+.familock-link{min-height:44px;padding:10px 16px;font-size:11px;transition:transform .15s,filter .15s}
+.familock-link:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.familock-link.secondary{border-color:var(--gold)}
+@media(max-width:720px){
+ .account-card{grid-template-columns:1fr;gap:12px}
+ .account-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .account-stat b{font-size:19px}
+ .familock-strip{align-items:stretch;flex-direction:column}
+ .familock-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:430px){
+ .account-card{padding:14px}
+ .account-main{grid-template-columns:42px minmax(0,1fr) 16px}
+ .account-avatar{width:42px;height:42px}
+ .account-name{font-size:20px}
+ .account-stat b{font-size:17px}
+ .quick{gap:7px}
+ .quick a{min-height:57px;padding:7px 5px;gap:5px;font-size:10.5px;flex-direction:column}
+ .quick a::before{width:16px;height:16px}
+ .familock-strip{padding:17px}
+ .familock-actions{grid-template-columns:1fr}
+}
+
 </style>
 <meta name="theme-color" content="#2f4a39">
 </head>
