@@ -18,8 +18,30 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent
 WFS = "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBoundaries"
 LAYER = "A04_Granice_miast"
-NAME_FIELDS = ("NAZWA", "NAZWA_MIASTA", "nazwa", "name", "JPT_NAZWA_", "JPT_NAZWA")
-ID_FIELDS = ("ID_JEDNOSTKI", "ID_TERYT", "TERYT", "teryt", "JPT_KOD_JE", "JPT_KOD")
+NAME_FIELDS = ("JPT_NAZWA_", "JPT_NAZWA", "NAZWA", "NAZWA_MIASTA", "nazwa", "name")
+ID_FIELDS = ("JPT_KOD_JE", "JPT_KOD", "ID_JEDNOSTKI", "ID_TERYT", "TERYT", "teryt")
+
+def clean_city_name(name):
+    """Remove official descriptive unit suffix, keep real city name."""
+    if not name:
+        return None
+    for suffix in (" - gmina miejska", " - miasto", " - część miejska",
+                   " - obszar miejski", " (miasto)"):
+        if name.casefold().endswith(suffix.casefold()):
+            return name[:-len(suffix)].strip()
+    return name.strip()
+
+def normalized_teryt(raw):
+    """Teryt: 246901_1 -> 2469011; valid unit types 1 (urban commune),
+    4 (town part of mixed commune). Return None otherwise."""
+    if not raw:
+        return None
+    val=str(raw).strip()
+    if re.fullmatch(r"24\d{4}_[14]",val):
+        return val.replace("_","")
+    if re.fullmatch(r"24\d{4}[14]",val):
+        return val
+    return None
 
 def property_value(props, keys):
     for k in keys:
@@ -99,23 +121,27 @@ def main():
         print("GeoJSON example property names:",sorted((dataset["features"][0].get("properties") or {}).keys()),flush=True)
         print("GeoJSON example properties:",str(dataset["features"][0].get("properties") or {})[:1000],flush=True)
     output,issues,seen=[],[],set()
+    region_features=sum(str(property_value(f.get("properties") or {},ID_FIELDS) or "").startswith("24") for f in dataset["features"])
+    print("Wszystkie obiekty kodu województwa 24:",region_features,flush=True)
     for feature in dataset["features"]:
         props=feature.get("properties") or {}
-        name=property_value(props,NAME_FIELDS)
+        raw_name=property_value(props,NAME_FIELDS)
+        name=clean_city_name(raw_name)
+        raw_teryt=property_value(props,ID_FIELDS)
+        # Warstwa krajowa zawiera homonimy z innych województw (np. Olsztyn).
+        # Filtr regionu obowiązuje przed dopasowaniem nazwy.
+        if not raw_teryt or not raw_teryt.startswith("24"):
+            continue
         if name not in expected:
             continue
-        teryt=property_value(props,ID_FIELDS)
-        # Dwie miejscowości w różnych województwach mogą nosić tę samą nazwę,
-        # np. Olsztyn. Filtr regionu MUSI poprzedzać wykrywanie duplikatów.
-        if not teryt or not teryt.startswith("24"):
+        teryt=normalized_teryt(raw_teryt)
+        if not teryt:
+            issues.append({"city":name,"error":"nieoczekiwany format TERYT: "+raw_teryt})
             continue
         if name in seen:
             issues.append({"city":name,"error":"duplikat w województwie śląskim"})
             continue
         seen.add(name)
-        if not re.fullmatch(r"24\d{4}[14]",teryt):
-            issues.append({"city":name,"error":"nieoczekiwany kod TERYT miasta: "+teryt})
-            continue
         try:
             contour,center=to_contour(feature.get("geometry") or {})
         except (ValueError,TypeError,IndexError) as exc:
@@ -128,7 +154,7 @@ def main():
     ids=[x["id"] for x in output]
     if len(set(ids))!=len(ids):
         issues.append({"city":"ALL","error":"duplikaty kodów TERYT"})
-    report={"status":"NOT_VERIFIED","layerDeclared":LAYER,"source":WFS,
+    report={"status":"NOT_VERIFIED","regionFeatureCount":region_features,"inputFeatureCount":len(dataset["features"]),"layerDeclared":LAYER,"source":WFS,
             "sourceLayerIndependentlyVerified":False,"referenceDateDeclared":args.reference_date,
             "officialTerytCompared":False,"visualReviewDone":False,
             "count":len(output),"expected":75,"issues":issues}
