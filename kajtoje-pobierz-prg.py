@@ -65,8 +65,9 @@ def main():
     print("Liczba obiektów w eksporcie:",len(obj["features"]),flush=True)
     if len(obj["features"])<75:
         raise RuntimeError("Warstwa A04 zwróciła mniej niż 75 miast, sprawdź WFS")
-    run([sys.executable, str(ROOT / "kajtoje-import.py"), str(OUTPUT),
-         "--reference-date", args.reference_date])
+    subprocess.run([sys.executable, str(ROOT / "kajtoje-import.py"), str(OUTPUT),
+                    "--reference-date", args.reference_date],
+                   cwd=ROOT, check=True, timeout=240)
     print("Powstały dane robocze. Weryfikacja TERYT i herbów pozostaje obowiązkowa.")
 
 if __name__ == "__main__":
