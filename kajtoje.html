@@ -114,7 +114,7 @@ function render(){
 function outline(){
  let root=section(tr("outline")),pane=el("div","silhouette"),svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),path=document.createElementNS("http://www.w3.org/2000/svg","path");
  svg.setAttribute("viewBox",city.contour.viewBox.join(" "));svg.setAttribute("role","img");svg.setAttribute("aria-label","Kontur miasta, północ u góry");
- path.setAttribute("d",city.contour.path);svg.append(path);pane.append(svg,el("span","north","N ↑"));root.append(pane);
+ path.setAttribute("d",city.contour.path);path.setAttribute("fill-rule","evenodd");svg.append(path);pane.append(svg,el("span","north","N ↑"));root.append(pane);
  let dots=el("div","tries");for(let i=0;i<6;i++)dots.append(el("span",i<state.guesses.length?"used":""));root.append(dots);
  let hist=el("ul","history");
  state.guesses.forEach(g=>{let c=data.cities.find(x=>x.id===g);if(!c)return;let li=el("li");li.append(el("span","",c.name),el("span","muted",distance(c.center,city.center)+" km · "+compass(c.center,city.center)));hist.append(li)});
