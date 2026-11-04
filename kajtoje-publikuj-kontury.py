@@ -41,5 +41,5 @@ data = {
     "cities": [by_name[n] for n in names],
 }
 target = ROOT / "kajtoje-kontury.json"
-target.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\\n", encoding="utf-8")
+target.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
 print(f"Review outlines published: {len(cities)} cities, {target.stat().st_size} bytes")
