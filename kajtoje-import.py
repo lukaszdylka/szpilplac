@@ -94,6 +94,10 @@ def main():
     crs=dataset.get("crs",{})
     if crs and "4326" not in json.dumps(crs):
         raise ValueError("GeoJSON nie ma układu EPSG:4326")
+    print("GeoJSON feature count:",len(dataset["features"]),flush=True)
+    if dataset["features"]:
+        print("GeoJSON example property names:",sorted((dataset["features"][0].get("properties") or {}).keys()),flush=True)
+        print("GeoJSON example properties:",str(dataset["features"][0].get("properties") or {})[:1000],flush=True)
     output,issues,seen=[],[],set()
     for feature in dataset["features"]:
         props=feature.get("properties") or {}
