@@ -35,6 +35,9 @@ with tempfile.TemporaryDirectory() as td:
 review=(root/"kajtoje-kontury.html").read_text(encoding="utf-8")
 assert '/kajtoje-kontury.json' in review
 assert 'mode-review' in review and 'mode-daily' in review
+assert 'LANDMARKS={' in review and 'renderLandmark()' in review
+assert 'wrong>=3||finished||forceSymbol' in review
+assert 'preview-symbol' in review
 review_scripts=re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>",review,re.S)
 assert len(review_scripts)==1
 with tempfile.TemporaryDirectory() as td:
