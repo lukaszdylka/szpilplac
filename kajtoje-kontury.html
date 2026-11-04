@@ -18,6 +18,10 @@ h1{font-size:clamp(30px,5vw,50px);line-height:1.1;margin:18px 0 10px;font-family
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:19px;padding:22px}
 .map{position:relative;display:grid;place-items:center;min-height:400px;background:radial-gradient(circle at center,#213c35,#142522 70%);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 svg{width:90%;height:335px;overflow:visible}#outline{fill:var(--accent);stroke:#e8f4d8;stroke-width:1.4;stroke-linejoin:round;vector-effect:non-scaling-stroke;fill-rule:evenodd}
+.landmark-overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;display:grid;place-items:center;border-radius:50%;background:#102520ee;border:2px solid #d2ecc0;box-shadow:0 8px 40px #06130faa;pointer-events:none}
+.landmark-overlay[hidden]{display:none}.landmark-overlay svg{width:70px;height:70px;stroke:#d4efbd;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.landmark-overlay .symbol-mark{font-size:35px;color:var(--accent)}
+.symbol-note{margin:8px 0 0;font-size:12px;color:var(--muted)}
 .north{position:absolute;right:18px;top:14px;color:var(--muted);font-size:13px;letter-spacing:.1em}
 .mode{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 button,select,input{font:inherit}button{cursor:pointer;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--ink);padding:10px 14px}
@@ -53,9 +57,10 @@ ol{list-style:none;padding:0;margin:12px 0 0}li{display:flex;gap:9px;justify-con
 <div class="layout">
 <section class="panel">
 <div class="mode"><button id="mode-daily" class="active" type="button">Miasto dnia</button><button id="mode-review" type="button">Przeglądaj 75 miast</button></div>
-<div class="map"><div class="north">N ↑</div><svg id="shape" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" role="img" aria-label="Kontur miasta"><path id="outline" d=""></path></svg></div>
+<div class="map"><div class="north">N ↑</div><svg id="shape" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" role="img" aria-label="Kontur miasta"><path id="outline" d=""></path></svg><div id="landmark-overlay" class="landmark-overlay" hidden aria-label="Symbol charakterystycznego obiektu miasta"></div></div>
+<p id="symbol-note" class="symbol-note" hidden>Symbol jest ilustracją podpowiedzi, a nie dokładnym położeniem obiektu.</p>
 <p class="meta" id="map-note">Północ zawsze u góry. Wszystkie miasta są skalowane do tej samej maksymalnej wielkości.</p>
-<div id="review-picker" hidden><label for="city-review">Wybierz miasto do kontroli</label><select id="city-review"></select><div class="actions"><button id="prev" type="button">Poprzednie</button><button id="next" type="button">Następne</button></div></div>
+<div id="review-picker" hidden><label for="city-review">Wybierz miasto do kontroli</label><select id="city-review"></select><div class="actions"><button id="prev" type="button">Poprzednie</button><button id="next" type="button">Następne</button></div><div class="actions"><button id="preview-symbol" type="button">Podejrzyj symbol miasta</button></div><p class="meta">Na razie przygotowano 10 symboli. W trybie przeglądania możesz je pokazać bez zgadywania.</p></div>
 <div class="details"><p id="source">Ładowanie danych...</p><p id="coords"></p></div>
 </section>
 <section class="panel">
@@ -73,7 +78,7 @@ ol{list-style:none;padding:0;margin:12px 0 0}li{display:flex;gap:9px;justify-con
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-let cities=[],selected=null,mode="daily",guesses=[],finished=false,seed=1,extent=null;
+let cities=[],selected=null,mode="daily",guesses=[],finished=false,seed=1,extent=null,forceSymbol=false;
 const KATOWICE=[50.2649,19.0238];
 const dayIndex=()=>Math.max(0,Math.floor((Date.now()-Date.UTC(2026,5,23))/86400000));
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -100,12 +105,44 @@ function hintRegion(city){
  if(latBand==="środkowa")return lonBand.charAt(0).toUpperCase()+lonBand.slice(1)+" część województwa";
  return latBand.charAt(0).toUpperCase()+latBand.slice(1)+"-"+lonBand+" część województwa";
 }
+// Autorskie, schematyczne piktogramy. To nie są reprodukcje budynków.
+const LANDMARKS={
+ "Katowice":{name:"Spodek",drawing:"M7 27 Q24 10 41 27 M5 27 Q24 38 43 27 M10 29 L14 36 Q24 42 34 36 L38 29 M12 36 H36"},
+ "Gliwice":{name:"Radiostacja Gliwice",drawing:"M24 4 L12 44 M24 4 L36 44 M15 35 H33 M17 27 H31 M19 19 H29 M21 11 H27 M12 44 H36 M12 44 L36 44 M14 35 L31 27 M34 35 L17 27 M17 27 L29 19 M31 27 L19 19"},
+ "Częstochowa":{name:"Jasna Góra",drawing:"M11 44 V28 H37 V44 M14 28 V18 H21 V28 M28 28 V11 H35 V28 M30 11 V7 H33 M17 18 V13 M17 13 H19 M15 44 H34 M24 44 V36 H29 V44"},
+ "Chorzów":{name:"Planetarium Śląskie",drawing:"M5 37 Q24 8 43 37 M7 37 H41 M12 37 V42 H36 V37 M24 12 L24 6 M21 9 H27 M35 10 L38 7 M38 10 L35 7"},
+ "Zabrze":{name:"Kopalnia Guido",drawing:"M11 43 H37 M15 43 V20 H33 V43 M14 20 L24 9 L34 20 Z M24 9 V5 M17 30 H31 M17 37 H31 M24 20 V43"},
+ "Żywiec":{name:"Muzeum Browaru Żywiec",drawing:"M18 10 H30 M20 10 V17 L15 24 V40 Q15 44 20 44 H28 Q33 44 33 40 V24 L28 17 V10 M18 29 H30 M18 37 H30"},
+ "Pszczyna":{name:"Zamek w Pszczynie",drawing:"M6 42 H42 M9 42 V22 H39 V42 M12 22 V13 H18 V22 M30 22 V13 H36 V22 M18 42 V32 Q24 25 30 32 V42 M20 22 H28"},
+ "Tarnowskie Góry":{name:"Zabytkowa Kopalnia Srebra",drawing:"M8 12 Q22 4 36 14 M22 9 L35 39 M19 41 L39 34 M11 42 L34 15 M8 15 L14 8"},
+ "Bielsko-Biała":{name:"Zamek Sułkowskich",drawing:"M6 43 H42 M9 43 V21 L15 17 L21 21 H39 V43 M23 21 V13 H34 V21 M12 29 H17 V35 H12 Z M23 29 H29 V35 H23 Z M35 29 V35"},
+ "Będzin":{name:"Zamek w Będzinie",drawing:"M8 43 H40 M10 43 V22 L17 17 L24 22 V43 M25 43 V14 H36 V43 M28 14 V9 H33 V14 M13 28 H20 M13 35 H20 M29 25 H33 M29 32 H33"}
+};
+function renderLandmark(){
+ const target=$("landmark-overlay"),note=$("symbol-note");
+ const entry=selected&&LANDMARKS[selected.name];
+ const enabled=!!entry&&(forceSymbol||finished||guesses.filter(g=>g.id!==selected.id).length>=3);
+ target.hidden=!enabled;note.hidden=!enabled;
+ target.replaceChildren();
+ if(enabled){
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 48 48");
+  svg.setAttribute("aria-hidden","true");
+  const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+  p.setAttribute("d",entry.drawing);svg.append(p);target.append(svg);
+  target.setAttribute("aria-label",finished||forceSymbol?"Symbol: "+entry.name:"Symbol charakterystycznego obiektu");
+ }
+ $("preview-symbol").disabled=!entry;
+ $("preview-symbol").textContent=forceSymbol?"Ukryj symbol miasta":"Podejrzyj symbol miasta";
+}
 function updateHints(){
  if(!selected||!extent)return;
  const wrong=guesses.filter(c=>c.id!==selected.id).length;
+ const entry=LANDMARKS[selected.name];
  const stages=[
   {available:true,title:"Gdzie leży miasto?",value:hintRegion(selected)},
   {available:wrong>=2||finished,title:"Odległość od Katowic",value:"Około "+km(KATOWICE,selected.center)+" km w linii prostej",locked:"Odblokuje się po 2 błędnych próbach"},
+  ...(entry?[{available:wrong>=3||finished||forceSymbol,title:"Symbol charakterystycznego obiektu",value:finished||forceSymbol?entry.name:"Piktogram pojawił się na konturze",locked:"Odblokuje się po 3 błędnych próbach"}]:[]),
   {available:wrong>=4||finished,title:"Pierwsza litera nazwy",value:selected.name.charAt(0).toLocaleUpperCase("pl"),locked:"Odblokuje się po 4 błędnych próbach"}
  ];
  const ul=$("hint-list");ul.replaceChildren();
@@ -117,10 +154,11 @@ function updateHints(){
   small.textContent=stage.available?stage.value:stage.locked;
   content.append(name,small);li.append(mark,content);ul.append(li);
  }
+ renderLandmark();
 }
 function dailyCity(){return cities[dayIndex()%cities.length]}
 function selectCity(city){
- selected=city;guesses=[];finished=false;
+ selected=city;guesses=[];finished=false;forceSymbol=false;
  const shape=city.contour;
  $("shape").setAttribute("viewBox",shape.viewBox.join(" "));
  $("outline").setAttribute("d",shape.path);
@@ -173,6 +211,7 @@ $("mode-review").addEventListener("click",()=>chooseMode("review"));
 $("city-review").addEventListener("change",e=>{const c=cities.find(c=>c.id===e.target.value);if(c)selectCity(c)});
 function move(n){if(!selected)return;selectCity(cities[(cities.findIndex(c=>c.id===selected.id)+n+cities.length)%cities.length])}
 $("prev").addEventListener("click",()=>move(-1));$("next").addEventListener("click",()=>move(1));
+$("preview-symbol").addEventListener("click",()=>{if(selected&&LANDMARKS[selected.name]){forceSymbol=!forceSymbol;updateHints();}});
 async function init(){
  try{
   const r=await fetch("/kajtoje-kontury.json",{cache:"no-store"});
