@@ -129,6 +129,7 @@ footer a{color:var(--green);font-weight:600}
 </style>
 <meta name="theme-color" content="#2f4a39">
 <script src="/site-events.js?v=2026.08.02.1"></script>
+<link rel="stylesheet" href="/support-banner.css?v=1">
 </head>
 <body>
 <header>
@@ -476,7 +477,7 @@ function openEndFor(mode,idx){
   var oldGame=game;game=g;var won=g.status==="won",isArchive=idx<TODAY_NO;
   var countdownHtml=isArchive?'<div class="cd">'+T.archiveDone+'</div>':'<div class="cd">'+T.next+' <b id="cd">'+countdown()+'</b></div>';
   modal.innerHTML='<button class="modal-close" aria-label="Zamknij">×</button><h2>'+(won?T.endW:T.endL)+'</h2><div class="reveal-card"><div class="reveal-lbl">'+T.revealLbl+'</div><div class="reveal-code" id="revealCode">'+(g.reveal||"····")+'</div></div>'+countdownHtml+'<button class="btn share" id="shareBtn">'+T.share+'</button><div class="share-msg" id="shareMsg" aria-live="polite"></div><button class="btn ghost" id="closeBtn">'+T.again+'</button>';
-  scrim.classList.add("open");modal.querySelector(".modal-close").addEventListener("click",closeModal);modal.querySelector("#closeBtn").addEventListener("click",closeModal);modal.querySelector("#shareBtn").addEventListener("click",function(){var text=buildShareText("daily",idx,g);copyShareText(text,function(){showShareMsg(T.copied,true);},function(){showShareMsg(T.copyFail,false);});});
+  scrim.classList.add("open");if(!isArchive&&window.SZP_SUPPORT)window.SZP_SUPPORT.showResult(modal);modal.querySelector(".modal-close").addEventListener("click",closeModal);modal.querySelector("#closeBtn").addEventListener("click",closeModal);modal.querySelector("#shareBtn").addEventListener("click",function(){var text=buildShareText("daily",idx,g);copyShareText(text,function(){showShareMsg(T.copied,true);},function(){showShareMsg(T.copyFail,false);});});
   clearInterval(openEndFor._t);if(!isArchive)openEndFor._t=setInterval(function(){var el=document.getElementById("cd");if(el)el.textContent=countdown();else clearInterval(openEndFor._t);},1000);game=oldGame;
 }
 function openFinishedModal(delay){if(!game||(game.status!=="won"&&game.status!=="lost"))return;delay=delay===undefined?250:delay;var idx=DAY_NO;setTimeout(function(){openEndFor("daily",idx);},delay);if(game.reveal)return;rpc("klodka_reveal",{p_mode:"daily",p_idx:idx}).then(function(code){var saved=loadSavedGame("daily",idx)||game;if(saved){saved.reveal=code;saveGameFor("daily",idx,saved);}if(game&&DAY_NO===idx){game.reveal=code;saveGameFor("daily",idx,game);}updateRevealInModal(code);}).catch(function(){});}
@@ -529,5 +530,6 @@ else if(!localStorage.getItem(HELP_KEY))setTimeout(function(){if(!document.getEl
 <script src="game-result-actions.js?v=128"></script>
 <script src="result-stats-snapshot.js?v=1"></script>
 <script src="pwa-push.js?v=1"></script>
+<script src="/support-banner.js?v=1"></script>
 </body>
 </html>
