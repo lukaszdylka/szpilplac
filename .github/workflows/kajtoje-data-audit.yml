@@ -38,18 +38,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq gdal-bin
-      - name: Import local GML first, fallback to WFS
+      - name: Download complete official A04 city layer and audit all 75
         run: |
-          if [ -s ms_A04_Granice_miast.gml ]; then
-            echo "Sprawdzam dostarczony GML. Jeśli niekompletny, pobiorę pełną warstwę WFS."
-            if python3 kajtoje-import-gml.py ms_A04_Granice_miast.gml --reference-date "$(date -u +%Y-%m-%d)"; then
-              echo "Import z GML zakończony kontrolą formalną."
-              exit 0
-            fi
-            echo "GML nie przeszedł kontroli. Zatrzymuję import, żeby zachować raport."
-            exit 1
-          fi
-          echo "Nie znaleziono GML. Pobieranie WFS w osobnym procesie."
           python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
       - name: Upload audit output, also on failure
         if: always()
