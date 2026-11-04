@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "verified": false,
+  "demo": true,
+  "notice": "DEMO: fikcyjne miasta, kontury, herby oraz pytania",
+  "cities": [
+    {
+      "id": "2400001",
+      "name": "Testowice",
+      "center": [
+        50,
+        19.01
+      ],
+      "contour": {
+        "viewBox": [
+          0,
+          0,
+          100,
+          100
+        ],
+        "path": "M 14 10 L 80 6 L 92 25 L 78 43 L 93 66 L 58 88 L 22 78 L 8 45 Z"
+      },
+      "herb": "/kajtoje-demo/2400001.svg",
+      "sources": {
+        "border": "DANE FIKCYJNE, WYŁĄCZNIE PODGLĄD",
+        "herb": "HERB FIKCYJNY, WYŁĄCZNIE PODGLĄD"
+      },
+      "questions": [
+        {
+          "prompt": "Która odpowiedź została przypisana do fikcyjnego miasta Testowice?",
+          "options": [
+            "Wariant A",
+            "Wariant B",
+            "Wariant C",
+            "Wariant D"
+          ],
+          "correct": 0,
+          "source": "ZESTAW DEMONSTRACYJNY, BRAK DANYCH URZĘDOWYCH",
+          "asOf": "2026-11-04"
+        }
+      ]
+    },
+    {
+      "id": "2400002",
+      "name": "Próbnik",
+      "center": [
+        50.1,
+        18.95
+      ],
+      "contour": {
+        "viewBox": [
+          0,
+          0,
+          100,
+          100
+        ],
+        "path": "M 20 9 L 47 17 L 66 8 L 90 37 L 84 65 L 53 92 L 25 80 L 10 49 Z"
+      },
+      "herb": "/kajtoje-demo/2400002.svg",
+      "sources": {
+        "border": "DANE FIKCYJNE, WYŁĄCZNIE PODGLĄD",
+        "herb": "HERB FIKCYJNY, WYŁĄCZNIE PODGLĄD"
+      },
+      "questions": [
+        {
+          "prompt": "Która odpowiedź została przypisana do fikcyjnego miasta Próbnik?",
+          "options": [
+            "Wariant A",
+            "Wariant B",
+            "Wariant C",
+            "Wariant D"
+          ],
+          "correct": 1,
+          "source": "ZESTAW DEMONSTRACYJNY, BRAK DANYCH URZĘDOWYCH",
+          "asOf": "2026-11-04"
+        }
+      ]
+    },
+    {
+      "id": "2400003",
+      "name": "Modelowo",
+      "center": [
+        50.2,
+        19.18
+      ],
+      "contour": {
+        "viewBox": [
+          0,
+          0,
+          100,
+          100
+        ],
+        "path": "M 22 15 L 62 7 L 83 20 L 91 53 L 65 77 L 38 90 L 13 58 L 9 37 Z"
+      },
+      "herb": "/kajtoje-demo/2400003.svg",
+      "sources": {
+        "border": "DANE FIKCYJNE, WYŁĄCZNIE PODGLĄD",
+        "herb": "HERB FIKCYJNY, WYŁĄCZNIE PODGLĄD"
+      },
+      "questions": [
+        {
+          "prompt": "Która odpowiedź została przypisana do fikcyjnego miasta Modelowo?",
+          "options": [
+            "Wariant A",
+            "Wariant B",
+            "Wariant C",
+            "Wariant D"
+          ],
+          "correct": 2,
+          "source": "ZESTAW DEMONSTRACYJNY, BRAK DANYCH URZĘDOWYCH",
+          "asOf": "2026-11-04"
+        }
+      ]
+    },
+    {
+      "id": "2400004",
+      "name": "Symulice",
+      "center": [
+        49.95,
+        19.28
+      ],
+      "contour": {
+        "viewBox": [
+          0,
+          0,
+          100,
+          100
+        ],
+        "path": "M 21 8 L 48 11 L 75 21 L 92 54 L 74 85 L 40 82 L 11 61 L 6 25 Z"
+      },
+      "herb": "/kajtoje-demo/2400004.svg",
+      "sources": {
+        "border": "DANE FIKCYJNE, WYŁĄCZNIE PODGLĄD",
+        "herb": "HERB FIKCYJNY, WYŁĄCZNIE PODGLĄD"
+      },
+      "questions": [
+        {
+          "prompt": "Która odpowiedź została przypisana do fikcyjnego miasta Symulice?",
+          "options": [
+            "Wariant A",
+            "Wariant B",
+            "Wariant C",
+            "Wariant D"
+          ],
+          "correct": 3,
+          "source": "ZESTAW DEMONSTRACYJNY, BRAK DANYCH URZĘDOWYCH",
+          "asOf": "2026-11-04"
+        }
+      ]
+    }
+  ]
+}
