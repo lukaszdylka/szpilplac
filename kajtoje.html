@@ -125,7 +125,7 @@ function outline(){
  let list=el("datalist");list.id="city-options";data.cities.slice().sort((a,b)=>a.name.localeCompare(b.name,"pl")).forEach(c=>{let o=el("option");o.value=c.name;list.append(o)});
  form.append(input,btn(tr("guess"),()=>{}, "primary"));form.lastElementChild.type="submit";form.lastElementChild.replaceWith(el("button","primary",tr("guess")));form.lastElementChild.type="submit";
  form.addEventListener("submit",ev=>{ev.preventDefault();let selected=data.cities.find(c=>c.name.toLocaleLowerCase("pl")===input.value.trim().toLocaleLowerCase("pl"));if(!selected){status(tr("pick"));return}if(state.guesses.includes(selected.id)){status(tr("repeat"));return}state.guesses.push(selected.id);if(selected.id===city.id){state.score=60-(state.guesses.length-1)*10;state.stage=2;save();render();return}if(state.guesses.length===6){state.stage=4;state.finished=true;save();render();return}save();render();status(tr("wrong"))});
- root.append(form,list);status((6-state.guesses.length)+"/6");
+ root.append(form,list);if(DEMO)root.append(btn("Pokaż odpowiedź demonstracyjną",()=>status("W tym teście odpowiedź to: "+city.name),"choice"));status((6-state.guesses.length)+"/6");
 }
 function herb(){
  let root=section(tr("herb"));root.append(el("p","sub",resultCity()));let grid=el("div","choices");
