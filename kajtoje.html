@@ -43,6 +43,7 @@ form{display:flex;gap:8px;margin:14px 0 4px}input{min-width:0;flex:1;padding:13p
 <h1>Kaj to je?</h1>
 <p class="sub" id="intro">Jedno miasto, trzy zagadki. Rozpoznaj Śląsk!</p>
 <div class="between"><span class="pill" id="day">Dzień…</span><span class="pill" id="points">0 / 100 pkt</span></div>
+<div class="notice hidden" id="demo-banner" role="status">PODGLĄD DEMONSTRACYJNY. Miasta, granice, herby i pytania są fikcyjne. Ten tryb służy wyłącznie do sprawdzenia działania interfejsu, nie ocenia wiedzy o Śląsku.</div>
 <div class="pills" id="steps"><span class="pill current">1. Kontur</span><span class="pill">2. Herb</span><span class="pill">3. Pytanie</span></div>
 <section class="card" id="game" aria-live="polite"><p class="status">Wczytywanie zweryfikowanych danych…</p></section>
 </main>
@@ -51,10 +52,11 @@ form{display:flex;gap:8px;margin:14px 0 4px}input{min-width:0;flex:1;padding:13p
 <script>
 "use strict";
 (function(){
-const DATA_URL="/kajtoje-data.json";
+const DEMO=new URLSearchParams(location.search).get("demo")==="1";
+const DATA_URL=DEMO?"/kajtoje-demo.json":"/kajtoje-data.json";
 const START="2026-11-04";
 const ZONE="Europe/Warsaw";
-const STORE="kajtoje_v1";
+const STORE=DEMO?"kajtoje_demo_v1":"kajtoje_v1";
 const dict={
 pl:{intro:"Jedno miasto, trzy zagadki. Rozpoznaj Śląsk!",outline:"Rozpoznaj miasto po granicach",herb:"Który herb należy do tego miasta?",question:"Odpowiedz na pytanie o miasto",guess:"Sprawdź",type:"Wybierz miasto",fail:"Nie udało się. Prawidłowe miasto: ",ok:"Brawo! To ",next:"Przejdź do następnej rundy",finish:"Zobacz wynik",share:"Udostępnij wynik",copied:"Wynik skopiowany",again:"Wróć jutro po nową zagadkę",rules:"1. Rozpoznaj kontur miasta w maksymalnie sześciu próbach. 2. Wskaż prawidłowy herb. 3. Odpowiedz na jedno pytanie o miasto. Każdy gracz ma tę samą zagadkę dnia. Odpowiedzi do etapów 2 i 3 można podać tylko raz.",missing:"Gra czeka na zatwierdzoną bazę 75 miast, ich oficjalnych granic, herbów i pytań. Nie pokazujemy danych przykładowych jako prawdziwych.",bad:"Nie można rozpocząć gry: baza nie przeszła weryfikacji.",pick:"Wybierz miasto z listy.",repeat:"To miasto było już podane.",wrong:"Nie tym razem.",loading:"Sprawdzanie danych...",pts:"punktów"},
 szl:{intro:"Jedno miasto, trzi zagodki. Poznosz Ślonsk?",outline:"Zgodnij miasto po granicach",herb:"Kery herb pasuje do tego miasta?",question:"Odpowiydz na pytanie ô miasto",guess:"Sprawdź",type:"Ôbier miasto",fail:"Niy poszło. To było: ",ok:"Brawo! To ",next:"Idź dalij",finish:"Pokoż wynik",share:"Podziel sie wynikym",copied:"Wynik skopiowany",again:"Przidź jutro po nowo zagodka",rules:"1. Zgodnij miasto po konturze w sześciu próbach. 2. Ôbier richtik herb. 3. Odpowiydz na jedno pytanie ô miasto. Kozdy mo ta samo zagodka dnia. Na pytania w rundach 2 i 3 mosz po jednej próbie.",missing:"Szpil czeko na sprawdzono baza 75 miast, granic, herbów i pytań. Niy pokozujymy zmyślōnych danych.",bad:"Niy idzie zaczonć: baza niy przeszła kontroli.",pick:"Ôbier miasto z listy.",repeat:"To miasto już było.",wrong:"Niy tym razym.",loading:"Sprawdzōmy dane...",pts:"punktōw"}};
@@ -63,19 +65,19 @@ let lang=read("familock_lang")||"pl",data=null,city=null,puzzle=null,state=null,
 function read(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function write(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function tr(k){return dict[lang][k]}
-function datePL(){return new Intl.DateTimeFormat("en-CA",{timeZone:ZONE,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}
+function datePL(){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:ZONE,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());const part=t=>parts.find(p=>p.type===t).value;return part("year")+"-"+part("month")+"-"+part("day")}
 function dayNumber(){let parts=datePL().split("-").map(Number),n=Date.UTC(parts[0],parts[1]-1,parts[2]),s=Date.UTC(2026,10,4);return Math.floor((n-s)/86400000)}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function seededShuffle(a,seed){let result=a.slice(),x=hash(seed)||1;for(let i=result.length-1;i>0;i--){x^=x<<13;x^=x>>>17;x^=x<<5;let j=(x>>>0)%(i+1);[result[i],result[j]]=[result[j],result[i]]}return result}
 function save(){write(key,JSON.stringify(state))}
 function validate(d){
- if(!d||d.verified!==true||d.schema!==1||!Array.isArray(d.cities)||d.cities.length!==75)throw Error("Unverified dataset");
+ if(!d||d.schema!==1||!Array.isArray(d.cities)||d.cities.length!==(DEMO?4:75)||(DEMO?d.demo!==true:d.verified!==true))throw Error("Unverified dataset");
  const ids=new Set(),names=new Set();
  d.cities.forEach(c=>{
   if(!c||typeof c.id!=="string"||!/^[0-9]{7}$/.test(c.id)||typeof c.name!=="string"||!c.name||ids.has(c.id)||names.has(c.name))throw Error("Invalid city identity");
   if(!Array.isArray(c.center)||c.center.length!==2||!c.center.every(Number.isFinite)||c.center[0]<48||c.center[0]>52||c.center[1]<17||c.center[1]>22)throw Error("Invalid center");
   if(!c.contour||!Array.isArray(c.contour.viewBox)||c.contour.viewBox.length!==4||!c.contour.viewBox.every(Number.isFinite)||typeof c.contour.path!=="string"||!/^[0-9eE+., MLCQZHVSTAm lcqzhvst-]+$/.test(c.contour.path)||c.contour.path.length<30)throw Error("Invalid contour");
-  if(typeof c.herb!=="string"||!/^\/kajtoje-herby\/[a-z0-9_-]+\.svg$/.test(c.herb)||!c.sources||!c.sources.border||!c.sources.herb)throw Error("Missing verified provenance");
+  if(typeof c.herb!=="string"||!(DEMO?/^\/kajtoje-demo\/[a-z0-9_-]+\.svg$/.test(c.herb):/^\/kajtoje-herby\/[a-z0-9_-]+\.svg$/.test(c.herb))||!c.sources||!c.sources.border||!c.sources.herb)throw Error("Missing verified provenance");
   if(!Array.isArray(c.questions)||!c.questions.length)throw Error("Missing questions");
   c.questions.forEach(q=>{if(!q||typeof q.prompt!=="string"||!Array.isArray(q.options)||q.options.length!==4||new Set(q.options).size!==4||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!q.source||!q.asOf)throw Error("Invalid question")});
   ids.add(c.id);names.add(c.name);
@@ -94,7 +96,7 @@ function status(t){let existing=$("game").querySelector(".status");if(!existing)
 function resultCity(){return city.name}
 function derive(){
  const day=dayNumber();if(day<0)throw Error("Future start");
- const order=seededShuffle(data.cities.map(c=>c.id),"kajtoje-order-v1");
+ const order=seededShuffle(data.cities.map(c=>c.id),DEMO?"kajtoje-demo-order-v1":"kajtoje-order-v1");
  const picked=order[day%order.length];city=data.cities.find(c=>c.id===picked);
  const questions=city.questions,p=questions[Math.floor(day/order.length)%questions.length];
  const emblems=seededShuffle(data.cities.filter(c=>c.id!==city.id),"herb-distractors-"+day).slice(0,3);
@@ -141,7 +143,8 @@ function summary(){
  let line=state.guesses.includes(city.id)?"Kontur: "+state.guesses.length+"/6":"Kontur: nieodgadnięty";
  let details=el("p","meta",line+" · Herb: "+(state.herbCorrect===null?"—":state.herbCorrect?"✓":"✕")+" · Pytanie: "+(state.questionCorrect===null?"—":state.questionCorrect?"✓":"✕"));
  box.append(points,el("p","muted",tr("pts")),cityText,details);root.append(box);
- let share="Kaj to je? #"+(dayNumber()+1)+"\n"+line+"\nHerb: "+(state.herbCorrect?"✓":"✕")+" · Pytanie: "+(state.questionCorrect?"✓":"✕")+"\n"+state.score+"/100\nszpilplac.familock.pl/kajtoje.html";
+ let share=(DEMO?"DEMO TESTOWE (fikcyjne dane)\n":"")+"Kaj to je? #"+(dayNumber()+1)+"\n"+line+"\nHerb: "+(state.herbCorrect?"✓":"✕")+" · Pytanie: "+(state.questionCorrect?"✓":"✕")+"\n"+state.score+"/100\nszpilplac.familock.pl/kajtoje.html";
+ if(DEMO)root.append(btn("Zagraj od nowa (DEMO)",()=>{state=null;write(key,"");derive();render()}));
  root.append(btn(tr("share"),async()=>{try{if(navigator.share)await navigator.share({text:share});else await navigator.clipboard.writeText(share);status(tr("copied"))}catch(e){status("Nie udało się udostępnić.")}}));
  status(tr("again"));
 }
@@ -150,6 +153,7 @@ $("pl").onclick=()=>setLang("pl");$("szl").onclick=()=>setLang("szl");
 $("theme").onclick=()=>{let t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;write("szpilplac_theme",t)};
 $("help").onclick=()=>alert(tr("rules"));
 setLang(lang==="szl"?"szl":"pl");
+if(DEMO){$("demo-banner").classList.remove("hidden");document.title="DEMO · Kaj to je? · Szpilplac"}
 $("day").textContent="Dzień #"+Math.max(1,dayNumber()+1);
 fetch(DATA_URL,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Missing dataset");return r.json()}).then(d=>{validate(d);data=d;derive();render()}).catch(err=>{console.warn("Kaj to je: dataset validation",err);notice(err.message==="Missing dataset"?tr("missing"):tr("bad"))});
 })();
