@@ -31,7 +31,7 @@ jobs:
         run: python3 kajtoje-test-preview.py
   prg:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Install GDAL
@@ -41,12 +41,14 @@ jobs:
       - name: Import local GML first, fallback to WFS
         run: |
           if [ -s ms_A04_Granice_miast.gml ]; then
-            echo "Używam lokalnego ms_A04_Granice_miast.gml, bez połączenia z WFS."
-            python3 kajtoje-import-gml.py ms_A04_Granice_miast.gml --reference-date "$(date -u +%Y-%m-%d)"
-          else
-            echo "Nie ma lokalnego GML, próbuję WFS."
-            python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
+            echo "Sprawdzam dostarczony GML. Jeśli niekompletny, pobiorę pełną warstwę WFS."
+            if python3 kajtoje-import-gml.py ms_A04_Granice_miast.gml --reference-date "$(date -u +%Y-%m-%d)"; then
+              echo "Import z GML zakończony kontrolą formalną."
+              exit 0
+            fi
+            echo "GML nie przeszedł kontroli, uruchamiam pełną warstwę A04 z WFS."
           fi
+          python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
       - name: Upload audit output, also on failure
         if: always()
         uses: actions/upload-artifact@v4
