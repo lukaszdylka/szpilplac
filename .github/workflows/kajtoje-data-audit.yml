@@ -47,5 +47,6 @@ jobs:
           path: |
             kajtoje-audyt-granic.json
             kajtoje-granice-robocze.json
+            kajtoje-granice-z-prg.geojson
           if-no-files-found: warn
           retention-days: 30
