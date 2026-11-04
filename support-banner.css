@@ -1,0 +1,19 @@
+/* Szpilplac: spokojne karty dobrowolnego wsparcia */
+.szp-support{box-sizing:border-box;width:100%;max-width:980px;margin:18px auto 0;padding:17px 19px;border:1px solid var(--line,#443b2d);border-radius:17px;background:var(--surface,#262018);color:var(--ink,#ede5d0);font-family:Inter,system-ui,sans-serif;box-shadow:0 8px 26px -24px #000}
+.szp-support *{box-sizing:border-box}
+.szp-support__eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--gold,#c99b54);margin:0 0 6px}
+.szp-support__heading{margin:0 0 7px;font-family:Oswald,Inter,system-ui,sans-serif;font-size:clamp(19px,3vw,24px);line-height:1.2;color:var(--ink,#ede5d0);font-weight:700}
+.szp-support__copy{margin:0;color:var(--ink2,#9a907a);font-size:12.5px;line-height:1.65}
+.szp-support__actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px}
+.szp-support__link{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 14px;text-align:center;text-decoration:none!important;border-radius:10px;font-size:12px;font-weight:800;background:var(--green,#4a7a56);color:#fff!important;border:1px solid transparent;transition:filter .15s}
+.szp-support__link:hover{filter:brightness(1.12)}
+.szp-support__link:focus-visible{outline:2px solid var(--gold,#d4a04a);outline-offset:3px}
+.szp-support__note{font-size:11px;color:var(--ink2,#9a907a)}
+.szp-support--home{margin:20px 0}
+.szp-support--compact{padding:14px 16px;margin:16px auto 0}
+.szp-support--compact .szp-support__heading{font-size:18px}
+.szp-support--compact .szp-support__copy{font-size:11.5px}
+.szp-support--result{margin:14px 0 0;padding:12px 13px;box-shadow:none;border-style:dashed;text-align:left}
+.szp-support--result .szp-support__heading{font-family:Inter,system-ui,sans-serif;font-size:14px}
+.szp-support--result .szp-support__link{min-height:36px}
+@media(max-width:480px){.szp-support{padding:14px}.szp-support__actions{align-items:stretch}.szp-support__link{width:100%}}
