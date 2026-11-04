@@ -104,13 +104,17 @@ def main():
         name=property_value(props,NAME_FIELDS)
         if name not in expected:
             continue
+        teryt=property_value(props,ID_FIELDS)
+        # Dwie miejscowości w różnych województwach mogą nosić tę samą nazwę,
+        # np. Olsztyn. Filtr regionu MUSI poprzedzać wykrywanie duplikatów.
+        if not teryt or not teryt.startswith("24"):
+            continue
         if name in seen:
-            issues.append({"city":name,"error":"duplikat"})
+            issues.append({"city":name,"error":"duplikat w województwie śląskim"})
             continue
         seen.add(name)
-        teryt=property_value(props,ID_FIELDS)
-        if not teryt or not re.fullmatch(r"24\d{4}[14]",teryt):
-            issues.append({"city":name,"error":"brak poprawnego 7-cyfrowego identyfikatora TERYT rodzaju 1 lub 4"})
+        if not re.fullmatch(r"24\d{4}[14]",teryt):
+            issues.append({"city":name,"error":"nieoczekiwany kod TERYT miasta: "+teryt})
             continue
         try:
             contour,center=to_contour(feature.get("geometry") or {})
