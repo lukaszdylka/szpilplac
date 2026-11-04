@@ -303,6 +303,7 @@ footer a{color:var(--green);font-weight:600}
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#2f4a39">
 <script src="/site-events.js?v=2026.08.02.1"></script>
+<link rel="stylesheet" href="/support-banner.css?v=1">
 </head>
 <body>
 <header>
@@ -1049,7 +1050,9 @@ function showEnd(){
     '<button class="btn" id="shareBtn">'+t.share+'</button>'+
     '<div class="share-msg" id="shareMsg" aria-live="polite"></div>');
   var sb=document.getElementById("shareBtn");if(sb)sb.addEventListener("click",share);
-  if(isToday)startCd();}
+  if(isToday)startCd();
+  if(isToday&&window.SZP_SUPPORT)window.SZP_SUPPORT.showResult(modal);
+}
 
 function showStats(){
   var t=T(),dg=loadDayGame(TODAY_IDX)||{guesses:[],status:"playing"};
@@ -1289,5 +1292,6 @@ loadDay(TODAY_IDX);
   <script src="game-result-actions.js?v=128"></script>
   <script src="result-stats-snapshot.js?v=1"></script>
 <script src="pwa-push.js?v=1"></script>
+<script src="/support-banner.js?v=1"></script>
 </body>
 </html>
