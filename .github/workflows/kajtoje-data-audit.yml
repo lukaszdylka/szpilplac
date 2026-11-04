@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - "kajtoje-import.py"
+      - "kajtoje-import-gml.py"
+      - "ms_A04_Granice_miast.gml"
       - "kajtoje-pobierz-prg.py"
       - "kajtoje-katalog.json"
       - "kajtoje.html"
@@ -36,9 +38,15 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq gdal-bin
-      - name: Pull official city boundaries and audit
+      - name: Import local GML first, fallback to WFS
         run: |
-          python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
+          if [ -s ms_A04_Granice_miast.gml ]; then
+            echo "Używam lokalnego ms_A04_Granice_miast.gml, bez połączenia z WFS."
+            python3 kajtoje-import-gml.py ms_A04_Granice_miast.gml --reference-date "$(date -u +%Y-%m-%d)"
+          else
+            echo "Nie ma lokalnego GML, próbuję WFS."
+            python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
+          fi
       - name: Upload audit output, also on failure
         if: always()
         uses: actions/upload-artifact@v4
