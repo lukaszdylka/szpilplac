@@ -20,6 +20,10 @@ WFS = "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBou
 LAYER = "A04_Granice_miast"
 NAME_FIELDS = ("JPT_NAZWA_", "JPT_NAZWA", "NAZWA", "NAZWA_MIASTA", "nazwa", "name")
 ID_FIELDS = ("JPT_KOD_JE", "JPT_KOD", "ID_JEDNOSTKI", "ID_TERYT", "TERYT", "teryt")
+# Przyrów, miasto w gminie miejsko-wiejskiej: urzędowy TERYT 2404144.
+# Źródło: GUS BDL, wykaz TERYT jednostek obowiązujących 2024-2026.
+OFFICIAL_CITY_IDS = {"2404144": "Przyrów"}
+
 
 def clean_city_name(name):
     """Remove official descriptive unit suffix, keep real city name."""
@@ -121,6 +125,8 @@ def main():
         print("GeoJSON example property names:",sorted((dataset["features"][0].get("properties") or {}).keys()),flush=True)
         print("GeoJSON example properties:",str(dataset["features"][0].get("properties") or {})[:1000],flush=True)
     output,issues,seen=[],[],set()
+    unexpected=[]
+    aliases=[]
     region_features=sum(str(property_value(f.get("properties") or {},ID_FIELDS) or "").startswith("24") for f in dataset["features"])
     print("Wszystkie obiekty kodu województwa 24:",region_features,flush=True)
     for feature in dataset["features"]:
@@ -132,9 +138,21 @@ def main():
         # Filtr regionu obowiązuje przed dopasowaniem nazwy.
         if not raw_teryt or not raw_teryt.startswith("24"):
             continue
-        if name not in expected:
-            continue
         teryt=normalized_teryt(raw_teryt)
+        if teryt in OFFICIAL_CITY_IDS:
+            official_name=OFFICIAL_CITY_IDS[teryt]
+            if not raw_name or official_name.casefold() not in raw_name.casefold():
+                issues.append({"city": official_name,
+                               "error": "TERYT pasuje, ale źródłowa nazwa jest sprzeczna: "+str(raw_name)})
+                continue
+            if name != official_name:
+                aliases.append({"teryt": teryt, "nameFromPRG": raw_name,
+                                "nameForGame": official_name,
+                                "verification": "GUS BDL TERYT 2404144"})
+            name=official_name
+        if name not in expected:
+            unexpected.append({"teryt": raw_teryt, "nameFromPRG": raw_name})
+            continue
         if not teryt:
             issues.append({"city":name,"error":"nieoczekiwany format TERYT: "+raw_teryt})
             continue
@@ -149,6 +167,11 @@ def main():
             continue
         output.append({"id":teryt,"name":name,"center":center,"contour":contour,
                        "sources":{"border":WFS+"; layer="+LAYER,"referenceDate":args.reference_date}})
+    print("Obiekty śląskie niedopasowane do katalogu:",len(unexpected),flush=True)
+    for item in unexpected:
+        print("  ",item,flush=True)
+    for alias in aliases:
+        print("Ujednolicenie nazwy wg TERYT:",alias,flush=True)
     for missing in sorted(expected-seen):
         issues.append({"city":missing,"error":"brak na wejściu"})
     ids=[x["id"] for x in output]
@@ -157,7 +180,7 @@ def main():
     report={"status":"NOT_VERIFIED","regionFeatureCount":region_features,"inputFeatureCount":len(dataset["features"]),"layerDeclared":LAYER,"source":WFS,
             "sourceLayerIndependentlyVerified":False,"referenceDateDeclared":args.reference_date,
             "officialTerytCompared":False,"visualReviewDone":False,
-            "count":len(output),"expected":75,"issues":issues}
+            "count":len(output),"expected":75,"aliases":aliases,"unmatchedRegionalFeatures":unexpected,"issues":issues}
     (ROOT/"kajtoje-granice-robocze.json").write_text(
         json.dumps({"status":"NOT_VERIFIED","cities":output},ensure_ascii=False)+"\n",encoding="utf-8")
     (ROOT/"kajtoje-audyt-granic.json").write_text(
