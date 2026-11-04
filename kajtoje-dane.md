@@ -105,3 +105,18 @@ Skrypt generuje robocze kontury `kajtoje-granice-robocze.json` i raport `kajtoje
 Kontury SVG wykorzystują korektę skali poziomej przez cosinus szerokości geograficznej, zachowują wyspy i otwory. Po stronie gry obowiązuje `fill-rule=evenodd`. Weryfikacja każdego konturu wizualnie nadal jest obowiązkowa.
 
 Stan prac: warstwa i format zostały udokumentowane i zakodowane, lecz pełnego eksportu z serwera GUGiK nie udało się pobrać w bieżącym środowisku. Nie wolno raportować 75 poprawnych granic ani gotowej gry bez przeprowadzenia rzeczywistego importu i audytu.
+
+## Automatyczny audyt źródeł (aktualizacja 2026-11-04)
+
+Dodałem `kajtoje-pobierz-prg.py`, który próbuje pobrać warstwę A04 bez QGIS, korzystając z GDAL/ogr2ogr. Dodałem też GitHub Actions `.github/workflows/kajtoje-data-audit.yml`, automatycznie uruchamiane przy zmianach importera, katalogu lub definicji workflow; wynik audytu jest zapisywany jako artefakt `kajtoje-prg-audit`. W przypadku błędu pobierania lub niezgodności 75 konturów zadanie kończy się niepowodzeniem.
+
+```sh
+python kajtoje-pobierz-prg.py --reference-date 2026-11-04
+python kajtoje-sprawdz.py
+```
+
+`kajtoje-sprawdz.py` to blokada wydania: kontroluje listę miast, geometrię, pliki herbów, źródła, daty i pytania. Obecnie ma zgłaszać NIEGOTOWE. To prawidłowy wynik, bo produkcyjna baza nadal nie istnieje.
+
+Uwaga: skrypt pobierający i workflow zostały zapisane, lecz nie ma potwierdzonego udanego przebiegu GH Actions ani pobranych wyników PRG. Nie wolno uważać ich za przetestowane na oficjalnej warstwie. W przypadku nietypowych nazw atrybutów WFS konieczne będzie dopasowanie parsera do uzyskanego pliku.
+
+Automatyczna weryfikacja syntaktyczna nie zastępuje zatwierdzenia dokumentacji heraldycznej i jednoznaczności pytań.
