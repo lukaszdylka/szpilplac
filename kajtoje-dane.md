@@ -79,4 +79,12 @@ Nie dodawać gry do menu głównego, dopóki nie ma pełnych danych i testów. N
 * Dodano `kajtoje-import.py`: pobiera warstwę gmin z państwowego PRG, filtruje kod województwa i typ jednostki, wyodrębnia kontury kandydatów oraz tworzy `kajtoje-granice-robocze.json` i `kajtoje-audyt-granic.json`. Skrypt wymaga dostępu do Internetu, a po uruchomieniu należy porównać wynik z oficjalnym TERYT i dokonać oględzin wszystkich konturów. Jeśli usługa lub jej kodowanie się zmieniły, skrypt zakończy się błędem zamiast publikować dane.
 * Nie przygotowano jeszcze zweryfikowanych 75 herbów i wartości GUS. Nie ma `kajtoje-data.json`, a więc gra nie podaje niepotwierdzonych odpowiedzi.
 
-Komenda importu w katalogu repozytorium: `python kajtoje-import.py` (Python 3.9+, bez zewnętrznych bibliotek). Generowane pliki są robocze. `verified: true` wolno ustawić dopiero po zakończeniu całego audytu.
+Komenda audytu po pobraniu właściwej warstwy miejskiej: `python kajtoje-import.py granice-miast.geojson`. Plik GeoJSON musi mieć pole provenance.unitType = "city" i oficjalny URL źródła. Uruchomienie wymaga wcześniejszego wyeksportowania warstwy miast, a nie gmin. Wynik zawsze pozostaje roboczy.
+
+## Korekta po weryfikacji z 2026-11-04
+
+Poprzedni importer korzystał z usługi ArcGIS `PRG_gugik_wyszukiwarka/MapServer/0`, która jest wyraźnie opisana jako **Gminy**, nie miasta. Wskutek tego nie wolno uznawać generowanych tam konturów za granice miast w gminach miejsko-wiejskich. Skrypt zastąpiono bezpiecznym audytorem GeoJSON, który nie pobiera automatycznie warstwy gmin. Sprawdzono urzędowe źródła: https://mapy.geoportal.gov.pl/wss/ims/maps/PRG_gugik_wyszukiwarka/MapServer/0 i https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-granic-prg/ .
+
+MSWiA potwierdza status miejski Janowa od 1 stycznia 2026: https://www.gov.pl/web/mswia/szesc-miejscowosci-zyskalo-status-miejski . BIP Janowa wykazuje obecnie Miasto i Gminę Janów: https://www.bip.janow.akcessnet.net/index.php?id=1&idg=1&x=1 . Nie przesądza to, czy herb gminy to zatwierdzony herb miasta; wymaga sprawdzenia stosownej uchwały.
+
+Weryfikacja dostępności źródeł nie jest potwierdzeniem danych wszystkich 75 jednostek. Bez pełnego zestawu geometrii miast, kodów TERYT i dokumentów heraldycznych baza nie może otrzymać `verified: true`.
