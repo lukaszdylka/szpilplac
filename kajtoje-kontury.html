@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kaj to je? | Test konturów | Szpilplac</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{color-scheme:dark;--bg:#0c1717;--panel:#142422;--panel2:#1c302c;--border:#345149;--ink:#f4f2e9;--muted:#bdc8bd;--accent:#c6e7a6;--red:#efad9f}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 25% 0,#23433b 0,transparent 48%),var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+a{color:var(--accent)}main{max-width:1060px;margin:auto;padding:24px 18px 72px}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(30px,5vw,50px);line-height:1.1;margin:18px 0 10px;font-family:Georgia,serif;font-weight:500}
+.subtitle{color:var(--muted);max-width:760px;margin:0 0 24px}
+.alert{padding:12px 16px;border:1px solid var(--border);background:#20362e;border-radius:12px;color:var(--muted);font-size:14px;margin:0 0 22px}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:19px;padding:22px}
+.map{position:relative;display:grid;place-items:center;min-height:400px;background:radial-gradient(circle at center,#213c35,#142522 70%);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+svg{width:90%;height:335px;overflow:visible}#outline{fill:var(--accent);stroke:#e8f4d8;stroke-width:1.4;stroke-linejoin:round;vector-effect:non-scaling-stroke;fill-rule:evenodd}
+.north{position:absolute;right:18px;top:14px;color:var(--muted);font-size:13px;letter-spacing:.1em}
+.mode{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+button,select,input{font:inherit}button{cursor:pointer;border:1px solid var(--border);border-radius:11px;background:var(--panel2);color:var(--ink);padding:10px 14px}
+button.active,button.primary{background:var(--accent);color:#0c1717;border-color:var(--accent);font-weight:650}
+button:disabled{opacity:.5;cursor:not-allowed}button:hover:not(:disabled){filter:brightness(1.14)}
+label{display:block;color:var(--muted);font-size:13px;margin:17px 0 7px}
+select,input{width:100%;background:#0c1918;border:1px solid #49665b;border-radius:10px;color:var(--ink);padding:12px}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.actions button{flex:1}
+h2{font-size:19px;margin:4px 0 10px;font-weight:600}.meta{font-size:13px;color:var(--muted)}
+.result{padding:12px 13px;border-radius:10px;background:#19312b;min-height:48px;margin:15px 0;color:var(--accent)}
+.bad{color:var(--red)}ol{list-style:none;padding:0;margin:12px 0 0}li{display:flex;gap:9px;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}li span:last-child{color:var(--muted);text-align:right}
+.details{margin-top:18px;border-top:1px solid var(--border);padding-top:14px}.details p{margin:8px 0;color:var(--muted);font-size:13px}
+.footer{font-size:13px;color:var(--muted);margin-top:22px}#counter{color:var(--accent)}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.map{min-height:310px}svg{height:275px}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="logo">SZPILPLAC · FAMILOCK</div><a href="/index.html">Strona główna</a></header>
+<h1>Kaj to je?</h1>
+<p class="subtitle">Pierwsza wersja testowa. Rozpoznawanie 75 miast województwa śląskiego po rzeczywistych konturach z Państwowego Rejestru Granic.</p>
+<div class="alert">Tryb kontroli geometrii. Kontury pochodzą z eksportu GUGiK, ale nie zostały jeszcze wszystkie sprawdzone wizualnie. Herby, pytania i oficjalne statystyki dodamy w następnych etapach. Wyniki nie trafiają do statystyk Szpilplacu.</div>
+<div class="layout">
+<section class="panel">
+<div class="mode"><button id="mode-daily" class="active" type="button">Miasto dnia</button><button id="mode-review" type="button">Przeglądaj 75 miast</button></div>
+<div class="map"><div class="north">N ↑</div><svg id="shape" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 250" role="img" aria-label="Kontur miasta"><path id="outline" d=""></path></svg></div>
+<p class="meta" id="map-note">Północ zawsze u góry. Wszystkie miasta są skalowane do tej samej maksymalnej wielkości.</p>
+<div id="review-picker" hidden><label for="city-review">Wybierz miasto do kontroli</label><select id="city-review"></select><div class="actions"><button id="prev" type="button">Poprzednie</button><button id="next" type="button">Następne</button></div></div>
+<div class="details"><p id="source">Ładowanie danych...</p><p id="coords"></p></div>
+</section>
+<section class="panel">
+<h2 id="title">Rozpoznaj miasto</h2><p class="meta">Masz maksymalnie sześć prób. Za trafienie otrzymasz 60, 50, 40, 30, 20 lub 10 punktów.</p>
+<div id="counter">Próba 1 z 6</div>
+<form id="guess-form"><label for="guess">Jakie to miasto?</label><input id="guess" type="text" list="city-options" autocomplete="off" placeholder="Wpisz nazwę miasta" required><datalist id="city-options"></datalist><div class="actions"><button type="submit" class="primary">Sprawdź</button><button id="reveal" type="button">Pokaż odpowiedź</button></div></form>
+<div class="result" id="result" role="status">Wybierz miasto i sprawdź odpowiedź.</div>
+<ol id="history"></ol>
+<div class="actions"><button id="reset" type="button">Zagraj od nowa</button><button id="random" type="button">Losowy kontur</button></div>
+<p class="footer">Tryb testowy nie zapisuje wyniku. Możesz swobodnie sprawdzić wszystkie kształty. Odległości liczymy w linii prostej pomiędzy środkami zasięgu miast.</p>
+</section>
+</div>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+let cities=[],selected=null,mode="daily",guesses=[],finished=false,seed=1;
+const dayIndex=()=>Math.max(0,Math.floor((Date.now()-Date.UTC(2026,5,23))/86400000));
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const same=(a,b)=>a.localeCompare(b,"pl",{sensitivity:"base"})===0;
+function km(a,b){
+ const rad=Math.PI/180,dlat=(b[0]-a[0])*rad,dlon=(b[1]-a[1])*rad;
+ const x=Math.sin(dlat/2)**2+Math.cos(a[0]*rad)*Math.cos(b[0]*rad)*Math.sin(dlon/2)**2;
+ return Math.round(6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)));
+}
+function direction(a,b){
+ const rad=Math.PI/180,dlon=(b[1]-a[1])*rad;
+ const y=Math.sin(dlon)*Math.cos(b[0]*rad);
+ const x=Math.cos(a[0]*rad)*Math.sin(b[0]*rad)-Math.sin(a[0]*rad)*Math.cos(b[0]*rad)*Math.cos(dlon);
+ const degrees=(Math.atan2(y,x)*180/Math.PI+360)%360;
+ return ["N","NE","E","SE","S","SW","W","NW"][Math.round(degrees/45)%8];
+}
+function dailyCity(){return cities[dayIndex()%cities.length]}
+function selectCity(city){
+ selected=city;guesses=[];finished=false;
+ const shape=city.contour;
+ $("shape").setAttribute("viewBox",shape.viewBox.join(" "));
+ $("outline").setAttribute("d",shape.path);
+ $("guess").value="";$("guess").disabled=false;
+ $("guess-form").querySelector('button[type="submit"]').disabled=false;
+ $("result").textContent="Wybierz miasto i sprawdź odpowiedź.";
+ $("history").replaceChildren();
+ $("counter").textContent="Próba 1 z 6";
+ $("coords").textContent="";$("city-review").value=city.id;
+ $("title").textContent=mode==="daily"?"Rozpoznaj miasto dnia":"Rozpoznaj lub oceń kontur";
+ $("map-note").textContent=mode==="daily"?"Północ zawsze u góry.":"Północ zawsze u góry. Wybrano "+(cities.findIndex(c=>c.id===city.id)+1)+" z 75 miast.";
+}
+function finish(message){
+ finished=true;$("result").textContent=message;
+ $("guess").disabled=true;$("guess-form").querySelector('button[type="submit"]').disabled=true;
+ $("coords").textContent="Miasto: "+selected.name+" · TERYT: "+selected.id+" · Środek obwiedni: "+selected.center.join(", ");
+}
+function chooseMode(next){
+ mode=next;$("mode-daily").classList.toggle("active",next==="daily");
+ $("mode-review").classList.toggle("active",next==="review");
+ $("review-picker").hidden=next!=="review";
+ selectCity(next==="daily"?dailyCity():cities[0]);
+}
+$("guess-form").addEventListener("submit",e=>{
+ e.preventDefault();if(finished||!selected)return;
+ const typed=$("guess").value.trim();const candidate=cities.find(c=>same(c.name,typed));
+ if(!candidate){$("result").textContent="Wybierz miasto z listy.";return}
+ if(guesses.some(x=>x.id===candidate.id)){$("result").textContent="To miasto już było podane.";return}
+ guesses.push(candidate);
+ if(candidate.id===selected.id){
+   const pts=70-10*guesses.length;
+   finish("Trafione! "+selected.name+" · "+pts+" / 60 punktów.");
+ }else{
+   const dist=km(candidate.center,selected.center),dir=direction(candidate.center,selected.center);
+   const li=document.createElement("li");
+   li.innerHTML="<span>"+escapeHtml(candidate.name)+"</span><span>"+dist+" km · "+dir+"</span>";
+   $("history").append(li);
+   if(guesses.length===6){finish("Koniec prób. Prawidłowe miasto: "+selected.name);}
+   else{$("result").textContent="Nie tym razem. Kierunek "+dir+", odległość ok. "+dist+" km.";$("counter").textContent="Próba "+(guesses.length+1)+" z 6";}
+ }
+ $("guess").value="";
+});
+$("reveal").addEventListener("click",()=>{if(selected)finish("Odpowiedź: "+selected.name+".")});
+$("reset").addEventListener("click",()=>{if(selected)selectCity(selected)});
+$("random").addEventListener("click",()=>{if(cities.length)selectCity(cities[Math.floor(Math.random()*cities.length)])});
+$("mode-daily").addEventListener("click",()=>chooseMode("daily"));
+$("mode-review").addEventListener("click",()=>chooseMode("review"));
+$("city-review").addEventListener("change",e=>{const c=cities.find(c=>c.id===e.target.value);if(c)selectCity(c)});
+function move(n){if(!selected)return;selectCity(cities[(cities.findIndex(c=>c.id===selected.id)+n+cities.length)%cities.length])}
+$("prev").addEventListener("click",()=>move(-1));$("next").addEventListener("click",()=>move(1));
+async function init(){
+ try{
+  const r=await fetch("/kajtoje-kontury.json",{cache:"no-store"});
+  if(!r.ok)throw Error("Brak pliku z konturami ("+r.status+")");
+  const data=await r.json();
+  if(data.schema!==1||data.mode!=="outlines-review"||!Array.isArray(data.cities)||data.cities.length!==75)throw Error("Niekompletna baza danych");
+  const ids=new Set();
+  for(const c of data.cities){
+   if(!c.id||ids.has(c.id)||!c.name||!Array.isArray(c.center)||c.center.length!==2||!c.contour?.path||!Array.isArray(c.contour.viewBox))throw Error("Błędny kontur: "+(c.name||"?"));
+   ids.add(c.id);
+  }
+  cities=data.cities;
+  const sorted=[...cities].sort((a,b)=>a.name.localeCompare(b.name,"pl"));
+  for(const c of sorted){
+   let o=document.createElement("option");o.value=c.name;$("city-options").append(o);
+   o=document.createElement("option");o.value=c.id;o.textContent=c.name;$("city-review").append(o);
+  }
+  $("source").textContent="Źródło: GUGiK, PRG A04 · dane pobrane "+data.referenceDate+" · 75 konturów · status: do przeglądu wizualnego";
+  chooseMode("daily");
+ }catch(error){
+  $("result").textContent="Nie udało się wczytać danych: "+error.message;
+  $("guess").disabled=true;
+  $("guess-form").querySelector('button[type="submit"]').disabled=true;
+  $("source").textContent="Zestaw 75 konturów nie jest jeszcze opublikowany.";
+ }
+}
+init();
+</script>
+</body>
+</html>
