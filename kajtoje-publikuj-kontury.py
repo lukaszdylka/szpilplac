@@ -23,7 +23,7 @@ assert len({c["id"] for c in cities}) == 75
 assert {c["name"] for c in cities} == set(names), "Names differ from catalog"
 
 for c in cities:
-    assert re.fullmatch(r"24\\d{4}[14]", c["id"]), c["name"]
+    assert re.fullmatch(r"24\d{4}[14]", c["id"]), c["name"]
     assert len(c["center"]) == 2 and all(isinstance(v, (int, float)) for v in c["center"])
     shape = c["contour"]
     assert len(shape["viewBox"]) == 4 and all(isinstance(v, (int, float)) for v in shape["viewBox"])
