@@ -10,7 +10,6 @@ import argparse
 import datetime
 import json
 import pathlib
-import re
 import subprocess
 import sys
 
@@ -28,32 +27,31 @@ def main():
         ap.error("Niepoprawna data")
     OUTPUT.unlink(missing_ok=True)
     source = "WFS:" + WFS
-    # WFS commonly exposes feature types with the ms: prefix.
-    # Discover the actual GDAL layer name rather than assuming it.
-    listing = subprocess.run(["ogrinfo", "-ro", "-so", source], cwd=ROOT,
-        check=True, capture_output=True, text=True, timeout=120).stdout
-    matches = re.findall(r"^\s*\d+:\s+(\S*A04_Granice_miast)\s*(?:\(|$)", listing, flags=re.MULTILINE)
-    if len(matches) != 1:
-        raise RuntimeError("Nie udało się jednoznacznie ustalić warstwy A04 w WFS: "+listing[:2000])
-    layer = matches[0]
-    print("Urzędowa warstwa WFS:", layer, flush=True)
-    # A04 obejmuje wszystkie miasta Polski. Filtr przestrzenny WFS bywa
-    # interpretowany w kolejności osi zależnej od CRS, co może dać 0 obiektów
-    # mimo kodu wyjścia 0. Najpierw diagnostyka, potem pełny eksport.
-    details = subprocess.run(["ogrinfo","-ro","-so","-al",source,layer],
-        cwd=ROOT,capture_output=True,text=True,timeout=120)
-    print("Ogrinfo layer schema / diagnostics:", (details.stdout+"\\n"+details.stderr)[-8000:], flush=True)
-    if details.returncode != 0:
-        raise RuntimeError("Nie udało się odczytać warstwy A04 z WFS")
+    # Nazwa została już potwierdzona przez wcześniejszy udany eksport 1050
+    # obiektów. Nie pytaj ponownie ogrinfo: niepotrzebnie blokuje WFS.
+    layer = "ms:A04_Granice_miast"
+    print("Warstwa urzędowa (potwierdzona wcześniejszym eksportem):", layer, flush=True)
     # Bez -spat: nie ryzykuj pustego wyniku wskutek zamiany osi / bbox.
     # Dane całej Polski są pobierane tylko jako plik roboczy do audytu.
     command=["ogr2ogr","-overwrite","-f","GeoJSON",str(OUTPUT),
              source,layer,"-t_srs","EPSG:4326","-lco","RFC7946=YES"]
-    result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=600)
-    print("ogr2ogr stdout:",result.stdout[-3000:],flush=True)
-    print("ogr2ogr stderr:",result.stderr[-5000:],flush=True)
-    if result.returncode != 0:
-        raise RuntimeError("Eksport PRG nie powiódł się. Kod: "+str(result.returncode))
+    # Ograniczony retry na przejściowe błędy serwera; każda próba zaczyna
+    # od usunięcia niekompletnego eksportu.
+    import time
+    for attempt in range(1,4):
+        OUTPUT.unlink(missing_ok=True)
+        print(f"Eksport PRG: próba {attempt}/3",flush=True)
+        try:
+            result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=180)
+            print("ogr2ogr stdout:",result.stdout[-1000:],flush=True)
+            print("ogr2ogr stderr:",result.stderr[-3000:],flush=True)
+            if result.returncode==0 and OUTPUT.is_file() and OUTPUT.stat().st_size>10000:
+                break
+        except subprocess.TimeoutExpired:
+            print("Przekroczony czas pobierania z serwera GUGiK",flush=True)
+        if attempt==3:
+            raise RuntimeError("Nie udało się pobrać PRG po 3 próbach; użyj lokalnego GML A04")
+        time.sleep(5)
     if not OUTPUT.is_file():
         raise RuntimeError("Eksport PRG nie stworzył pliku")
     size=OUTPUT.stat().st_size
