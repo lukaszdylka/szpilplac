@@ -41,8 +41,8 @@ def ring_to_svg(ring, minx, maxy, scale, tolerance=0.0):
         if not isinstance(xy, list) or len(xy) < 2:
             raise ValueError("Niepoprawny punkt geometrii PRG")
         lon, lat = xy[:2]
-        if not (17 <= lon <= 22 and 48 <= lat <= 52):
-            raise ValueError("Geometria poza województwem śląskim lub błędny CRS")
+        if not (8 <= lon <= 22 and 48 <= lat <= 52):
+            raise ValueError("Geometria poza oczekiwanym zakresem lub błędny CRS")
         x, y = (lon - minx) * scale, (maxy - lat) * scale
         if not pts or math.hypot(x - pts[-1][0], y - pts[-1][1]) >= tolerance:
             pts.append((x, y))
@@ -61,6 +61,8 @@ def contour(geom):
     east = max(p[0] * coslat for p in all_pts)
     north = max(p[1] for p in all_pts)
     south = min(p[1] for p in all_pts)
+    if any(not (17 <= p[0] <= 22 and 48 <= p[1] <= 52) for p in all_pts):
+        raise ValueError("Nieoczekiwany układ współrzędnych lub geometria poza Śląskiem")
     width, height = east - west, north - south
     if width <= 0 or height <= 0:
         raise ValueError("Nieprawidłowa wielkość miasta")
