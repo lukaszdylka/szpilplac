@@ -1,0 +1,37 @@
+name: Kaj to je - audit danych PRG
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "kajtoje-import.py"
+      - "kajtoje-pobierz-prg.py"
+      - "kajtoje-katalog.json"
+      - ".github/workflows/kajtoje-data-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  prg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GDAL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gdal-bin
+      - name: Pull official city boundaries and audit
+        run: |
+          python3 kajtoje-pobierz-prg.py --reference-date "$(date -u +%Y-%m-%d)"
+      - name: Upload audit output, also on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kajtoje-prg-audit
+          path: |
+            kajtoje-audyt-granic.json
+            kajtoje-granice-robocze.json
+          if-no-files-found: warn
+          retention-days: 30
