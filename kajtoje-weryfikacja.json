@@ -1,0 +1,2638 @@
+{
+  "schema": 1,
+  "region": "24",
+  "asOf": "2026-01-01",
+  "status": "NIEZATWIERDZONE",
+  "officialSources": {
+    "teryt": "https://eteryt.stat.gov.pl/",
+    "prg": "https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-granic-prg/",
+    "population": "https://bdl.stat.gov.pl/"
+  },
+  "cities": [
+    {
+      "name": "Katowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Częstochowa",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Sosnowiec",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Gliwice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Bielsko-Biała",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Zabrze",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Bytom",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Rybnik",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Ruda Śląska",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Tychy",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Dąbrowa Górnicza",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Chorzów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Jaworzno",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Jastrzębie-Zdrój",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Mysłowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Siemianowice Śląskie",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Żory",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Tarnowskie Góry",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Będzin",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Piekary Śląskie",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Racibórz",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Zawiercie",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Świętochłowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Wodzisław Śląski",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Mikołów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Knurów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Czechowice-Dziedzice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Cieszyn",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Czeladź",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Żywiec",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Myszków",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Czerwionka-Leszczyny",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Pszczyna",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Lubliniec",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Orzesze",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Łaziska Górne",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Rydułtowy",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Bieruń",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Pyskowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Radlin",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Lędziny",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Radzionków",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Ustroń",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Skoczów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Pszów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Kłobuck",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Wisła",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Imielin",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Blachownia",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Wojkowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Kalety",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Poręba",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Miasteczko Śląskie",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Sławków",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Łazy",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Siewierz",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Koniecpol",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Szczyrk",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Kuźnia Raciborska",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Żarki",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Woźniki",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Krzepice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Ogrodzieniec",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Strumień",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Toszek",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Szczekociny",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Wilamowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Olsztyn",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Koziegłowy",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Sośnicowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Krzanowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Pilica",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Włodowice",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Przyrów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    },
+    {
+      "name": "Janów",
+      "teryt": null,
+      "boundary": {
+        "validated": false,
+        "source": null
+      },
+      "herb": {
+        "validated": false,
+        "source": null,
+        "asset": null
+      },
+      "population": {
+        "validated": false,
+        "value": null,
+        "asOf": null,
+        "source": null
+      },
+      "area": {
+        "validated": false,
+        "valueKm2": null,
+        "asOf": null,
+        "source": null
+      },
+      "neighbors": {
+        "validated": false,
+        "values": [],
+        "source": null
+      },
+      "questions": {
+        "validated": false,
+        "count": 0
+      },
+      "reviewedBy": null
+    }
+  ]
+}
