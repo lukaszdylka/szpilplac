@@ -32,4 +32,16 @@ with tempfile.TemporaryDirectory() as td:
         path=pathlib.Path(td)/(str(i)+".js")
         path.write_text(content,encoding="utf-8")
         subprocess.run(["node","--check",str(path)],check=True)
+review=(root/"kajtoje-kontury.html").read_text(encoding="utf-8")
+assert '/kajtoje-kontury.json' in review
+assert 'mode-review' in review and 'mode-daily' in review
+review_scripts=re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>",review,re.S)
+assert len(review_scripts)==1
+with tempfile.TemporaryDirectory() as td:
+    path=pathlib.Path(td)/"contours-preview.js"
+    path.write_text(review_scripts[0],encoding="utf-8")
+    subprocess.run(["node","--check",str(path)],check=True)
+import py_compile
+py_compile.compile(str(root/"kajtoje-publikuj-kontury.py"),doraise=True)
+print("PASS: contour preview JS and publication script syntax")
 print("PASS: Fictional preview fixtures, asset paths and JS syntax")
