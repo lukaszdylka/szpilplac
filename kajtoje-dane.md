@@ -76,7 +76,7 @@ Nie dodawać gry do menu głównego, dopóki nie ma pełnych danych i testów. N
 
 * Zapisano katalog 75 nazw w `kajtoje-katalog.json`, stan `do_weryfikacji_teryt`. Nie używać jako listy oficjalnie zatwierdzonej.
 * Dodano `kajtoje-weryfikacja.json`: 75 kart audytu z oddzielnymi stanami dla TERYT, granic, herbów, ludności, powierzchni, sąsiadów i pytań. Puste wartości są celowe.
-* Dodano `kajtoje-import.py`: pobiera warstwę gmin z państwowego PRG, filtruje kod województwa i typ jednostki, wyodrębnia kontury kandydatów oraz tworzy `kajtoje-granice-robocze.json` i `kajtoje-audyt-granic.json`. Skrypt wymaga dostępu do Internetu, a po uruchomieniu należy porównać wynik z oficjalnym TERYT i dokonać oględzin wszystkich konturów. Jeśli usługa lub jej kodowanie się zmieniły, skrypt zakończy się błędem zamiast publikować dane.
+* Dodano `kajtoje-import.py`: przetwarza wyeksportowaną z QGIS warstwę miast A04 (nie gmin), kontroluje atrybuty i tworzy `kajtoje-granice-robocze.json` i `kajtoje-audyt-granic.json`. Skrypt wymaga dostępu do Internetu, a po uruchomieniu należy porównać wynik z oficjalnym TERYT i dokonać oględzin wszystkich konturów. Jeśli usługa lub jej kodowanie się zmieniły, skrypt zakończy się błędem zamiast publikować dane.
 * Nie przygotowano jeszcze zweryfikowanych 75 herbów i wartości GUS. Nie ma `kajtoje-data.json`, a więc gra nie podaje niepotwierdzonych odpowiedzi.
 
 Komenda audytu po pobraniu właściwej warstwy miejskiej: `python kajtoje-import.py granice-miast.geojson`. Plik GeoJSON musi mieć pole provenance.unitType = "city" i oficjalny URL źródła. Uruchomienie wymaga wcześniejszego wyeksportowania warstwy miast, a nie gmin. Wynik zawsze pozostaje roboczy.
@@ -88,3 +88,20 @@ Poprzedni importer korzystał z usługi ArcGIS `PRG_gugik_wyszukiwarka/MapServer
 MSWiA potwierdza status miejski Janowa od 1 stycznia 2026: https://www.gov.pl/web/mswia/szesc-miejscowosci-zyskalo-status-miejski . BIP Janowa wykazuje obecnie Miasto i Gminę Janów: https://www.bip.janow.akcessnet.net/index.php?id=1&idg=1&x=1 . Nie przesądza to, czy herb gminy to zatwierdzony herb miasta; wymaga sprawdzenia stosownej uchwały.
 
 Weryfikacja dostępności źródeł nie jest potwierdzeniem danych wszystkich 75 jednostek. Bez pełnego zestawu geometrii miast, kodów TERYT i dokumentów heraldycznych baza nie może otrzymać `verified: true`.
+
+## Import A04 potwierdzony na podstawie przepisów (4 listopada 2026)
+
+Warstwa miasta na urzędowej usłudze PRG WFS to `A04_Granice_miast`, a nie `A03_Granice_gmin`. Podstawa: Dz.U. 2021 poz. 1373, załącznik 1, tabela 1: https://eli.gov.pl/api/acts/DU/2021/1373/text.pdf. Dostępna usługa: https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBoundaries .
+
+Instrukcja eksportu: w QGIS dodać WFS, wybrać wyłącznie `A04_Granice_miast`, wyeksportować do GeoJSON w EPSG:4326. Dla wydajności można pobrać tylko obszar województwa, ale eksport musi zawierać wszystkie 75 jednostek. Nie używać granic gmin do uzupełniania braków. Skrypt rozpoznaje m.in. nazwy atrybutów `NAZWA`, `nazwa`, `name`, `JPT_NAZWA_` oraz kody `TERYT`, `JPT_KOD_JE`, `ID_JEDNOSTKI`. Faktyczny zestaw nazw atrybutów eksportu należy sprawdzić przed importem.
+
+Po eksporcie:
+```sh
+python kajtoje-import.py granice-miast.geojson --reference-date 2026-01-01
+```
+
+Skrypt generuje robocze kontury `kajtoje-granice-robocze.json` i raport `kajtoje-audyt-granic.json`, nie tworzy zatwierdzonej bazy produkcyjnej. Data w parametrze jest deklaracją osoby wykonującej eksport, nie odczytem daty z PRG.
+
+Kontury SVG wykorzystują korektę skali poziomej przez cosinus szerokości geograficznej, zachowują wyspy i otwory. Po stronie gry obowiązuje `fill-rule=evenodd`. Weryfikacja każdego konturu wizualnie nadal jest obowiązkowa.
+
+Stan prac: warstwa i format zostały udokumentowane i zakodowane, lecz pełnego eksportu z serwera GUGiK nie udało się pobrać w bieżącym środowisku. Nie wolno raportować 75 poprawnych granic ani gotowej gry bez przeprowadzenia rzeczywistego importu i audytu.
