@@ -7,12 +7,26 @@ on:
       - "kajtoje-import.py"
       - "kajtoje-pobierz-prg.py"
       - "kajtoje-katalog.json"
+      - "kajtoje.html"
+      - "kajtoje-demo.json"
+      - "kajtoje-demo/**"
+      - "kajtoje-test-preview.py"
       - ".github/workflows/kajtoje-data-audit.yml"
 
 permissions:
   contents: read
 
 jobs:
+  preview-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate demo fixtures and JavaScript
+        run: python3 kajtoje-test-preview.py
   prg:
     runs-on: ubuntu-latest
     timeout-minutes: 15
