@@ -120,3 +120,11 @@ python kajtoje-sprawdz.py
 Uwaga: skrypt pobierający i workflow zostały zapisane, lecz nie ma potwierdzonego udanego przebiegu GH Actions ani pobranych wyników PRG. Nie wolno uważać ich za przetestowane na oficjalnej warstwie. W przypadku nietypowych nazw atrybutów WFS konieczne będzie dopasowanie parsera do uzyskanego pliku.
 
 Automatyczna weryfikacja syntaktyczna nie zastępuje zatwierdzenia dokumentacji heraldycznej i jednoznaczności pytań.
+
+## Wynik rzeczywistego importu WFS, 4 listopada 2026
+
+Według logu udostępnionego przez właściciela projektu, WFS A04 zwrócił **1050 obiektów**, z których **75 ma prefiks TERYT 24**. Parser dopasował 74/75; nierozpoznana została nazwa Przyrów. Lokalny GML okazał się wycinkiem 78 obiektów, z czego 56 pochodzi z woj. śląskiego. Nie używać lokalnego GML jako pełnego katalogu.
+
+GUS potwierdza jednostkę `Przyrów - miasto (4)`, kod `2404144`, obowiązującą od 2024 roku. Urzędowa strona miasta potwierdza status miejski. Źródła: https://bdl.stat.gov.pl/bdl/metadane/teryt/lista/15135 oraz https://www.przyrow.pl/aktualnosci/480 .
+
+Importer w nowej wersji identyfikuje rekord 2404144 po kodzie oraz sprawdza, że oryginalna nazwa zawiera Przyrów. W raporcie zapisuje oryginalne nazwy niepasujące do katalogu. Jest to poprawka reguły dopasowania; pełne 75/75 nie zostało jeszcze potwierdzone ponownym uruchomieniem.
