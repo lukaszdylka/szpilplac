@@ -35,7 +35,7 @@ def audit(path):
         seen.add(name)
         code = str(props.get("teryt") or props.get("TERYT") or props.get("id") or "")
         geom = f.get("geometry") or {}
-        if len(code) != 7 or not code.isdigit() or not code.startswith("24") or code[-1] != "4":
+        if len(code) != 7 or not code.isdigit() or not code.startswith("24") or code[-1] not in ("1","4"):
             issues.append({"city":name,"error":"brak potwierdzonego kodu miejskiej części gminy; sprawdź TERYT"})
             continue
         if geom.get("type") not in ("Polygon","MultiPolygon"):
