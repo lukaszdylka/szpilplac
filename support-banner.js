@@ -1,7 +1,8 @@
 /* Wspólna, nienachalna zachęta do wsparcia Szpilplaca. Bez zbierania danych i bez fikcyjnego licznika. */
 (function(){
   "use strict";
-  var URL="https://buycoffee.to/szpilplacfamilocka";
+  var GENERAL_URL="https://buycoffee.to/szpilplacfamilocka";
+  var GOAL_URL="https://buycoffee.to/szpilplacfamilocka/nowa-gra-na-szpilplacu";
   var KEY="szpilplac_support_result_last_v1";
   var DAYS=14;
   function lang(){
@@ -28,8 +29,8 @@
     section.appendChild(element("h2","szp-support__heading",kind==="result"?w.thanks:w.goal));
     section.appendChild(element("p","szp-support__copy",kind==="result"?w.result:w.body));
     var actions=element("div","szp-support__actions");
-    var link=element("a","szp-support__link",w.button);
-    link.href=URL;link.target="_blank";link.rel="noopener noreferrer";
+    var link=element("a","szp-support__link",kind==="result"?w.button:(lang()==="szl"?"Wesprzyj nowo gra":"Wesprzyj nową grę"));
+    link.href=kind==="result"?GENERAL_URL:GOAL_URL;link.target="_blank";link.rel="noopener noreferrer";
     link.dataset.supportSource=kind==="result"?"game-result":"support-"+kind;
     actions.appendChild(link);actions.appendChild(element("span","szp-support__note",w.note));
     section.appendChild(actions);return section;
