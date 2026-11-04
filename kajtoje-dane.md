@@ -72,3 +72,11 @@ Codzienny wybór jest deterministyczny według daty polskiej. Wybór pytań rotu
 Silnik nie pobiera granic z usług GUGiK w czasie każdej gry. Dane należy pozyskać i sprawdzić wcześniej, a następnie umieścić jako statyczny zasób. `verified: true` to znacznik zatwierdzenia danych przez redaktora, a nie dowód automatycznej poprawności. Nie należy zmieniać go bez audytu.
 
 Nie dodawać gry do menu głównego, dopóki nie ma pełnych danych i testów. Nie trzeba zmieniać innych gier.
+## Aktualny postęp prac (2026-11-04)
+
+* Zapisano katalog 75 nazw w `kajtoje-katalog.json`, stan `do_weryfikacji_teryt`. Nie używać jako listy oficjalnie zatwierdzonej.
+* Dodano `kajtoje-weryfikacja.json`: 75 kart audytu z oddzielnymi stanami dla TERYT, granic, herbów, ludności, powierzchni, sąsiadów i pytań. Puste wartości są celowe.
+* Dodano `kajtoje-import.py`: pobiera warstwę gmin z państwowego PRG, filtruje kod województwa i typ jednostki, wyodrębnia kontury kandydatów oraz tworzy `kajtoje-granice-robocze.json` i `kajtoje-audyt-granic.json`. Skrypt wymaga dostępu do Internetu, a po uruchomieniu należy porównać wynik z oficjalnym TERYT i dokonać oględzin wszystkich konturów. Jeśli usługa lub jej kodowanie się zmieniły, skrypt zakończy się błędem zamiast publikować dane.
+* Nie przygotowano jeszcze zweryfikowanych 75 herbów i wartości GUS. Nie ma `kajtoje-data.json`, a więc gra nie podaje niepotwierdzonych odpowiedzi.
+
+Komenda importu w katalogu repozytorium: `python kajtoje-import.py` (Python 3.9+, bez zewnętrznych bibliotek). Generowane pliki są robocze. `verified: true` wolno ustawić dopiero po zakończeniu całego audytu.
