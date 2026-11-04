@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kaj to je? · Szpilplac · Familock</title>
+<meta name="description" content="Rozpoznaj miasto województwa śląskiego po konturze, herbie i danych urzędowych.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Inter:wght@400;500;600;700;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('szpilplac_theme')||'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
+<style>
+:root{--bg:#f0e8d4;--surface:#fbf7ee;--surface2:#f3ecda;--ink:#23201a;--ink2:#6a6150;--line:#c9bfa6;--green:#2f4a39;--gold:#bf8a3a;--ok:#3f8a5a;--bad:#ad594c}
+[data-theme=dark]{--bg:#161310;--surface:#262018;--surface2:#2e2820;--ink:#ede5d0;--ink2:#aaa18d;--line:#3d3629;--green:#4a7a56;--gold:#d4a04a;--ok:#4a9a6a;--bad:#d4776a}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit;text-decoration:none}:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.shell{width:min(100% - 24px,560px);margin:auto}header{padding:18px 0 8px}.bar,.between{display:flex;justify-content:space-between;align-items:center;gap:10px}.back{font-size:12px;font-weight:700;color:var(--green)}
+.toggle{display:flex;gap:3px}.toggle button,.round{border:1px solid var(--line);background:var(--surface2);border-radius:999px;min-width:38px;height:36px;font-weight:800;font-size:11px}.toggle button.active{background:var(--green);color:white;border-color:var(--green)}
+.round{font-size:18px}h1,h2{font-family:Oswald,sans-serif;text-transform:uppercase;font-weight:700}h1{font-size:40px;line-height:1;margin:18px 0 4px;letter-spacing:.02em}h2{font-size:25px;margin:0 0 10px}
+.sub,.muted{color:var(--ink2)}.sub{font-size:12px;line-height:1.55;margin:0 0 18px}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 16px}.pill{padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--ink2);font-size:11px;font-weight:800}.pill.current{background:var(--green);border-color:var(--green);color:#fff}.pill.done{color:var(--ok);border-color:var(--ok)}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:18px;margin:10px 0;box-shadow:0 12px 26px -23px #0008}
+.eyebrow{text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:800;font-size:10px;margin:0 0 8px}
+.silhouette{min-height:265px;display:grid;place-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:14px;position:relative;padding:18px}
+.silhouette svg{display:block;width:100%;max-height:265px;overflow:visible}.silhouette path{fill:var(--green);stroke:var(--gold);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.north{position:absolute;right:12px;top:10px;font-size:11px;color:var(--ink2);font-weight:800}
+form{display:flex;gap:8px;margin:14px 0 4px}input{min-width:0;flex:1;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--surface2);color:var(--ink);font-size:14px}
+.primary,.choice{border-radius:11px;padding:12px 15px;font-size:13px;font-weight:800}.primary{background:var(--green);color:#fff;border:1px solid var(--green)}button:disabled{opacity:.45;cursor:not-allowed}.choice{width:100%;text-align:left;min-height:65px;border:1px solid var(--line);background:var(--surface2);display:flex;align-items:center;gap:14px}.choice:hover:not(:disabled){border-color:var(--gold)}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.choices.text-only{grid-template-columns:1fr 1fr}
+.choice img{width:66px;height:76px;object-fit:contain}.choice span{min-width:0;overflow-wrap:anywhere}.choice.correct{border:2px solid var(--ok)}.choice.wrong{border:2px solid var(--bad)}.status{margin:12px 0 0;font-size:12px;line-height:1.6;color:var(--ink2)}.history{margin:12px 0;padding:0;list-style:none}.history li{font-size:12px;border-bottom:1px solid var(--line);padding:9px 0;display:flex;justify-content:space-between;gap:10px}
+.tries{display:flex;gap:6px;margin:12px 0}.tries span{height:8px;flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:99px}.tries span.used{background:var(--gold);border-color:var(--gold)}
+.result{text-align:center}.score{font-family:Oswald;font-size:64px;color:var(--gold);line-height:1}.meta{margin:14px 0;font-size:12px;line-height:1.7;color:var(--ink2)}.footer{padding:24px 0;text-align:center;font-size:11px;color:var(--ink2)}.footer a{color:var(--green)}
+.notice{padding:15px;background:var(--surface2);border-left:3px solid var(--gold);border-radius:9px;font-size:12px;line-height:1.7}
+.hidden{display:none!important}
+@media(max-width:400px){.shell{width:min(100% - 18px,560px)}.card{padding:13px}h1{font-size:34px}.choices{gap:6px}.choice{padding:9px;gap:5px;flex-direction:column;text-align:center}.choices.text-only .choice{font-size:12px;min-height:65px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div class="bar"><a class="back" href="/index.html">← Szpilplac</a><div class="bar"><div class="toggle" aria-label="Język"><button id="pl" type="button">PL</button><button id="szl" type="button">ŚL</button></div><button id="theme" class="round" type="button" aria-label="Zmień motyw">◐</button><button id="help" class="round" type="button" aria-label="Zasady">?</button></div></div></header>
+<main>
+<h1>Kaj to je?</h1>
+<p class="sub" id="intro">Jedno miasto, trzy zagadki. Rozpoznaj Śląsk!</p>
+<div class="between"><span class="pill" id="day">Dzień…</span><span class="pill" id="points">0 / 100 pkt</span></div>
+<div class="pills" id="steps"><span class="pill current">1. Kontur</span><span class="pill">2. Herb</span><span class="pill">3. Pytanie</span></div>
+<section class="card" id="game" aria-live="polite"><p class="status">Wczytywanie zweryfikowanych danych…</p></section>
+</main>
+<footer class="footer"><a href="https://familock.pl" rel="noopener">Familock · Starzik</a> · Świętochłowice</footer>
+</div>
+<script>
+"use strict";
+(function(){
+const DATA_URL="/kajtoje-data.json";
+const START="2026-11-04";
+const ZONE="Europe/Warsaw";
+const STORE="kajtoje_v1";
+const dict={
+pl:{intro:"Jedno miasto, trzy zagadki. Rozpoznaj Śląsk!",outline:"Rozpoznaj miasto po granicach",herb:"Który herb należy do tego miasta?",question:"Odpowiedz na pytanie o miasto",guess:"Sprawdź",type:"Wybierz miasto",fail:"Nie udało się. Prawidłowe miasto: ",ok:"Brawo! To ",next:"Przejdź do następnej rundy",finish:"Zobacz wynik",share:"Udostępnij wynik",copied:"Wynik skopiowany",again:"Wróć jutro po nową zagadkę",rules:"1. Rozpoznaj kontur miasta w maksymalnie sześciu próbach. 2. Wskaż prawidłowy herb. 3. Odpowiedz na jedno pytanie o miasto. Każdy gracz ma tę samą zagadkę dnia. Odpowiedzi do etapów 2 i 3 można podać tylko raz.",missing:"Gra czeka na zatwierdzoną bazę 75 miast, ich oficjalnych granic, herbów i pytań. Nie pokazujemy danych przykładowych jako prawdziwych.",bad:"Nie można rozpocząć gry: baza nie przeszła weryfikacji.",pick:"Wybierz miasto z listy.",repeat:"To miasto było już podane.",wrong:"Nie tym razem.",loading:"Sprawdzanie danych...",pts:"punktów"},
+szl:{intro:"Jedno miasto, trzi zagodki. Poznosz Ślonsk?",outline:"Zgodnij miasto po granicach",herb:"Kery herb pasuje do tego miasta?",question:"Odpowiydz na pytanie ô miasto",guess:"Sprawdź",type:"Ôbier miasto",fail:"Niy poszło. To było: ",ok:"Brawo! To ",next:"Idź dalij",finish:"Pokoż wynik",share:"Podziel sie wynikym",copied:"Wynik skopiowany",again:"Przidź jutro po nowo zagodka",rules:"1. Zgodnij miasto po konturze w sześciu próbach. 2. Ôbier richtik herb. 3. Odpowiydz na jedno pytanie ô miasto. Kozdy mo ta samo zagodka dnia. Na pytania w rundach 2 i 3 mosz po jednej próbie.",missing:"Szpil czeko na sprawdzono baza 75 miast, granic, herbów i pytań. Niy pokozujymy zmyślōnych danych.",bad:"Niy idzie zaczonć: baza niy przeszła kontroli.",pick:"Ôbier miasto z listy.",repeat:"To miasto już było.",wrong:"Niy tym razym.",loading:"Sprawdzōmy dane...",pts:"punktōw"}};
+const $=id=>document.getElementById(id);
+let lang=read("familock_lang")||"pl",data=null,city=null,puzzle=null,state=null,key=null,phase=1;
+function read(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function write(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function tr(k){return dict[lang][k]}
+function datePL(){return new Intl.DateTimeFormat("en-CA",{timeZone:ZONE,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}
+function dayNumber(){let parts=datePL().split("-").map(Number),n=Date.UTC(parts[0],parts[1]-1,parts[2]),s=Date.UTC(2026,10,4);return Math.floor((n-s)/86400000)}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function seededShuffle(a,seed){let result=a.slice(),x=hash(seed)||1;for(let i=result.length-1;i>0;i--){x^=x<<13;x^=x>>>17;x^=x<<5;let j=(x>>>0)%(i+1);[result[i],result[j]]=[result[j],result[i]]}return result}
+function save(){write(key,JSON.stringify(state))}
+function validate(d){
+ if(!d||d.verified!==true||d.schema!==1||!Array.isArray(d.cities)||d.cities.length!==75)throw Error("Unverified dataset");
+ const ids=new Set(),names=new Set();
+ d.cities.forEach(c=>{
+  if(!c||typeof c.id!=="string"||!/^[0-9]{7}$/.test(c.id)||typeof c.name!=="string"||!c.name||ids.has(c.id)||names.has(c.name))throw Error("Invalid city identity");
+  if(!Array.isArray(c.center)||c.center.length!==2||!c.center.every(Number.isFinite)||c.center[0]<48||c.center[0]>52||c.center[1]<17||c.center[1]>22)throw Error("Invalid center");
+  if(!c.contour||!Array.isArray(c.contour.viewBox)||c.contour.viewBox.length!==4||!c.contour.viewBox.every(Number.isFinite)||typeof c.contour.path!=="string"||!/^[0-9eE+., MLCQZHVSTAm lcqzhvst-]+$/.test(c.contour.path)||c.contour.path.length<30)throw Error("Invalid contour");
+  if(typeof c.herb!=="string"||!/^\/kajtoje-herby\/[a-z0-9_-]+\.svg$/.test(c.herb)||!c.sources||!c.sources.border||!c.sources.herb)throw Error("Missing verified provenance");
+  if(!Array.isArray(c.questions)||!c.questions.length)throw Error("Missing questions");
+  c.questions.forEach(q=>{if(!q||typeof q.prompt!=="string"||!Array.isArray(q.options)||q.options.length!==4||new Set(q.options).size!==4||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!q.source||!q.asOf)throw Error("Invalid question")});
+  ids.add(c.id);names.add(c.name);
+ });
+ return true;
+}
+function distance(a,b){const r=Math.PI/180,p1=a[0]*r,p2=b[0]*r,dp=(b[0]-a[0])*r,dl=(b[1]-a[1])*r,h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return Math.round(6371*2*Math.asin(Math.min(1,Math.sqrt(h))))}
+function compass(from,to){const dx=to[1]-from[1],dy=to[0]-from[0],angle=(Math.atan2(dx,dy)*180/Math.PI+360)%360;return ["↑ N","↗ NE","→ E","↘ SE","↓ S","↙ SW","← W","↖ NW"][Math.round(angle/45)%8]}
+function el(tag,cls,txt){let n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n}
+function btn(txt,fn,cls){let b=el("button",cls||"primary",txt);b.type="button";b.addEventListener("click",fn);return b}
+function section(title){let root=$("game");root.replaceChildren();root.append(el("p","eyebrow","KAJ TO JE?"),el("h2","",title));return root}
+function notice(txt){let p=el("div","notice",txt);$("game").replaceChildren(p)}
+function score(){let n=state?state.score:0;$("points").textContent=n+" / 100 pkt"}
+function updateSteps(){let items=$("steps").children;for(let i=0;i<3;i++){items[i].className="pill"+(i+1<phase?" done":i+1===phase?" current":"")}score()}
+function status(t){let existing=$("game").querySelector(".status");if(!existing){existing=el("p","status");$("game").append(existing)}existing.textContent=t}
+function resultCity(){return city.name}
+function derive(){
+ const day=dayNumber();if(day<0)throw Error("Future start");
+ const order=seededShuffle(data.cities.map(c=>c.id),"kajtoje-order-v1");
+ const picked=order[day%order.length];city=data.cities.find(c=>c.id===picked);
+ const questions=city.questions,p=questions[Math.floor(day/order.length)%questions.length];
+ const emblems=seededShuffle(data.cities.filter(c=>c.id!==city.id),"herb-distractors-"+day).slice(0,3);
+ puzzle={q:p,emblems:seededShuffle([city,...emblems],"herb-display-"+day)};
+ key=STORE+":"+datePL()+":"+city.id;
+ try{state=JSON.parse(read(key)||"null")}catch(e){state=null}
+ if(!state||state.city!==city.id||!Array.isArray(state.guesses)||state.guesses.length>6||!Number.isInteger(state.score))state={city:city.id,guesses:[],score:0,stage:1,herbCorrect:null,questionCorrect:null,finished:false};
+ phase=state.stage;score();
+}
+function render(){
+ if(!data)return;phase=state.stage;updateSteps();
+ if(phase===1)outline();
+ else if(phase===2)herb();
+ else if(phase===3)question();
+ else summary();
+}
+function outline(){
+ let root=section(tr("outline")),pane=el("div","silhouette"),svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),path=document.createElementNS("http://www.w3.org/2000/svg","path");
+ svg.setAttribute("viewBox",city.contour.viewBox.join(" "));svg.setAttribute("role","img");svg.setAttribute("aria-label","Kontur miasta, północ u góry");
+ path.setAttribute("d",city.contour.path);svg.append(path);pane.append(svg,el("span","north","N ↑"));root.append(pane);
+ let dots=el("div","tries");for(let i=0;i<6;i++)dots.append(el("span",i<state.guesses.length?"used":""));root.append(dots);
+ let hist=el("ul","history");
+ state.guesses.forEach(g=>{let c=data.cities.find(x=>x.id===g);if(!c)return;let li=el("li");li.append(el("span","",c.name),el("span","muted",distance(c.center,city.center)+" km · "+compass(c.center,city.center)));hist.append(li)});
+ root.append(hist);
+ let form=el("form"),input=el("input");input.setAttribute("list","city-options");input.setAttribute("autocomplete","off");input.setAttribute("placeholder",tr("type"));input.setAttribute("aria-label",tr("type"));
+ let list=el("datalist");list.id="city-options";data.cities.slice().sort((a,b)=>a.name.localeCompare(b.name,"pl")).forEach(c=>{let o=el("option");o.value=c.name;list.append(o)});
+ form.append(input,btn(tr("guess"),()=>{}, "primary"));form.lastElementChild.type="submit";form.lastElementChild.replaceWith(el("button","primary",tr("guess")));form.lastElementChild.type="submit";
+ form.addEventListener("submit",ev=>{ev.preventDefault();let selected=data.cities.find(c=>c.name.toLocaleLowerCase("pl")===input.value.trim().toLocaleLowerCase("pl"));if(!selected){status(tr("pick"));return}if(state.guesses.includes(selected.id)){status(tr("repeat"));return}state.guesses.push(selected.id);if(selected.id===city.id){state.score=60-(state.guesses.length-1)*10;state.stage=2;save();render();return}if(state.guesses.length===6){state.stage=4;state.finished=true;save();render();return}save();render();status(tr("wrong"))});
+ root.append(form,list);status((6-state.guesses.length)+"/6");
+}
+function herb(){
+ let root=section(tr("herb"));root.append(el("p","sub",resultCity()));let grid=el("div","choices");
+ puzzle.emblems.forEach((c,i)=>{let b=btn("",()=>{state.herbCorrect=c.id===city.id;if(state.herbCorrect)state.score+=20;state.stage=3;save();render()},"choice"),img=el("img");img.src=c.herb;img.alt="Herb "+String.fromCharCode(65+i);img.loading="lazy";b.append(img,el("span","",String.fromCharCode(65+i)));grid.append(b)});
+ root.append(grid);status("Jedna odpowiedź. Po wyborze przejdziesz dalej.");
+}
+function question(){
+ let root=section(tr("question"));root.append(el("p","sub",resultCity()),el("p","",puzzle.q.prompt));
+ let grid=el("div","choices text-only");
+ puzzle.q.options.forEach((answer,i)=>grid.append(btn(answer,()=>{state.questionCorrect=i===puzzle.q.correct;if(state.questionCorrect)state.score+=20;state.stage=4;state.finished=true;save();render()},"choice")));
+ root.append(grid);let source=el("p","meta","Źródło: "+puzzle.q.source+" · Stan danych: "+puzzle.q.asOf);root.append(source);
+}
+function summary(){
+ let root=section("Wynik dnia"),box=el("div","result"),points=el("div","score",String(state.score)),cityText=el("h2","",city.name);
+ let line=state.guesses.includes(city.id)?"Kontur: "+state.guesses.length+"/6":"Kontur: nieodgadnięty";
+ let details=el("p","meta",line+" · Herb: "+(state.herbCorrect===null?"—":state.herbCorrect?"✓":"✕")+" · Pytanie: "+(state.questionCorrect===null?"—":state.questionCorrect?"✓":"✕"));
+ box.append(points,el("p","muted",tr("pts")),cityText,details);root.append(box);
+ let share="Kaj to je? #"+(dayNumber()+1)+"\n"+line+"\nHerb: "+(state.herbCorrect?"✓":"✕")+" · Pytanie: "+(state.questionCorrect?"✓":"✕")+"\n"+state.score+"/100\nszpilplac.familock.pl/kajtoje.html";
+ root.append(btn(tr("share"),async()=>{try{if(navigator.share)await navigator.share({text:share});else await navigator.clipboard.writeText(share);status(tr("copied"))}catch(e){status("Nie udało się udostępnić.")}}));
+ status(tr("again"));
+}
+function setLang(v){lang=v;write("familock_lang",lang);$("pl").classList.toggle("active",v==="pl");$("szl").classList.toggle("active",v==="szl");$("intro").textContent=tr("intro");if(data)render()}
+$("pl").onclick=()=>setLang("pl");$("szl").onclick=()=>setLang("szl");
+$("theme").onclick=()=>{let t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;write("szpilplac_theme",t)};
+$("help").onclick=()=>alert(tr("rules"));
+setLang(lang==="szl"?"szl":"pl");
+$("day").textContent="Dzień #"+Math.max(1,dayNumber()+1);
+fetch(DATA_URL,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Missing dataset");return r.json()}).then(d=>{validate(d);data=d;derive();render()}).catch(err=>{console.warn("Kaj to je: dataset validation",err);notice(err.message==="Missing dataset"?tr("missing"):tr("bad"))});
+})();
+</script>
+</body>
+</html>
