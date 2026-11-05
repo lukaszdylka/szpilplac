@@ -1,0 +1,35 @@
+name: Autentyczne screeny gierek
+on:
+  push:
+    paths:
+      - '.github/workflows/gierki-screeny.yml'
+      - 'scripts/capture-gierki.cjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser and image optimizer
+        run: |
+          npm install --prefix "$RUNNER_TEMP/szp-screens" --no-save --no-package-lock playwright sharp
+          "$RUNNER_TEMP/szp-screens/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Render actual game screens
+        env:
+          NODE_PATH: ${{ runner.temp }}/szp-screens/node_modules
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/szpilplac-screens-server.log 2>&1 &
+          sleep 2
+          node scripts/capture-gierki.cjs
+      - name: Publish original screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gierki/screens/*.webp
+          if ! git diff --cached --quiet; then
+            git commit -m "Add authentic gameplay screenshots for four minigames"
+            git push
+          fi
