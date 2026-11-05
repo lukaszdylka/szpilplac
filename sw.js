@@ -17,6 +17,10 @@ const CORE_ASSETS=[
   "/na-wiyrch.html",
   "/bandyta.html",
   "/pong.html",
+  "/kajtoje.html",
+  "/game-save.js",
+  "/auth-widget.js",
+  "/config.js",
   "/minigry-stats.js",
   "/konto.html",
   "/ranking.html",
@@ -48,8 +52,15 @@ self.addEventListener("install",function(event){
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache){
       return Promise.all(CORE_ASSETS.map(function(url){
-        return cache.add(url).catch(function(){return null;});
-      }));
+        return cache.add(url).then(function(){return {url:url,ok:true};}).catch(function(err){
+          console.warn("Szpilplac PWA: nie udało się zapisać zasobu",url,err);
+          return {url:url,ok:false};
+        });
+      })).then(function(results){
+        var critical=["/","/index.html","/offline.html"];
+        var failed=results.filter(function(item){return !item.ok&&critical.indexOf(item.url)!==-1;});
+        if(failed.length)throw new Error("Brakuje podstawowych plików PWA: "+failed.map(function(item){return item.url;}).join(", "));
+      });
     }).then(function(){
       return self.skipWaiting();
     })
