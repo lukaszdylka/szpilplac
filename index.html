@@ -615,6 +615,8 @@ h1{
   </div>
 </div>
 
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   "use strict";
@@ -697,8 +699,9 @@ h1{
   function setText(id,value){var el=document.getElementById(id);if(el)el.textContent=value;}
   var SUPABASE_URL="https://xyivrakegwybwhmmcawq.supabase.co";
   var SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5aXZyYWtlZ3d5YndobW1jYXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTkxMjYsImV4cCI6MjA5MjE3NTEyNn0.68zlOkL7AOtX6qEukCpEV6R0rpo0bQ1dG9U7pPhVGvo";
-  var accountSummary=null,accountLoadPromise=null;
+  var accountSummary=null,accountLoadPromise=null,authReady=false,authSession=null,authClient=null;
   function getStoredSession(){
+    if(authReady)return authSession;
     try{
       var raw=localStorage.getItem(AUTH_KEY);
       if(!raw)return null;
@@ -723,7 +726,7 @@ h1{
     if(!session){
       if(stats)stats.hidden=true;
       setText("accountAvatar","?");
-      setText("accountName",p.loginRegister);
+      setText("accountName",authReady?p.loginRegister:(getLang()==="szl"?"Sprawdzōm konto…":"Sprawdzam konto…"));
       setText("accountSub",p.accountLoggedOut);
       return;
     }
@@ -744,6 +747,7 @@ h1{
     }).then(function(r){if(!r.ok)throw new Error("account "+r.status);return r.json();});
   }
   function loadAccountSummary(){
+    if(!authReady)return Promise.resolve();
     var session=getStoredSession();
     if(!session){accountSummary=null;accountLoadPromise=null;renderAccountCard(copy[getLang()]);return Promise.resolve();}
     if(accountLoadPromise)return accountLoadPromise;
@@ -763,9 +767,44 @@ h1{
       };
     }).catch(function(){accountSummary=null;}).then(function(){
       accountLoadPromise=null;
-      renderAccountCard(copy[getLang()]);
+      if(getStoredSession()&&getStoredSession().user.id===session.user.id)renderAccountCard(copy[getLang()]);
     });
     return accountLoadPromise;
+  }
+  function updateAuthSession(session){
+    var previous=authSession&&authSession.user&&authSession.user.id;
+    var next=session&&session.user&&session.user.id;
+    authSession=session||null;
+    authReady=true;
+    if(previous!==next)accountSummary=null;
+    renderAccountCard(copy[getLang()]);
+    if(next&&(!accountSummary||previous!==next))loadAccountSummary();
+  }
+  function initializeAuth(){
+    var cfg=window.SZPILPLAC_CONFIG||{};
+    if(!window.supabase||!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){
+      // Nie pokazuj fałszywego wylogowania, jeśli biblioteka chwilowo się nie załadowała.
+      authReady=false;
+      renderAccountCard(copy[getLang()]);
+      return;
+    }
+    try{
+      authClient=window.__SZPILPLAC_SUPABASE_CLIENT||window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY,{
+        auth:{storageKey:AUTH_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}
+      });
+      window.__SZPILPLAC_SUPABASE_CLIENT=authClient;
+      authClient.auth.onAuthStateChange(function(event,session){
+        if(event==="SIGNED_OUT"||event==="SIGNED_IN"||event==="TOKEN_REFRESHED"||event==="INITIAL_SESSION"){
+          updateAuthSession(session);
+        }
+      });
+      authClient.auth.getSession().then(function(result){
+        updateAuthSession(result&&result.data&&result.data.session);
+      }).catch(function(){
+        // Zachowaj aktualny wygląd konta przy przejściowym błędzie połączenia.
+        if(!authReady)renderAccountCard(copy[getLang()]);
+      });
+    }catch(e){console.warn("Nie można odczytać sesji Szpilplacu",e);}
   }
   function applyLang(){
     var lang=getLang(),p=copy[lang];
@@ -830,15 +869,15 @@ h1{
   document.getElementById("langSzl").addEventListener("click",function(){chooseLang("szl");});
   document.getElementById("themeBtn").addEventListener("click",toggleTheme);
   applyLang();
-  loadAccountSummary();
+  initializeAuth();
   themeIcon();
   bootCookies();
-  window.addEventListener("pageshow",function(){accountSummary=null;applyLang();loadAccountSummary();});
-  window.addEventListener("focus",function(){accountSummary=null;applyLang();loadAccountSummary();});
+  window.addEventListener("pageshow",function(){applyLang();if(authClient)authClient.auth.getSession().then(function(r){updateAuthSession(r.data&&r.data.session);});});
+  window.addEventListener("focus",function(){if(authClient)authClient.auth.getSession().then(function(r){updateAuthSession(r.data&&r.data.session);});});
   window.addEventListener("storage",function(e){
     if(!e)return;
     if(e.key===LANG_KEY)applyLang();
-    if(e.key===AUTH_KEY){accountSummary=null;applyLang();loadAccountSummary();}
+    if(e.key===AUTH_KEY&&authClient)authClient.auth.getSession().then(function(r){updateAuthSession(r.data&&r.data.session);});
   });
 })();
 </script>
