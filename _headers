@@ -12,3 +12,24 @@
 
 /stats.html
   Cache-Control: no-cache, no-store, must-revalidate
+
+/gierki.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/minigra.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/konto.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/ranking.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/nowosci.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/build-version.js
+  Cache-Control: no-cache, no-store, must-revalidate
