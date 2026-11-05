@@ -26,7 +26,8 @@
     var url=window.SUPABASE_URL||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_URL);
     var key=window.SUPABASE_ANON_KEY||(window.SZPILPLAC_CONFIG&&window.SZPILPLAC_CONFIG.SUPABASE_ANON_KEY);
     if(!url||!key||!window.supabase)return null;
-    client=window.supabase.createClient(url,key,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    client=window.__SZPILPLAC_SUPABASE_CLIENT||window.supabase.createClient(url,key,{auth:{storageKey:AUTH_STORAGE_KEY,detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    window.__SZPILPLAC_SUPABASE_CLIENT=client;
     return client;
   }
   function storedSession(){try{var raw=localStorage.getItem(AUTH_STORAGE_KEY);if(!raw)return null;var data=JSON.parse(raw);return data.currentSession||data.session||data;}catch(e){return null;}}
@@ -34,7 +35,7 @@
     var c=await getClient(); if(!c)return null;
     try{var r=await c.auth.getSession(); if(r&&r.data&&r.data.session)return r.data.session;}catch(e){}
     var s=storedSession();
-    if(s&&s.access_token&&s.refresh_token){try{var set=await c.auth.setSession({access_token:s.access_token,refresh_token:s.refresh_token}); if(set&&set.data&&set.data.session)return set.data.session;}catch(e){} return s;}
+    if(s&&s.access_token&&s.refresh_token){try{var set=await c.auth.setSession({access_token:s.access_token,refresh_token:s.refresh_token}); if(set&&set.data&&set.data.session)return set.data.session;}catch(e){console.warn("Nie udało się odnowić sesji Szpilplaca",e);}}
     return null;
   }
 
