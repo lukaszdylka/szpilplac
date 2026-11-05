@@ -69,6 +69,15 @@ footer{margin-top:26px;text-align:center;color:var(--ink2);font-size:11.5px;line
 footer a{color:var(--green);font-weight:900}
 @media(max-width:760px){.siatka{grid-template-columns:1fr}.karta{min-height:118px}}
 @media(max-width:480px){body{padding-left:12px;padding-right:12px}.karta{grid-template-columns:54px minmax(0,1fr);gap:12px;padding:14px}.ico{width:54px;height:54px}.graj{display:none}.txt h2{font-size:20px}.summary{align-items:flex-start;flex-direction:column;gap:4px}}
+
+/* Podgląd rozgrywki: prawdziwe zrzuty z katalogu /gierki/screens/ */
+.karta{grid-template-columns:155px minmax(0,1fr) auto;min-height:154px;gap:15px}
+.preview{position:relative;display:block;width:155px;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:#161a15}
+.preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.preview-fallback{display:grid;place-items:center;width:100%;height:100%;color:var(--gold);background:linear-gradient(145deg,#283d31,#171c17)}
+.preview-fallback svg{width:45px;height:45px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){.karta{grid-template-columns:130px minmax(0,1fr) auto}.preview{width:130px}}
+@media(max-width:480px){.karta{grid-template-columns:100px minmax(0,1fr)}.preview{width:100px}.txt h2{font-size:19px}.txt p{font-size:11.5px}}
 </style>
 <link rel="stylesheet" href="/support-banner.css?v=1">
 </head>
@@ -79,10 +88,10 @@ footer a{color:var(--green);font-weight:900}
     <div class="controls"><button class="icon-btn" id="themeBtn" type="button" title="Zmień motyw" aria-label="Zmień motyw">◐</button></div>
   </div>
   <h1>Gierki</h1>
-  <div class="sub">Dodatkowe familockowe gry na szybko. Każda otwiera się w tym samym widoku, z jednym powrotem i pełnym ekranem.</div>
+  <div class="sub">Cztery wybrane gierki ze Śląska. Jeden wspólny widok gry, prosty powrót i pełny ekran.</div>
 </header>
 <main>
-  <div class="summary"><span id="gameCount">Ładuję katalog…</span><span>Wyniki i rekordy zostają na urządzeniu.</span></div>
+  <div class="summary"><span id="gameCount">Ładuję katalog…</span><span>Wyniki i rekordy pozostają bez zmian.</span></div>
   <div class="siatka" id="siatka"><div class="empty">Ładuję gierki…</div></div>
 </main>
 <footer><a href="/">Szpilplac</a> · <a href="https://www.familock.pl" target="_blank" rel="noopener">Familock</a><br>Made in Świyntochłowice</footer>
@@ -115,18 +124,26 @@ footer a{color:var(--green);font-weight:900}
     return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(icons[name]||icons.gamepad)+'</svg>';
   }
 
+  var SHOWCASE=["zeflik","kopalnia","na-wiyrch","szlojder"];
+  function visible(game){return SHOWCASE.indexOf(game.id)!==-1;}
+  function prettyLink(game){return "/gierki/"+encodeURIComponent(game.id);}
+  function screenshot(game){
+    var src="/gierki/screens/"+encodeURIComponent(game.id)+".webp";
+    return '<span class="preview" aria-hidden="true"><img loading="lazy" decoding="async" src="'+src+'" alt="" onerror="this.hidden=true;this.parentNode.classList.add(\'no-shot\')"><span class="preview-fallback">'+iconSvg(game.icon)+'</span></span>';
+  }
   function card(game){
     var meta=[];
     if(game.category)meta.push('<span class="pill">'+esc(game.category)+'</span>');
     if(game.scoreLabel)meta.push('<span class="pill score">'+esc(game.scoreLabel)+'</span>');
-    return '<a class="karta" href="'+esc(game.href)+'" data-game-id="'+esc(game.id)+'">'+
-      '<div class="ico">'+iconSvg(game.icon)+'</div>'+
+    return '<a class="karta" href="'+esc(prettyLink(game))+'" data-game-id="'+esc(game.id)+'">'+
+      screenshot(game)+
       '<div class="txt"><h2>'+esc(game.title)+'</h2><p>'+esc(game.description)+'</p><div class="meta">'+meta.join("")+'</div></div>'+
       '<span class="graj">Graj</span></a>';
   }
 
   function render(games){
-    games.sort(function(a,b){return Number(a.order||999)-Number(b.order||999)||String(a.title).localeCompare(String(b.title),"pl");});
+    games=games.filter(visible);
+    games.sort(function(a,b){return SHOWCASE.indexOf(a.id)-SHOWCASE.indexOf(b.id);});
     grid.innerHTML=games.length?games.map(card).join(""):'<div class="empty">Brak opublikowanych gierek.</div>';
     count.innerHTML='<b>'+games.length+'</b> '+(games.length===1?'gierka':(games.length<5?'gierki':'gierek'));
   }
@@ -157,7 +174,7 @@ footer a{color:var(--green);font-weight:900}
   }
 
   async function boot(){
-    var games=registryGames();
+    var games=registryGames().filter(visible);
     render(games);
     var cfg=window.SZPILPLAC_CONFIG||{};
     if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)return;
@@ -165,7 +182,7 @@ footer a{color:var(--green);font-weight:900}
       var url=cfg.SUPABASE_URL+"/rest/v1/szpilplac_minigry?select=slug,tytul,opis,ikona,kategoria,typ,url,pelny,kolejnosc&opublikowana=eq.true&order=kolejnosc.asc";
       var response=await fetch(url,{headers:{apikey:cfg.SUPABASE_ANON_KEY,Authorization:"Bearer "+cfg.SUPABASE_ANON_KEY}});
       if(!response.ok)throw new Error("HTTP "+response.status);
-      render(mergeGames(games,await response.json()));
+      render(mergeGames(games,(await response.json()).filter(function(row){return SHOWCASE.indexOf(row.slug)!==-1;})));
     }catch(e){
       console.warn("Katalog gierek: używam danych lokalnych",e&&e.message||e);
     }
