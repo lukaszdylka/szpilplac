@@ -424,7 +424,7 @@
       return false;
     }
 
-    STATE.client = window.supabase.createClient(url, key, {
+    STATE.client = window.__SZPILPLAC_SUPABASE_CLIENT || window.supabase.createClient(url, key, {
       auth: {
         storageKey: STORE_KEYS.auth,
         detectSessionInUrl: false,
@@ -432,6 +432,8 @@
         autoRefreshToken: true
       }
     });
+
+    window.__SZPILPLAC_SUPABASE_CLIENT = STATE.client;
 
     STATE.client.auth.onAuthStateChange(function () {
       loadUserAndProfile();
