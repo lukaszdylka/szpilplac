@@ -746,6 +746,16 @@ h1{
       headers:{"Accept":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+token}
     }).then(function(r){if(!r.ok)throw new Error("account "+r.status);return r.json();});
   }
+  async function fetchAllAccountResults(id,token){
+    var all=[];
+    for(var start=0;start<10000;start+=1000){
+      var page=await fetchAccountJson("user_game_results?select=score&user_id=eq."+id+"&order=created_at.asc&limit=1000&offset="+start,token);
+      if(!Array.isArray(page))throw new Error("Nieprawidłowa odpowiedź wyników");
+      all=all.concat(page);
+      if(page.length<1000)return all;
+    }
+    return all;
+  }
   function loadAccountSummary(){
     if(!authReady)return Promise.resolve();
     var session=getStoredSession();
@@ -754,7 +764,7 @@ h1{
     var id=encodeURIComponent(session.user.id),token=session.access_token;
     accountLoadPromise=Promise.all([
       fetchAccountJson("profiles?select=login,display_name,rank_name&id=eq."+id+"&limit=1",token),
-      fetchAccountJson("user_game_results?select=score&user_id=eq."+id+"&limit=1000",token)
+      fetchAllAccountResults(id,token)
     ]).then(function(res){
       var profile=res[0]&&res[0][0]?res[0][0]:{};
       var results=Array.isArray(res[1])?res[1]:[];
