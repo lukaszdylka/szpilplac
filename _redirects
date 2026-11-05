@@ -1,0 +1,6 @@
+# Publiczne, czytelne adresy gierek. Wszystkie otwierają istniejący wspólny ekran.
+# Status 200 zachowuje adres w pasku przeglądarki.
+/gierki/zeflik /minigra.html 200
+/gierki/kopalnia /minigra.html 200
+/gierki/na-wiyrch /minigra.html 200
+/gierki/szlojder /minigra.html 200
