@@ -1,0 +1,22 @@
+# Szpilplac
+
+> Szpilplac to śląski plac zabaw online z darmowymi grami słownymi, logicznymi i zręcznościowymi. Projekt Familock Escape Room w Świętochłowicach.
+
+Szpilplac jest dostępny w przeglądarce. Można grać bez zakładania konta. Konto gracza służy do zapisywania wyników, punktów i korzystania ze statystyk. Interfejs udostępnia język polski i śląski.
+
+## Główne strony
+
+- [Szpilplac](https://szpilplac.familock.pl/): strona główna, opis projektu, najczęstsze pytania i dostęp do gier.
+- [Słōwko](https://szpilplac.familock.pl/slowko): codzienna gra w zgadywanie śląskiego słowa w sześciu próbach, podobna w mechanice do Wordle.
+- [Kłōdka](https://szpilplac.familock.pl/klodka): codzienna łamigłówka polegająca na odgadnięciu czterocyfrowego kodu.
+- [Raja](https://szpilplac.familock.pl/raja/): tygodniowa gra logiczna polegająca na ułożeniu pięciu elementów w odpowiedniej kolejności.
+- [Minigry](https://szpilplac.familock.pl/gierki): dodatkowe gry zręcznościowe i inne krótkie wyzwania.
+
+## Informacje o projekcie
+
+- [Familock Escape Room](https://familock.pl/): inicjator projektu Szpilplac.
+- [Regulamin](https://szpilplac.familock.pl/regulamin): zasady korzystania z serwisu.
+- [Polityka prywatności](https://szpilplac.familock.pl/polityka-prywatnosci): informacje o przetwarzaniu danych.
+- [Mapa witryny](https://szpilplac.familock.pl/sitemap.xml): publiczne adresy głównych stron.
+
+Szpilplac ma śląski charakter, ale jest przeznaczony również dla osób spoza Śląska. Gry działają w przeglądarce i nie wymagają instalowania aplikacji.
