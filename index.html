@@ -534,6 +534,18 @@ h1{font-size:clamp(34px,8vw,52px)}
  .familock-link{white-space:normal}
 }
 
+.about-szpilplac{max-width:680px;margin-top:11px}
+.about-szpilplac summary{display:inline-flex;align-items:center;gap:7px;list-style:none;cursor:pointer;color:var(--ink2);font-size:12px;font-weight:700;line-height:1.5;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--ink2) 40%,transparent);text-underline-offset:3px}
+.about-szpilplac summary::-webkit-details-marker{display:none}
+.about-szpilplac summary::before{content:"i";display:grid;place-items:center;width:17px;height:17px;flex:none;border:1px solid var(--line);border-radius:50%;font:700 11px/1 Inter,system-ui,sans-serif;text-decoration:none}
+.about-szpilplac summary::after{content:"⌄";display:inline-block;font-size:16px;line-height:1;transition:transform .15s}
+.about-szpilplac[open] summary::after{transform:rotate(180deg)}
+.about-szpilplac summary:hover{color:var(--green)}
+.about-szpilplac summary:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.about-szpilplac-content{margin-top:11px;padding:13px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink2);font-size:12.5px;line-height:1.65;box-shadow:var(--shadow)}
+.about-szpilplac-content p{margin:0}
+.about-szpilplac-content p+p{margin-top:8px}
+@media(max-width:430px){.about-szpilplac{margin-top:9px}.about-szpilplac-content{padding:12px;font-size:12px}}
 </style>
 <meta name="theme-color" content="#2f4a39">
 <link rel="stylesheet" href="/support-banner.css?v=1">
@@ -559,6 +571,14 @@ h1{font-size:clamp(34px,8vw,52px)}
     <section class="hero" aria-labelledby="heroTitle">
       <div class="kicker" id="heroKicker">Szpilplac · Familock</div>
       <h1 id="heroTitle">Zagraj na Szpilplacu</h1>
+      <details class="about-szpilplac" id="aboutSzpilplac">
+        <summary id="aboutSzpilplacToggle">Co to jest Szpilplac?</summary>
+        <div class="about-szpilplac-content">
+          <p id="aboutSzpilplacIntro">Szpilplac to po śląsku plac zabaw. U nas to miejsce na krótkie gry słowne, logiczne i zręcznościowe.</p>
+          <p id="aboutSzpilplacGames">Codziennie czekają tu nowe zagadki inspirowane grami takimi jak Wordle czy Literalnie, ale są też zupełnie inne wyzwania. Możesz grać po polsku lub po śląsku, zbierać punkty i sprawdzać swoje miejsce w rankingu.</p>
+          <p id="aboutSzpilplacOrigin">Szpilplac powstał z inicjatywy Familock Escape Room w Świętochłowicach.</p>
+        </div>
+      </details>
     </section>
 
     <div class="section-head" id="gamesTitle">Gry</div>
@@ -685,6 +705,10 @@ h1{font-size:clamp(34px,8vw,52px)}
       title:"Zagraj na Szpilplacu",
       lead:"Codziennie czekają nowe zagadki w Słōwku i Kłōdce, a raz w tygodniu nowa Raja. Wybierz grę i sprawdź swój wynik.",
       games:"Gry",
+      aboutToggle:"Co to jest Szpilplac?",
+      aboutIntro:"Szpilplac to po śląsku plac zabaw. U nas to miejsce na krótkie gry słowne, logiczne i zręcznościowe.",
+      aboutGames:"Codziennie czekają tu nowe zagadki inspirowane grami takimi jak Wordle czy Literalnie, ale są też zupełnie inne wyzwania. Możesz grać po polsku lub po śląsku, zbierać punkty i sprawdzać swoje miejsce w rankingu.",
+      aboutOrigin:"Szpilplac powstał z inicjatywy Familock Escape Room w Świętochłowicach.",
       slowko:"Odgadnij śląskie słowo dnia w sześciu próbach.",
       klodka:"Odgadnij czterocyfrowy kod na podstawie podpowiedzi.",
       raja:"Ułóż pięć śląskich elementów we właściwej kolejności.",
@@ -713,6 +737,10 @@ h1{font-size:clamp(34px,8vw,52px)}
       title:"Szpilej na Szpilplacu",
       lead:"Kożdy dziyń czekajom nowe zagodki we Słōwku i Kłōdce, a roz na tydziyń nowo Raja. Wybiyr gra i sprawdź swój wynik.",
       games:"Gry",
+      aboutToggle:"Co to je Szpilplac?",
+      aboutIntro:"Szpilplac to po naszymu plac do szpilania. U nos to plac na krótkie gry słowne, logiczne i zręcznościowe.",
+      aboutGames:"Co dziyń trefisz sam na nowe zagodki, trocha jak we Wordle abo Literalnie, ale tyż na inksze wyzwania. Możesz szpilać po polsku abo po śląsku, zbiyrać punkty i sprawdzać swoje miejsce we rankingu.",
+      aboutOrigin:"Szpilplac powstoł z inicjatywy Familock Escape Room we Świyntochłowicach.",
       slowko:"Zgodnij slonskie słowo dnia w sześciu probach.",
       klodka:"Zgodnij sztyrocyfrowy kod podle podpowiedzi.",
       raja:"Poukładej piyńć slonskich rzeczy we dobrym porzondku.",
@@ -866,6 +894,10 @@ h1{font-size:clamp(34px,8vw,52px)}
     setText("siteSub",p.sub);
     setText("heroKicker",p.kicker);
     setText("heroTitle",p.title);
+    setText("aboutSzpilplacToggle",p.aboutToggle);
+    setText("aboutSzpilplacIntro",p.aboutIntro);
+    setText("aboutSzpilplacGames",p.aboutGames);
+    setText("aboutSzpilplacOrigin",p.aboutOrigin);
     setText("gamesTitle",p.games);
     setText("slowkoDesc",p.slowko);
     setText("klodkaDesc",p.klodka);
