@@ -546,6 +546,14 @@ h1{font-size:clamp(34px,8vw,52px)}
 .about-szpilplac-content p{margin:0}
 .about-szpilplac-content p+p{margin-top:8px}
 @media(max-width:430px){.about-szpilplac{margin-top:9px}.about-szpilplac-content{padding:12px;font-size:12px}}
+.szpilplac-faq{margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.szpilplac-faq h2{margin:0 0 9px;color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:13px;font-weight:800}
+.szpilplac-faq-item{padding:7px 0;border-bottom:1px solid var(--line)}
+.szpilplac-faq-item:last-child{border-bottom:0}
+.szpilplac-faq-item summary{display:list-item;list-style:revert;cursor:pointer;color:var(--ink);font-size:12.5px;font-weight:700;text-decoration:none;line-height:1.5}
+.szpilplac-faq-item summary::before,.szpilplac-faq-item summary::after{content:none}
+.szpilplac-faq-item summary::-webkit-details-marker{display:inline}
+.szpilplac-faq-item p{margin:6px 0 3px;color:var(--ink2);font-size:12px;line-height:1.6}
 </style>
 <meta name="theme-color" content="#2f4a39">
 <link rel="stylesheet" href="/support-banner.css?v=1">
@@ -641,6 +649,33 @@ h1{font-size:clamp(34px,8vw,52px)}
           <p id="aboutSzpilplacIntro">Szpilplac to po śląsku plac zabaw. U nas to miejsce na krótkie gry słowne, logiczne i zręcznościowe.</p>
           <p id="aboutSzpilplacGames">Codziennie czekają tu nowe zagadki inspirowane grami takimi jak Wordle czy Literalnie, ale są też zupełnie inne wyzwania. Możesz grać po polsku lub po śląsku, zbierać punkty i sprawdzać swoje miejsce w rankingu.</p>
           <p id="aboutSzpilplacOrigin">Szpilplac powstał z inicjatywy Familock Escape Room w Świętochłowicach.</p>
+          <div class="szpilplac-faq" aria-labelledby="szpilplacFaqTitle">
+            <h2 id="szpilplacFaqTitle">Najczęstsze pytania</h2>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-free-q">Czy gry są darmowe?</summary>
+              <p id="faq-free-a">Tak. Możesz grać w przeglądarce bez opłat.</p>
+            </details>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-schedule-q">Jak często pojawiają się nowe zagadki?</summary>
+              <p id="faq-schedule-a">Słōwko i Kłōdka mają nowe zagadki codziennie, a Raja co tydzień.</p>
+            </details>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-account-q">Czy potrzebuję konta?</summary>
+              <p id="faq-account-a">Nie musisz się logować, żeby zagrać. Konto pozwala zapisywać wyniki i punkty oraz korzystać ze statystyk gracza.</p>
+            </details>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-games-q">Jakie gry znajdę na Szpilplacu?</summary>
+              <p id="faq-games-a">Słōwko to gra w zgadywanie słów, Kłōdka to łamigłówka z kodem, a Raja polega na układaniu elementów w kolejności. Są też minigry zręcznościowe.</p>
+            </details>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-language-q">Czy można grać po polsku i po śląsku?</summary>
+              <p id="faq-language-a">Tak, w grach dostępny jest przełącznik PL / ŚL. Śląski charakter mają też słowa i zagadki.</p>
+            </details>
+            <details class="szpilplac-faq-item">
+              <summary id="faq-creator-q">Kto stworzył Szpilplac?</summary>
+              <p id="faq-creator-a">Szpilplac jest projektem Familock Escape Room w Świętochłowicach.</p>
+            </details>
+          </div>
         </div>
       </details>
     </section>
@@ -773,6 +808,19 @@ h1{font-size:clamp(34px,8vw,52px)}
       aboutIntro:"Szpilplac to po śląsku plac zabaw. U nas to miejsce na krótkie gry słowne, logiczne i zręcznościowe.",
       aboutGames:"Codziennie czekają tu nowe zagadki inspirowane grami takimi jak Wordle czy Literalnie, ale są też zupełnie inne wyzwania. Możesz grać po polsku lub po śląsku, zbierać punkty i sprawdzać swoje miejsce w rankingu.",
       aboutOrigin:"Szpilplac powstał z inicjatywy Familock Escape Room w Świętochłowicach.",
+      faqTitle:"Najczęstsze pytania",
+      faq_free_q:"Czy gry są darmowe?",
+      faq_free_a:"Tak. Możesz grać w przeglądarce bez opłat.",
+      faq_schedule_q:"Jak często pojawiają się nowe zagadki?",
+      faq_schedule_a:"Słōwko i Kłōdka mają nowe zagadki codziennie, a Raja co tydzień.",
+      faq_account_q:"Czy potrzebuję konta?",
+      faq_account_a:"Nie musisz się logować, żeby zagrać. Konto pozwala zapisywać wyniki i punkty oraz korzystać ze statystyk gracza.",
+      faq_games_q:"Jakie gry znajdę na Szpilplacu?",
+      faq_games_a:"Słōwko to gra w zgadywanie słów, Kłōdka to łamigłówka z kodem, a Raja polega na układaniu elementów w kolejności. Są też minigry zręcznościowe.",
+      faq_language_q:"Czy można grać po polsku i po śląsku?",
+      faq_language_a:"Tak, w grach dostępny jest przełącznik PL / ŚL. Śląski charakter mają też słowa i zagadki.",
+      faq_creator_q:"Kto stworzył Szpilplac?",
+      faq_creator_a:"Szpilplac jest projektem Familock Escape Room w Świętochłowicach.",
       slowko:"Odgadnij śląskie słowo dnia w sześciu próbach.",
       klodka:"Odgadnij czterocyfrowy kod na podstawie podpowiedzi.",
       raja:"Ułóż pięć śląskich elementów we właściwej kolejności.",
@@ -805,6 +853,19 @@ h1{font-size:clamp(34px,8vw,52px)}
       aboutIntro:"Szpilplac to po naszymu plac do szpilania. U nos to plac na krótkie gry słowne, logiczne i zręcznościowe.",
       aboutGames:"Co dziyń trefisz sam na nowe zagodki, trocha jak we Wordle abo Literalnie, ale tyż na inksze wyzwania. Możesz szpilać po polsku abo po śląsku, zbiyrać punkty i sprawdzać swoje miejsce we rankingu.",
       aboutOrigin:"Szpilplac powstoł z inicjatywy Familock Escape Room we Świyntochłowicach.",
+      faqTitle:"Noczynstsze pytania",
+      faq_free_q:"Czy szpile są za darmo?",
+      faq_free_a:"Ja. Możesz szpilać we przeglądarce za darmo.",
+      faq_schedule_q:"Kej są nowe zagodki?",
+      faq_schedule_a:"We Słōwku i Kłōdce masz nowe zagodki co dziyń, a we Raji co tydziyń.",
+      faq_account_q:"Musza mieć konto?",
+      faq_account_a:"Niy musisz się logować, coby poszpilać. Konto pozwolo zapisywać wyniki i punkty oraz sprawdzać statystyki.",
+      faq_games_q:"Jakie szpile sam trefia?",
+      faq_games_a:"Słōwko to zgadywanie słów, Kłōdka to zagodka z kodem, a Raja to ukłodanie rzeczy we dobrym porzondku. Są tyż minigry na refleks.",
+      faq_language_q:"Idzie szpilać po polsku i po śląsku?",
+      faq_language_a:"Ja, we szpilach je przełoncznik PL / ŚL. Śląski klimat majom tyż słowa i zagodki.",
+      faq_creator_q:"Kto zrobił Szpilplac?",
+      faq_creator_a:"Szpilplac to projekt Familock Escape Room we Świyntochłowicach.",
       slowko:"Zgodnij slonskie słowo dnia w sześciu probach.",
       klodka:"Zgodnij sztyrocyfrowy kod podle podpowiedzi.",
       raja:"Poukładej piyńć slonskich rzeczy we dobrym porzondku.",
@@ -962,6 +1023,19 @@ h1{font-size:clamp(34px,8vw,52px)}
     setText("aboutSzpilplacIntro",p.aboutIntro);
     setText("aboutSzpilplacGames",p.aboutGames);
     setText("aboutSzpilplacOrigin",p.aboutOrigin);
+    setText("szpilplacFaqTitle",p.faqTitle);
+    setText("faq-free-q",p.faq_free_q);
+    setText("faq-free-a",p.faq_free_a);
+    setText("faq-schedule-q",p.faq_schedule_q);
+    setText("faq-schedule-a",p.faq_schedule_a);
+    setText("faq-account-q",p.faq_account_q);
+    setText("faq-account-a",p.faq_account_a);
+    setText("faq-games-q",p.faq_games_q);
+    setText("faq-games-a",p.faq_games_a);
+    setText("faq-language-q",p.faq_language_q);
+    setText("faq-language-a",p.faq_language_a);
+    setText("faq-creator-q",p.faq_creator_q);
+    setText("faq-creator-a",p.faq_creator_a);
     setText("gamesTitle",p.games);
     setText("slowkoDesc",p.slowko);
     setText("klodkaDesc",p.klodka);
